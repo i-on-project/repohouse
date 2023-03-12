@@ -72,4 +72,4 @@ O modelo OAuth do Github está envolvido em três partes principais: o utilizado
 
     É possível criar até dez tokens para uma combinação utilizador/aplicação/scope. Se uma aplicação criar mais dez tokens para o mesmo utilizador e os mesmos *scopes*, o mais antigo será revogado.
 
-![Github Flow Example](./img/github-oauth-example.png)*Github Flow Example*
+![GitHub Flow Example](./img/github-oauth-example.png)*GitHub Flow Example*
