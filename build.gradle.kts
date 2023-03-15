@@ -8,6 +8,15 @@ plugins {
     kotlin("plugin.spring") version "1.7.22"
 }
 
+sourceSets {
+    main {
+        java.srcDirs("code/jvm/main/kotlin")
+        resources.srcDirs("code/jvm/main/resources")
+    }
+    test {
+        java.srcDirs("code/jvm/test/kotlin")
+    }
+}
 group = "com.isel.leic.ps.ion_repohouse"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
