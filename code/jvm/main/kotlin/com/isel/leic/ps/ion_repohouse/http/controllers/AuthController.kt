@@ -1,18 +1,14 @@
 package com.isel.leic.ps.ion_repohouse.http.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.isel.leic.ps.ion_repohouse.ClientToken
-import com.isel.leic.ps.ion_repohouse.GitHubUserInfo
 import com.isel.leic.ps.ion_repohouse.InvalidAuthenticationStateException
-import com.isel.leic.ps.ion_repohouse.OAuthState
 import com.isel.leic.ps.ion_repohouse.http.Status
 import com.isel.leic.ps.ion_repohouse.http.Uris
+import com.isel.leic.ps.ion_repohouse.http.model.output.*
 import com.isel.leic.ps.ion_repohouse.http.send
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
@@ -20,7 +16,6 @@ import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -51,16 +46,14 @@ const val STATE_COOKIE_NAME = "userState"
 const val STATE_COOKIE_PATH = Uris.CALLBACK_PATH
 const val HALF_HOUR: Long = 60 * 30
 
-var ACCESS_TOKEN = ""
-
 @RestController
 class AuthController(
     val httpClient: OkHttpClient,
     val jsonMapper: ObjectMapper,
 ) {
 
-    @GetMapping("/")
-    fun hello() = "<a href=/auth>Use Github Account</a>"
+    @GetMapping(Uris.HOME)
+    fun hello() = "<a href=/api/auth>Use Github Account</a>"
 
     @GetMapping(Uris.AUTH_PATH)
     fun auth(): ResponseEntity<Any> {
@@ -72,7 +65,7 @@ class AuthController(
                 HttpHeaders.LOCATION,
                 GITHUB_OAUTH_URI +
                 "?client_id=" + System.getenv("GITHUB_CLIENT_ID") +
-                "&scope=" + GITHUB_STUDENT_SCOPE +
+                "&scope=" + GITHUB_TEACHER_SCOPE +
                 "&state=" + state.value
             ).build()
     }
@@ -82,14 +75,34 @@ class AuthController(
         @RequestParam code: String,
         @RequestParam state: String,
         @CookieValue userState: String,
-    ): GitHubUserInfo {
+    ): JsonOutputModel {
         if (state != userState) throw InvalidAuthenticationStateException()
         val accessToken = fetchAccessToken(code)
         val userInfo = fetchUserInfo(accessToken.access_token)
 
         // TODO(Store user info in database and create a session)
 
-        return userInfo
+        return JsonOutputModel(
+            cls = listOf("Auth"),
+            properties = GitHubUserInfo(
+                login = userInfo.login,
+                url = userInfo.url,
+                name = userInfo.name
+            ),
+            actions = emptyList(),
+            links = listOf(
+                Link(
+                    rel = listOf("self"),
+                    href = Uris.callbackUri(),
+                    requiredAuthentication = true
+                ),
+                Link(
+                    rel = listOf("home"),
+                    href = Uris.homeUri(),
+                    requiredAuthentication = false
+                )
+            )
+        )
     }
 
     private fun generateUserState(): OAuthState {
@@ -127,7 +140,7 @@ class AuthController(
 
     /** Needing to be tested **/
 
-    private suspend fun getOrgRepos(orgName:String,perPage: Int=100,page: Int=1,accessToken: String): String {
+    private suspend fun getOrgRepos(orgName:String,perPage: Int=100,page: Int=1,accessToken: String): List<GithubRepo> {
 
         val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_REPOS(orgName,perPage, page)}")
             .addHeader("Authorization", "Bearer $accessToken")

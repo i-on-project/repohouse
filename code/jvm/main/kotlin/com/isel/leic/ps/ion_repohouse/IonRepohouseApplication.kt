@@ -21,7 +21,6 @@ class IonRepohouseApplication {
 }
 
 
-
 fun main(args: Array<String>) {
     runApplication<IonRepohouseApplication>(*args)
 }
