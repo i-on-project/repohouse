@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.http.HttpMethod
 import java.net.URI
 
+/**
+ * This code was made by the teacher Pedro Felix in DAW class.
+ * https://github.com/isel-leic-daw/s2223i-51d-51n-public/blob/main/code/tic-tac-tow-service/src/main/kotlin/pt/isel/daw/tictactow/infra/Siren.kt
+ */
 data class SirenModel<T>(
     @get:JsonProperty("class")
     val clazz: List<String>,
