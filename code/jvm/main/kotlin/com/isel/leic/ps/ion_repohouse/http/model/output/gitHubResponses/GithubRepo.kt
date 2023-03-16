@@ -1,6 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.http.model.output
-
-
+package com.isel.leic.ps.ion_repohouse.http.model.output.gitHubResponses
 
 data class GithubRepo(
     val id: Int,
@@ -73,7 +71,7 @@ data class GithubRepo(
     val forks: Int,
     val open_issues: Int,
     val watchers: Int,
-    val default_branch: String
+    val default_branch: String,
 )
 
 data class Owner(
@@ -94,13 +92,13 @@ data class Owner(
     val events_url: String,
     val received_events_url: String,
     val type: String,
-    val site_admin: Boolean
+    val site_admin: Boolean,
 )
+
 data class License(
     val key: String,
     val name: String,
     val spdx_id: String,
     val url: String,
-    val node_id: String
+    val node_id: String,
 )
-
