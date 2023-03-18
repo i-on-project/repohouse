@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.http.model.output.gitHubResponses
+package com.isel.leic.ps.ion_repohouse.http.model.output.GithubResponses
 
 data class TeamList(
     val id: Int,
