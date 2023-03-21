@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.infra
+package com.isel.leic.ps.ion_classcode.infra
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper

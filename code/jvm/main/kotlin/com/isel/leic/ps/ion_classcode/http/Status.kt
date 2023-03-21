@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.http
+package com.isel.leic.ps.ion_classcode.http
 
 object Status {
 

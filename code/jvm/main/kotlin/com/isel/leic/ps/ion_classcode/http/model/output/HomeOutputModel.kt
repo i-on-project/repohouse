@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.http.model.output
+package com.isel.leic.ps.ion_classcode.http.model.output
 
 data class HomeOutputModel(
     val title:String = "i-on ClassCode",

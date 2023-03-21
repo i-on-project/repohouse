@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.http
+package com.isel.leic.ps.ion_classcode.http
 
 import java.net.URI
 
@@ -11,7 +11,7 @@ object Uris {
 
     /** Common Uris **/
 
-    const val HOME = "$API/"
+    const val HOME = API
     const val AUTH_PATH = "$API/auth"
     const val CALLBACK_PATH = "$AUTH_PATH/callback"
     const val MENU_PATH = "$AUTH_PATH/menu"

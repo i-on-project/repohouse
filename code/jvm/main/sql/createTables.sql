@@ -29,8 +29,9 @@ CREATE TABLE "Course"(
 );
 
 CREATE TABLE "Student_Course"(
-    student serial primary key,
-    course serial primary key,
+    student serial,
+    course serial,
+    primary key (student, course),
     foreign key (student) references "Student"(id),
     foreign key (course) references "Course"(id)
 );
@@ -93,8 +94,9 @@ CREATE TABLE "Team"(
 );
 
 CREATE TABLE "Student_Team"(
-    student serial primary key,
-    team serial primary key,
+    student serial,
+    team serial,
+    primary key (student, team),
     foreign key (student) references "Student"(id),
     foreign key (team) references "Course"(id)
 );

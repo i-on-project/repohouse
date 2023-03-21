@@ -1,9 +1,9 @@
-package com.isel.leic.ps.ion_repohouse
+package com.isel.leic.ps.ion_classcode
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.isel.leic.ps.ion_repohouse.http.pipeline.LoggerFilter
+import com.isel.leic.ps.ion_classcode.http.pipeline.LoggerFilter
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.infra
+package com.isel.leic.ps.ion_classcode.infra
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.http.HttpMethod

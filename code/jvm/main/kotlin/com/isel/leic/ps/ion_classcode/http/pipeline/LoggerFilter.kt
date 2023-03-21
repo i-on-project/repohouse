@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.http.pipeline
+package com.isel.leic.ps.ion_classcode.http.pipeline
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpFilter

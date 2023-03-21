@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_repohouse.infra
+package com.isel.leic.ps.ion_classcode.infra
 
 /**
  * This code was made by the teacher Pedro Felix in DAW class.
