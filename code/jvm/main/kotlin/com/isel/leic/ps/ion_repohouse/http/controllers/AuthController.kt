@@ -72,7 +72,7 @@ class AuthController(
     fun home() = siren(value = HomeOutputModel()) {
         link(rel = LinkRelation("self"), href = Uris.homeUri())
         link(rel = LinkRelation("auth"), href = Uris.authUri())
-        link(rel = LinkRelation("menu"), href = Uris.menuUri(), clazz = listOf("Authenticated"))
+        link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
     }
 
     @GetMapping(Uris.AUTH_PATH)
@@ -107,7 +107,7 @@ class AuthController(
             clazz("Auth")
             link(rel = LinkRelation("self"), href = Uris.authUri())
             link(rel = LinkRelation("home"), href = Uris.homeUri())
-            link(rel = LinkRelation("menu"), href = Uris.menuUri(), clazz = listOf("Authenticated"))
+            link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
         }
     }
 

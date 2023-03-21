@@ -20,10 +20,7 @@ data class SirenModel<T>(
 data class LinkModel(
     val rel: List<String>,
     val href: String,
-    @get:JsonProperty("class")
-    val clazz: List<String>? = null,
-    val title: String? = null,
-    val type: String? = null,
+    val needAuthentication: Boolean,
 )
 
 data class EntityModel<T>(
@@ -58,14 +55,12 @@ class SirenBuilderScope<T>(
         classes.add(value)
     }
 
-    fun link(href: URI, rel: LinkRelation, clazz: List<String>? = null, title: String? = null, type: String? = null) {
+    fun link(href: URI, rel: LinkRelation, needAuthentication: Boolean = false) {
         links.add(
             LinkModel(
                 rel = listOf(rel.value),
                 href = href.toASCIIString(),
-                clazz = clazz,
-                title = title,
-                type = type,
+                needAuthentication = needAuthentication,
             ),
         )
     }
@@ -97,14 +92,12 @@ class EntityBuilderScope<T>(
 ) {
     private val links = mutableListOf<LinkModel>()
 
-    fun link(href: URI, rel: LinkRelation, clazz: List<String>? = null, title: String? = null, type: String? = null) {
+    fun link(href: URI, rel: LinkRelation, needAuthentication: Boolean = false) {
         links.add(
             LinkModel(
                 rel = listOf(rel.value),
                 href = href.toASCIIString(),
-                clazz = clazz,
-                title = title,
-                type = type,
+                needAuthentication = needAuthentication,
             ),
         )
     }
