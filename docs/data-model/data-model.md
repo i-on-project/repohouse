@@ -13,11 +13,13 @@ ___
 - id - identificador do utilizador
 - name - nome do utilizador
 - email - email do utilizador
+- token - token de autenticação do utilizador
 - github_username - username do utilizador no github
 
 ``Teacher`` - especialização de ``User``
 > Entidade que representa um docente do sistema.
 - is_Created - flag que indica se o docente já foi criado
+- github_token - token de autenticação do docente no github
 
 ``Student`` - especialização de ``User``
 > Entidade que representa um aluno do sistema.
@@ -35,6 +37,7 @@ ___
 - name - nome da turma
 - invite_link - link de convite para a turma
 - last_sync - data da última sincronização
+- is_archived - flag que indica se a turma está arquivada
 
 ``Assignment``
 > Entidade que representa uma tarefa, atribuída a uma turma do sistema.
@@ -55,7 +58,7 @@ ___
 > Entidade que representa um grupo de uma turma do sistema.
 - team_id - identificador do grupo
 - name - nome do grupo
-- dirty_flag - flag que indica se o grupo sofreu alterações
+- is_created - flag que indica se o grupo já foi criado
 
 ``Feedback`` - entidade fraca de ``Team``
 > Entidade que representa os _feedback´s_ dados por um docente a um grupo do sistema.
@@ -68,6 +71,7 @@ ___
 - repo_id - identificador do repositório
 - url - url do repositório
 - name - nome do repositório
+- is_created - flag que indica se o repositório já foi criado
 
 ``Tag`` - entidade fraca de ``Repo``
 > Entidade que representa as _tag´s_ de um repositório Github do sistema.
@@ -80,17 +84,32 @@ ___
 > Entidade que representa um pedido de escrita externa.
 - id - identificador do pedido
 
-``Create`` - especialização de ``Request``
+``CreateRepo`` - especialização de ``Request``
+> Entidade que representa um pedido de criação de um repositório.
+- repo_id - identificador do repositório
+
+``ArchieveRepo`` - especialização de ``Request``
+> Entidade que representa um pedido de arquivamento de um repositório.
+- repo_id - identificador do repositório
+
+``LeaveCourse`` - especialização de ``Request``
+> Entidade que representa um pedido de saída de uma disciplina/cadeira.
+- course_id - identificador da disciplina/cadeira
+
+``CreateTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de criação de uma turma.
 - team_id - identificador do grupo
 
-``Join`` - especialização de ``Request``
+``JoinTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de adesão a uma turma.
 - team_id - identificador do grupo
 
-``Leave`` - especialização de ``Request``
+``LeaveTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de saída de uma turma.
 - team_id - identificador do grupo
 
 ``Apply`` - especialização de ``Request``
 > Entidade que representa um pedido de aplicação como docente no sistema.
+
+``Composite`` - especialização de ``Request``
+> Entidade que representa um conjunto de Request's.
