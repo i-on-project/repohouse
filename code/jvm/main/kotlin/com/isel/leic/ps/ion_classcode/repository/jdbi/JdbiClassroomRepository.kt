@@ -1,6 +1,8 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
+import com.isel.leic.ps.ion_classcode.domain.Assigment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
+import com.isel.leic.ps.ion_classcode.domain.input.AssigmentInput
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
@@ -8,36 +10,52 @@ import org.jdbi.v3.core.Handle
 
 class JdbiClassroomRepository(private val handle: Handle): ClassroomRepository {
     override fun createClassroom(classroom: ClassroomInput): Int {
-        handle.createUpdate(
+       return handle.createUpdate(
             """
-            INSERT INTO Classroom (name, teacher_id)
-            VALUES (:name, :teacherId)
+            INSERT INTO Classroom (name, last_sync, invite_link,is_archive,course_id)
+            VALUES (:name,CURRENT_DATE,:invite_link,false,:course_id)
             RETURNING id
             """,
         )
             .bind("name", classroom.name)
-            .bind("teacherId", classroom.teacherId)
+            .bind("invite_link", classroom.inviteLink)
+            .bind("course_id", classroom.courseId)
             .execute()
     }
 
     override fun deleteClassroom(classroomId: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun enterClassroom(classroomId: Int, userId: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun leaveClassroom(classroomId: Int, userId: Int) {
-        TODO("Not yet implemented")
+        handle.createUpdate(
+            """
+            DELETE FROM Classroom
+            WHERE id = :id
+            """,
+        )
+            .bind("id", classroomId)
+            .execute()
     }
 
     override fun getClassroomById(classroomId: Int): Classroom? {
-        TODO("Not yet implemented")
+        return handle.createQuery(
+            """
+            SELECT * FROM Classroom
+            WHERE id = :id
+            """,
+        )
+            .bind("id", classroomId)
+            .mapTo(Classroom::class.java)
+            .firstOrNull()
     }
 
-    override fun getTeamsOfAClassroom(classroomId: Int): List<TeamInput> {
-        TODO("Not yet implemented")
+    override fun getAssigmentsOfAClassroom(classroomId: Int): List<Assigment> {
+        return handle.createQuery(
+            """
+            SELECT * FROM assignment
+            WHERE classroom_id = :classroom_id
+            """,
+        )
+            .bind("classroom_id", classroomId)
+            .mapTo(Assigment::class.java)
+            .list()
     }
 
 }

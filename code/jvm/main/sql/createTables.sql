@@ -1,7 +1,7 @@
-BEGIN TRANSACTION;
 SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+BEGIN TRANSACTION;
 
-CREATE TABLE "User"(
+CREATE TABLE Users(
     id serial primary key,
     email text unique check (email like '%@%') not null,
     github_username text unique not null,
@@ -13,13 +13,13 @@ CREATE TABLE Teacher(
     id int primary key,
     is_created boolean not null,
     github_token text unique not null,
-    foreign key(id) references "User"(id)
+    foreign key(id) references users(id)
 );
 
 CREATE TABLE Student(
     id int primary key,
     school_id int unique not null,
-    foreign key(id) references "User"(id)
+    foreign key(id) references users(id)
 );
 
 CREATE TABLE Course(
@@ -51,16 +51,15 @@ CREATE TABLE Classroom(
 CREATE TABLE Request(
     id serial primary key,
     creator int not null,
-    classroom int not null,
-    foreign key (creator) references "User"(id),
-    foreign key (classroom) references Classroom(id)
+    composite int default null,
+    state text not null check ( state in ('pending', 'accepted', 'rejected') ),
+    foreign key (creator) references users(id),
+    foreign key (composite) references Request(id)
 );
 
 CREATE TABLE Composite(
     id int primary key,
-    request_id int not null,
-    foreign key (id) references Request(id),
-    foreign key (request_id) references Request(id)
+    foreign key (id) references Request(id)
 );
 
 CREATE TABLE CreateRepo(
@@ -103,7 +102,7 @@ CREATE TABLE Apply(
     id int primary key,
     teacher_id int not null,
     foreign key (id) references Request(id),
-    foreign key (teacher_id) references "User"(id)
+    foreign key (teacher_id) references users(id)
 );
 
 CREATE TABLE Assignment(
@@ -145,6 +144,7 @@ CREATE TABLE Repo(
     id serial primary key,
     name text not null,
     url text unique not null,
+    is_created boolean not null,
     team_id int not null,
     foreign key (team_id) references Team(id)
 );

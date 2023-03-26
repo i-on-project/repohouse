@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.domain.input
 
-data class TagsInput(
+data class TagInput(
     val name: String,
     val isDelivered: Boolean,
     val tagDate: Int,
