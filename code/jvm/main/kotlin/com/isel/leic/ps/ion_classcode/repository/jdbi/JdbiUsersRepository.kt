@@ -2,6 +2,7 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
+import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import org.jdbi.v3.core.Handle
 
@@ -56,6 +57,38 @@ class JdbiUsersRepository(
         )
             .bind("email", email)
             .mapTo(Student::class.java)
+            .firstOrNull()
+    }
+
+    override fun getUserByToken(token: String): User? {
+        val id = handle.createQuery(
+            """
+            SELECT id FROM users
+            WHERE token = :token
+            """,
+        )
+            .bind("token", token)
+            .mapTo(Int::class.java)
+            .firstOrNull() ?: return null
+
+        return handle.createQuery(
+            """
+            SELECT name, email,users.id,github_username,school_id FROM Student
+            JOIN users on users.id = student.id
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .mapTo(Student::class.java)
+            .firstOrNull() ?: handle.createQuery(
+            """
+            SELECT name, email,users.id,github_username,github_token,is_created FROM Teacher
+            JOIN users on users.id = teacher.id
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .mapTo(Teacher::class.java)
             .firstOrNull()
     }
 
