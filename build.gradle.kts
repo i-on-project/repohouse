@@ -36,6 +36,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // for JDBI
+    implementation("org.jdbi:jdbi3-core:3.37.1")
+    implementation("org.jdbi:jdbi3-kotlin:3.37.1")
+    implementation("org.jdbi:jdbi3-postgres:3.37.1")
+    implementation("org.postgresql:postgresql:42.5.4")
 }
 
 tasks.withType<KotlinCompile> {

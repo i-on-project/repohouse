@@ -14,7 +14,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @SpringBootApplication
 class IonRepohouseApplication : WebMvcConfigurer {
-
     @Bean
     fun okHttpClient() = OkHttpClient()
 
