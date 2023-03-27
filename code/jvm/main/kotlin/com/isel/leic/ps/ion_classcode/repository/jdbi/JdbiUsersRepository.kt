@@ -91,7 +91,7 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
-    override fun getUserByGithubId(githubId: Int): User? {
+    override fun getUserByGithubId(githubId: Long): User? {
         val id = handle.createQuery(
             """
             SELECT id FROM users

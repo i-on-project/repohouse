@@ -1,0 +1,33 @@
+package com.isel.leic.ps.ion_classcode.utils.cypher
+
+import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+
+class AESEncrypt {
+
+    private val encryptionKey: String = System.getenv("CLASSCODE_ENCRYPTION_KEY")
+
+    fun encrypt(stringToEncrypt: String): String {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING")
+        val key = SecretKeySpec(encryptionKey.toByteArray(), "AES")
+
+        val iv = ByteArray(cipher.blockSize)
+        val ivSpec = IvParameterSpec(iv)
+
+        cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
+
+        val encryptedBytes = cipher.doFinal(stringToEncrypt.toByteArray())
+        return Base64.getEncoder().encodeToString(encryptedBytes)
+    }
+
+}
+
+fun main() {
+    val stringToEncrypt = "Hello World"
+    val encryptedString = AESEncrypt().encrypt(stringToEncrypt)
+    println(encryptedString)
+    val decryptedString = AESDecrypt().decrypt(encryptedString)
+    println(decryptedString)
+}

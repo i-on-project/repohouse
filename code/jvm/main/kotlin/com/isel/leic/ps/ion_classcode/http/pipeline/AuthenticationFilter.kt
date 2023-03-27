@@ -1,5 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.pipeline
 
+import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
+import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
@@ -19,15 +21,15 @@ class AuthenticationFilter(
 
     override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
         val httpServletRequest = request as HttpServletRequest
-        val token = WebUtils.getCookie(httpServletRequest, AUTHORIZATION_COOKIE_NAME)?.value
-        val user = authorizationHeaderProcessor.process(token)
-
-        if (user == null) {
-            TODO("Redirect to login page or return 401")
-        } else {
-            val mutableRequest = MutableHttpServletRequest(httpServletRequest)
-            UserArgumentResolver.addUserTo(user, mutableRequest)
-            chain?.doFilter(mutableRequest, response)
+        val tokenEncrypted = WebUtils.getCookie(httpServletRequest, AUTHORIZATION_COOKIE_NAME)?.value
+        val token = tokenEncrypted?.let {
+            AESDecrypt().decrypt(it)
         }
+        val user = authorizationHeaderProcessor.process(token)
+        val mutableRequest = MutableHttpServletRequest(httpServletRequest)
+        if (user != null) {
+            UserArgumentResolver.addUserTo(user, mutableRequest)
+        }
+        chain?.doFilter(mutableRequest, response)
     }
 }

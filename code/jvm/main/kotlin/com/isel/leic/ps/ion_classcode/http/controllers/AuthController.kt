@@ -27,9 +27,8 @@ import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamCrea
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamList
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
-import com.isel.leic.ps.ion_classcode.infra.SirenModel
-import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import jakarta.servlet.http.HttpServletResponse
 import java.util.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -48,6 +47,8 @@ const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "admin:org"
 const val GITHUB_STUDENT_SCOPE = "repo"
 
+const val STUDENT_COOKIE_NAME = "Student"
+const val TEACHER_COOKIE_NAME = "Teacher"
 const val STATE_COOKIE_NAME = "userState"
 const val STATE_COOKIE_PATH = Uris.CALLBACK_PATH
 const val HALF_HOUR: Long = 60 * 30
@@ -64,7 +65,8 @@ class AuthController(
         val state = generateUserState()
         return ResponseEntity
             .status(Status.REDIRECT)
-            .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
+            .header(STATE_COOKIE_NAME, state.cookie.toString())
+            .header("Position", TEACHER_COOKIE_NAME)
             .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")
             .build()
     }
@@ -74,7 +76,8 @@ class AuthController(
         val state = generateUserState()
         return ResponseEntity
             .status(Status.REDIRECT)
-            .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
+            .header(STATE_COOKIE_NAME, state.cookie.toString())
+            .header("Position", STUDENT_COOKIE_NAME)
             .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")
             .build()
     }
@@ -84,34 +87,75 @@ class AuthController(
         @RequestParam code: String,
         @RequestParam state: String,
         @CookieValue userState: String,
+        @CookieValue position: String,
         response: HttpServletResponse
-    ): SirenModel<*> {
+    ): ResponseEntity<Any> {
         if (state != userState) throw InvalidAuthenticationStateException()
         val accessToken = fetchAccessToken(code)
-        val userInfo = fetchUserInfo(accessToken.access_token)
-        val user = userServices.getUserByGithubId(userInfo.id)
-
-        return when(user) {
+        val userGithubInfo = fetchUserInfo(accessToken.access_token)
+        return when(val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
             is Either.Right -> {
-                // TODO(Check if user is created and verified)
-                // TODO(If not, redirect to verification page)
-                // TODO(If yes, create a session, and redirect to menu page)
-                val cookie = ResponseCookie.from(APP_COOKIE_NAME, /** TODO(Encrypt token) **/ )
-                    .httpOnly(true)
-                    .sameSite("Strict")
-                    .secure(true)
-                    .maxAge(60*60*24)
-                    .path("/api")
-                    .build()
-                response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-                siren("Dummy"){}
+                userInfo.value.isCreated.let {
+                    if (it) {
+                        val cookie = ResponseCookie.from(
+                            APP_COOKIE_NAME,
+                            AESEncrypt().encrypt("DummyToken")
+                        )
+                            .httpOnly(true)
+                            .sameSite("Strict")
+                            .secure(true)
+                            .maxAge(60 * 60 * 24)
+                            .path("/api")
+                            .build()
+
+                        ResponseEntity
+                            .status(Status.REDIRECT)
+                            .header(APP_COOKIE_NAME, cookie.toString())
+                            .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
+                            .build()
+                    } else {
+                        ResponseEntity
+                            .status(Status.REDIRECT)
+                            .header(HttpHeaders.LOCATION, Uris.AUTH_STATUS_PATH)
+                            .build()
+                    }
+                }
             }
             is Either.Left -> {
                 // TODO(Store new user info in database)
-                // TODO(Redirect for verification page)
-                siren("Dummy"){}
+                val token = generateRandomToken()
+                userServices.createUser(userGithubInfo,position)
+
+                val cookie = ResponseCookie.from(
+                    APP_COOKIE_NAME,
+                    AESEncrypt().encrypt(token)
+                )
+                    .httpOnly(true)
+                    .sameSite("Strict")
+                    .secure(true)
+                    .maxAge(60 * 60 * 24)
+                    .path("/api")
+                    .build()
+
+                ResponseEntity
+                    .status(Status.REDIRECT)
+                    .header(APP_COOKIE_NAME, cookie.toString())
+                    .header(HttpHeaders.LOCATION, Uris.AUTH_STATUS_PATH)
+                    .build()
             }
         }
+    }
+
+    @GetMapping(Uris.AUTH_STATUS_PATH)
+    fun authStatus(
+
+    ): ResponseEntity<Any>{
+        // TODO(Verify user is created, if so redirect to menu, if not show auth status page)
+
+        return ResponseEntity
+            .status(Status.REDIRECT)
+            .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
+            .build()
     }
 
     @GetMapping(Uris.LOGOUT)
@@ -161,6 +205,10 @@ class AuthController(
             .build()
 
         return okHttp.makeCallToObject(request)
+    }
+
+    private fun generateRandomToken(): String {
+        return UUID.randomUUID().toString()
     }
 
     /** Finding place to this functions **/

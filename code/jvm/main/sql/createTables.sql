@@ -6,7 +6,7 @@ CREATE TABLE Users(
     email text unique check (email like '%@%') not null,
     is_created boolean not null default false,
     github_username text unique not null,
-    github_id int unique not null,
+    github_id bigint unique not null,
     token text unique not null,
     name text not null
 );
