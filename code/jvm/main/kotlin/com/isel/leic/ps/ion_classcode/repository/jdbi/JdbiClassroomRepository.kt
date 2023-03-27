@@ -2,15 +2,13 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Assigment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
-import com.isel.leic.ps.ion_classcode.domain.input.AssigmentInput
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
-import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import org.jdbi.v3.core.Handle
 
-class JdbiClassroomRepository(private val handle: Handle): ClassroomRepository {
+class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository {
     override fun createClassroom(classroom: ClassroomInput): Int {
-       return handle.createUpdate(
+        return handle.createUpdate(
             """
             INSERT INTO Classroom (name, last_sync, invite_link,is_archive,course_id)
             VALUES (:name,CURRENT_DATE,:invite_link,false,:course_id)
@@ -57,5 +55,4 @@ class JdbiClassroomRepository(private val handle: Handle): ClassroomRepository {
             .mapTo(Assigment::class.java)
             .list()
     }
-
 }

@@ -1,13 +1,7 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.*
-import com.isel.leic.ps.ion_classcode.domain.requests.Apply
-import com.isel.leic.ps.ion_classcode.domain.requests.ArchieveRepo
+import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ion_classcode.domain.requests.CreateRepo
-import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
-import com.isel.leic.ps.ion_classcode.domain.requests.Request
-import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
-import com.isel.leic.ps.ion_classcode.repository.request.ArchieveRepoRequestRepository
 import com.isel.leic.ps.ion_classcode.repository.request.CreateRepoRepository
 import org.jdbi.v3.core.Handle
 
@@ -21,7 +15,7 @@ class JdbiCreateRepoRequestRepository(
             INSERT INTO request (creator, composite,state)
             VALUES (:creator, :compositeId,'pending')
             RETURNING id
-            """
+            """,
         )
             .bind("creator", request.creator)
             .bind("composite", request.composite)
@@ -31,7 +25,7 @@ class JdbiCreateRepoRequestRepository(
             """
             INSERT INTO createrepo (id, repo_id)
             VALUES (:id, :repoId)
-            """
+            """,
         )
             .bind("id", id)
             .bind("repoId", request.repoId)
@@ -42,7 +36,7 @@ class JdbiCreateRepoRequestRepository(
         return handle.createQuery(
             """
             SELECT * FROM createrepo
-            """
+            """,
         )
             .mapTo(CreateRepo::class.java)
             .list()
@@ -53,7 +47,7 @@ class JdbiCreateRepoRequestRepository(
             """
             SELECT * FROM createrepo
             WHERE id = :id
-            """
+            """,
         )
             .bind("id", id)
             .mapTo(CreateRepo::class.java)
@@ -66,7 +60,7 @@ class JdbiCreateRepoRequestRepository(
             SELECT createrepo.id,creator,state,composite FROM createrepo
             JOIN request ON request.id = createrepo.id
             WHERE request.creator = :userId
-            """
+            """,
         )
             .bind("userId", userId)
             .mapTo(CreateRepo::class.java)
