@@ -5,6 +5,8 @@ sealed class User {
     abstract val name: String
     abstract val email: String
     abstract val githubUsername: String
+    abstract val isCreated: Boolean
+    abstract val githubId: Int
 }
 
 data class Student(
@@ -12,28 +14,16 @@ data class Student(
     override val email: String,
     override val id: Int,
     override val githubUsername: String,
+    override val githubId: Int,
+    override val isCreated: Boolean,
     val schoolId: Int,
-) : User() {
-    init {
-        require(name.isNotBlank() && name.length in (5..20)) { "Invalid name" }
-        require(email.isNotBlank() && email.length in (5..30) && email.contains(char = '@')) { "Invalid email" }
-        require(id > 0) { "Invalid id" }
-        require(githubUsername.isNotBlank()) { "Invalid github username" }
-    }
-}
+) : User()
 
 data class Teacher(
     override val name: String,
     override val email: String,
     override val id: Int,
     override val githubUsername: String,
-    val githubToken: String,
-    val isCreated: Boolean,
-) : User() {
-    init {
-        require(name.isNotBlank() && name.length in (5..20)) { "Invalid name" }
-        require(email.isNotBlank() && email.length in (5..30) && email.contains(char = '@')) { "Invalid email" }
-        require(id > 0) { "Invalid id" }
-        require(githubUsername.isNotBlank()) { "Invalid github username" }
-    }
-}
+    override val githubId: Int,
+    override val isCreated: Boolean,
+) : User()

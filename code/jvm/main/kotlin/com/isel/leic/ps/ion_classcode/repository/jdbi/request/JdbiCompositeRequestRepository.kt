@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.*
+import com.isel.leic.ps.ion_classcode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Composite
 import com.isel.leic.ps.ion_classcode.domain.requests.Request
 import com.isel.leic.ps.ion_classcode.repository.request.CompositeRepository
@@ -11,13 +11,12 @@ class JdbiCompositeRequestRepository(
 ) : CompositeRepository {
 
     override fun createCompositeRequest(request: CompositeInput): Int {
-
         val requestId = handle.createUpdate(
             """
         INSERT INTO request (creator, composite,state)
         VALUES (:creator, :compositeId,'pending')
         RETURNING id
-        """
+        """,
         )
             .bind("creator", request.creator)
             .bind("composite", request.composite)
@@ -28,7 +27,7 @@ class JdbiCompositeRequestRepository(
         INSERT INTO composite (id)
         VALUES (:creator)
         RETURNING id
-        """
+        """,
         )
             .bind("id", requestId)
             .execute()
@@ -40,7 +39,7 @@ class JdbiCompositeRequestRepository(
             UPDATE request
             SET state = :state
             WHERE id = :id
-            """
+            """,
         )
             .bind("id", id)
             .bind("state", status)
@@ -51,7 +50,7 @@ class JdbiCompositeRequestRepository(
         val compositeIds = handle.createQuery(
             """
            SELECT id FROM composite
-           """
+           """,
         )
             .mapTo(Int::class.java)
             .list()
@@ -64,7 +63,7 @@ class JdbiCompositeRequestRepository(
             """
           SELECT * FROM request
           WHERE id = :id
-          """
+          """,
         )
             .bind("id", id)
             .mapTo(Request::class.java)
@@ -74,7 +73,7 @@ class JdbiCompositeRequestRepository(
             """
           SELECT * FROM request
           WHERE composite = :id
-          """
+          """,
         )
             .bind("id", id)
             .mapTo(Request::class.java)
@@ -90,7 +89,7 @@ class JdbiCompositeRequestRepository(
             """
             SELECT * FROM request
             WHERE creator = :userId
-            """
+            """,
         )
             .bind("userId", userId)
             .mapTo(Request::class.java)
@@ -101,7 +100,7 @@ class JdbiCompositeRequestRepository(
                 """
                 SELECT * FROM request
                 WHERE composite = :id
-                """
+                """,
             )
                 .bind("id", it.id)
                 .mapTo(Request::class.java)

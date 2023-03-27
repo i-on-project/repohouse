@@ -12,7 +12,7 @@ class JdbiTagRepository(private val handle: Handle) : TagRepository {
                 INSERT INTO tags (name,repo_id) 
                 VALUES (:name, :repoId)
                 RETURNING id
-                """
+                """,
         )
             .bind("name", tag.name)
             .bind("repoId", tag.repoId)
@@ -24,7 +24,7 @@ class JdbiTagRepository(private val handle: Handle) : TagRepository {
             """
                 DELETE FROM tags
                 WHERE id = :tagId
-                """
+                """,
         )
             .bind("tagId", tagId)
             .execute()
@@ -35,7 +35,7 @@ class JdbiTagRepository(private val handle: Handle) : TagRepository {
             """
                 SELECT * FROM tags
                 WHERE id = :tagId
-                """
+                """,
         )
             .bind("tagId", tagId)
             .mapTo(Tags::class.java)
@@ -47,7 +47,7 @@ class JdbiTagRepository(private val handle: Handle) : TagRepository {
             """
                 SELECT * FROM tags
                 WHERE repo_id = :deliveryId
-                """
+                """,
         )
             .bind("deliveryId", deliveryId)
             .mapTo(Tags::class.java)

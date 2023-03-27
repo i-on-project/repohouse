@@ -11,7 +11,7 @@ class JdbiAssigmentRepository(private val handle: Handle) : AssigmentRepository 
             """
                INSERT INTO assignment (title, description, max_number_elems, max_number_groups,classroom_id,release_date) 
                    VALUES (:title, :description, :numb_elems_per_group, :numb_groups,:classroom_id, CURRENT_DATE)
-               """
+               """,
         )
             .bind("title", assigment.title)
             .bind("description", assigment.description)
@@ -27,7 +27,7 @@ class JdbiAssigmentRepository(private val handle: Handle) : AssigmentRepository 
         return handle.createQuery(
             """
                 SELECT * FROM assignment WHERE id = :assigmentId
-            """
+            """,
         ).bind("assigmentId", assigmentId).mapTo(Assigment::class.java).one()
     }
 
@@ -35,7 +35,7 @@ class JdbiAssigmentRepository(private val handle: Handle) : AssigmentRepository 
         handle.createUpdate(
             """
                 DELETE FROM assignment WHERE id = :assigmentId
-            """
+            """,
         ).bind("assigmentId", assigmentId).execute()
     }
 
@@ -43,7 +43,7 @@ class JdbiAssigmentRepository(private val handle: Handle) : AssigmentRepository 
         handle.createUpdate(
             """
                 UPDATE assignment SET title = :title WHERE id = :assigmentId
-            """
+            """,
         ).bind("assigmentId", assigmentId).bind("title", title).execute()
     }
 
@@ -51,7 +51,7 @@ class JdbiAssigmentRepository(private val handle: Handle) : AssigmentRepository 
         handle.createUpdate(
             """
                 UPDATE assignment SET description = :description WHERE id = :assigmentId
-            """
+            """,
         ).bind("assigmentId", assigmentId).bind("description", description).execute()
     }
 
@@ -59,7 +59,7 @@ class JdbiAssigmentRepository(private val handle: Handle) : AssigmentRepository 
         handle.createUpdate(
             """
                 UPDATE assignment SET max_number_elems = :numb WHERE id = :assigmentId
-            """
+            """,
         ).bind("assigmentId", assigmentId).bind("numb", numb).execute()
     }
 
@@ -67,7 +67,7 @@ class JdbiAssigmentRepository(private val handle: Handle) : AssigmentRepository 
         handle.createUpdate(
             """
                 UPDATE assignment SET max_number_groups = :numb WHERE id = :assigmentId
-            """
+            """,
         ).bind("assigmentId", assigmentId).bind("numb", numb).execute()
     }
 }

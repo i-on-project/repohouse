@@ -12,7 +12,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
                 INSERT INTO FEEDBACK (description,label,team_id) 
                 VALUES (:description, :label, :teamId)
                 RETURNING id
-                """
+                """,
         )
             .bind("description", feedback.description)
             .bind("label", feedback.label)
@@ -25,7 +25,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             """
                 DELETE FROM FEEDBACK
                 WHERE id = :feedbackId
-                """
+                """,
         )
             .bind("feedbackId", feedbackId)
             .execute()
@@ -37,7 +37,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
                 UPDATE FEEDBACK
                 SET description = :description
                 WHERE id = :feedbackId
-                """
+                """,
         )
             .bind("feedbackId", feedbackId)
             .bind("description", description)
@@ -50,7 +50,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
                 UPDATE FEEDBACK
                 SET label = :label
                 WHERE id = :feedbackId
-                """
+                """,
         )
             .bind("feedbackId", feedbackId)
             .bind("label", label)
@@ -62,7 +62,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             """
                 SELECT * FROM FEEDBACK
                 WHERE id = :feedbackId
-                """
+                """,
         )
             .bind("feedbackId", feedbackId)
             .mapTo(Feedback::class.java)
@@ -74,7 +74,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             """
                 SELECT * FROM FEEDBACK
                 WHERE team_id = :teamId
-                """
+                """,
         )
             .bind("teamId", teamId)
             .mapTo(Feedback::class.java)

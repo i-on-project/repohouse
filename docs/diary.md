@@ -5,8 +5,12 @@
 - Os requests na db serão necessitam estar explicitos se vão mexer em uma 'team' ou num repo. No telemóvel do professor as várias explicitas do que vai acontecer no github, apesar na nossa aplicação ser uma ação mais simples.
 - As classrooms são arquivadas quando chega ao fim do semestre(será que o course também poderá ser? quando mudam a cadeira ou assim)
 
+## 24 Março - João
+- Começo no uso no JDBI
+- Começo na criação das classes de domain
+- Criação do diário
 
-26 Março - Ricardo
+## 26 Março - Ricardo
 - Progresso na utilização de JDBI
 - Progresso na criação das rotas
 - Descobrir a possibilidade de ter a mesma rota para duas funções no spring e fazer a distinção através do header, podendo ter então como exemplo a rota /home e depender se é um aluno ou professor, adicionando ao header correspondente.

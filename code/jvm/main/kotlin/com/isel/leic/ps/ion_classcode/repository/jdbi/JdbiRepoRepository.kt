@@ -12,7 +12,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
                 INSERT INTO REPO (name,url,team_id,is_created) 
                 VALUES (:name, :url, :teamId, false)
                 RETURNING id
-                """
+                """,
         )
             .bind("name", repo.name)
             .bind("url", repo.url)
@@ -25,7 +25,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             """
                 DELETE FROM REPO
                 WHERE id = :repoId
-                """
+                """,
         )
             .bind("repoId", repoId)
             .execute()
@@ -37,7 +37,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
                 UPDATE REPO
                 SET is_created = :status
                 WHERE id = :repoId
-                """
+                """,
         )
             .bind("repoId", repoId)
             .bind("status", status)
@@ -49,7 +49,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             """
                 SELECT * FROM REPO
                 WHERE id = :repoId
-                """
+                """,
         )
             .bind("repoId", repoId)
             .mapTo(RepoInput::class.java)
@@ -61,7 +61,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             """
                 SELECT * FROM REPO
                 WHERE team_id = :teamId
-                """
+                """,
         )
             .bind("teamId", teamId)
             .mapTo(Repo::class.java)

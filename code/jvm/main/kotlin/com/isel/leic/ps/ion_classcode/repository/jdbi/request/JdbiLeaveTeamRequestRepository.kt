@@ -1,8 +1,8 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.*
-import com.isel.leic.ps.ion_classcode.domain.requests.*
-import com.isel.leic.ps.ion_classcode.repository.request.*
+import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ion_classcode.domain.requests.LeaveTeam
+import com.isel.leic.ps.ion_classcode.repository.request.LeaveTeamRepository
 import org.jdbi.v3.core.Handle
 
 class JdbiLeaveTeamRequestRepository(
@@ -15,7 +15,7 @@ class JdbiLeaveTeamRequestRepository(
                 INSERT INTO request (creator, composite,state)
                 VALUES (:creator, :compositeId,'pending')
                 RETURNING id
-                """
+                """,
         )
             .bind("creator", request.creator)
             .bind("composite", request.composite)
@@ -25,7 +25,7 @@ class JdbiLeaveTeamRequestRepository(
             """
                 INSERT INTO leaveteam (id, team_id)
                 VALUES (:id, :teamId)
-                """
+                """,
         )
             .bind("id", id)
             .bind("teamId", request.teamId)
@@ -36,7 +36,7 @@ class JdbiLeaveTeamRequestRepository(
         return handle.createQuery(
             """
                 SELECT * FROM leaveteam
-                """
+                """,
         )
             .mapTo(LeaveTeam::class.java)
             .list()
@@ -47,7 +47,7 @@ class JdbiLeaveTeamRequestRepository(
             """
                 SELECT * FROM leaveteam
                 WHERE id = :id
-                """
+                """,
         )
             .bind("id", id)
             .mapTo(LeaveTeam::class.java)
@@ -62,7 +62,7 @@ class JdbiLeaveTeamRequestRepository(
                     SELECT id FROM request
                     WHERE creator = :creator
                 )
-                """
+                """,
         )
             .bind("creator", userId)
             .mapTo(LeaveTeam::class.java)
