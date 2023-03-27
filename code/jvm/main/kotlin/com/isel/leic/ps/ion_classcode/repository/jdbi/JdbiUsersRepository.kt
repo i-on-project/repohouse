@@ -90,6 +90,19 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
+    override fun getUserByGithubId(githubId: Int): User? {
+        val id = handle.createQuery(
+            """
+            SELECT id FROM users
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo(Int::class.java)
+            .firstOrNull() ?: return null
+        return helper(handle = handle, id = id)
+    }
+
     override fun getUserByToken(token: String): User? {
         val id = handle.createQuery(
             """
