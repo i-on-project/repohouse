@@ -25,11 +25,13 @@ import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.OrgRepoC
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamAddUser
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamCreated
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamList
-import com.isel.leic.ps.ion_classcode.http.model.output.HomeOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
-import com.isel.leic.ps.ion_classcode.infra.LinkRelation
+import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
+import com.isel.leic.ps.ion_classcode.utils.Either
+import jakarta.servlet.http.HttpServletResponse
+import java.util.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -41,7 +43,6 @@ import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "admin:org"
@@ -50,21 +51,16 @@ const val GITHUB_STUDENT_SCOPE = "repo"
 const val STATE_COOKIE_NAME = "userState"
 const val STATE_COOKIE_PATH = Uris.CALLBACK_PATH
 const val HALF_HOUR: Long = 60 * 30
+const val APP_COOKIE_NAME = "Session"
 
 @RestController
 class AuthController(
-    private val okHttp: OkHttp
+    private val okHttp: OkHttp,
+    private val userServices: UserServices
 ) {
 
-    @GetMapping(Uris.HOME)
-    fun home() = siren(value = HomeOutputModel()) {
-        link(rel = LinkRelation("self"), href = Uris.homeUri())
-        link(rel = LinkRelation("auth"), href = Uris.authUri())
-        link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
-    }
-
-    @GetMapping(Uris.AUTH_PATH)
-    fun auth(): ResponseEntity<Any> {
+    @GetMapping(Uris.AUTH_TEACHER_PATH)
+    fun authTeacher(): ResponseEntity<Any> {
         val state = generateUserState()
         return ResponseEntity
             .status(Status.REDIRECT)
@@ -73,25 +69,67 @@ class AuthController(
             .build()
     }
 
+    @GetMapping(Uris.AUTH_STUDENT_PATH)
+    fun authStudent(): ResponseEntity<Any> {
+        val state = generateUserState()
+        return ResponseEntity
+            .status(Status.REDIRECT)
+            .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
+            .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")
+            .build()
+    }
+
     @GetMapping(Uris.CALLBACK_PATH)
     suspend fun callback(
         @RequestParam code: String,
         @RequestParam state: String,
         @CookieValue userState: String,
-    ): SirenModel<List<GithubRepo>> {
+        response: HttpServletResponse
+    ): SirenModel<*> {
         if (state != userState) throw InvalidAuthenticationStateException()
         val accessToken = fetchAccessToken(code)
-        // val userInfo = fetchUserInfo(accessToken.access_token)
-        val orgList = getOrgRepos(ORG_NAME, accessToken = accessToken.access_token)
-        // TODO(Store user info in database and create a session)
-        return siren(
-            value = orgList,
-        ) {
-            clazz("Auth")
-            link(rel = LinkRelation("self"), href = Uris.authUri())
-            link(rel = LinkRelation("home"), href = Uris.homeUri())
-            link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
+        val userInfo = fetchUserInfo(accessToken.access_token)
+        val user = userServices.getUserByGithubId(userInfo.id)
+
+        return when(user) {
+            is Either.Right -> {
+                // TODO(Check if user is created and verified)
+                // TODO(If not, redirect to verification page)
+                // TODO(If yes, create a session, and redirect to menu page)
+                val cookie = ResponseCookie.from(APP_COOKIE_NAME, /** TODO(Encrypt token) **/ )
+                    .httpOnly(true)
+                    .sameSite("Strict")
+                    .secure(true)
+                    .maxAge(60*60*24)
+                    .path("/api")
+                    .build()
+                response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+                siren("Dummy"){}
+            }
+            is Either.Left -> {
+                // TODO(Store new user info in database)
+                // TODO(Redirect for verification page)
+                siren("Dummy"){}
+            }
         }
+    }
+
+    @GetMapping(Uris.LOGOUT)
+    fun logout(
+        response: HttpServletResponse
+    ): ResponseEntity<Any> {
+        val cookie = ResponseCookie.from(APP_COOKIE_NAME, "")
+            .httpOnly(true)
+            .sameSite("Strict")
+            .secure(true)
+            .maxAge(0)
+            .path("/api")
+            .build()
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+        return ResponseEntity
+            .status(Status.REDIRECT)
+            .header(HttpHeaders.LOCATION, Uris.HOME)
+            .build()
     }
 
     private fun generateUserState(): OAuthState {
@@ -125,7 +163,7 @@ class AuthController(
         return okHttp.makeCallToObject(request)
     }
 
-    /** Needing to be tested **/
+    /** Finding place to this functions **/
 
     private suspend fun getOrgRepos(orgName: String = ORG_NAME, perPage: Int = 100, page: Int = 1, accessToken: String): List<GithubRepo> {
         val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_REPOS_URI(orgName,perPage, page)}")
@@ -226,4 +264,6 @@ class AuthController(
 
         return okHttp.makeCallToObject(request)
     }
+
 }
+

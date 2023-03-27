@@ -1,15 +1,12 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Team
-import com.isel.leic.ps.ion_classcode.domain.input.AssigmentInput
-import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
-import com.isel.leic.ps.ion_classcode.repository.AssigmentRepository
 import com.isel.leic.ps.ion_classcode.repository.TeamRepository
 import org.jdbi.v3.core.Handle
 
-class JdbiTeamRepository(private val handle: Handle): TeamRepository {
-    override fun createTeam(team: TeamInput):Int {
+class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
+    override fun createTeam(team: TeamInput): Int {
         return handle.createUpdate(
             """
             INSERT INTO team (assignment, name,is_created)
@@ -93,5 +90,4 @@ class JdbiTeamRepository(private val handle: Handle): TeamRepository {
             .mapTo(Team::class.java)
             .list()
     }
-
 }

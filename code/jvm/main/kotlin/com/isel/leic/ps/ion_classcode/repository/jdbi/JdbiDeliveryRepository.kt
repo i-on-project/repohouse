@@ -1,15 +1,12 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Delivery
-import com.isel.leic.ps.ion_classcode.domain.input.AssigmentInput
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
-import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
-import com.isel.leic.ps.ion_classcode.repository.AssigmentRepository
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
 import org.jdbi.v3.core.Handle
 
-class JdbiDeliveryRepository(private val handle: Handle): DeliveryRepository {
-    override fun createDelivery(delivery: DeliveryInput):Int{
+class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
+    override fun createDelivery(delivery: DeliveryInput): Int {
 
         return handle.createUpdate(
             """
@@ -85,5 +82,4 @@ class JdbiDeliveryRepository(private val handle: Handle): DeliveryRepository {
             .bind("deliveryId", deliveryId)
             .execute()
     }
-
 }

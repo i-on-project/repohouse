@@ -5,7 +5,7 @@ interface Request {
     val creator: Int
     val state: String
 
-    fun checkState(): Boolean{
+    fun checkState(): Boolean {
         return state == "pending" || state == "accepted" || state == "rejected"
     }
 }

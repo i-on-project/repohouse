@@ -4,7 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import org.jdbi.v3.core.Handle
 
-class JdbiCourseRepository(private val handle: Handle): CourseRepository {
+class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun createCourse(course: CourseInput): Int {
         return handle.createUpdate(
             """

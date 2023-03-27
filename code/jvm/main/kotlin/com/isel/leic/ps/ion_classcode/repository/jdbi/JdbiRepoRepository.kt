@@ -1,16 +1,11 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Repo
-import com.isel.leic.ps.ion_classcode.domain.input.AssigmentInput
-import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
-import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
 import com.isel.leic.ps.ion_classcode.domain.input.RepoInput
-import com.isel.leic.ps.ion_classcode.repository.AssigmentRepository
-import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
 import com.isel.leic.ps.ion_classcode.repository.RepoRepository
 import org.jdbi.v3.core.Handle
 
-class JdbiRepoRepository(private val handle: Handle): RepoRepository   {
+class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
     override fun createRepo(repo: RepoInput): Int {
         return handle.createUpdate(
             """
@@ -50,7 +45,7 @@ class JdbiRepoRepository(private val handle: Handle): RepoRepository   {
     }
 
     override fun getRepoById(repoId: Int): RepoInput {
-       return handle.createQuery(
+        return handle.createQuery(
             """
                 SELECT * FROM REPO
                 WHERE id = :repoId
@@ -72,5 +67,4 @@ class JdbiRepoRepository(private val handle: Handle): RepoRepository   {
             .mapTo(Repo::class.java)
             .list()
     }
-
 }

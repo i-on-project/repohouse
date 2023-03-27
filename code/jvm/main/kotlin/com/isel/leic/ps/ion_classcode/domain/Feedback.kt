@@ -5,7 +5,7 @@ data class Feedback(
     val description: String,
     val label: String,
     val teamId: Int,
-){
+) {
     init {
         require(id > 0) { "Feedback id must be greater than 0" }
         require(description.isNotBlank()) { "Feedback description cannot be blank" }

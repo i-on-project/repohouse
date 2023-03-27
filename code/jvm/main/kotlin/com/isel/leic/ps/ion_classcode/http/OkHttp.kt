@@ -25,7 +25,7 @@ suspend inline fun <reified T : Any> Caller.makeCallToList(request: Request): Li
 class OkHttp(
     private val okHttpClient: OkHttpClient,
     private val jsonMapper: ObjectMapper,
-): Caller {
+) : Caller {
 
     private suspend fun send(request: Request): String? {
         val response = suspendCoroutine { continuation ->
@@ -47,8 +47,7 @@ class OkHttp(
         val body = send(request)
         try {
             return jsonMapper.readValue(body, kClass)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             throw e
         }
     }
@@ -57,8 +56,7 @@ class OkHttp(
         val body = send(request)
         try {
             return jsonMapper.readValue(body, object : TypeReference<List<T>>() {})
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             throw e
         }
     }

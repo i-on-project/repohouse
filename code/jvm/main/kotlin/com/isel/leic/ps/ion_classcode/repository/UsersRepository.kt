@@ -14,6 +14,4 @@ interface UsersRepository {
     fun getTeacherByEmail(email: String): Teacher?
     fun deleteStudent(id: Int)
     fun deleteTeacher(id: Int)
-
-
 }

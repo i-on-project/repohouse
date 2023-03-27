@@ -1,16 +1,11 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Feedback
-import com.isel.leic.ps.ion_classcode.domain.Team
-import com.isel.leic.ps.ion_classcode.domain.input.AssigmentInput
 import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
-import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
-import com.isel.leic.ps.ion_classcode.repository.AssigmentRepository
 import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
-import com.isel.leic.ps.ion_classcode.repository.TeamRepository
 import org.jdbi.v3.core.Handle
 
-class JdbiFeedbackRepository(private val handle: Handle): FeedbackRepository {
+class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
     override fun createFeedback(feedback: FeedbackInput): Int {
         return handle.createUpdate(
             """

@@ -2,8 +2,6 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
 import com.isel.leic.ps.ion_classcode.domain.input.request.*
 import com.isel.leic.ps.ion_classcode.domain.requests.Apply
-import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
-import com.isel.leic.ps.ion_classcode.domain.requests.Request
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import org.jdbi.v3.core.Handle
 
@@ -34,7 +32,6 @@ class JdbiApplyRequestRepository(
             .bind("id", requestId)
             .bind("teacher_id", request.teacherId)
             .execute()
-
     }
 
     override fun getApplyRequests(): List<Apply> {

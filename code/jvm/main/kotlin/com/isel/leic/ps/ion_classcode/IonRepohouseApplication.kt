@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.isel.leic.ps.ion_classcode.http.pipeline.LoggerFilter
+import com.isel.leic.ps.ion_classcode.http.pipeline.UserArgumentResolver
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @SpringBootApplication
@@ -24,6 +27,16 @@ class IonRepohouseApplication : WebMvcConfigurer {
 
     @Bean
     fun getLogger(): Logger = LoggerFactory.getLogger(LoggerFilter::class.java)
+}
+
+@Configuration
+class PipelineConfigurer(
+    val userArgumentResolver: UserArgumentResolver
+) : WebMvcConfigurer {
+
+    override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
+        resolvers.add(userArgumentResolver)
+    }
 }
 
 fun main(args: Array<String>) {

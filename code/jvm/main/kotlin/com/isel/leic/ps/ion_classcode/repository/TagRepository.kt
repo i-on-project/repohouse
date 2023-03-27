@@ -9,4 +9,3 @@ interface TagRepository {
     fun getTagById(tagId: Int): Tags
     fun getTagsByDelivery(deliveryId: Int): List<Tags>
 }
-

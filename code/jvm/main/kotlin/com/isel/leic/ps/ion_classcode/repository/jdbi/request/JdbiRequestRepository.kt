@@ -1,8 +1,8 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
 import com.isel.leic.ps.ion_classcode.domain.input.request.*
-import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 import com.isel.leic.ps.ion_classcode.domain.requests.Request
+import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 import org.jdbi.v3.core.Handle
 
 class JdbiRequestRepository(
@@ -67,6 +67,4 @@ class JdbiRequestRepository(
             .mapTo(Request::class.java)
             .first()
     }
-
-
 }

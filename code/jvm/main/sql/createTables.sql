@@ -4,14 +4,15 @@ BEGIN TRANSACTION;
 CREATE TABLE Users(
     id serial primary key,
     email text unique check (email like '%@%') not null,
+    is_created boolean not null default false,
     github_username text unique not null,
+    github_id int unique not null,
     token text unique not null,
     name text not null
 );
 
 CREATE TABLE Teacher(
     id int primary key,
-    is_created boolean not null,
     github_token text unique not null,
     foreign key(id) references users(id)
 );

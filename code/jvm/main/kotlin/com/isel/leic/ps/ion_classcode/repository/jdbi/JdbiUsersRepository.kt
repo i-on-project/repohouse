@@ -5,6 +5,7 @@ import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import org.jdbi.v3.core.Handle
+import org.springframework.stereotype.Component
 
 class JdbiUsersRepository(
     private val handle: Handle,

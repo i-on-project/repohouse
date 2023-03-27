@@ -1,12 +1,11 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Tags
-import com.isel.leic.ps.ion_classcode.domain.input.RepoInput
 import com.isel.leic.ps.ion_classcode.domain.input.TagInput
 import com.isel.leic.ps.ion_classcode.repository.TagRepository
 import org.jdbi.v3.core.Handle
 
-class JdbiTagRepository(private val handle: Handle): TagRepository   {
+class JdbiTagRepository(private val handle: Handle) : TagRepository {
     override fun createTag(tag: TagInput): Int {
         return handle.createUpdate(
             """
