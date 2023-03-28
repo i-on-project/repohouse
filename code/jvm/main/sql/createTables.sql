@@ -38,6 +38,7 @@ CREATE TABLE Student_Course(
     foreign key (student) references Student(id),
     foreign key (course) references Course(id)
 );
+
 CREATE TABLE Classroom(
     id serial primary key,
     name text not null,
