@@ -9,6 +9,7 @@ val GITHUB_OAUTH_URI: (scope: String, state: String) -> String = { scope, state 
         "&state=$state"
 }
 const val GITHUB_USERINFO_URI = "/user"
+const val GITHUB_USERMAILS_URI = "$GITHUB_USERINFO_URI/emails"
 val GITHUB_ACCESS_TOKEN_URI: (code: String) -> String = { code ->
     "/login/oauth/access_token?" +
         "client_id=" + System.getenv("GITHUB_CLIENT_ID") +

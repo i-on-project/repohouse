@@ -2,16 +2,18 @@ package com.isel.leic.ps.ion_classcode.http
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import java.awt.print.Book
+import java.io.IOException
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.springframework.stereotype.Component
-import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+
 
 interface Caller {
     suspend fun <T : Any> makeCallToObject(request: Request, kClass: Class<T>): T
@@ -53,9 +55,11 @@ class OkHttp(
     }
 
     override suspend fun <T : Any> makeCallToList(request: Request, kClass: Class<T>): List<T> {
+
         val body = send(request)
+        val listType = jsonMapper.typeFactory.constructCollectionType(ArrayList::class.java, kClass)
         try {
-            return jsonMapper.readValue(body, object : TypeReference<List<T>>() {})
+            return jsonMapper.readValue(body, listType);
         } catch (e: Exception) {
             throw e
         }

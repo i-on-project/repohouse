@@ -6,7 +6,7 @@ data class StudentInput(
     val githubUsername: String,
     val schoolId: Int,
     val token: String,
-    val githubId: Int,
+    val githubId: Long,
 ) {
     init {
         require(name.isNotBlank() && name.length in (5..20)) { "Invalid name" }

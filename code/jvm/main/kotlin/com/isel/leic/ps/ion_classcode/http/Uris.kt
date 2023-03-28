@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http
 
 import java.net.URI
+import org.springframework.web.util.UriTemplate
 
 object Uris {
 
@@ -14,9 +15,10 @@ object Uris {
     const val HOME = "$API/home"
     const val CREDITS = "$API/credits"
     const val AUTH_PATH = "$API/auth"
+    const val AUTH_REGISTER_PATH = "$API/auth/register"
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
-    const val AUTH_STATUS_PATH = "$AUTH_PATH/status"
+    const val AUTH_STATUS_PATH = "$AUTH_PATH/status/{id}"
     const val LOGOUT = "$AUTH_PATH/logout"
     const val CALLBACK_PATH = "$AUTH_PATH/callback"
     const val MENU_PATH = "$API/menu"
@@ -33,7 +35,7 @@ object Uris {
     fun homeUri(): URI = URI(HOME)
     fun creditsUri(): URI = URI(CREDITS)
     fun authUri(): URI = URI(AUTH_PATH)
-    fun authStatusUri(): URI = URI(AUTH_STATUS_PATH)
+    fun authStatusUri(userId:Int): URI = UriTemplate(AUTH_STATUS_PATH).expand(userId)
     fun authUriStudent(): URI = URI(AUTH_STUDENT_PATH)
     fun authUriTeacher(): URI = URI(AUTH_TEACHER_PATH)
     fun callbackUri(): URI = URI(CALLBACK_PATH)

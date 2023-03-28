@@ -23,14 +23,11 @@ const val DATABASE_URL = "JDBC_DATABASE_URL"
 @SpringBootApplication
 class IonClassCodeApplication : WebMvcConfigurer {
     @Bean
-    fun jdbi(): Jdbi {
-        val jdbcDatabaseURL = System.getenv(DATABASE_URL)
-        return Jdbi.create(
-            PGSimpleDataSource().apply {
-                setURL(jdbcDatabaseURL)
-            },
-        ).configure()
-    }
+    fun jdbi() = Jdbi.create(
+        PGSimpleDataSource().apply {
+            setURL(System.getenv(DATABASE_URL))
+        }
+    ).configure()
 
     @Bean
     fun okHttpClient() = OkHttpClient()
@@ -42,6 +39,7 @@ class IonClassCodeApplication : WebMvcConfigurer {
 
     @Bean
     fun getLogger(): Logger = LoggerFactory.getLogger(LoggerFilter::class.java)
+
 }
 
 @Configuration

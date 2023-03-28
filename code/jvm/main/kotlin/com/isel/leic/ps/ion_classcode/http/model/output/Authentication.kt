@@ -19,3 +19,11 @@ data class GitHubUserInfo(
     val url: String,
     val name: String
 )
+
+data class GitHubUserEmail(
+    val email: String,
+    val verified: Boolean,
+    val primary: Boolean,
+    val visibility: String?
+)
+

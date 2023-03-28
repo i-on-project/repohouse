@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 class MenuController {
 
     @GetMapping(Uris.MENU_PATH, headers = ["User=Teacher"])
-    fun menuTeacher(
-
-    ): SirenModel<MenuOutputModel> {
+    fun menuTeacher(): SirenModel<MenuOutputModel> {
         /** Services functions **/
         //val user = getUser()
         //val courses = getCourses()
@@ -33,6 +31,7 @@ class MenuController {
 
         val courses = listOf<CourseOutputModel>()
         return siren(value = MenuTeacherOutputModel("Teacher Name", "", courses)){
+            clazz("menu")
             link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
             link(rel = LinkRelation("credits"), href = Uris.creditsUri())
             link(rel = LinkRelation("logout"), href = Uris.logoutUri(), needAuthentication = true)

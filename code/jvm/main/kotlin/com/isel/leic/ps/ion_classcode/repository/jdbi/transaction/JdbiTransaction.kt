@@ -22,7 +22,7 @@ import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import org.jdbi.v3.core.Handle
 import org.springframework.stereotype.Component
 
-@Component
+
 class JdbiTransaction(
     private val handle: Handle,
 ) : Transaction {

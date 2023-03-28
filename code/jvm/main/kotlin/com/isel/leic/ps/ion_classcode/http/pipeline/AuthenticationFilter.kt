@@ -16,7 +16,7 @@ class AuthenticationFilter(
 ) : Filter {
 
     companion object {
-        private const val AUTHORIZATION_COOKIE_NAME = "ClassCodeAuthorization"
+        private const val AUTHORIZATION_COOKIE_NAME = "Session"
     }
 
     override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
@@ -30,6 +30,7 @@ class AuthenticationFilter(
         if (user != null) {
             UserArgumentResolver.addUserTo(user, mutableRequest)
         }
+        val x = mutableRequest.getHeader("User")
         chain?.doFilter(mutableRequest, response)
     }
 }

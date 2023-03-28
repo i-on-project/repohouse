@@ -1,6 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.controllers
 
 import com.isel.leic.ps.ion_classcode.InvalidAuthenticationStateException
+import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
+import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.http.GITHUB_ACCESS_TOKEN_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_API_BASE_URL
 import com.isel.leic.ps.ion_classcode.http.GITHUB_BASE_URL
@@ -12,12 +14,14 @@ import com.isel.leic.ps.ion_classcode.http.GITHUB_ORG_TEAMS_USER_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_ORG_TEAM_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_ORG_USER_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_USERINFO_URI
+import com.isel.leic.ps.ion_classcode.http.GITHUB_USERMAILS_URI
 import com.isel.leic.ps.ion_classcode.http.OkHttp
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
+import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.GithubRepo
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.OrgMembership
@@ -26,9 +30,15 @@ import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamAddU
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamCreated
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamList
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
+import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
+import com.isel.leic.ps.ion_classcode.infra.LinkRelation
+import com.isel.leic.ps.ion_classcode.infra.SirenModel
+import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
+import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import java.util.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -40,12 +50,15 @@ import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.collections.LinkedHashMap
 
 const val ORG_NAME = "test-project-isel"
-const val GITHUB_TEACHER_SCOPE = "admin:org"
-const val GITHUB_STUDENT_SCOPE = "repo"
+const val GITHUB_TEACHER_SCOPE = "read:org%20user:email"
+const val GITHUB_STUDENT_SCOPE = "repo%20user:email"
 
 const val STUDENT_COOKIE_NAME = "Student"
 const val TEACHER_COOKIE_NAME = "Teacher"
@@ -65,8 +78,8 @@ class AuthController(
         val state = generateUserState()
         return ResponseEntity
             .status(Status.REDIRECT)
-            .header(STATE_COOKIE_NAME, state.cookie.toString())
-            .header("Position", TEACHER_COOKIE_NAME)
+            .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
+            .header(HttpHeaders.SET_COOKIE, generateUserPosition(TEACHER_COOKIE_NAME).toString())
             .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")
             .build()
     }
@@ -77,7 +90,7 @@ class AuthController(
         return ResponseEntity
             .status(Status.REDIRECT)
             .header(STATE_COOKIE_NAME, state.cookie.toString())
-            .header("Position", STUDENT_COOKIE_NAME)
+            .header(STATE_COOKIE_NAME, generateUserPosition(STUDENT_COOKIE_NAME).toString())
             .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")
             .build()
     }
@@ -99,7 +112,7 @@ class AuthController(
                     if (it) {
                         val cookie = ResponseCookie.from(
                             APP_COOKIE_NAME,
-                            AESEncrypt().encrypt("DummyToken")
+                            AESEncrypt().encrypt(userInfo.value.token)
                         )
                             .httpOnly(true)
                             .sameSite("Strict")
@@ -116,46 +129,95 @@ class AuthController(
                     } else {
                         ResponseEntity
                             .status(Status.REDIRECT)
-                            .header(HttpHeaders.LOCATION, Uris.AUTH_STATUS_PATH)
+                            .header(HttpHeaders.LOCATION, userInfo.value.id?.let { it1 -> Uris.authStatusUri(it1).toString() })
                             .build()
                     }
                 }
             }
             is Either.Left -> {
-                // TODO(Store new user info in database)
-                val token = generateRandomToken()
-                userServices.createUser(userGithubInfo,position)
+                if(position == "Teacher"){
+                    val userEmail = fetchUserEmails(accessToken.access_token).filter { it.primary }.first()
+                    when(val user = userServices.createTeacher(
+                        TeacherInput(
+                            userEmail.email,
+                            userGithubInfo.login,
+                            userGithubInfo.id,
+                            generateRandomToken(),
+                            userGithubInfo.name,
+                            accessToken.access_token
+                        )
+                    )){
+                        is Either.Right -> {
+                            return ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.LOCATION,Uris.authStatusUri(user.value.id).toString())
+                                .build()
+                        }
+                        is Either.Left -> {
+                            TODO()
+                        }
+                    }
 
-                val cookie = ResponseCookie.from(
-                    APP_COOKIE_NAME,
-                    AESEncrypt().encrypt(token)
-                )
-                    .httpOnly(true)
-                    .sameSite("Strict")
-                    .secure(true)
-                    .maxAge(60 * 60 * 24)
-                    .path("/api")
-                    .build()
-
-                ResponseEntity
-                    .status(Status.REDIRECT)
-                    .header(APP_COOKIE_NAME, cookie.toString())
-                    .header(HttpHeaders.LOCATION, Uris.AUTH_STATUS_PATH)
-                    .build()
+                }else{
+                    return ResponseEntity
+                        .status(Status.REDIRECT)
+                        .header(HttpHeaders.LOCATION, Uris.AUTH_REGISTER_PATH)
+                        .build()
+                }
             }
         }
     }
 
-    @GetMapping(Uris.AUTH_STATUS_PATH)
-    fun authStatus(
-
-    ): ResponseEntity<Any>{
-        // TODO(Verify user is created, if so redirect to menu, if not show auth status page)
-
+    @GetMapping(Uris.AUTH_REGISTER_PATH)
+    suspend fun authRegisterStudent(
+       // @RequestParam school_id: String
+    ): ResponseEntity<Any> {
+        // TODO(Get school_id, create student and redirect to auth status page, after email verification)
         return ResponseEntity
             .status(Status.REDIRECT)
-            .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
+            .header(HttpHeaders.LOCATION, Uris.AUTH_STATUS_PATH)
             .build()
+    }
+
+    @GetMapping(Uris.AUTH_STATUS_PATH)
+    fun authStatus(
+        @PathVariable("id") id: Int,
+        response: HttpServletResponse
+    ): SirenModel<Any>{
+        return when (val user = userServices.getUserById(id)){
+             is Either.Right -> {
+                if(user.value.isCreated){
+                    val cookie = ResponseCookie.from(
+                        APP_COOKIE_NAME,
+                        AESEncrypt().encrypt(user.value.token)
+                    )
+                        .httpOnly(true)
+                        .sameSite("Strict")
+                        .secure(true)
+                        .maxAge(60 * 60 * 24)
+                        .path("/api")
+                        .build()
+                    response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+
+                    siren(StatusOutputModel("User created", "User created successfully, you can navigate to menu")) {
+                        link(href = Uris.menuUri(), rel = LinkRelation("menu"), needAuthentication = true)
+                        link(href = Uris.logoutUri(), rel = LinkRelation("logout"), needAuthentication = true)
+                        link(href = Uris.authStatusUri(id), rel = LinkRelation("self"))
+                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                    }
+                }else{
+                    siren(StatusOutputModel("User not yet created", "Pending user creation, please wait, if a student check your email for verification")) {
+                        link(href = Uris.authStatusUri(id), rel = LinkRelation("self"))
+                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                    }
+                }
+            }
+            is Either.Left -> {
+                TODO()
+            }
+        }
     }
 
     @GetMapping(Uris.LOGOUT)
@@ -189,6 +251,16 @@ class AuthController(
         return OAuthState(state, cookie)
     }
 
+    private fun generateUserPosition(position: String): ResponseCookie {
+        return ResponseCookie.from("position", position)
+            .path(STATE_COOKIE_PATH)
+            .maxAge(HALF_HOUR)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .build()
+    }
+
     private suspend fun fetchAccessToken(code: String): ClientToken {
         val request = Request.Builder().url("$GITHUB_BASE_URL${GITHUB_ACCESS_TOKEN_URI(code)}")
             .addHeader("Accept", "application/json")
@@ -205,6 +277,15 @@ class AuthController(
             .build()
 
         return okHttp.makeCallToObject(request)
+    }
+
+    private suspend fun fetchUserEmails(accessToken: String):List<GitHubUserEmail>{
+        val request = Request.Builder().url("$GITHUB_API_BASE_URL$GITHUB_USERMAILS_URI")
+            .addHeader("Authorization", "Bearer $accessToken")
+            .addHeader("Accept", "application/vnd.github+json")
+            .build()
+
+        return okHttp.makeCallToList(request)
     }
 
     private fun generateRandomToken(): String {

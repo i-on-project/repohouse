@@ -23,11 +23,3 @@ class AESEncrypt {
     }
 
 }
-
-fun main() {
-    val stringToEncrypt = "Hello World"
-    val encryptedString = AESEncrypt().encrypt(stringToEncrypt)
-    println(encryptedString)
-    val decryptedString = AESDecrypt().decrypt(encryptedString)
-    println(decryptedString)
-}

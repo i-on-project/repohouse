@@ -7,6 +7,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import org.jdbi.v3.core.Handle
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 
 class JdbiUsersRepository(
@@ -46,7 +47,7 @@ class JdbiUsersRepository(
     override fun createTeacher(teacher: TeacherInput): Int {
         val keys = handle.createUpdate(
             """
-            INSERT INTO users (email, github_username, github_id, token, name)
+            INSERT INTO Users (email, github_username, github_id, token, name)
             VALUES (:email, :github_username, :github_id, :token, :name)
             RETURNING id
             """,
@@ -81,7 +82,7 @@ class JdbiUsersRepository(
     override fun getUserByEmail(email: String): User? {
         val id = handle.createQuery(
             """
-            SELECT id FROM users
+            SELECT id FROM Users
             WHERE email = :email
             """,
         )
@@ -94,7 +95,7 @@ class JdbiUsersRepository(
     override fun getUserByGithubId(githubId: Long): User? {
         val id = handle.createQuery(
             """
-            SELECT id FROM users
+            SELECT id FROM Users
             WHERE github_id = :github_id
             """,
         )
@@ -107,7 +108,7 @@ class JdbiUsersRepository(
     override fun getUserByToken(token: String): User? {
         val id = handle.createQuery(
             """
-            SELECT id FROM users
+            SELECT id FROM Users
             WHERE token = :token
             """,
         )
@@ -143,18 +144,18 @@ class JdbiUsersRepository(
 private fun helper(handle: Handle, id: Int): User? {
     return handle.createQuery(
         """
-            SELECT name, email, users.id, github_username, github_id, is_created, school_id FROM Student
-            JOIN users on users.id = student.id
-            WHERE users.id = :id
+            SELECT name, email, Users.id, github_username, github_id, is_created, school_id,token FROM Student
+            JOIN Users on Users.id = student.id
+            WHERE Users.id = :id
             """,
     )
         .bind("id", id)
         .mapTo(Student::class.java)
         .firstOrNull() ?: handle.createQuery(
         """
-            SELECT name, email, users.id, github_username, github_id, is_created FROM Teacher
-            JOIN users on users.id = teacher.id
-            WHERE users.id = :id
+            SELECT name, email, Users.id, github_username, github_id, is_created,token FROM Teacher
+            JOIN Users on Users.id = teacher.id
+            WHERE Users.id = :id
             """,
     )
         .bind("id", id)
