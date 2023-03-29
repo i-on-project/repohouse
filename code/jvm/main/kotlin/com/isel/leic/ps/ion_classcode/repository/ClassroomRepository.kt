@@ -8,5 +8,5 @@ interface ClassroomRepository {
     fun createClassroom(classroom: ClassroomInput): Int
     fun deleteClassroom(classroomId: Int)
     fun getClassroomById(classroomId: Int): Classroom?
-    fun getAssigmentsOfAClassroom(classroomId: Int): List<Assigment>
+    fun getAssignmentsOfAClassroom(classroomId: Int): List<Assigment>
 }

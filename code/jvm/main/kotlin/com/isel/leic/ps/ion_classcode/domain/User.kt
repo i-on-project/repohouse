@@ -6,7 +6,7 @@ sealed class User {
     abstract val email: String
     abstract val githubUsername: String
     abstract val isCreated: Boolean
-    abstract val githubId: Int
+    abstract val githubId: Long
     abstract val token: String
 }
 
@@ -15,7 +15,7 @@ data class Student(
     override val email: String,
     override val id: Int,
     override val githubUsername: String,
-    override val githubId: Int,
+    override val githubId: Long,
     override val isCreated: Boolean,
     override val token: String,
     val schoolId: Int,
@@ -26,7 +26,7 @@ data class Teacher(
     override val email: String,
     override val id: Int,
     override val githubUsername: String,
-    override val githubId: Int,
+    override val githubId: Long,
     override val token: String,
-    override val isCreated: Boolean
+    override val isCreated: Boolean,
 ) : User()

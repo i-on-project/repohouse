@@ -7,14 +7,13 @@ import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import org.jdbi.v3.core.Handle
-import org.springframework.context.annotation.Bean
-import org.springframework.stereotype.Component
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiUsersRepository(
     private val handle: Handle,
 ) : UsersRepository {
     override fun createStudent(student: StudentInput): Int {
-        val keys = handle.createUpdate(
+        val id = handle.createUpdate(
             """
             INSERT INTO Users (email, github_username, github_id, token, name)
             VALUES (:email, :github_username, :github_id, :token, :name)
@@ -27,11 +26,9 @@ class JdbiUsersRepository(
             .bind("token", student.token)
             .bind("name", student.name)
             .executeAndReturnGeneratedKeys()
-            .mapToMap()
-            .findFirst()
-            .orElseThrow { IllegalStateException("Failed to retrieve generated keys after inserting user") }
+            .mapTo<Int>()
+            .first()
 
-        val id = keys["id"] as Int
         handle.createUpdate(
             """
             INSERT INTO student (id, school_id)
@@ -45,7 +42,7 @@ class JdbiUsersRepository(
     }
 
     override fun createTeacher(teacher: TeacherInput): Int {
-        val keys = handle.createUpdate(
+        val id = handle.createUpdate(
             """
             INSERT INTO Users (email, github_username, github_id, token, name)
             VALUES (:email, :github_username, :github_id, :token, :name)
@@ -58,11 +55,9 @@ class JdbiUsersRepository(
             .bind("token", teacher.token)
             .bind("name", teacher.name)
             .executeAndReturnGeneratedKeys()
-            .mapToMap()
-            .findFirst()
-            .orElseThrow { IllegalStateException("Failed to retrieve generated keys after inserting user") }
+            .mapTo<Int>()
+            .first()
 
-        val id = keys["id"] as Int
         handle.createUpdate(
             """
             INSERT INTO Teacher (id, github_token)
@@ -87,7 +82,7 @@ class JdbiUsersRepository(
             """,
         )
             .bind("email", email)
-            .mapTo(Int::class.java)
+            .mapTo<Int>()
             .firstOrNull() ?: return null
         return helper(handle = handle, id = id)
     }
@@ -100,7 +95,7 @@ class JdbiUsersRepository(
             """,
         )
             .bind("github_id", githubId)
-            .mapTo(Int::class.java)
+            .mapTo<Int>()
             .firstOrNull() ?: return null
         return helper(handle = handle, id = id)
     }
@@ -113,7 +108,7 @@ class JdbiUsersRepository(
             """,
         )
             .bind("token", token)
-            .mapTo(Int::class.java)
+            .mapTo<Int>()
             .firstOrNull() ?: return null
 
         return helper(handle = handle, id = id)
@@ -150,7 +145,7 @@ private fun helper(handle: Handle, id: Int): User? {
             """,
     )
         .bind("id", id)
-        .mapTo(Student::class.java)
+        .mapTo<Student>()
         .firstOrNull() ?: handle.createQuery(
         """
             SELECT name, email, Users.id, github_username, github_id, is_created,token FROM Teacher
@@ -159,6 +154,6 @@ private fun helper(handle: Handle, id: Int): User? {
             """,
     )
         .bind("id", id)
-        .mapTo(Teacher::class.java)
+        .mapTo<Teacher>()
         .firstOrNull()
 }

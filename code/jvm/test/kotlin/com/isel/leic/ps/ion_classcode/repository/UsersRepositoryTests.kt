@@ -44,7 +44,7 @@ class UsersRepositoryTests {
     @Test
     fun `can create a user and retrieve it by githubId`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val githubId = 12345
+        val githubId = 12345L
         userRepo.createStudent(student = StudentInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", schoolId = 12345, token = "token", githubId = githubId))
         userRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, token = "token1", githubId = 1345))
         val student = userRepo.getUserByGithubId(githubId = githubId) ?: fail("Student not found")

@@ -9,7 +9,7 @@ import com.isel.leic.ps.ion_classcode.repository.RepoRepository
 import com.isel.leic.ps.ion_classcode.repository.TagRepository
 import com.isel.leic.ps.ion_classcode.repository.TeamRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
-import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiAssigmentRepository
+import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiAssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiCourseRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiDeliveryRepository
@@ -20,13 +20,12 @@ import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiTeamRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiUsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import org.jdbi.v3.core.Handle
-import org.springframework.stereotype.Component
 
 
 class JdbiTransaction(
     private val handle: Handle,
 ) : Transaction {
-    override val assigmentRepository: AssigmentRepository by lazy { JdbiAssigmentRepository(handle = handle) }
+    override val assigmentRepository: AssigmentRepository by lazy { JdbiAssignmentRepository(handle = handle) }
     override val classroomRepository: ClassroomRepository by lazy { JdbiClassroomRepository(handle = handle) }
     override val feedbackRepository: FeedbackRepository by lazy { JdbiFeedbackRepository(handle = handle) }
     override val repoRepository: RepoRepository by lazy { JdbiRepoRepository(handle = handle) }
