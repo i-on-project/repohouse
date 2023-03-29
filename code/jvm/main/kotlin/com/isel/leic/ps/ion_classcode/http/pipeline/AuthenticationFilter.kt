@@ -30,7 +30,7 @@ class AuthenticationFilter(
         if (user != null) {
             UserArgumentResolver.addUserTo(user, mutableRequest)
         }
-        val x = mutableRequest.getHeader("User")
-        chain?.doFilter(mutableRequest, response)
+        val x = mutableRequest as HttpServletRequest
+        chain?.doFilter(x, response)
     }
 }

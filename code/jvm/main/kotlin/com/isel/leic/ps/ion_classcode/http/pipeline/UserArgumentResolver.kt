@@ -25,15 +25,17 @@ class UserArgumentResolver : HandlerMethodArgumentResolver {
     }
 
     companion object {
-        private const val KEY = "User"
+        private const val KEY_HEADER = "User"
+        private const val KEY_ATTRIBUTE = "UserArgumentResolver"
 
         fun addUserTo(user: User, request: MutableHttpServletRequest) {
-            return request.putHeader(KEY, user::class.simpleName.toString())
+            request.setAttribute(KEY_ATTRIBUTE, user)
+            return request.putHeader(KEY_HEADER, user::class.simpleName.toString())
         }
 
-        fun getUserFrom(request: MutableHttpServletRequest): String? {
-            return request.getAttribute(KEY)?.let {
-                it as? String
+        fun getUserFrom(request: MutableHttpServletRequest): User? {
+            return request.getAttribute(KEY_ATTRIBUTE)?.let {
+                it as? User
             }
         }
     }

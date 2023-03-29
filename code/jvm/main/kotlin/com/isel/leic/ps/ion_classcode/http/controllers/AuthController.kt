@@ -102,41 +102,55 @@ class AuthController(
         @CookieValue userState: String,
         @CookieValue position: String,
         response: HttpServletResponse
-    ): ResponseEntity<Any> {
+    ): SirenModel<StatusOutputModel> {
         if (state != userState) throw InvalidAuthenticationStateException()
         val accessToken = fetchAccessToken(code)
         val userGithubInfo = fetchUserInfo(accessToken.access_token)
         return when(val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
             is Either.Right -> {
-                userInfo.value.isCreated.let {
-                    if (it) {
-                        val cookie = ResponseCookie.from(
-                            APP_COOKIE_NAME,
-                            AESEncrypt().encrypt(userInfo.value.token)
-                        )
-                            .httpOnly(true)
-                            .sameSite("Strict")
-                            .secure(true)
-                            .maxAge(60 * 60 * 24)
-                            .path("/api")
-                            .build()
+                if (userInfo.value.isCreated) {
+                    val cookie = ResponseCookie.from(
+                        APP_COOKIE_NAME,
+                        AESEncrypt().encrypt(userInfo.value.token)
+                    )
+                        .httpOnly(true)
+                        .sameSite("Strict")
+                        .secure(true)
+                        .maxAge(60 * 60 * 24)
+                        .path("/api")
+                        .build()
 
-                        ResponseEntity
-                            .status(Status.REDIRECT)
-                            .header(APP_COOKIE_NAME, cookie.toString())
-                            .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
-                            .build()
-                    } else {
-                        ResponseEntity
-                            .status(Status.REDIRECT)
-                            .header(HttpHeaders.LOCATION, userInfo.value.id?.let { it1 -> Uris.authStatusUri(it1).toString() })
-                            .build()
+                    siren(
+                        StatusOutputModel(
+                            "User logged in",
+                            "Redirect to menu page",
+                        )
+                    ) {
+                        link(href = Uris.menuUri(), rel = LinkRelation("menu"), needAuthentication = true)
+                        link(href = Uris.logoutUri(), rel = LinkRelation("logout"), needAuthentication = true)
+                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                    }.also {
+                        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+                    }
+
+                } else {
+                    val userId = userInfo.value.id ?: throw Exception("User id is null")
+                    siren(
+                        StatusOutputModel(
+                            "Check user status",
+                            "Redirect to status page",
+                        )
+                    ) {
+                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                        link(href = Uris.authStatusUri(userId), rel = LinkRelation("status"))
                     }
                 }
             }
             is Either.Left -> {
                 if(position == "Teacher"){
-                    val userEmail = fetchUserEmails(accessToken.access_token).filter { it.primary }.first()
+                    val userEmail = fetchUserEmails(accessToken.access_token).first { it.primary }
                     when(val user = userServices.createTeacher(
                         TeacherInput(
                             userEmail.email,
@@ -148,10 +162,16 @@ class AuthController(
                         )
                     )){
                         is Either.Right -> {
-                            return ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION,Uris.authStatusUri(user.value.id).toString())
-                                .build()
+                             siren(
+                                    StatusOutputModel(
+                                        "Check user status",
+                                        "Redirect to status page",
+                                    )
+                             ) {
+                                link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                                link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                                link(href = Uris.authStatusUri(user.value.id), rel = LinkRelation("status"))
+                            }
                         }
                         is Either.Left -> {
                             TODO()
@@ -159,10 +179,16 @@ class AuthController(
                     }
 
                 }else{
-                    return ResponseEntity
-                        .status(Status.REDIRECT)
-                        .header(HttpHeaders.LOCATION, Uris.AUTH_REGISTER_PATH)
-                        .build()
+                    siren(
+                        StatusOutputModel(
+                            "Register user",
+                            "Redirect to register page",
+                        )
+                    ) {
+                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                        link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
+                    }
                 }
             }
         }

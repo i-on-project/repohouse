@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.controllers
 
+import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.TeacherInputModel
@@ -9,6 +10,7 @@ import com.isel.leic.ps.ion_classcode.http.model.output.MenuStudentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.MenuTeacherOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeacherOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeachersOutputModel
+import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
@@ -20,14 +22,16 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-class MenuController {
+class MenuController(
+    private val teacterServices: TeacherServices
+) {
 
     @GetMapping(Uris.MENU_PATH, headers = ["User=Teacher"])
-    fun menuTeacher(): SirenModel<MenuOutputModel> {
-        /** Services functions **/
-        //val user = getUser()
+    fun menuTeacher(
+        user:User
+    ): SirenModel<MenuOutputModel> {
         //val courses = getCourses()
-        /** Services functions **/
+
 
         val courses = listOf<CourseOutputModel>()
         return siren(value = MenuTeacherOutputModel("Teacher Name", "", courses)){
