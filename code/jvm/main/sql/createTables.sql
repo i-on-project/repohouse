@@ -44,7 +44,7 @@ CREATE TABLE Classroom(
     name text not null,
     last_sync timestamp not null,
     invite_link text unique not null,
-    is_archive boolean not null default false,
+    is_archived boolean not null,
     course_id int not null,
     foreign key (course_id) references Course(id)
 );
