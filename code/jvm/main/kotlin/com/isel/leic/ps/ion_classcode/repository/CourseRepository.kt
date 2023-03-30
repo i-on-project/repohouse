@@ -9,6 +9,9 @@ interface CourseRepository {
     fun deleteCourse(courseId: Int)
     fun enterCourse(courseId: Int, studentId: Int)
     fun leaveCourse(courseId: Int, studentId: Int)
-    fun getCourse(teacherId: Int): Course?
+    fun getAllTeacherCourses(teacherId: Int): List<Course>
+    fun getAllStudentCourses(teacherId: Int): List<Course>
+
     fun getStudentInCourse(courseId: Int): List<Student>
+
 }

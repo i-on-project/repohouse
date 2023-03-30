@@ -3,6 +3,7 @@ package com.isel.leic.ps.ion_classcode.http.controllers
 import com.isel.leic.ps.ion_classcode.InvalidAuthenticationStateException
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
 import com.isel.leic.ps.ion_classcode.http.GITHUB_ACCESS_TOKEN_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_API_BASE_URL
 import com.isel.leic.ps.ion_classcode.http.GITHUB_BASE_URL
@@ -31,6 +32,7 @@ import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamCrea
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamList
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
+import com.isel.leic.ps.ion_classcode.http.services.RequestServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
@@ -70,7 +72,8 @@ const val APP_COOKIE_NAME = "Session"
 @RestController
 class AuthController(
     private val okHttp: OkHttp,
-    private val userServices: UserServices
+    private val userServices: UserServices,
+    private val requestServices: RequestServices
 ) {
 
     @GetMapping(Uris.AUTH_TEACHER_PATH)
@@ -162,6 +165,8 @@ class AuthController(
                         )
                     )){
                         is Either.Right -> {
+                            val request = requestServices.createApplyRequest(ApplyInput(user.value.id,null,user.value.id))
+                            if(request is Either.Left) TODO()
                              siren(
                                     StatusOutputModel(
                                         "Check user status",

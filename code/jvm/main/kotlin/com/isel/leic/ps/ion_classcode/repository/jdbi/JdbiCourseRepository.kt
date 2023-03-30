@@ -59,7 +59,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .execute()
     }
 
-    override fun getCourse(teacherId: Int): Course? {
+    override fun getAllTeacherCourses(teacherId: Int): List<Course>{
         return handle.createQuery(
             """
             SELECT * FROM Course
@@ -68,8 +68,19 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         )
             .bind("teacher_id", teacherId)
             .mapTo<Course>()
-            .findFirst()
-            .orElse(null)
+            .list()
+    }
+
+    override fun getAllStudentCourses(studentId: Int): List<Course>{
+        return handle.createQuery(
+            """
+            SELECT id,org_url,name,teacher_id FROM Course JOIN student_course ON Course.id = student_course.course
+            WHERE student = :student_id
+            """,
+        )
+            .bind("student_id", studentId)
+            .mapTo<Course>()
+            .list()
     }
 
     override fun getStudentInCourse(courseId: Int): List<Student> {

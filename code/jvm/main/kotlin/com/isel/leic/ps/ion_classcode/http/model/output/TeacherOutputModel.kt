@@ -1,11 +1,14 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
-data class TeacherOutputModel(
-    val id: Int,
-    val name: String,
-    val email: String
+
+data class TeachersPendingOutputModel(
+    val teachers : List<TeacherPending>
 )
 
-data class TeachersOutputModel(
-    val teachers : List<TeacherOutputModel>
+
+data class TeacherPending(
+    val name: String,
+    val email: String,
+    val id: Int,
+    val requestId: Int
 )

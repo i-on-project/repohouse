@@ -70,6 +70,28 @@ class JdbiUsersRepository(
         return id
     }
 
+    override fun getAllStudents(): List<Student> {
+        return handle.createQuery(
+            """
+            SELECT name, email, Users.id, github_username, github_id, is_created, school_id,token FROM Student
+            JOIN Users on Users.id = Student.id
+            """,
+        )
+            .mapTo<Student>()
+            .list()
+    }
+
+    override fun getAllTeachers(): List<Teacher> {
+        return handle.createQuery(
+            """
+            SELECT name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+            JOIN Users on Users.id = Teacher.id
+            """,
+        )
+            .mapTo<Teacher>()
+            .list()
+    }
+
     override fun getUserById(id: Int): User? {
         return helper(handle = handle, id = id)
     }
@@ -112,6 +134,18 @@ class JdbiUsersRepository(
             .firstOrNull() ?: return null
 
         return helper(handle = handle, id = id)
+    }
+
+    override fun getStudentSchoolId(id: Int): Int? {
+        return handle.createQuery(
+            """
+            SELECT school_id FROM Student
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .mapTo<Int>()
+            .firstOrNull()
     }
 
     override fun deleteStudent(id: Int) {
