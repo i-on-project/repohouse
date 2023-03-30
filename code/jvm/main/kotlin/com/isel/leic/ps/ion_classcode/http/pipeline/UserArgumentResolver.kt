@@ -20,7 +20,7 @@ class UserArgumentResolver : HandlerMethodArgumentResolver {
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?
     ): Any? {
-        val request = webRequest.getNativeRequest(HttpServletRequest::class.java) as MutableHttpServletRequest // TODO ?: throw FailException("Obtain request failed")
+        val request = webRequest.getNativeRequest(HttpServletRequest::class.java) ?: TODO("Obtain request failed")
         return getUserFrom(request) // TODO ?: throw FailException("Server error")
     }
 
@@ -28,12 +28,11 @@ class UserArgumentResolver : HandlerMethodArgumentResolver {
         private const val KEY_HEADER = "User"
         private const val KEY_ATTRIBUTE = "UserArgumentResolver"
 
-        fun addUserTo(user: User, request: MutableHttpServletRequest) {
-            request.setAttribute(KEY_ATTRIBUTE, user)
-            return request.putHeader(KEY_HEADER, user::class.simpleName.toString())
+        fun addUserTo(user: User, request: HttpServletRequest) {
+            return request.setAttribute(KEY_ATTRIBUTE, user)
         }
 
-        fun getUserFrom(request: MutableHttpServletRequest): User? {
+        fun getUserFrom(request: HttpServletRequest): User? {
             return request.getAttribute(KEY_ATTRIBUTE)?.let {
                 it as? User
             }

@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
+import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
@@ -35,6 +36,13 @@ class StudentServices(
             } else {
                 Either.Left(StudentServicesError.UserNotFound)
             }
+        }
+    }
+
+    fun createStudent(student:StudentInput): StudentSchoolIdResponse {
+        return transactionManager.run {
+            val schoolId = it.usersRepository.createStudent(student)
+            Either.Right(schoolId)
         }
     }
 

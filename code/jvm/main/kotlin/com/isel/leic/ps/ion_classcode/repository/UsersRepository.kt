@@ -16,6 +16,7 @@ interface UsersRepository {
     fun getUserByToken(token: String): User?
     fun getUserByGithubId(githubId: Long): User?
     fun getStudentSchoolId(id: Int): Int?
+    fun updateStudentStatus(id: Int)
     fun deleteStudent(id: Int)
     fun deleteTeacher(id: Int)
 }

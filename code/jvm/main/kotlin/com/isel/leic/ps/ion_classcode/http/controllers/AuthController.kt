@@ -1,6 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.controllers
 
 import com.isel.leic.ps.ion_classcode.InvalidAuthenticationStateException
+import com.isel.leic.ps.ion_classcode.domain.User
+import com.isel.leic.ps.ion_classcode.domain.input.OtpInputModel
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
@@ -21,6 +23,7 @@ import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
+import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
@@ -30,29 +33,30 @@ import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.OrgRepoC
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamAddUser
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamCreated
 import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.TeamList
+import com.isel.leic.ps.ion_classcode.http.model.output.InfoOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
+import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
 import com.isel.leic.ps.ion_classcode.http.services.RequestServices
+import com.isel.leic.ps.ion_classcode.http.services.StudentServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
-import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import java.util.*
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -73,7 +77,9 @@ const val APP_COOKIE_NAME = "Session"
 class AuthController(
     private val okHttp: OkHttp,
     private val userServices: UserServices,
-    private val requestServices: RequestServices
+    private val studentServices: StudentServices,
+    private val requestServices: RequestServices,
+    private val outboxServices: OutboxServices
 ) {
 
     @GetMapping(Uris.AUTH_TEACHER_PATH)
@@ -200,15 +206,90 @@ class AuthController(
     }
 
     @GetMapping(Uris.AUTH_REGISTER_PATH)
-    suspend fun authRegisterStudent(
-       // @RequestParam school_id: String
-    ): ResponseEntity<Any> {
-        // TODO(Get school_id, create student and redirect to auth status page, after email verification)
-        return ResponseEntity
-            .status(Status.REDIRECT)
-            .header(HttpHeaders.LOCATION, Uris.AUTH_STATUS_PATH)
-            .build()
+    fun authRegisterStudentPage(): SirenModel<InfoOutputModel> {
+        return siren(InfoOutputModel("Register student", "Please fill the form below with you school identification to register as a student")){
+            link(href = Uris.homeUri(), rel = LinkRelation("home"))
+            link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+            link(href = Uris.authUriRegister(), rel = LinkRelation("self"))
+            action("register", href = Uris.authUriRegister(), method = HttpMethod.POST, type = "application/json"){
+                numberField("school_id")
+            }
+        }
     }
+
+    @PostMapping(Uris.AUTH_REGISTER_PATH)
+    fun authRegisterStudent(
+        user: User,
+        input: SchoolIdInputModel
+    ): SirenModel<Any> {
+        if (user.id == null) TODO("ErrorOutputModel")
+        return when(val createStudent = studentServices.createStudent(StudentInput(user.name,user.email,user.githubUsername,input.schoolId,user.token,user.githubId))) {
+            is Either.Right -> {
+                when (outboxServices.createUserVerification(createStudent.value)){
+                    is Either.Right -> siren(StatusOutputModel("User need verification", "Check you email to proceed with the verification")) {
+                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                        link(href = Uris.authUriRegisterVerification(), rel = LinkRelation("verify"))
+                        link(href = Uris.authUriRegister(), rel = LinkRelation("self"))
+                    }
+                    is Either.Left -> TODO()
+                }
+            }
+            is Either.Left -> TODO("Error creating student")
+        }
+    }
+
+    @GetMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH)
+    fun authRegisterVerifyStudent(
+        user: User,
+        input: SchoolIdInputModel
+    ): SirenModel<Any> {
+       return siren(StatusOutputModel("Send otp", "Check you email to proceed with the verification, entering the OTP")) {
+            link(href = Uris.homeUri(), rel = LinkRelation("home"))
+            link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+            link(href = Uris.authUriRegisterVerification(), rel = LinkRelation("self"))
+            action("verify", href = Uris.authUriRegisterVerification(), method = HttpMethod.POST, type = "application/json"){
+                numberField("otp")
+            }
+        }
+    }
+
+    @PostMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH)
+    fun authRegisterVerifyStudent(
+        user: User,
+        input: OtpInputModel,
+        response: HttpServletResponse
+    ): SirenModel<Any> {
+        if (user.id == null) TODO()
+        return when(outboxServices.checkOtp(user.id!!, input.otp)){
+            is Either.Right -> {
+                val cookie = ResponseCookie.from(
+                    APP_COOKIE_NAME,
+                    AESEncrypt().encrypt(user.token)
+                )
+                    .httpOnly(true)
+                    .sameSite("Strict")
+                    .secure(true)
+                    .maxAge(60 * 60 * 24)
+                    .path("/api")
+                    .build()
+                response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+                siren(StatusOutputModel("User verified", "User verified successfully, you can navigate to menu")) {
+                    link(href = Uris.menuUri(), rel = LinkRelation("menu"), needAuthentication = true)
+                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                }
+            }
+            is Either.Left -> {
+                siren(StatusOutputModel("User not verified", "User not verified, please try again")) {
+                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                    link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
+                }
+            }
+        }
+    }
+
 
     @GetMapping(Uris.AUTH_STATUS_PATH)
     fun authStatus(
@@ -245,9 +326,7 @@ class AuthController(
                     }
                 }
             }
-            is Either.Left -> {
-                TODO()
-            }
+            is Either.Left -> TODO()
         }
     }
 
@@ -322,108 +401,5 @@ class AuthController(
     private fun generateRandomToken(): String {
         return UUID.randomUUID().toString()
     }
-
-    /** Finding place to this functions **/
-
-    private suspend fun getOrgRepos(orgName: String = ORG_NAME, perPage: Int = 100, page: Int = 1, accessToken: String): List<GithubRepo> {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_REPOS_URI(orgName,perPage, page)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .build()
-
-        return okHttp.makeCallToList(request)
-    }
-
-    private suspend fun addUserToOrg(orgName: String, userName: String, accessToken: String): OrgMembership {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_USER_URI(orgName,userName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .put("{\"role\":\"member\"}".toRequestBody("application/json".toMediaType()))
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    private suspend fun listOrgTeams(orgName: String, accessToken: String): List<TeamList> {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_TEAMS_URI(orgName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .get()
-            .build()
-
-        return okHttp.makeCallToList(request)
-    }
-
-    private suspend fun createOrgRepo(orgName: String, repoName: String, accessToken: String): List<OrgRepoCreated> {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_CREATE_REPO_URI(orgName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .post("{\"name\": \"$repoName\",\"description\": \"This is your first repository\",\"homepage\": \"https://github.com\",\"private\": true,\"has_issues\": true,\"has_projects\": true,\"has_wiki\": true }".toRequestBody("application/json".toMediaType()))
-            .build()
-
-        return okHttp.makeCallToList(request)
-    }
-
-    private suspend fun createOrgTeam(orgName: String, teamName: String, description: String, accessToken: String): TeamCreated {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_TEAMS_URI(orgName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .post("{\"name\":\"$teamName\",\"$description\":\"description\",\"permission\":\"push\",\"privacy\":\"secret\"}".toRequestBody("application/json".toMediaType()))
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    private suspend fun addUserToTeam(orgName: String, teamName: String, userName: String, accessToken: String): TeamAddUser {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_TEAMS_USER_URI(orgName,teamName,userName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .put("{\"role\":\"member\"}".toRequestBody("application/json".toMediaType()))
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    // Don´t have a response body. Status is 204
-    private suspend fun removeUserOfTeam(orgName: String, teamName: String, userName: String, accessToken: String) {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_TEAMS_USER_URI(orgName,teamName,userName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .delete()
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    private suspend fun addRepoToTeam(orgName: String, teamName: String, prefix: String, teamId: Int, accessToken: String): List<OrgRepoCreated> {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_CREATE_REPO_URI(orgName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .post("{\"name\": \"$prefix-$teamName\",\"description\": \"This is your first repository\",\"homepage\": \"https://github.com\",\"private\": true,\"has_issues\": true,\"has_projects\": true,\"has_wiki\": true,\"team_id\": $teamId }".toRequestBody("application/json".toMediaType()))
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    // Don´t have a response body. Status is 204
-    private suspend fun deleteOrgTeam(orgName: String, teamName: String, accessToken: String) {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_ORG_TEAM_URI(orgName,teamName)}")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .delete()
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    private suspend fun checkScopes(accessToken: String): String {
-        val request = Request.Builder().url(" https://api.github.com/users/codertocat")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
 }
 

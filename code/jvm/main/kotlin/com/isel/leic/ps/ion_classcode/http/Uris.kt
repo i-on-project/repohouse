@@ -15,7 +15,8 @@ object Uris {
     const val HOME = "$API/home"
     const val CREDITS = "$API/credits"
     const val AUTH_PATH = "$API/auth"
-    const val AUTH_REGISTER_PATH = "$API/auth/register"
+    const val AUTH_REGISTER_PATH = "$AUTH_PATH/register"
+    const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_PATH/register"
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
     const val AUTH_STATUS_PATH = "$AUTH_PATH/status/{id}"
@@ -39,6 +40,7 @@ object Uris {
     fun authUriRegister(): URI = URI(AUTH_REGISTER_PATH)
     fun authUriStudent(): URI = URI(AUTH_STUDENT_PATH)
     fun authUriTeacher(): URI = URI(AUTH_TEACHER_PATH)
+    fun authUriRegisterVerification(): URI = URI(AUTH_REGISTER_VERIFICATION_PATH)
     fun callbackUri(): URI = URI(CALLBACK_PATH)
     fun logoutUri(): URI = URI(LOGOUT)
     fun menuUri(): URI = URI(MENU_PATH)

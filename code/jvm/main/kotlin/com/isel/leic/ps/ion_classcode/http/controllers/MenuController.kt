@@ -1,8 +1,10 @@
 package com.isel.leic.ps.ion_classcode.http.controllers
 
+import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
+import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.input.TeachersPendingInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.MenuOutputModel
@@ -16,7 +18,6 @@ import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
-import org.jetbrains.annotations.NotNull
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -31,8 +32,18 @@ class MenuController(
     private val studentServices: StudentServices
 ) {
 
-    @GetMapping(Uris.MENU_PATH, headers = ["User=Teacher"])
-    fun menuTeacher(
+    @GetMapping(Uris.MENU_PATH)
+    fun menu(
+        user: User
+    ): SirenModel<MenuOutputModel> {
+        return if (user is Student) {
+            menuStudent(user)
+        } else {
+            menuTeacher(user)
+        }
+    }
+
+    private fun menuTeacher(
         user:User
     ): SirenModel<MenuOutputModel> {
         return when(val courses = user.id?.let { teacherServices.getCourses(it)}) {
@@ -52,14 +63,14 @@ class MenuController(
         }
     }
 
-
-    @GetMapping(Uris.MENU_PATH, headers = ["User=Student"])
-    fun menuStudent(
+    private fun menuStudent(
         user:User
     ): SirenModel<MenuOutputModel>  {
-        val student = user.id?.let { studentServices.getStudentSchoolId(user.id!!) }
-        return when(val courses = user.id?.let { studentServices.getCourses(it)}) {
-            is Either.Right -> siren(value = MenuStudentOutputModel(user.name, 1,user.email,courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId) } )) {
+        if (user !is Student) TODO("ErrorOutputModel")
+        val studentSchoolId = user.id.let { studentServices.getStudentSchoolId(user.id) }
+        if (studentSchoolId is Either.Left) TODO("ErrorOutputModel")
+        return when(val courses = studentServices.getCourses(user.id)) {
+            is Either.Right -> siren(value = MenuStudentOutputModel(user.name, (studentSchoolId as Either.Right).value,user.email,courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId) } )) {
                 link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
                 link(rel = LinkRelation("credits"), href = Uris.creditsUri())
                 link(rel = LinkRelation("logout"), href = Uris.logoutUri(), needAuthentication = true)
@@ -68,7 +79,6 @@ class MenuController(
                 }
             }
             is Either.Left ->  TODO("ErrorOutputModel")
-            else -> TODO("ErrorOutputModel")
         }
     }
 

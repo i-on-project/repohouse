@@ -148,6 +148,18 @@ class JdbiUsersRepository(
             .firstOrNull()
     }
 
+    override fun updateStudentStatus(id: Int) {
+        handle.createUpdate(
+            """
+            UPDATE Users
+            SET is_created = true
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .execute()
+    }
+
     override fun deleteStudent(id: Int) {
         handle.createUpdate(
             """

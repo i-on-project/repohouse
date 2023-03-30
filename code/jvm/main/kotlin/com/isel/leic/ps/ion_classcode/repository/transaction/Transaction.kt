@@ -29,5 +29,7 @@ interface Transaction {
     val leaveTeamRepository: LeaveTeamRepository
     val leaveCourseRepository: LeaveCourseRepository
     val requestRepository: RequestRepository
+    val outboxRepository: OutboxRepository
+    val cooldownRepository: CooldownRepository
     fun rollback()
 }

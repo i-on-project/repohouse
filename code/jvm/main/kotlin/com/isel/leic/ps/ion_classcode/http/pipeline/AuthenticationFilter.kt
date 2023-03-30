@@ -26,11 +26,9 @@ class AuthenticationFilter(
             AESDecrypt().decrypt(it)
         }
         val user = authorizationHeaderProcessor.process(token)
-        val mutableRequest = MutableHttpServletRequest(httpServletRequest)
         if (user != null) {
-            UserArgumentResolver.addUserTo(user, mutableRequest)
+            UserArgumentResolver.addUserTo(user, httpServletRequest)
         }
-        val x = mutableRequest as HttpServletRequest
-        chain?.doFilter(x, response)
+        chain?.doFilter(httpServletRequest, response)
     }
 }

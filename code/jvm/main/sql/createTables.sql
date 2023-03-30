@@ -130,7 +130,7 @@ CREATE TABLE Student_Team(
     team int,
     primary key (student, team),
     foreign key (student) references Student(id),
-    foreign key (team) references Course(id)
+    foreign key (team) references Team(id)
 );
 
 CREATE TABLE Delivery(
@@ -167,6 +167,23 @@ CREATE TABLE Feedback(
     label text not null,
     team_id int not null,
     foreign key (team_id) references Team(id)
+);
+
+CREATE TABLE Cooldown(
+    id serial primary key,
+    user_id int not null,
+    end_date timestamp not null,
+    foreign key (user_id) references users(id)
+);
+
+Create TABLE Outbox(
+    id serial primary key,
+    user_id int not null,
+    otp int not null,
+    status text not null check ( status in ('Pending', 'Sent') ),
+    expired_at timestamp not null,
+    sent_at timestamp default null,
+    foreign key (user_id) references users(id)
 );
 
 COMMIT;

@@ -14,3 +14,7 @@
 - Progresso na utilização de JDBI
 - Progresso na criação das rotas
 - Descobrir a possibilidade de ter a mesma rota para duas funções no spring e fazer a distinção através do header, podendo ter então como exemplo a rota /home e depender se é um aluno ou professor, adicionando ao header correspondente.
+
+## 30 Março - Ricardo
+- Outbox pattern
+- Schedule para o envio de emails
