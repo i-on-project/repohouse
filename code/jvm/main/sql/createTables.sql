@@ -54,7 +54,7 @@ CREATE TABLE Request(
     creator int not null,
     composite integer default null,
     state text not null check ( state in ('pending', 'accepted', 'rejected') ),
-    foreign key (creator) references users(id),
+    foreign key (creator) references Users(id),
     foreign key (composite) references Request(id)
 );
 
@@ -103,7 +103,7 @@ CREATE TABLE Apply(
     id int primary key,
     teacher_id int not null,
     foreign key (id) references Request(id),
-    foreign key (teacher_id) references users(id)
+    foreign key (teacher_id) references Users(id)
 );
 
 CREATE TABLE Assignment(
