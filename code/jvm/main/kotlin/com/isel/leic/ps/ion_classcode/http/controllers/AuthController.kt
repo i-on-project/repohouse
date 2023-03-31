@@ -37,6 +37,7 @@ import com.isel.leic.ps.ion_classcode.http.model.output.InfoOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
+import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.http.services.RequestServices
 import com.isel.leic.ps.ion_classcode.http.services.StudentServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
@@ -44,6 +45,7 @@ import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import jakarta.servlet.http.HttpServletResponse
 import java.util.*
@@ -57,7 +59,7 @@ import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import kotlin.collections.LinkedHashMap
@@ -98,8 +100,8 @@ class AuthController(
         val state = generateUserState()
         return ResponseEntity
             .status(Status.REDIRECT)
-            .header(STATE_COOKIE_NAME, state.cookie.toString())
-            .header(STATE_COOKIE_NAME, generateUserPosition(STUDENT_COOKIE_NAME).toString())
+            .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
+            .header(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
             .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")
             .build()
     }
@@ -158,8 +160,8 @@ class AuthController(
                 }
             }
             is Either.Left -> {
+                val userEmail = fetchUserEmails(accessToken.access_token).first { it.primary }
                 if(position == "Teacher"){
-                    val userEmail = fetchUserEmails(accessToken.access_token).first { it.primary }
                     when(val user = userServices.createTeacher(
                         TeacherInput(
                             userEmail.email,
@@ -190,15 +192,43 @@ class AuthController(
                     }
 
                 }else{
-                    siren(
-                        StatusOutputModel(
-                            "Register user",
-                            "Redirect to register page",
+                    when(val user = userServices.createPendingStudent(
+                        StudentInput(
+                            email = userEmail.email,
+                            githubUsername = userGithubInfo.login,
+                            githubId = userGithubInfo.id,
+                            token=generateRandomToken(),
+                            name= userGithubInfo.name
                         )
-                    ) {
-                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                        link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
+                    )) {
+                        is Either.Right -> {
+                            val cookie = ResponseCookie.from(
+                                "PendingStudent",
+                                AESEncrypt().encrypt(user.value.token)
+                            )
+                                .httpOnly(true)
+                                .sameSite("Strict")
+                                .secure(true)
+                                .maxAge(60 * 60 * 24)
+                                .path("/api")
+                                .build()
+                            response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+
+                            siren(
+                                StatusOutputModel(
+                                    "Register student user",
+                                    "Redirect to register page",
+                                )
+                            ) {
+                                link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                                link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                                link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
+                            }
+                        }
+
+                        is Either.Left -> {
+                            TODO()
+                        }
                     }
                 }
             }
@@ -206,7 +236,9 @@ class AuthController(
     }
 
     @GetMapping(Uris.AUTH_REGISTER_PATH)
-    fun authRegisterStudentPage(): SirenModel<InfoOutputModel> {
+    fun authRegisterStudentPage(
+        @CookieValue("PendingStudent") token: String
+    ): SirenModel<InfoOutputModel> {
         return siren(InfoOutputModel("Register student", "Please fill the form below with you school identification to register as a student")){
             link(href = Uris.homeUri(), rel = LinkRelation("home"))
             link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
@@ -219,30 +251,55 @@ class AuthController(
 
     @PostMapping(Uris.AUTH_REGISTER_PATH)
     fun authRegisterStudent(
-        user: User,
-        input: SchoolIdInputModel
+        @CookieValue("PendingStudent") token: String,
+        @RequestBody input: SchoolIdInputModel
     ): SirenModel<Any> {
-        if (user.id == null) TODO("ErrorOutputModel")
-        return when(val createStudent = studentServices.createStudent(StudentInput(user.name,user.email,user.githubUsername,input.schoolId,user.token,user.githubId))) {
+        val decryptToken = AESDecrypt().decrypt(token)
+        when (val user = userServices.checkAuthentication(decryptToken)) {
             is Either.Right -> {
-                when (outboxServices.createUserVerification(createStudent.value)){
-                    is Either.Right -> siren(StatusOutputModel("User need verification", "Check you email to proceed with the verification")) {
-                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                        link(href = Uris.authUriRegisterVerification(), rel = LinkRelation("verify"))
-                        link(href = Uris.authUriRegister(), rel = LinkRelation("self"))
+                return when (studentServices.updateStudent(user.value.id, input.schoolId)) {
+                    is Either.Right -> {
+                        when (val userOutbox = outboxServices.createUserVerification(user.value.id)) {
+                            is Either.Right -> siren(
+                                StatusOutputModel(
+                                    "User need verification",
+                                    "Check you email to proceed with the verification and go to the verify page",
+                                )
+                            ) {
+                                link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                                link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                                link(href = Uris.authUriRegisterVerification(), rel = LinkRelation("verify"))
+                                link(href = Uris.authUriRegister(), rel = LinkRelation("self"))
+                            }
+
+                            is Either.Left ->
+                                when(userOutbox.value){
+                                    is OutboxServicesError.CooldownNotExpired -> siren(
+                                        StatusOutputModel(
+                                            "In cooldown",
+                                            "You are in cooldown, try again in ${userOutbox.value.cooldown} seconds",
+                                        )
+                                    ) {
+                                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                                        link(href = Uris.authUriRegisterVerification(), rel = LinkRelation("verify"))
+                                        link(href = Uris.authUriRegister(), rel = LinkRelation("self"))
+                                    }
+                                    else -> TODO()
+                                }
+                        }
                     }
-                    is Either.Left -> TODO()
+
+                    is Either.Left -> TODO("Error creating student")
                 }
             }
-            is Either.Left -> TODO("Error creating student")
+            is Either.Left -> TODO("throw InvalidAuthenticationStateException()")
         }
     }
 
     @GetMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH)
     fun authRegisterVerifyStudent(
-        user: User,
-        input: SchoolIdInputModel
+        @CookieValue("PendingStudent") token: String,
     ): SirenModel<Any> {
        return siren(StatusOutputModel("Send otp", "Check you email to proceed with the verification, entering the OTP")) {
             link(href = Uris.homeUri(), rel = LinkRelation("home"))
@@ -256,37 +313,84 @@ class AuthController(
 
     @PostMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH)
     fun authRegisterVerifyStudent(
-        user: User,
+        @CookieValue("PendingStudent") token: String,
+        @RequestBody
         input: OtpInputModel,
         response: HttpServletResponse
     ): SirenModel<Any> {
-        if (user.id == null) TODO()
-        return when(outboxServices.checkOtp(user.id!!, input.otp)){
+        val decryptToken = AESDecrypt().decrypt(token)
+        when (val user = userServices.checkAuthentication(decryptToken)) {
             is Either.Right -> {
-                val cookie = ResponseCookie.from(
-                    APP_COOKIE_NAME,
-                    AESEncrypt().encrypt(user.token)
-                )
-                    .httpOnly(true)
-                    .sameSite("Strict")
-                    .secure(true)
-                    .maxAge(60 * 60 * 24)
-                    .path("/api")
-                    .build()
-                response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-                siren(StatusOutputModel("User verified", "User verified successfully, you can navigate to menu")) {
-                    link(href = Uris.menuUri(), rel = LinkRelation("menu"), needAuthentication = true)
-                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                return when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
+                    is Either.Right -> {
+                        val deleteCookie = ResponseCookie.from(
+                            "PendingStudent",
+                            ""
+                        )
+                            .httpOnly(true)
+                            .sameSite("Strict")
+                            .secure(true)
+                            .maxAge(0)
+                            .path("/api")
+                            .build()
+
+                        val cookie = ResponseCookie.from(
+                            APP_COOKIE_NAME,
+                            AESEncrypt().encrypt(decryptToken)
+                        )
+                            .httpOnly(true)
+                            .sameSite("Strict")
+                            .secure(true)
+                            .maxAge(60 * 60 * 24)
+                            .path("/api")
+                            .build()
+                        response.setHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+                        response.setHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
+                        siren(
+                            StatusOutputModel(
+                                "User verified",
+                                "User verified successfully, you can navigate to menu"
+                            )
+                        ) {
+                            link(href = Uris.menuUri(), rel = LinkRelation("menu"), needAuthentication = true)
+                            link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                            link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                        }
+                    }
+
+                    is Either.Left -> {
+                        when (checkOTP.value) {
+                            is OutboxServicesError.OtpExpired -> {
+                                siren(StatusOutputModel("OTP Expired", "OTP expired, please request new OTP")) {
+                                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                                    link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
+                                }
+                            }
+
+                            is OutboxServicesError.OtpDifferent -> {
+                                siren(StatusOutputModel("OTP Not Valid", "OTP not valid, try again in 5 minutes")) {
+                                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                                    link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
+                                }
+                            }
+
+                            is OutboxServicesError.OtpNotFound -> {
+                                siren(StatusOutputModel("OTP Not Found", "OTP not found, try again to register")) {
+                                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
+                                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
+                                    link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
+                                }
+                            }
+
+                            else -> TODO()
+                        }
+                    }
                 }
             }
-            is Either.Left -> {
-                siren(StatusOutputModel("User not verified", "User not verified, please try again")) {
-                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                    link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
-                }
-            }
+            is Either.Left -> TODO()
         }
     }
 

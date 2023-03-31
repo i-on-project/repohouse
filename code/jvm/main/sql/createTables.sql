@@ -19,7 +19,7 @@ CREATE TABLE Teacher(
 
 CREATE TABLE Student(
     id int primary key,
-    school_id int unique not null,
+    school_id int unique default null,
     foreign key(id) references users(id)
 );
 
@@ -52,7 +52,7 @@ CREATE TABLE Classroom(
 CREATE TABLE Request(
     id serial primary key,
     creator int not null,
-    composite int default null,
+    composite integer default null,
     state text not null check ( state in ('pending', 'accepted', 'rejected') ),
     foreign key (creator) references users(id),
     foreign key (composite) references Request(id)
@@ -184,6 +184,12 @@ Create TABLE Outbox(
     expired_at timestamp not null,
     sent_at timestamp default null,
     foreign key (user_id) references users(id)
+);
+
+CREATE TABLE PendingStudent(
+    id int primary key,
+    email text unique check (email like '%@%') not null,
+    foreign key (id) references users(id)
 );
 
 COMMIT;

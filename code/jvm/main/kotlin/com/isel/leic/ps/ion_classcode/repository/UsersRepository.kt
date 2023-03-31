@@ -8,6 +8,8 @@ import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 
 interface UsersRepository {
     fun createStudent(student: StudentInput): Int
+    fun createPendingStudent(student: StudentInput): Int
+    fun updateStudentSchool(userId: Int, schoolId: Int)
     fun createTeacher(teacher: TeacherInput): Int
     fun getAllStudents(): List<Student>
     fun getAllTeachers(): List<Teacher>

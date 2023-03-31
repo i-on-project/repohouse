@@ -1,14 +1,17 @@
 package com.isel.leic.ps.ion_classcode.http.pipeline
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
-import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
+import java.lang.StringBuilder
 import org.springframework.stereotype.Component
+import org.springframework.util.StreamUtils
 import org.springframework.web.util.WebUtils
+
 
 @Component
 class AuthenticationFilter(

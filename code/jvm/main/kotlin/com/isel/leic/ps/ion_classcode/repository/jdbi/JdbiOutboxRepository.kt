@@ -3,6 +3,7 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 import com.isel.leic.ps.ion_classcode.domain.Outbox
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
+import java.sql.Timestamp
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
@@ -12,14 +13,14 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
         return handle.createUpdate(
             """
             INSERT INTO Outbox (user_id, otp,status,expired_at)
-            VALUES (:user_id,:otp,:status,CURRENT_DATE + INTERVAL :interval)
+            VALUES (:user_id,:otp,:status,:interval::timestamp)
             RETURNING id
             """,
         )
             .bind("user_id", outbox.userId)
             .bind("otp", outbox.otp)
             .bind("status", "Pending")
-            .bind("interval", INTERVAL)
+            .bind("interval", toTimestamp(INTERVAL))
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .firstOrNull(
@@ -82,6 +83,17 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
         )
             .bind("id", outboxId)
             .execute() == 1
+    }
+
+    private fun toTimestamp(interval: String): Timestamp {
+        return handle.createQuery(
+            """
+            SELECT NOW() + :interval::interval AS timestamp
+            """,
+        )
+            .bind("interval", interval)
+            .mapTo<Timestamp>()
+            .first()
     }
 
 }

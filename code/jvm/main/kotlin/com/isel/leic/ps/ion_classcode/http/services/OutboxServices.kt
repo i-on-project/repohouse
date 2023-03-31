@@ -3,8 +3,10 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
+import java.sql.Timestamp
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+
 
 typealias OutboxResponse = Either<OutboxServicesError, Unit>
 
@@ -15,13 +17,15 @@ sealed class OutboxServicesError {
     object OtpDifferent : OutboxServicesError()
     object EmailNotSent : OutboxServicesError()
     object ErrorCreatingRequest : OutboxServicesError()
-    object CooldownNotExpired : OutboxServicesError()
+    class CooldownNotExpired(val cooldown: Int) : OutboxServicesError()
 }
 
+private const val COOLDOWN_TIME = 500000
 
 @Component
 class OutboxServices(
     private val transactionManager: TransactionManager,
+    private val emailService: EmailService
 ) {
 
     //TODO: Insert user,otp,timestamp,sent in entity + call create user
@@ -36,14 +40,14 @@ class OutboxServices(
         val otp = createRamdomOtp()
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId)
-            if(!cooldown) {
-                Either.Left(OutboxServicesError.CooldownNotExpired)
+            if(cooldown != null) {
+                return@run Either.Left(OutboxServicesError.CooldownNotExpired(cooldown))
             }
             val outbox = it.outboxRepository.createOutboxRequest(OutboxInput(userId, otp))
             if(outbox == null) {
-                Either.Left(OutboxServicesError.ErrorCreatingRequest)
+                return@run Either.Left(OutboxServicesError.ErrorCreatingRequest)
             } else {
-                Either.Right(Unit)
+                return@run Either.Right(Unit)
             }
         }
     }
@@ -55,6 +59,7 @@ class OutboxServices(
                 Either.Left(OutboxServicesError.OtpNotFound)
             } else {
                 if (outbox.expired_at.before(System.currentTimeMillis().toTimestamp())) {
+                    it.outboxRepository.deleteOutboxRequest(outbox.id)
                     Either.Left(OutboxServicesError.OtpExpired)
                 }
                 if(outbox.otp == otp) {
@@ -62,7 +67,7 @@ class OutboxServices(
                     Either.Right(Unit)
                 } else {
                     it.outboxRepository.deleteOutboxRequest(outbox.id)
-                    it.cooldownRepository.createCooldownRequest(userId, System.currentTimeMillis().toTimestamp())
+                    it.cooldownRepository.createCooldownRequest(userId, addTime(COOLDOWN_TIME))
                     Either.Left(OutboxServicesError.OtpDifferent)
                 }
             }
@@ -73,8 +78,10 @@ class OutboxServices(
     fun sendEmails() {
         transactionManager.run {
             it.outboxRepository.getOutboxPendingRequests().forEach { outbox ->
-                //TODO: Send email
-                it.outboxRepository.updateOutboxStateRequest(outbox.id)
+                it.usersRepository.getUserById(outbox.userId)?.let { user ->
+                    emailService.sendVerificationEmail(user.name,user.email, outbox.otp)
+                    it.outboxRepository.updateOutboxStateRequest(outbox.id)
+                }
             }
         }
     }
@@ -91,5 +98,10 @@ class OutboxServices(
     private fun java.sql.Timestamp.toLong(): Long {
         return this.time
     }
+
+    private fun addTime(millis: Int): Timestamp {
+        return (System.currentTimeMillis() + millis).toTimestamp()
+    }
+
 }
 

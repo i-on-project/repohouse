@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 
 typealias StudentCoursesResponse = Either<StudentServicesError, List<Course>>
 typealias StudentSchoolIdResponse = Either<StudentServicesError, Int>
+typealias StudentSchoolIdUpdateResponse = Either<StudentServicesError, Unit>
 
 
 sealed class StudentServicesError {
@@ -39,10 +40,10 @@ class StudentServices(
         }
     }
 
-    fun createStudent(student:StudentInput): StudentSchoolIdResponse {
+    fun updateStudent(userId:Int,schoolId:Int): StudentSchoolIdUpdateResponse {
         return transactionManager.run {
-            val schoolId = it.usersRepository.createStudent(student)
-            Either.Right(schoolId)
+            val school= it.usersRepository.updateStudentSchool(userId, schoolId)
+            Either.Right(school)
         }
     }
 

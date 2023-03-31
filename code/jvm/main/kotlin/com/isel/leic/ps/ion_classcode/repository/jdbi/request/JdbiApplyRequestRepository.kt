@@ -18,7 +18,7 @@ class JdbiApplyRequestRepository(
             """,
         )
             .bind("creator", request.creator)
-            .bind("composite", request.composite)
+            .bind("compositeId", request.composite)
             .execute()
 
         return handle.createUpdate(

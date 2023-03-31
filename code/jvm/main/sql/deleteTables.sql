@@ -23,6 +23,8 @@ DELETE FROM Student_Course;
 DELETE FROM Course;
 DELETE FROM Student;
 DELETE FROM Teacher;
+DELETE FROM outbox;
+DELETE From cooldown;
 DELETE FROM Users;
 
 COMMIT TRANSACTION;

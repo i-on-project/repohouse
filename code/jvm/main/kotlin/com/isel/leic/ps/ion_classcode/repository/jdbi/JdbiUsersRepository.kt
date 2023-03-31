@@ -41,7 +41,7 @@ class JdbiUsersRepository(
         return id
     }
 
-    override fun createTeacher(teacher: TeacherInput): Int {
+    override fun createPendingStudent(student: StudentInput): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO Users (email, github_username, github_id, token, name)
@@ -49,23 +49,22 @@ class JdbiUsersRepository(
             RETURNING id
             """,
         )
-            .bind("email", teacher.email)
-            .bind("github_username", teacher.githubUsername)
-            .bind("github_id", teacher.githubId)
-            .bind("token", teacher.token)
-            .bind("name", teacher.name)
+            .bind("email", student.email)
+            .bind("github_username", student.githubUsername)
+            .bind("github_id", student.githubId)
+            .bind("token", student.token)
+            .bind("name", student.name)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
 
         handle.createUpdate(
             """
-            INSERT INTO Teacher (id, github_token)
-            VALUES (:id, :github_token)
+            INSERT INTO student (id)
+            VALUES (:id)
             """,
         )
             .bind("id", id)
-            .bind("github_token", teacher.githubToken)
             .execute()
         return id
     }
@@ -146,6 +145,47 @@ class JdbiUsersRepository(
             .bind("id", id)
             .mapTo<Int>()
             .firstOrNull()
+    }
+
+    override fun updateStudentSchool(userId:Int,schoolId: Int) {
+        handle.createUpdate(
+            """
+            update student set school_id = :school_id
+            where id = :id
+            """,
+        )
+            .bind("id", userId)
+            .bind("school_id", schoolId)
+            .execute()
+    }
+
+    override fun createTeacher(teacher: TeacherInput): Int {
+        val id = handle.createUpdate(
+            """
+            INSERT INTO Users (email, github_username, github_id, token, name)
+            VALUES (:email, :github_username, :github_id, :token, :name)
+            RETURNING id
+            """,
+        )
+            .bind("email", teacher.email)
+            .bind("github_username", teacher.githubUsername)
+            .bind("github_id", teacher.githubId)
+            .bind("token", teacher.token)
+            .bind("name", teacher.name)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
+
+        handle.createUpdate(
+            """
+            INSERT INTO teacher (id, github_token)
+            VALUES (:id, :github_token)
+            """,
+        )
+            .bind("id", id)
+            .bind("github_token", teacher.githubToken)
+            .execute()
+        return id
     }
 
     override fun updateStudentStatus(id: Int) {

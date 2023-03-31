@@ -16,7 +16,7 @@ object Uris {
     const val CREDITS = "$API/credits"
     const val AUTH_PATH = "$API/auth"
     const val AUTH_REGISTER_PATH = "$AUTH_PATH/register"
-    const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_PATH/register"
+    const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_PATH/verify"
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
     const val AUTH_STATUS_PATH = "$AUTH_PATH/status/{id}"

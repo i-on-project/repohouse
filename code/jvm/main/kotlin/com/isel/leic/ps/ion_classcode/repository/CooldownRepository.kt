@@ -8,7 +8,7 @@ import java.sql.Timestamp
 
 interface CooldownRepository {
     fun createCooldownRequest(userId:Int,end_time:Timestamp): Int?
-    fun getCooldownRequest(userId: Int): Boolean
+    fun getCooldownRequest(userId: Int): Int?
     fun deleteCooldownRequest(userId: Int): Boolean
 
 }
