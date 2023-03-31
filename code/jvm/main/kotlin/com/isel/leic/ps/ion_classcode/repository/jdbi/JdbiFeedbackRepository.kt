@@ -4,6 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.Feedback
 import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
 import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
     override fun createFeedback(feedback: FeedbackInput): Int {
@@ -17,7 +18,9 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .bind("description", feedback.description)
             .bind("label", feedback.label)
             .bind("teamId", feedback.teamId)
-            .execute()
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
     override fun deleteFeedback(feedbackId: Int) {
@@ -57,7 +60,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .execute()
     }
 
-    override fun getFeedbackById(feedbackId: Int): Feedback {
+    override fun getFeedbackById(feedbackId: Int): Feedback? {
         return handle.createQuery(
             """
                 SELECT * FROM FEEDBACK
@@ -65,8 +68,8 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
                 """,
         )
             .bind("feedbackId", feedbackId)
-            .mapTo(Feedback::class.java)
-            .one()
+            .mapTo<Feedback>()
+            .firstOrNull()
     }
 
     override fun getFeedbacksByTeam(teamId: Int): List<Feedback> {
@@ -77,7 +80,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
                 """,
         )
             .bind("teamId", teamId)
-            .mapTo(Feedback::class.java)
+            .mapTo<Feedback>()
             .list()
     }
 }

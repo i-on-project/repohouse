@@ -192,12 +192,12 @@ class AuthController(
                     }
 
                 }else{
-                    when(val user = userServices.createPendingStudent(
+                    when(val user = userServices.createStudent(
                         StudentInput(
                             email = userEmail.email,
                             githubUsername = userGithubInfo.login,
                             githubId = userGithubInfo.id,
-                            token=generateRandomToken(),
+                            token = generateRandomToken(),
                             name= userGithubInfo.name
                         )
                     )) {

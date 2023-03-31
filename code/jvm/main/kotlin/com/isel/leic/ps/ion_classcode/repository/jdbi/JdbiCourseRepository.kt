@@ -94,4 +94,16 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .mapTo<Student>()
             .list()
     }
+
+    override fun getCourse(courseId: Int): Course? {
+        return handle.createQuery(
+            """
+            SELECT * FROM course 
+            WHERE id = :course_id
+            """
+        )
+            .bind("course_id", courseId)
+            .mapTo<Course>()
+            .firstOrNull()
+    }
 }

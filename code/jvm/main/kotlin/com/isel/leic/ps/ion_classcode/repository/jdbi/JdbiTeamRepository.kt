@@ -4,19 +4,22 @@ import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
 import com.isel.leic.ps.ion_classcode.repository.TeamRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
     override fun createTeam(team: TeamInput): Int {
         return handle.createUpdate(
             """
-            INSERT INTO team (assignment, name,is_created)
-            VALUES (:assigmentId, :name,false)
+            INSERT INTO team (assignment, name, is_created)
+            VALUES (:assignmentId, :name,false)
             RETURNING id
             """,
         )
-            .bind("assigmentId", team.assigmentId)
+            .bind("assignmentId", team.assignmentId)
             .bind("name", team.name)
-            .execute()
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
     override fun updateTeamStatus(id: Int, status: Boolean) {
@@ -39,8 +42,20 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             """,
         )
             .bind("id", id)
-            .mapTo(Team::class.java)
+            .mapTo<Team>()
             .firstOrNull()
+    }
+
+    override fun enterTeam(teamId: Int, studentId: Int) {
+        handle.createUpdate(
+            """
+            INSERT INTO student_team (student, team)
+            VALUES (:student_id, :team_id)
+            """,
+        )
+            .bind("student_id", studentId)
+            .bind("team_id", teamId)
+            .execute()
     }
 
     override fun leaveTeam(teamId: Int, studentId: Int) {
@@ -66,15 +81,15 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .execute()
     }
 
-    override fun getTeamsFromAssigment(assigmentId: Int): List<Team> {
+    override fun getTeamsFromAssignment(assignmentId: Int): List<Team> {
         return handle.createQuery(
             """
             SELECT * FROM team
-            WHERE assignment = :assigmentId
+            WHERE assignment = :assignmentId
             """,
         )
-            .bind("assigmentId", assigmentId)
-            .mapTo(Team::class.java)
+            .bind("assignmentId", assignmentId)
+            .mapTo<Team>()
             .list()
     }
 
@@ -87,7 +102,7 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             """,
         )
             .bind("studentId", studentId)
-            .mapTo(Team::class.java)
+            .mapTo<Team>()
             .list()
     }
 }

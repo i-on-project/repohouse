@@ -63,7 +63,7 @@ class OutboxServices(
                     Either.Left(OutboxServicesError.OtpExpired)
                 }
                 if(outbox.otp == otp) {
-                    it.usersRepository.updateStudentStatus(userId)
+                    it.usersRepository.updateUserStatus(userId)
                     Either.Right(Unit)
                 } else {
                     it.outboxRepository.deleteOutboxRequest(outbox.id)

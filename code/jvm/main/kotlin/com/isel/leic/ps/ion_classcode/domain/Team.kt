@@ -4,5 +4,5 @@ data class Team(
     val id: Int,
     val name: String,
     val isCreated: Boolean,
-    val assigmentId: Int,
+    val assignment: Int,
 )

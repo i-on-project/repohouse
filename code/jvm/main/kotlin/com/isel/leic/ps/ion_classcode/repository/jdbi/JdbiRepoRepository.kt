@@ -4,6 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.Repo
 import com.isel.leic.ps.ion_classcode.domain.input.RepoInput
 import com.isel.leic.ps.ion_classcode.repository.RepoRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
     override fun createRepo(repo: RepoInput): Int {
@@ -16,8 +17,10 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
         )
             .bind("name", repo.name)
             .bind("url", repo.url)
-            .bind("teamId", repo.team_id)
-            .execute()
+            .bind("teamId", repo.teamId)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
     override fun deleteRepo(repoId: Int) {
@@ -31,7 +34,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .execute()
     }
 
-    override fun updateRepoStatus(repoId: Int, status: String) {
+    override fun updateRepoStatus(repoId: Int, status: Boolean) {
         handle.createUpdate(
             """
                 UPDATE REPO
@@ -44,7 +47,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .execute()
     }
 
-    override fun getRepoById(repoId: Int): RepoInput {
+    override fun getRepoById(repoId: Int): Repo? {
         return handle.createQuery(
             """
                 SELECT * FROM REPO
@@ -52,8 +55,8 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
                 """,
         )
             .bind("repoId", repoId)
-            .mapTo(RepoInput::class.java)
-            .first()
+            .mapTo<Repo>()
+            .firstOrNull()
     }
 
     override fun getReposByTeam(teamId: Int): List<Repo> {
@@ -64,7 +67,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
                 """,
         )
             .bind("teamId", teamId)
-            .mapTo(Repo::class.java)
+            .mapTo<Repo>()
             .list()
     }
 }

@@ -3,9 +3,9 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 import com.isel.leic.ps.ion_classcode.domain.Outbox
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
-import java.sql.Timestamp
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
+import java.sql.Timestamp
 
 const val INTERVAL = "10 MINUTES"
 class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
@@ -23,8 +23,7 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .bind("interval", toTimestamp(INTERVAL))
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
-            .firstOrNull(
-        )
+            .firstOrNull()
     }
 
     override fun getOutboxPendingRequests(): List<Outbox> {
@@ -95,5 +94,4 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .mapTo<Timestamp>()
             .first()
     }
-
 }
