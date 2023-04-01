@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
+import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
@@ -57,6 +58,18 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("student_id", studentId)
             .bind("course_id", courseId)
             .execute()
+    }
+
+    override fun getCourseClassrooms(courseId: Int): List<Classroom> {
+        return handle.createQuery(
+            """
+                SELECT * FROM classroom
+                WHERE course_id = :course_id
+            """,
+        )
+            .bind("course_id", courseId)
+            .mapTo<Classroom>()
+            .list()
     }
 
     override fun getAllTeacherCourses(teacherId: Int): List<Course>{

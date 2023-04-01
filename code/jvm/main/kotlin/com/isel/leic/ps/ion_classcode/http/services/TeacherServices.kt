@@ -29,7 +29,7 @@ class TeacherServices(
         }
     }
 
-    fun getTeatchersNeedingApproval(): TeacherPendingResponse {
+    fun getTeachersNeedingApproval(): TeacherPendingResponse {
         return transactionManager.run {
             val requestsPending = it.applyRequestRepository.getApplyRequests().filter {request -> request.state == "Pending" }
             val teachers = requestsPending

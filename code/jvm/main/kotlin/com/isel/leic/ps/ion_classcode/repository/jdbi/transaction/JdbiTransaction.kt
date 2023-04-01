@@ -55,7 +55,7 @@ class JdbiTransaction(
     override val courseRepository: CourseRepository by lazy { JdbiCourseRepository(handle = handle) }
     override val deliveryRepository: DeliveryRepository by lazy { JdbiDeliveryRepository(handle = handle) }
     override val applyRequestRepository: ApplyRequestRepository by lazy { JdbiApplyRequestRepository(handle = handle) }
-    override val archieveRepoRepository: AssigmentRepository by lazy { JdbiAssignmentRepository(handle = handle) }
+    override val archiveRepoRepository: AssigmentRepository by lazy { JdbiAssignmentRepository(handle = handle) }
     override val compositeRepository: CompositeRepository by lazy { JdbiCompositeRequestRepository(handle = handle) }
     override val createRepoRepository: CreateRepoRepository by lazy { JdbiCreateRepoRequestRepository(handle = handle) }
     override val createTeamRepository: CreateTeamRepository by lazy { JdbiCreateTeamRequestRepository(handle = handle) }
