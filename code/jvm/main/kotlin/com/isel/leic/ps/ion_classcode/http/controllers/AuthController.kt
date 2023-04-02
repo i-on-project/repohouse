@@ -17,16 +17,19 @@ import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
+import com.isel.leic.ps.ion_classcode.http.model.output.ErrorOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
 import com.isel.leic.ps.ion_classcode.http.model.output.InfoOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.http.services.RequestServices
 import com.isel.leic.ps.ion_classcode.http.services.StudentServices
+import com.isel.leic.ps.ion_classcode.http.services.StudentServicesError
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
@@ -212,9 +215,9 @@ class AuthController(
         @RequestBody input: SchoolIdInputModel
     ): ResponseEntity<*> {
         val decryptToken = AESDecrypt.decrypt(token)
-        when (val user = userServices.checkAuthentication(decryptToken)) {
+        return when (val user = userServices.checkAuthentication(decryptToken)) {
             is Either.Right -> {
-                return when (studentServices.updateStudent(user.value.id, input.schoolId)) {
+                 when (val student = studentServices.updateStudent(user.value.id, input.schoolId)) {
                     is Either.Right -> {
                         when (val userOutbox = outboxServices.createUserVerification(user.value.id)) {
                             is Either.Right -> siren(StatusOutputModel(
@@ -237,14 +240,14 @@ class AuthController(
                                         link(href = Uris.authUriRegisterVerification(), rel = LinkRelation("verify"))
                                         link(href = Uris.authUriRegister(), rel = LinkRelation("self"))
                                     }
-                                    else -> TODO()
+                                    else -> problemOtp(userOutbox.value)
                                 }
                         }
                     }
-                    is Either.Left -> TODO("Error creating student")
+                    is Either.Left -> problemStudent(student.value)
                 }
             }
-            is Either.Left -> TODO("throw InvalidAuthenticationStateException()")
+            is Either.Left -> problemUser(user.value)
         }
     }
 
@@ -270,9 +273,9 @@ class AuthController(
         response: HttpServletResponse
     ): ResponseEntity<*> {
         val decryptToken = AESDecrypt.decrypt(token)
-        when (val user = userServices.checkAuthentication(decryptToken)) {
+        return when (val user = userServices.checkAuthentication(decryptToken)) {
             is Either.Right -> {
-                return when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
+                 when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
                     is Either.Right -> {
                         val deleteCookie = ResponseCookie.from("PendingStudent", "")
                             .httpOnly(true)
@@ -329,12 +332,12 @@ class AuthController(
                                 }
                             }
 
-                            else -> TODO()
+                            else -> problemOtp(checkOTP.value)
                         }
                     }
                 }
             }
-            is Either.Left -> TODO()
+            is Either.Left -> problemUser(user.value)
         }
     }
 
@@ -451,6 +454,35 @@ class AuthController(
 
     private fun generateRandomToken(): String {
         return UUID.randomUUID().toString()
+    }
+
+    private fun problemUser(error:UserServicesError):ResponseEntity<ErrorMessageModel>{
+        return when(error){
+            UserServicesError.InvalidData -> Problem.invalidInput
+            UserServicesError.UserNotFound -> Problem.notFound
+            UserServicesError.UserNotAuthenticated -> Problem.unauthenticated
+            UserServicesError.ErrorCreatingUser -> Problem.internalError
+            UserServicesError.InvalidGithubId -> Problem.invalidInput
+        }
+    }
+
+    private fun problemOtp(error:OutboxServicesError):ResponseEntity<ErrorMessageModel>{
+        return when(error){
+            OutboxServicesError.OtpExpired -> Problem.gone
+            OutboxServicesError.OtpDifferent -> Problem.badRequest
+            OutboxServicesError.OtpNotFound -> Problem.notFound
+            OutboxServicesError.UserNotFound -> Problem.notFound
+            OutboxServicesError.EmailNotSent -> Problem.internalError
+            OutboxServicesError.ErrorCreatingRequest -> Problem.internalError
+            else -> Problem.forbidden //OutboxServicesError.CooldownNotExpired(cooldownTime)
+        }
+    }
+
+    private fun problemStudent(error: StudentServicesError): ResponseEntity<ErrorMessageModel> {
+        return when (error) {
+            is StudentServicesError.UserNotFound -> Problem.userNotFound
+            is StudentServicesError.CourseNotFound -> Problem.courseNotFound
+        }
     }
 }
 

@@ -54,7 +54,7 @@ class Problem {
         ))
 
         val unauthorized = response(HttpStatus.UNAUTHORIZED, ErrorMessageModel(
-            URI("$BASE_URL/already-exists"),
+            URI("$BASE_URL/unauthorized"),
             "Unauthorized Action.",
             "The resource you are trying to access is forbidden because of your user status."
         ))
@@ -100,5 +100,30 @@ class Problem {
             "Not a teacher.",
             "The resource you are trying to access is forbidden because of your user status."
         ))
+
+        val unauthenticated = response(HttpStatus.UNAUTHORIZED, ErrorMessageModel(
+            URI("$BASE_URL/unauthenticated"),
+            "Unauthenticated.",
+            "The resource you are trying to access is forbidden because of your user status."
+        ))
+
+        val gone = response(HttpStatus.GONE, ErrorMessageModel(
+            URI("$BASE_URL/gone"),
+            "Gone.",
+            "The resource you are trying to access is no longer available."
+        ))
+
+        val badRequest = response(HttpStatus.BAD_REQUEST, ErrorMessageModel(
+            URI("$BASE_URL/bad-request"),
+            "Bad Request.",
+            "The request is not valid."
+        ))
+
+        val forbidden = response(HttpStatus.FORBIDDEN, ErrorMessageModel(
+            URI("$BASE_URL/forbidden"),
+            "Forbidden.",
+            "The resource you are trying to access is forbidden."
+        ))
+
     }
 }

@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.controllers
 
 import com.isel.leic.ps.ion_classcode.domain.Student
+import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
@@ -10,8 +11,13 @@ import com.isel.leic.ps.ion_classcode.http.model.output.MenuOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.MenuStudentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.MenuTeacherOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeachersPendingOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
+import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
+import com.isel.leic.ps.ion_classcode.http.services.CourseServicesError
 import com.isel.leic.ps.ion_classcode.http.services.StudentServices
+import com.isel.leic.ps.ion_classcode.http.services.StudentServicesError
 import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
+import com.isel.leic.ps.ion_classcode.http.services.TeacherServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
@@ -32,7 +38,7 @@ class MenuController(
     @GetMapping(Uris.MENU_PATH)
     fun menu(
         user: User
-    ): ResponseEntity<SirenModel<MenuOutputModel>> {
+    ): ResponseEntity<*> {
         return if (user is Student) {
             menuStudent(user)
         } else {
@@ -42,7 +48,8 @@ class MenuController(
 
     private fun menuTeacher(
         user:User
-    ): ResponseEntity<SirenModel<MenuOutputModel>> {
+    ): ResponseEntity<*> {
+        if (user !is Teacher) return Problem.stateMismatch
         return when(val courses = teacherServices.getCourses(user.id)) {
             is Either.Right -> siren(value = MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId) })) {
                 clazz("menu")
@@ -55,16 +62,16 @@ class MenuController(
                     link(rel = LinkRelation("course"), href = Uris.courseUri(it.id), needAuthentication = true)
                 }
             }
-            is Either.Left ->  TODO("ErrorOutputModel")
+            is Either.Left ->  problemTeacher(courses.value)
         }
     }
 
     private fun menuStudent(
         user:User
-    ): ResponseEntity<SirenModel<MenuOutputModel>> {
-        if (user !is Student) TODO("ErrorOutputModel")
+    ): ResponseEntity<*> {
+        if (user !is Student) return Problem.stateMismatch
         val studentSchoolId = studentServices.getStudentSchoolId(user.id)
-        if (studentSchoolId is Either.Left) TODO("ErrorOutputModel")
+        if (studentSchoolId is Either.Left) return problemStudent(studentSchoolId.value)
         return when(val courses = studentServices.getCourses(user.id)) {
             is Either.Right -> siren(value = MenuStudentOutputModel(user.name, (studentSchoolId as Either.Right).value,user.email,courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId) } )) {
                 link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
@@ -74,15 +81,15 @@ class MenuController(
                     link(rel = LinkRelation("course"), href = Uris.courseUri(it.id), needAuthentication = true)
                 }
             }
-            is Either.Left ->  TODO("ErrorOutputModel")
+            is Either.Left ->  problemStudent(courses.value)
         }
     }
 
     @GetMapping(Uris.TEACHERS_APPROVAL_PATH)
     fun teachersApproval(
         user:User
-    ): ResponseEntity<SirenModel<TeachersPendingOutputModel>> {
-
+    ): ResponseEntity<*> {
+        if (user !is Teacher) return Problem.stateMismatch
         return when(val teachers = teacherServices.getTeachersNeedingApproval()) {
             is Either.Right -> siren(value = TeachersPendingOutputModel(teachers.value)) {
                 link(rel = LinkRelation("self"), href = Uris.teachersApprovalUri(), needAuthentication = true)
@@ -101,7 +108,7 @@ class MenuController(
                 }
             }
 
-            is Either.Left -> TODO("ErrorOutputModel")
+            is Either.Left -> problemTeacher(teachers.value)
 
         }
     }
@@ -118,6 +125,18 @@ class MenuController(
             is Either.Left -> ResponseEntity
                 .status(Status.BAD_REQUEST)
                 .build()
+        }
+    }
+    private fun problemStudent(error: StudentServicesError): ResponseEntity<ErrorMessageModel> {
+        return when (error) {
+            is StudentServicesError.UserNotFound -> Problem.userNotFound
+            is StudentServicesError.CourseNotFound -> Problem.courseNotFound
+        }
+    }
+
+    private fun problemTeacher(error: TeacherServicesError): ResponseEntity<ErrorMessageModel> {
+        return when (error) {
+            is TeacherServicesError.CourseNotFound -> Problem.courseNotFound
         }
     }
 }

@@ -20,21 +20,13 @@ sealed class OutboxServicesError {
     class CooldownNotExpired(val cooldown: Int) : OutboxServicesError()
 }
 
-private const val COOLDOWN_TIME = 500000
+private const val COOLDOWN_TIME = 500000 // 5 minutes cooldown
 
 @Component
 class OutboxServices(
     private val transactionManager: TransactionManager,
     private val emailService: EmailService
 ) {
-
-    //TODO: Insert user,otp,timestamp,sent in entity + call create user
-    //TODO: Send emails to users
-    //TODO: Check if email was sent
-    //TODO: Delete requests from outbox
-    //TODO: If otp is expired, delete it - trigger
-    //TODO: If email was not sent, sendEmails()
-    //TODO: If otp is different, block for 5 minutes and then repeat process - cooldown table
 
     fun createUserVerification(userId:Int):OutboxResponse {
         val otp = createRamdomOtp()
@@ -79,8 +71,9 @@ class OutboxServices(
         transactionManager.run {
             it.outboxRepository.getOutboxPendingRequests().forEach { outbox ->
                 it.usersRepository.getUserById(outbox.userId)?.let { user ->
-                    emailService.sendVerificationEmail(user.name,user.email, outbox.otp)
-                    it.outboxRepository.updateOutboxStateRequest(outbox.id)
+                    if (emailService.sendVerificationEmail(user.name,user.email, outbox.otp) is Either.Right) {
+                        it.outboxRepository.updateOutboxStateRequest(outbox.id)
+                    }
                 }
             }
         }
@@ -91,12 +84,8 @@ class OutboxServices(
         return (100000..999999).random()
     }
 
-    private fun Long.toTimestamp(): java.sql.Timestamp {
-        return java.sql.Timestamp(this)
-    }
-
-    private fun java.sql.Timestamp.toLong(): Long {
-        return this.time
+    private fun Long.toTimestamp(): Timestamp {
+        return Timestamp(this)
     }
 
     private fun addTime(millis: Int): Timestamp {

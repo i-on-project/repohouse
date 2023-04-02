@@ -24,7 +24,6 @@ class StudentServices(
         return transactionManager.run {
             val courses = it.courseRepository.getAllStudentCourses(studentId)
             Either.Right(courses)
-            // TODO("Check options to be Either.Left")
         }
     }
 

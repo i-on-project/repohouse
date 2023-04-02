@@ -25,7 +25,6 @@ class TeacherServices(
         return transactionManager.run {
             val courses = it.courseRepository.getAllTeacherCourses(teacherId)
             Either.Right(courses)
-            // TODO("Check options to be Either.Left")
         }
     }
 
@@ -42,7 +41,6 @@ class TeacherServices(
                     }
                 }
             Either.Right(teachers)
-            // TODO("Check options to be Either.Left")
         }
     }
 
@@ -55,7 +53,6 @@ class TeacherServices(
                 it.requestRepository.changeStatusRequest(teacherRequest, "Approved")
             }
             Either.Right(true)
-            // TODO("Check options to be Either.Left")
         }
     }
 
