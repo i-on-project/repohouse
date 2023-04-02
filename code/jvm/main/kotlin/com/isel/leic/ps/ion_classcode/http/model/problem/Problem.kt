@@ -23,16 +23,82 @@ class Problem {
             .header("Content-Type", MEDIA_TYPE)
             .body(problem)
 
+        val internalError = response(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessageModel(
+            URI("$BASE_URL/internal-server-error"),
+            "An unexpected error as occurred.",
+            "The server failed to process the request."
+        ))
+
         val stateMismatch = response(HttpStatus.UNAUTHORIZED, ErrorMessageModel(
             URI("$BASE_URL/state-mismatch"),
             "Authentication Failed.",
             "This response as been originated as a security measure."
         ))
 
-        val invalidTeacherInput = response(HttpStatus.BAD_REQUEST, ErrorMessageModel(
-            URI("$BASE_URL/invalid-teacher-input"),
-            "Invalid Payload Body",
-            "Your request body does not follow the specification"
+        val invalidInput = response(HttpStatus.BAD_REQUEST, ErrorMessageModel(
+            URI("$BASE_URL/invalid-input"),
+            "Invalid Payload Body.",
+            "Your request body does not follow the specification."
+        ))
+
+        val notFound = response(HttpStatus.NOT_FOUND, ErrorMessageModel(
+            URI("$BASE_URL/not-found"),
+            "Resource not found.",
+            "The resource does not exist."
+        ))
+
+        val conflict = response(HttpStatus.CONFLICT, ErrorMessageModel(
+            URI("$BASE_URL/conflict"),
+            "Conflict.",
+            "The resource you are trying to create or update conflicts with one that already exists."
+        ))
+
+        val unauthorized = response(HttpStatus.UNAUTHORIZED, ErrorMessageModel(
+            URI("$BASE_URL/already-exists"),
+            "Unauthorized Action.",
+            "The resource you are trying to access is forbidden because of your user status."
+        ))
+
+        val userNotFound = response(HttpStatus.NOT_FOUND, ErrorMessageModel(
+            URI("$BASE_URL/user-not-found"),
+            "User not found.",
+            "This user does not exist."
+        ))
+
+        val courseNotFound = response(HttpStatus.NOT_FOUND, ErrorMessageModel(
+            URI("$BASE_URL/course-not-found"),
+            "Course not found.",
+            "This Course does not exist."
+        ))
+
+        val courseAlreadyExists = response(HttpStatus.CONFLICT, ErrorMessageModel(
+            URI("$BASE_URL/course-already-exists"),
+            "Course already exists.",
+            "The name or url specified are already in use."
+        ))
+
+        val userInCourse = response(HttpStatus.CONFLICT, ErrorMessageModel(
+            URI("$BASE_URL/user-in-course"),
+            "User already in course.",
+            "You are already in this course."
+        ))
+
+        val userNotInCourse = response(HttpStatus.CONFLICT, ErrorMessageModel(
+            URI("$BASE_URL/user-not-in-course"),
+            "User not in course.",
+            "You can not leave a course where you are not listed."
+        ))
+
+        val notStudent = response(HttpStatus.UNAUTHORIZED, ErrorMessageModel(
+            URI("$BASE_URL/not-student"),
+            "Not a student.",
+            "The resource you are trying to access is forbidden because of your user status."
+        ))
+
+        val notTeacher = response(HttpStatus.UNAUTHORIZED, ErrorMessageModel(
+            URI("$BASE_URL/not-teacher"),
+            "Not a teacher.",
+            "The resource you are trying to access is forbidden because of your user status."
         ))
     }
 }

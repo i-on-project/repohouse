@@ -160,6 +160,30 @@ class JdbiUsersRepository(
         return id
     }
 
+    override fun getStudent(userId: Int): Student? {
+        return handle.createQuery(
+            """
+            SELECT name, email, Users.id, github_username, github_id, is_created, school_id,token FROM Student
+            JOIN Users on Users.id = Student.id WHERE Student.id = :id
+            """,
+        )
+            .bind("id", userId)
+            .mapTo<Student>()
+            .firstOrNull()
+    }
+
+    override fun getTeacher(userId: Int): Teacher? {
+        return handle.createQuery(
+            """
+            SELECT name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+            JOIN Users on Users.id = Teacher.id WHERE Teacher.id = :id
+            """,
+        )
+            .bind("id", userId)
+            .mapTo<Teacher>()
+            .firstOrNull()
+    }
+
     override fun updateUserStatus(id: Int) {
         handle.createUpdate(
             """

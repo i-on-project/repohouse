@@ -10,6 +10,8 @@ interface UsersRepository {
     fun createStudent(student: StudentInput): Int
     fun updateStudentSchoolId(userId: Int, schoolId: Int)
     fun createTeacher(teacher: TeacherInput): Int
+    fun getStudent(userId: Int): Student?
+    fun getTeacher(userId: Int): Teacher?
     fun getAllStudents(): List<Student>
     fun getAllTeachers(): List<Teacher>
     fun getUserById(id: Int): User?

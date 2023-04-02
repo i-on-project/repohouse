@@ -1,8 +1,17 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
 import com.isel.leic.ps.ion_classcode.domain.Classroom
+import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
+import com.isel.leic.ps.ion_classcode.domain.Student
 
 data class CourseOutputModel(
+    val id: Int,
+    val orgUrl: String,
+    val name: String,
+    val teacherId: Int,
+)
+
+data class CourseWithClassroomOutputModel(
     val id: Int,
     val orgUrl: String,
     val name: String,
@@ -10,8 +19,29 @@ data class CourseOutputModel(
     val classrooms: List<Classroom>
 )
 
+data class CourseWithStudentsOutputModel(
+    val id: Int,
+    val orgUrl: String,
+    val name: String,
+    val teacherId: Int,
+    val students: List<Student>
+)
+
+data class CoursesOutputModel(
+    val courses: List<CourseWithClassrooms>
+)
+
 data class CourseCreatedOutputModel(
     val created: Boolean = true,
     val id: Int
 )
 
+data class EnterCourseOutputModel(
+    val entered: Boolean = true,
+    val id: Int
+)
+
+data class LeaveCourseOutputModel(
+    val left: Boolean = true,
+    val id: Int
+)

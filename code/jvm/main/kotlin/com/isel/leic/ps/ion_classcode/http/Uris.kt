@@ -24,9 +24,15 @@ object Uris {
     const val CALLBACK_PATH = "$AUTH_PATH/callback"
     const val MENU_PATH = "$API/menu"
     const val TEACHERS_APPROVAL_PATH = "$API/teachers"
+    const val STUDENTS_PATH = "$API/students"
+    const val STUDENT_PATH = "$STUDENTS_PATH/{id}"
     const val COURSES_PATH = "$API/courses"
-    const val COURSE_PATH = "$COURSES_PATH/{id}/classrooms"
-    const val CLASSROOM_PATH = "$COURSE_PATH/{id}"
+    const val COURSE_PATH = "$COURSES_PATH/{id}"
+    const val STUDENTS_COURSE_PATH = "$COURSE_PATH/students"
+    const val ENTER_COURSE_PATH = "$COURSE_PATH/enter"
+    const val LEAVE_COURSE_PATH = "$COURSE_PATH/leave"
+    const val CLASSROOM_PATH = "$COURSE_PATH/classrooms"
+    const val CLASSROOMS_PATH = "$CLASSROOM_PATH/{id}"
 
     /** Web Uris **/
 
@@ -44,9 +50,16 @@ object Uris {
     fun authUriRegisterVerification(): URI = URI(AUTH_REGISTER_VERIFICATION_PATH)
     fun callbackUri(): URI = URI(CALLBACK_PATH)
     fun logoutUri(): URI = URI(LOGOUT)
+
     fun menuUri(): URI = URI(MENU_PATH)
     fun teachersApprovalUri(): URI = URI(TEACHERS_APPROVAL_PATH)
+    fun studentsUri(userId: Int): URI = UriTemplate(ENTER_COURSE_PATH).expand(userId)
+
     fun coursesUri(): URI = URI(COURSES_PATH)
     fun courseUri(courseId: Int): URI = UriTemplate(COURSE_PATH).expand(courseId)
-    fun classroomUri(classroomId: Int): URI = UriTemplate(CLASSROOM_PATH).expand(classroomId)
+    fun courseStudentsUri(courseId: Int): URI = UriTemplate(STUDENTS_COURSE_PATH).expand(courseId)
+    fun enterCourse(courseId: Int): URI = UriTemplate(ENTER_COURSE_PATH).expand(courseId)
+    fun leaveCourse(courseId: Int): URI = UriTemplate(LEAVE_COURSE_PATH).expand(courseId)
+
+    fun classroomUri(classroomId: Int): URI = UriTemplate(CLASSROOMS_PATH).expand(classroomId)
 }

@@ -41,13 +41,13 @@ class OutboxServices(
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId)
             if(cooldown != null) {
-                return@run Either.Left(OutboxServicesError.CooldownNotExpired(cooldown))
+                Either.Left(OutboxServicesError.CooldownNotExpired(cooldown))
             }
             val outbox = it.outboxRepository.createOutboxRequest(OutboxInput(userId, otp))
             if(outbox == null) {
-                return@run Either.Left(OutboxServicesError.ErrorCreatingRequest)
+                Either.Left(OutboxServicesError.ErrorCreatingRequest)
             } else {
-                return@run Either.Right(Unit)
+                Either.Right(Unit)
             }
         }
     }

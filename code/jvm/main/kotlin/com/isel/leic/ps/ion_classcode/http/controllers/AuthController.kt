@@ -28,6 +28,7 @@ import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.http.services.RequestServices
 import com.isel.leic.ps.ion_classcode.http.services.StudentServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
+import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
@@ -141,7 +142,7 @@ class AuthController(
                             userGithubInfo.name,
                             accessToken.access_token
                         )
-                    )){
+                    )) {
                         is Either.Right -> {
                             requestServices.createApplyRequest(ApplyInput(user.value.id,null, user.value.id))
                             siren(StatusOutputModel("Check user status", "Redirect to status page")) {
@@ -150,7 +151,10 @@ class AuthController(
                                 link(href = Uris.authStatusUri(user.value.id), rel = LinkRelation("status"))
                             }
                         }
-                        is Either.Left -> Problem.invalidTeacherInput
+                        is Either.Left -> when (user.value) {
+                            UserServicesError.InvalidData -> Problem.invalidInput
+                            else -> Problem.internalError
+                        }
                     }
                 } else {
                     when(val user = userServices.createStudent(
@@ -178,8 +182,9 @@ class AuthController(
                                 link(href = Uris.authUriRegister(), rel = LinkRelation("register"))
                             }
                         }
-                        is Either.Left -> {
-                            TODO()
+                        is Either.Left -> when (user.value) {
+                            UserServicesError.InvalidData -> Problem.invalidInput
+                            else -> Problem.internalError
                         }
                     }
                 }
@@ -369,7 +374,10 @@ class AuthController(
                     }
                 }
             }
-            is Either.Left -> TODO()
+            is Either.Left -> when (user.value) {
+                UserServicesError.InvalidData -> Problem.invalidInput
+                else -> Problem.notFound
+            }
         }
     }
 
