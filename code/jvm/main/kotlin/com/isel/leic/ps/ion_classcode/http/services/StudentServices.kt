@@ -1,7 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
-import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
@@ -42,7 +41,7 @@ class StudentServices(
 
     fun updateStudent(userId:Int,schoolId:Int): StudentSchoolIdUpdateResponse {
         return transactionManager.run {
-            val school= it.usersRepository.updateStudentSchool(userId, schoolId)
+            val school= it.usersRepository.updateStudentSchoolId(userId, schoolId)
             Either.Right(school)
         }
     }

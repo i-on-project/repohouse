@@ -8,6 +8,6 @@ interface FeedbackRepository {
     fun deleteFeedback(feedbackId: Int)
     fun updateFeedbackDescription(feedbackId: Int, description: String)
     fun updateFeedbackLabel(feedbackId: Int, label: String)
-    fun getFeedbackById(feedbackId: Int): Feedback
+    fun getFeedbackById(feedbackId: Int): Feedback?
     fun getFeedbacksByTeam(teamId: Int): List<Feedback>
 }

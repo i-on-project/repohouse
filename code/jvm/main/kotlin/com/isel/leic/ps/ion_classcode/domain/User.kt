@@ -18,7 +18,7 @@ data class Student(
     override val githubId: Long,
     override val isCreated: Boolean,
     override val token: String,
-    val schoolId: Int,
+    val schoolId: Int?,
 ) : User()
 
 data class Teacher(

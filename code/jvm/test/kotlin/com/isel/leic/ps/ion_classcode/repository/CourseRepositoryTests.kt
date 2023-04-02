@@ -1,55 +1,52 @@
 package com.isel.leic.ps.ion_classcode.repository
 
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
-import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
-import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiCourseRepository
-import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiUsersRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 class CourseRepositoryTests {
     @Test
     fun `can create a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
-        val usersRepo = JdbiUsersRepository(handle = handle)
-        val id = usersRepo.createTeacher(teacher = TeacherInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", githubToken = "token", githubId = 12345, token = "token"))
-        courseRepo.createCourse(course = CourseInput(orgUrl = "https://daw.isel.pt", name = "DAW", teacherId = id))
-        courseRepo.createCourse(course = CourseInput(orgUrl = "https://pdm.isel.pt", name = "PDM", teacherId = id))
+        courseRepo.createCourse(course = CourseInput(orgUrl = "https://pdm.isel.pt", name = "PDM", teacherId = 2))
     }
 
     @Test
     fun `can get a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
-        val usersRepo = JdbiUsersRepository(handle = handle)
-        val id = usersRepo.createTeacher(teacher = TeacherInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", githubToken = "token", githubId = 12345, token = "token"))
-        courseRepo.createCourse(course = CourseInput(orgUrl = "https://daw.isel.pt", name = "DAW", teacherId = id))
-        val course = courseRepo.getCourse(teacherId = id)
-        assert(course != null)
+        val courseId = 1
+        val name = "DAW"
+        val course = courseRepo.getCourse(courseId = courseId) ?: fail("Should be able to get a course")
+        assert(course.name == name)
     }
 
     @Test
     fun `can delete a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
-        val usersRepo = JdbiUsersRepository(handle = handle)
-        val teacherId = usersRepo.createTeacher(teacher = TeacherInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", githubToken = "token", githubId = 12345, token = "token"))
-        val courseId = courseRepo.createCourse(course = CourseInput(orgUrl = "https://daw.isel.pt", name = "DAW", teacherId = teacherId))
+        val courseId = 3
         courseRepo.deleteCourse(courseId = courseId)
-        val course = courseRepo.getCourse(teacherId = teacherId)
-        assert(course == null)
+    }
+
+    @Test
+    fun `cannot delete a course`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val courseId = 1
+        try {
+            courseRepo.deleteCourse(courseId = courseId)
+            fail("Should not be able to delete a course")
+        } catch (e: Exception) {
+            assert(true)
+        }
     }
 
     @Test
     fun `can put a student in a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
-        val usersRepo = JdbiUsersRepository(handle = handle)
-        val teacherId = usersRepo.createTeacher(teacher = TeacherInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", githubToken = "token", githubId = 12345, token = "token"))
-        val studentId = usersRepo.createStudent(student = StudentInput(name = "test14", email = "test2@alunos.isel.pt", githubUsername = "test12345", schoolId = 12345, githubId = 123456, token = "token2"))
-        val studentId1 = usersRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, githubId = 1345, token = "token1"))
-        usersRepo.createStudent(student = StudentInput(name = "test14", email = "test3@alunos.isel.pt", githubUsername = "test122", schoolId = 125446, githubId = 132345, token = "token3"))
-        val courseId = courseRepo.createCourse(course = CourseInput(orgUrl = "https://daw.isel.pt", name = "DAW", teacherId = teacherId))
-        courseRepo.enterCourse(courseId = courseId, studentId = studentId)
-        courseRepo.enterCourse(courseId = courseId, studentId = studentId1)
+        val courseId = 3
+        courseRepo.enterCourse(courseId = courseId, studentId = 4)
+        courseRepo.enterCourse(courseId = courseId, studentId = 5)
         val studentsInCourse = courseRepo.getStudentInCourse(courseId = courseId)
         assert(studentsInCourse.size == 2)
     }
@@ -57,15 +54,35 @@ class CourseRepositoryTests {
     @Test
     fun `can delete a student from a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
-        val usersRepo = JdbiUsersRepository(handle = handle)
-        val teacherId = usersRepo.createTeacher(teacher = TeacherInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", githubToken = "token", githubId = 12345, token = "token"))
-        val studentId = usersRepo.createStudent(student = StudentInput(name = "test14", email = "test2@alunos.isel.pt", githubUsername = "test12345", schoolId = 12345, githubId = 123456, token = "token2"))
-        val studentId1 = usersRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, githubId = 1345, token = "token1"))
-        val courseId = courseRepo.createCourse(course = CourseInput(orgUrl = "https://daw.isel.pt", name = "DAW", teacherId = teacherId))
-        courseRepo.enterCourse(courseId = courseId, studentId = studentId)
-        courseRepo.enterCourse(courseId = courseId, studentId = studentId1)
-        courseRepo.leaveCourse(courseId = courseId, studentId = studentId1)
+        val courseId = 3
+        courseRepo.enterCourse(courseId = courseId, studentId = 4)
+        courseRepo.enterCourse(courseId = courseId, studentId = 5)
+        courseRepo.leaveCourse(courseId = courseId, studentId = 4)
         val studentsInCourse = courseRepo.getStudentInCourse(courseId = courseId)
         assert(studentsInCourse.size == 1)
+    }
+
+    @Test
+    fun `can get a teacher courses`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val teacherId = 2
+        val courses = courseRepo.getAllTeacherCourses(teacherId = teacherId)
+        assert(courses.size == 2)
+    }
+
+    @Test
+    fun `can get a student courses`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val studentId = 3
+        val courses = courseRepo.getAllStudentCourses(studentId = studentId)
+        assert(courses.size == 1)
+    }
+
+    @Test
+    fun `can get students in a course`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val courseId = 1
+        val students = courseRepo.getStudentInCourse(courseId = courseId)
+        assert(students.size == 2)
     }
 }

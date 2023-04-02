@@ -21,7 +21,7 @@ interface Transaction {
     val courseRepository: CourseRepository
     val deliveryRepository: DeliveryRepository
     val applyRequestRepository: ApplyRequestRepository
-    val archieveRepoRepository: AssigmentRepository
+    val archiveRepoRepository: AssigmentRepository
     val compositeRepository: CompositeRepository
     val createRepoRepository: CreateRepoRepository
     val createTeamRepository: CreateTeamRepository

@@ -4,6 +4,8 @@ import com.isel.leic.ps.ion_classcode.domain.Delivery
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
+import java.sql.Timestamp
 
 class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
     override fun createDelivery(delivery: DeliveryInput): Int {
@@ -17,7 +19,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .bind("assigmentId", delivery.assigmentId)
             .bind("dueDate", delivery.dueDate)
             .bind("tagControl", delivery.tagControl)
-            .execute()
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
     override fun deleteDelivery(deliveryId: Int) {
@@ -31,7 +35,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .execute()
     }
 
-    override fun getDeliveryById(deliveryId: Int): Delivery {
+    override fun getDeliveryById(deliveryId: Int): Delivery? {
         return handle.createQuery(
             """
                 SELECT * FROM DELIVERY
@@ -39,11 +43,11 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
                 """,
         )
             .bind("deliveryId", deliveryId)
-            .mapTo(Delivery::class.java)
-            .first()
+            .mapTo<Delivery>()
+            .firstOrNull()
     }
 
-    override fun getDeliveriesByAssigment(assigmentId: Int): List<Delivery> {
+    override fun getDeliveriesByAssigment(assignmentId: Int): List<Delivery> {
         return handle.createQuery(
             """
                 SELECT * FROM DELIVERY
@@ -51,12 +55,12 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
                 ORDER BY due_date
                 """,
         )
-            .bind("assigmentId", assigmentId)
-            .mapTo(Delivery::class.java)
+            .bind("assigmentId", assignmentId)
+            .mapTo<Delivery>()
             .list()
     }
 
-    override fun updateDueDateFromDelivery(deliveryId: Int, dueDate: String) {
+    override fun updateDueDateFromDelivery(deliveryId: Int, dueDate: Timestamp) {
         handle.createUpdate(
             """
                 UPDATE DELIVERY

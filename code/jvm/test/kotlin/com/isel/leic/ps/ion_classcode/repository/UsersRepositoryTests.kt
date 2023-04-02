@@ -11,71 +11,126 @@ class UsersRepositoryTests {
     @Test
     fun `can create a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        userRepo.createStudent(student = StudentInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", schoolId = 12345, token = "token", githubId = 12345))
-        userRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, token = "token1", githubId = 1345))
+        userRepo.createStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
+    }
+
+    @Test
+    fun `can update the schoolId`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val userId = 5
+        val schoolId = 1256
+        userRepo.updateStudentSchoolId(userId = userId, schoolId = schoolId)
+        val id = userRepo.getStudentSchoolId(id = userId)
+        assert(id == schoolId)
     }
 
     @Test
     fun `can create a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        userRepo.createTeacher(teacher = TeacherInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", githubToken = "token", githubId = 12345, token = "token"))
-        userRepo.createTeacher(teacher = TeacherInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1123", githubToken = "token1", githubId = 12344, token = "token1"))
+        userRepo.createTeacher(teacher = TeacherInput(name = "test142", email = "test5@alunos.isel.pt", githubUsername = "test1239", githubToken = "token5", githubId = 123415, token = "token5"))
     }
 
     @Test
-    fun `can create a student and retrieve it by name`() = testWithHandleAndRollback { handle ->
+    fun `can get all students`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id1 = userRepo.createStudent(student = StudentInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", schoolId = 12345, token = "token", githubId = 12345))
-        userRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, token = "token1", githubId = 1345))
-        val student = userRepo.getUserById(id = id1) ?: fail("Student not found")
-        assert(student.name == "test12")
+        val list = userRepo.getAllStudents()
+        assert(list.size == 3)
     }
 
     @Test
-    fun `can create a user and retrieve it by email`() = testWithHandleAndRollback { handle ->
+    fun `can can update user status`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val email = "test@alunos.isel.pt"
-        userRepo.createStudent(student = StudentInput(name = "test12", email = email, githubUsername = "test123", schoolId = 12345, token = "token", githubId = 12345))
-        userRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, token = "token1", githubId = 1345))
+        val id = 5
+        userRepo.updateUserStatus(id = id)
+        val user = userRepo.getUserById(id = id) ?: fail("User not found")
+        assert(user.isCreated)
+    }
+
+    @Test
+    fun `can get all teachers`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val list = userRepo.getAllTeachers()
+        assert(list.size == 3)
+    }
+
+    @Test
+    fun `can get a user name`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val student = userRepo.getUserById(id = 3) ?: fail("Student not found")
+        assert(student.name == "student1")
+    }
+
+    @Test
+    fun `can get a user by email`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val email = "test2@alunos.isel.pt"
         val student = userRepo.getUserByEmail(email = email) ?: fail("Student not found")
-        assert(student.name == "test12")
+        assert(student.name == "student1")
     }
 
     @Test
-    fun `can create a user and retrieve it by githubId`() = testWithHandleAndRollback { handle ->
+    fun `can get a user githubId`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val githubId = 12345L
-        userRepo.createStudent(student = StudentInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", schoolId = 12345, token = "token", githubId = githubId))
-        userRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, token = "token1", githubId = 1345))
+        val githubId = 123425L
         val student = userRepo.getUserByGithubId(githubId = githubId) ?: fail("Student not found")
-        assert(student.name == "test12")
+        assert(student.name == "student1")
+    }
+
+    @Test
+    fun `can get a student school id`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val id = 3
+        val schoolId = userRepo.getStudentSchoolId(id = id) ?: fail("Student not found")
+        assert(schoolId == 1234)
     }
 
     @Test
     fun `can create a user and retrieve by token it`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val token = "token"
-        userRepo.createStudent(student = StudentInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", schoolId = 12345, token = token, githubId = 12345))
-        userRepo.createStudent(student = StudentInput(name = "test13", email = "test1@alunos.isel.pt", githubUsername = "test1234", schoolId = 12346, token = "token1", githubId = 1345))
+        val token = "token2"
         val user = userRepo.getUserByToken(token = token) ?: fail("User not found")
-        assert(user.name == "test12")
+        assert(user.name == "student1")
     }
 
     @Test
     fun `can eliminate a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id = userRepo.createStudent(student = StudentInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", schoolId = 12345, token = "token", githubId = 12345))
+        val id = 5
         userRepo.deleteStudent(id = id)
         val student = userRepo.getUserById(id = id)
         assert(student == null)
     }
 
     @Test
+    fun `cannot eliminate a student`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val id = 3
+        try {
+            userRepo.deleteStudent(id = id)
+            fail("Should not be able to delete a student")
+        } catch (e: Exception) {
+            assert(true)
+        }
+    }
+
+    @Test
     fun `can eliminate a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id = userRepo.createTeacher(teacher = TeacherInput(name = "test12", email = "test@alunos.isel.pt", githubUsername = "test123", githubToken = "token", githubId = 12345, token = "token"))
+        val id = 6
         userRepo.deleteTeacher(id = id)
         val teacher = userRepo.getUserById(id = id)
         assert(teacher == null)
+    }
+
+    @Test
+    fun `cannot eliminate a teacher`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val id = 1
+        try {
+            userRepo.deleteTeacher(id = id)
+            fail("Should not be able to delete a student")
+        } catch (e: Exception) {
+            assert(true)
+        }
     }
 }

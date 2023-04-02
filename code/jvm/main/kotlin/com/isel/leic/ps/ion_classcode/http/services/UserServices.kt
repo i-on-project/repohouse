@@ -72,15 +72,6 @@ class UserServices(
         }
     }
 
-    fun createPendingStudent(student: StudentInput): StudentCreationResult {
-        if (student.name.isEmpty() || student.email.isEmpty()) return Either.Left(UserServicesError.InvalidData)
-        return transactionManager.run {
-            val studentId = it.usersRepository.createPendingStudent(student)
-            if (studentId <= 0 ) Either.Left(UserServicesError.ErrorCreatingUser)
-            else Either.Right(it.usersRepository.getUserById(studentId) as Student)
-        }
-    }
-
     fun getUserByGithubId(githubId: Long): UserByGithubIdResult {
         if (githubId <= 0) return Either.Left(UserServicesError.InvalidGithubId)
         return transactionManager.run {

@@ -1,10 +1,11 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
-interface MenuOutputModel{
+interface MenuOutputModel {
     val name: String
     val email: String
     val courses: List<CourseOutputModel>
 }
+
 data class MenuStudentOutputModel(
     override val name: String,
     val schoolNumber: Int,

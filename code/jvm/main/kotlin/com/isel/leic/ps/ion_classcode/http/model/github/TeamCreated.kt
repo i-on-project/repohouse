@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses
+package com.isel.leic.ps.ion_classcode.http.model.github
 
 data class TeamCreated(
     val id: Int,

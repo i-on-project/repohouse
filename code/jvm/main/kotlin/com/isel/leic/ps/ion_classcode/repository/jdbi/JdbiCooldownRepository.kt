@@ -1,14 +1,13 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
-
 import com.isel.leic.ps.ion_classcode.repository.CooldownRepository
-import java.sql.Timestamp
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
+import java.sql.Timestamp
 
 class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
 
-    override fun createCooldownRequest(userId:Int,time: Timestamp): Int? {
+    override fun createCooldownRequest(userId: Int, endTime: Timestamp): Int? {
         return handle.createUpdate(
             """
             INSERT INTO Cooldown (user_id, end_date)
@@ -17,7 +16,7 @@ class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
             """,
         )
             .bind("user_id", userId)
-            .bind("end_date", time)
+            .bind("end_date", endTime)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .firstOrNull()
@@ -34,8 +33,8 @@ class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
             .mapTo<Timestamp>()
             .firstOrNull() ?: return null
 
-        val currentTimeInSeconds = System.currentTimeMillis()/1000
-        val endDateInSeconds = endDate.time/1000
+        val currentTimeInSeconds = System.currentTimeMillis() / 1000
+        val endDateInSeconds = endDate.time / 1000
         return (endDateInSeconds - currentTimeInSeconds).toInt()
     }
 

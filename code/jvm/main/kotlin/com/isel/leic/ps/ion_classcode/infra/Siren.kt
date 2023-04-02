@@ -2,6 +2,7 @@ package com.isel.leic.ps.ion_classcode.infra
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.http.HttpMethod
+import org.springframework.http.ResponseEntity
 import java.net.URI
 
 /**
@@ -132,8 +133,8 @@ class ActionBuilderScope(
     fun build() = ActionModel(name, href.toASCIIString(), method.name(), type, fields)
 }
 
-fun <T> siren(value: T, block: SirenBuilderScope<T>.() -> Unit): SirenModel<T> {
+fun <T> siren(value: T, block: SirenBuilderScope<T>.() -> Unit): ResponseEntity<SirenModel<T>> {
     val scope = SirenBuilderScope(value)
     scope.block()
-    return scope.build()
+    return ResponseEntity.ok(scope.build())
 }

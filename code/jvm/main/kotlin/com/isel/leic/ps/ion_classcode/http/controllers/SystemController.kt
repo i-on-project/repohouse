@@ -3,7 +3,6 @@ package com.isel.leic.ps.ion_classcode.http.controllers
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.CreditsOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.GithubResponses.*
 import com.isel.leic.ps.ion_classcode.http.model.output.HomeOutputModel
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 class SystemController {
 
     @GetMapping(Uris.HOME)
-    fun home(): SirenModel<HomeOutputModel> {
+    fun home(): ResponseEntity<SirenModel<HomeOutputModel>> {
         return siren(value = HomeOutputModel()) {
             link(rel = LinkRelation("self"), href = Uris.homeUri())
             link(rel = LinkRelation("credits"), href = Uris.creditsUri())
@@ -29,7 +28,7 @@ class SystemController {
     }
 
     @GetMapping(Uris.CREDITS)
-    fun credits(): SirenModel<CreditsOutputModel> {
+    fun credits(): ResponseEntity<SirenModel<CreditsOutputModel>> {
         return siren(value = CreditsOutputModel()) {
             link(rel = LinkRelation("self"), href = Uris.creditsUri())
             link(rel = LinkRelation("home"), href = Uris.homeUri())
