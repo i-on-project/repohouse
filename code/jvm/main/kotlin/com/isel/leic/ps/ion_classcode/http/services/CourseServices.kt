@@ -24,10 +24,11 @@ class CourseServices(
     fun getCourseById(courseId: Int): CourseResponse {
         return transactionManager.run {
             val course = it.courseRepository.getCourse(courseId)
+            val classrooms = it.courseRepository.getCourseClassrooms(courseId)
             if (course == null) {
                 Either.Left(CourseServicesError.CourseNotFound)
             } else {
-                Either.Right(course)
+                Either.Right(Course(course.id, course.orgUrl, course.name, course.teacherId, classrooms))
             }
         }
     }
@@ -39,10 +40,4 @@ class CourseServices(
         }
     }
 
-    fun getCourseClassrooms(courseId: Int): CourseClassrooms {
-        return transactionManager.run {
-            val classrooms = it.courseRepository.getCourseClassrooms(courseId)
-            Either.Right(classrooms)
-        }
-    }
 }

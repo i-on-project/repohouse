@@ -45,7 +45,7 @@ class MenuController(
         user:User
     ): ResponseEntity<SirenModel<MenuOutputModel>> {
         return when(val courses = teacherServices.getCourses(user.id)) {
-            is Either.Right -> siren(value = MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId) })) {
+            is Either.Right -> siren(value = MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId,it.classrooms) })) {
                 clazz("menu")
                 link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
                 link(rel = LinkRelation("credits"), href = Uris.creditsUri())
@@ -67,7 +67,7 @@ class MenuController(
         val studentSchoolId = studentServices.getStudentSchoolId(user.id)
         if (studentSchoolId is Either.Left) TODO("ErrorOutputModel")
         return when(val courses = studentServices.getCourses(user.id)) {
-            is Either.Right -> siren(value = MenuStudentOutputModel(user.name, (studentSchoolId as Either.Right).value,user.email,courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId) } )) {
+            is Either.Right -> siren(value = MenuStudentOutputModel(user.name, (studentSchoolId as Either.Right).value,user.email,courses.value.map { CourseOutputModel(it.id,it.orgUrl,it.name,it.teacherId,it.classrooms) } )) {
                 link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
                 link(rel = LinkRelation("credits"), href = Uris.creditsUri())
                 link(rel = LinkRelation("logout"), href = Uris.logoutUri(), needAuthentication = true)

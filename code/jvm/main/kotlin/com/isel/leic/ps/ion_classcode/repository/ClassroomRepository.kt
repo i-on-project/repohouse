@@ -2,6 +2,7 @@ package com.isel.leic.ps.ion_classcode.repository
 
 import com.isel.leic.ps.ion_classcode.domain.Assigment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
+import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 
 interface ClassroomRepository {
@@ -9,4 +10,6 @@ interface ClassroomRepository {
     fun deleteClassroom(classroomId: Int)
     fun getClassroomById(classroomId: Int): Classroom?
     fun getAssignmentsOfAClassroom(classroomId: Int): List<Assigment>
+
+    fun getStudentClassroomId(courseId: Int,studentId:Int): Int?
 }

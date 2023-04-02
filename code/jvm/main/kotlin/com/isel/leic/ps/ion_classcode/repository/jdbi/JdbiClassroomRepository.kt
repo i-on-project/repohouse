@@ -57,4 +57,19 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .mapTo<Assigment>()
             .list()
     }
+
+    override fun getStudentClassroomId(courseId: Int, studentId: Int): Int? {
+        return handle.createQuery(
+            """
+            SELECT classroom.id FROM classroom
+            INNER JOIN course ON course.id = classroom.course_id
+            INNER JOIN student_course ON student_course.course = course.id
+            WHERE student_course.student = :student_id AND course.id = :course_id
+            """,
+        )
+            .bind("student_id", studentId)
+            .bind("course_id", courseId)
+            .mapTo<Int>()
+            .firstOrNull()
+    }
 }

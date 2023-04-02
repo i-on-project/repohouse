@@ -5,4 +5,5 @@ data class Course(
     val orgUrl: String,
     val name: String,
     val teacherId: Int,
+    val classrooms: List<Classroom> = emptyList()
 )

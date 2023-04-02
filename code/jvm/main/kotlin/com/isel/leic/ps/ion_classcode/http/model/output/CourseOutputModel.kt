@@ -7,6 +7,7 @@ data class CourseOutputModel(
     val orgUrl: String,
     val name: String,
     val teacherId: Int,
+    val classrooms: List<Classroom>
 )
 
 data class CourseCreatedOutputModel(
@@ -14,6 +15,3 @@ data class CourseCreatedOutputModel(
     val id: Int
 )
 
-data class CourseClassroomsOutputModel(
-    val classrooms: List<Classroom>
-)

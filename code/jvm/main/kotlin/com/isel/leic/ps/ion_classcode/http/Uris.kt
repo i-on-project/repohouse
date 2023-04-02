@@ -25,9 +25,8 @@ object Uris {
     const val MENU_PATH = "$API/menu"
     const val TEACHERS_APPROVAL_PATH = "$API/teachers"
     const val COURSES_PATH = "$API/courses"
-    const val COURSE_PATH = "$API/courses/{id}"
-    const val COURSE_CLASSROOM_PATH = "$API/courses/{id}/classrooms"
-
+    const val COURSE_PATH = "$COURSES_PATH/{id}/classrooms"
+    const val CLASSROOM_PATH = "$COURSE_PATH/{id}"
 
     /** Web Uris **/
 
@@ -49,5 +48,5 @@ object Uris {
     fun teachersApprovalUri(): URI = URI(TEACHERS_APPROVAL_PATH)
     fun coursesUri(): URI = URI(COURSES_PATH)
     fun courseUri(courseId: Int): URI = UriTemplate(COURSE_PATH).expand(courseId)
-    fun courseClassroomsUri(courseId: Int): URI = UriTemplate(COURSE_CLASSROOM_PATH).expand(courseId)
+    fun classroomUri(classroomId: Int): URI = UriTemplate(CLASSROOM_PATH).expand(classroomId)
 }
