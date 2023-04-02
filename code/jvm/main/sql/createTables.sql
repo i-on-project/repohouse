@@ -109,7 +109,7 @@ CREATE TABLE Apply(
 CREATE TABLE Assignment(
     id serial primary key,
     classroom_id int not null,
-    max_number_elems int not null,
+    max_elems_per_group int not null,
     max_number_groups int not null,
     release_date timestamp not null,
     description text unique not null,
@@ -184,12 +184,6 @@ Create TABLE Outbox(
     expired_at timestamp not null,
     sent_at timestamp default null,
     foreign key (user_id) references users(id)
-);
-
-CREATE TABLE PendingStudent(
-    id int primary key,
-    email text unique check (email like '%@%') not null,
-    foreign key (id) references users(id)
 );
 
 COMMIT;
