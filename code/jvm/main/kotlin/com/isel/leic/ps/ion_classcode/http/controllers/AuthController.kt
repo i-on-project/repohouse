@@ -17,7 +17,6 @@ import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
-import com.isel.leic.ps.ion_classcode.http.model.output.ErrorOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
 import com.isel.leic.ps.ion_classcode.http.model.output.InfoOutputModel
