@@ -16,7 +16,6 @@ typealias ClassroomEnterResponse = Either<ClassroomServicesError, ClassroomOutpu
 sealed class ClassroomServicesError {
     object ClasroomNotFound : ClassroomServicesError()
     object ClassroomArchived : ClassroomServicesError()
-
 }
 
 @Component

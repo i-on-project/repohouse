@@ -33,6 +33,24 @@ class Problem {
             ),
         )
 
+        val methodNotAllowed = response(
+            HttpStatus.METHOD_NOT_ALLOWED,
+            ErrorMessageModel(
+                URI("$BASE_URL/internal-server-error"),
+                "Method not supported.",
+                "Consult the API documentation for supported methods.",
+            ),
+        )
+
+        val unsupportedMediaType = response(
+            HttpStatus.METHOD_NOT_ALLOWED,
+            ErrorMessageModel(
+                URI("$BASE_URL/internal-server-error"),
+                "Media Type not supported",
+                "Consult the API documentation for supported media types",
+            ),
+        )
+
         val stateMismatch = response(
             HttpStatus.UNAUTHORIZED,
             ErrorMessageModel(

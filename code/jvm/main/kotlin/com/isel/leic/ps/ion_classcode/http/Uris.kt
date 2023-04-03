@@ -31,14 +31,17 @@ object Uris {
     const val STUDENTS_COURSE_PATH = "$COURSE_PATH/students"
     const val ENTER_COURSE_PATH = "$COURSE_PATH/enter"
     const val LEAVE_COURSE_PATH = "$COURSE_PATH/leave"
-    const val LEAVE_COURSE_REQUEST_PATH = "$COURSES_PATH/leave/request/{id}"
     const val CLASSROOMS_PATH = "$COURSE_PATH/classrooms"
-    const val CREATE_CLASSROOM_PATH = "$CLASSROOMS_PATH/create"
     const val CLASSROOM_PATH = "$CLASSROOMS_PATH/{classroomId}"
+    const val LEAVE_COURSE_REQUEST_PATH = "$COURSES_PATH/leave/request/{id}"
+    const val CREATE_CLASSROOM_PATH = "$CLASSROOMS_PATH/create"
     const val ARCHIVE_CLASSROOM_PATH = "$CLASSROOM_PATH/archive"
     const val SYNC_CLASSROOM_PATH = "$CLASSROOM_PATH/sync"
     const val EDIT_CLASSROOM_PATH = "$CLASSROOM_PATH/edit"
     const val INVITE_LINK_PATH = "$API/enter-classroom/{inviteLink}"
+    const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assigments"
+    const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assigmentId}"
+    const val CREATE_ASSIGMENT_PATH = "$ASSIGMENTS_PATH/create"
 
     /** Web Uris **/
 
@@ -57,6 +60,8 @@ object Uris {
 
     fun menuUri(): URI = URI(MENU_PATH)
     fun teachersApprovalUri(): URI = URI(TEACHERS_APPROVAL_PATH)
+    fun studentsUri(userId: Int): URI = UriTemplate(ENTER_COURSE_PATH).expand(userId)
+
     fun coursesUri(): URI = URI(COURSES_PATH)
     fun courseUri(courseId: Int): URI = UriTemplate(COURSE_PATH).expand(courseId)
     fun courseStudentsUri(courseId: Int): URI = UriTemplate(STUDENTS_COURSE_PATH).expand(courseId)
@@ -68,6 +73,9 @@ object Uris {
     fun syncClassroomUri(classroomId: Int): URI = UriTemplate(SYNC_CLASSROOM_PATH).expand(classroomId)
     fun editClassroomUri(classroomId: Int): URI = UriTemplate(EDIT_CLASSROOM_PATH).expand(classroomId)
     fun inviteLinkUri(inviteLink: String): URI = UriTemplate(INVITE_LINK_PATH).expand(inviteLink)
+    fun assigmentsUri(): URI = URI(ASSIGMENTS_PATH)
+    fun assigmentUri(assigmentId: Int): URI = UriTemplate(ASSIGMENT_PATH).expand(assigmentId)
+    fun createAssigmentUri(classroomId: Int): URI = UriTemplate(CREATE_ASSIGMENT_PATH).expand(classroomId)
 
     /** Mobile Uris **/
 
