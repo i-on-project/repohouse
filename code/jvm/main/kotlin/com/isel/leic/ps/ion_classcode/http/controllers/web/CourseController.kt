@@ -1,15 +1,15 @@
-package com.isel.leic.ps.ion_classcode.http.controllers
+package com.isel.leic.ps.ion_classcode.http.controllers.web
 
+import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
+import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithStudentsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CoursesOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.EnterCourseOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.LeaveCourseOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.CourseServices
@@ -19,6 +19,7 @@ import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -26,17 +27,18 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
-
 @RestController
 class CourseController(
     private val courseServices: CourseServices,
 ) {
 
-    @PostMapping(Uris.COURSES_PATH)
+    @PostMapping(Uris.COURSES_PATH, produces = ["application/vnd.siren+json"])
     fun createCourse(
         user: User,
         @RequestBody courseInfo: CourseInputModel,
     ): ResponseEntity<*> {
+        if (user !is Teacher) return Problem.unauthorized
+        // TODO: Check if course already exists, adds teacher to course
         return when (val course = courseServices.createCourse(courseInfo)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseCreatedOutputModel(id = course.value)) {
@@ -51,10 +53,10 @@ class CourseController(
         }
     }
 
-    @GetMapping(Uris.COURSE_PATH)
+    @GetMapping(Uris.COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun getCourse(
         user: User,
-        @PathVariable("id") id: Int,
+        @PathVariable("courseId") id: Int,
     ): ResponseEntity<*> {
         return when (val course = courseServices.getCourseById(id)) {
             is Either.Left -> problem(course.value)
@@ -64,13 +66,20 @@ class CourseController(
                 course.value.classrooms.forEach {
                     link(rel = LinkRelation("classroom"), href = Uris.classroomUri(it.id), needAuthentication = true)
                 }
+                if (user is Teacher) {
+                    action(name = "create-classroom", method = HttpMethod.POST, href = Uris.createClassroomUri(course.value.id), type = "x-www-form-urlencoded", block = {
+                        textField(name = "name")
+                    })
+                    action(name = "Delete Course", method = HttpMethod.DELETE, href = Uris.courseUri(course.value.id), type = "application/json", block = {})
+                }
             }
         }
     }
 
-    @GetMapping(Uris.COURSES_PATH)
+    // TODO: Check utility of this method
+    @GetMapping(Uris.COURSES_PATH, produces = ["application/vnd.siren+json"])
     fun getUserCourses(
-        user: User
+        user: User,
     ): ResponseEntity<*> {
         return when (val course = if (user is Teacher) courseServices.getTeacherCourses(user.id) else courseServices.getStudentCourses(user.id)) {
             is Either.Left -> problem(course.value)
@@ -84,59 +93,32 @@ class CourseController(
         }
     }
 
-    @GetMapping(Uris.STUDENTS_COURSE_PATH)
-    fun getStudentsInCourse(
-        user: User,
-        @PathVariable("id") id: Int,
-    ): ResponseEntity<*> {
-        return when (val course = courseServices.getStudentsInCourse(id)) {
-            is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = CourseWithStudentsOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teacherId, course.value.students)) {
-                clazz("course")
-                link(rel = LinkRelation("self"), href = Uris.courseStudentsUri(course.value.id), needAuthentication = true)
-                course.value.students.forEach {
-                    link(rel = LinkRelation("student"), href = Uris.studentsUri(it.id), needAuthentication = true)
-                }
-            }
-        }
-    }
-
-    @PutMapping(Uris.ENTER_COURSE_PATH)
-    fun enterCourse(
-        user: User,
-        @PathVariable("id") id: Int,
-    ): ResponseEntity<*> {
-        return when (val course = courseServices.enterCourse(id, user.id)) {
-            is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = EnterCourseOutputModel(id = course.value)) {
-                clazz("course")
-                link(rel = LinkRelation("self"), href = Uris.enterCourse(course.value), needAuthentication = true)
-                action(name = "Leave Course", method = HttpMethod.PUT, href = Uris.leaveCourse(course.value), type = "application/json", block = {})
-                //TODO(Action for Delete Course)
-            }
-        }
-    }
-
-    @PutMapping(Uris.LEAVE_COURSE_PATH)
+    @PutMapping(Uris.LEAVE_COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun leaveCourse(
         user: User,
-        @PathVariable("id") id: Int,
+        @PathVariable("courseId") id: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.leaveCourse(id, user.id)) {
-            is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = LeaveCourseOutputModel(id = course.value)) {
+        if (user !is Student) return Problem.unauthorized
+        return when (val request = courseServices.leaveCourse(id, user.id)) {
+            is Either.Left -> problem(request.value)
+            is Either.Right -> siren(value = RequestOutputModel(status = Status.CREATED, id = request.value, title = "Request to leave course created, waiting for teacher approval")) {
                 clazz("course")
-                link(rel = LinkRelation("self"), href = Uris.leaveCourse(course.value), needAuthentication = true)
-                action(name = "Enter Course", method = HttpMethod.PUT, href = Uris.enterCourse(course.value), type = "application/json", block = {})
-                //TODO(Action for Delete Course)
+                link(rel = LinkRelation("self"), href = Uris.leaveCourse(id), needAuthentication = true)
+                link(rel = LinkRelation("course"), href = Uris.courseUri(id), needAuthentication = true)
             }
         }
     }
 
-    //TODO(Delete Course)
+    @DeleteMapping(Uris.COURSE_PATH, produces = ["application/vnd.siren+json"])
+    fun deleteCourse(
+        user: User,
+        @PathVariable("courseId") id: Int,
+    ) {
+        // TODO: CHECK IF THIS IS APLIABLE
+    }
 
     private fun problem(error: CourseServicesError): ResponseEntity<ErrorMessageModel> {
-        return when(error) {
+        return when (error) {
             CourseServicesError.CourseNotFound -> Problem.courseNotFound
             CourseServicesError.CourseAlreadyExists -> Problem.courseAlreadyExists
             CourseServicesError.UserInCourse -> Problem.userInCourse

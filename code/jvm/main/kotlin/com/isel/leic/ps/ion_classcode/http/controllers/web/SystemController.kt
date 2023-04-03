@@ -1,9 +1,10 @@
-package com.isel.leic.ps.ion_classcode.http.controllers
+package com.isel.leic.ps.ion_classcode.http.controllers.web
 
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.CreditsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.HomeOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.OutputModel
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
@@ -12,12 +13,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
-
 @RestController
 class SystemController {
 
-    @GetMapping(Uris.HOME)
-    fun home(): ResponseEntity<SirenModel<HomeOutputModel>> {
+    @GetMapping(Uris.HOME, produces = ["application/vnd.siren+json"])
+    fun home(): ResponseEntity<SirenModel<OutputModel>> {
         return siren(value = HomeOutputModel()) {
             link(rel = LinkRelation("self"), href = Uris.homeUri())
             link(rel = LinkRelation("credits"), href = Uris.creditsUri())
@@ -27,8 +27,8 @@ class SystemController {
         }
     }
 
-    @GetMapping(Uris.CREDITS)
-    fun credits(): ResponseEntity<SirenModel<CreditsOutputModel>> {
+    @GetMapping(Uris.CREDITS, produces = ["application/vnd.siren+json"])
+    fun credits(): ResponseEntity<SirenModel<OutputModel>> {
         return siren(value = CreditsOutputModel()) {
             link(rel = LinkRelation("self"), href = Uris.creditsUri())
             link(rel = LinkRelation("home"), href = Uris.homeUri())

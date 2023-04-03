@@ -12,6 +12,7 @@ data class CourseWithClassrooms(
     val orgUrl: String,
     val name: String,
     val teacherId: Int,
+    val students: List<Student> = emptyList(),
     val classrooms: List<Classroom> = emptyList()
 )
 

@@ -6,6 +6,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 interface AssigmentRepository {
     fun createAssignment(assignment: AssignmentInput): Int
     fun getAssignmentById(assignmentId: Int): Assigment?
+    fun getAssignmentsByClassroom(classroomId: Int): List<Assigment>
     fun deleteAssignment(assignmentId: Int)
     fun updateAssignmentTitle(assignmentId: Int, title: String)
     fun updateAssignmentDescription(assignmentId: Int, description: String)

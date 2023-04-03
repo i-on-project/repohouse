@@ -36,6 +36,17 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssigmentRepository
             .firstOrNull()
     }
 
+    override fun getAssignmentsByClassroom(classroomId: Int): List<Assigment> {
+        return handle.createQuery(
+            """
+                SELECT * FROM assignment WHERE classroom_id = :classroomId
+            """,
+        )
+            .bind("classroomId", classroomId)
+            .mapTo<Assigment>()
+            .list()
+    }
+
     override fun deleteAssignment(assignmentId: Int) {
         handle.createUpdate(
             """

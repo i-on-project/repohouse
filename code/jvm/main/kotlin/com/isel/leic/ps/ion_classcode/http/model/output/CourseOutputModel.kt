@@ -9,7 +9,7 @@ data class CourseOutputModel(
     val orgUrl: String,
     val name: String,
     val teacherId: Int,
-)
+):OutputModel
 
 data class CourseWithClassroomOutputModel(
     val id: Int,
@@ -17,7 +17,7 @@ data class CourseWithClassroomOutputModel(
     val name: String,
     val teacherId: Int,
     val classrooms: List<Classroom>
-)
+):OutputModel
 
 data class CourseWithStudentsOutputModel(
     val id: Int,
@@ -25,21 +25,21 @@ data class CourseWithStudentsOutputModel(
     val name: String,
     val teacherId: Int,
     val students: List<Student>
-)
+):OutputModel
 
 data class CoursesOutputModel(
     val courses: List<CourseWithClassrooms>
-)
+):OutputModel
 
 data class CourseCreatedOutputModel(
     val created: Boolean = true,
     val id: Int
-)
+):OutputModel
 
 data class EnterCourseOutputModel(
     val entered: Boolean = true,
     val id: Int
-)
+):OutputModel
 
 data class LeaveCourseOutputModel(
     val left: Boolean = true,

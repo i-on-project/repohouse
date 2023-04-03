@@ -7,7 +7,7 @@ data class CreditsOutputModel(
         CreditsStudent("Ricardo Henriques",48322,"A48322@alunos.isel.pt"),
         CreditsStudent("João Magalhães",48323,"A48348@alunos.isel.pt"),
     )
-)
+):OutputModel
 
 
 data class CreditsStudent(
