@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
+import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.CourseWithStudents
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
@@ -9,11 +10,11 @@ import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
 typealias CourseResponse = Either<CourseServicesError, CourseWithClassrooms>
-typealias CourseCreatedResponse = Either<CourseServicesError, Int>
+typealias CourseCreatedResponse = Either<CourseServicesError, Course>
 typealias UserCoursesResponse = Either<CourseServicesError, List<CourseWithClassrooms>>
 typealias CourseStudentsResponse = Either<CourseServicesError, CourseWithStudents>
-typealias EnterCourseResponse = Either<CourseServicesError, Int>
-typealias LeaveCourseResponse = Either<CourseServicesError, Int>
+typealias EnterCourseResponse = Either<CourseServicesError, Course>
+typealias LeaveCourseResponse = Either<CourseServicesError, Course>
 
 sealed class CourseServicesError {
     object CourseNotFound : CourseServicesError()
@@ -93,8 +94,8 @@ class CourseServices(
             if (it.courseRepository.getCourse(courseId) == null) Either.Left(CourseServicesError.CourseNotFound)
             if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
             if (it.courseRepository.isUserInCourse(userId, courseId)) Either.Left(CourseServicesError.UserInCourse)
-            it.courseRepository.enterCourse(courseId, userId)
-            Either.Right(courseId)
+            val course = it.courseRepository.enterCourse(courseId, userId)
+            Either.Right(course)
         }
     }
 
@@ -103,8 +104,8 @@ class CourseServices(
             if (it.courseRepository.getCourse(courseId) == null) Either.Left(CourseServicesError.CourseNotFound)
             if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
             if (!it.courseRepository.isUserInCourse(userId, courseId)) Either.Left(CourseServicesError.UserNotInCourse)
-            it.courseRepository.leaveCourse(courseId, userId)
-            Either.Right(courseId)
+            val course = it.courseRepository.leaveCourse(courseId, userId)
+            Either.Right(course)
         }
     }
 }

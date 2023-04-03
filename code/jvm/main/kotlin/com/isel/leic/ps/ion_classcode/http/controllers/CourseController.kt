@@ -39,14 +39,14 @@ class CourseController(
     ): ResponseEntity<*> {
         return when (val course = courseServices.createCourse(courseInfo)) {
             is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = CourseCreatedOutputModel(id = course.value)) {
+            is Either.Right -> siren(value = CourseCreatedOutputModel(course.value)) {
                 clazz("course")
-                link(rel = LinkRelation("self"), href = Uris.courseUri(course.value), needAuthentication = true)
-                link(rel = LinkRelation("course"), href = Uris.courseUri(course.value), needAuthentication = true)
+                link(rel = LinkRelation("self"), href = Uris.courseUri(course.value.id), needAuthentication = true)
+                link(rel = LinkRelation("course"), href = Uris.courseUri(course.value.id), needAuthentication = true)
                 link(rel = LinkRelation("courses"), href = Uris.coursesUri(), needAuthentication = true)
-                link(rel = LinkRelation("students"), href = Uris.courseStudentsUri(course.value), needAuthentication = true)
-                action(name = "Enter Course", method = HttpMethod.PUT, href = Uris.enterCourse(course.value), type = "application/json", block = {})
-                action(name = "Leave Course", method = HttpMethod.PUT, href = Uris.leaveCourse(course.value), type = "application/json", block = {})
+                link(rel = LinkRelation("students"), href = Uris.courseStudentsUri(course.value.id), needAuthentication = true)
+                action(name = "Enter Course", method = HttpMethod.PUT, href = Uris.enterCourse(course.value.id), type = "application/json", block = {})
+                action(name = "Leave Course", method = HttpMethod.PUT, href = Uris.leaveCourse(course.value.id), type = "application/json", block = {})
             }
         }
     }
@@ -54,9 +54,9 @@ class CourseController(
     @GetMapping(Uris.COURSE_PATH)
     fun getCourse(
         user: User,
-        @PathVariable("id") id: Int,
+        @PathVariable("courseId") courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.getCourseById(id)) {
+        return when (val course = courseServices.getCourseById(courseId)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teacherId, course.value.classrooms)) {
                 clazz("course")
@@ -87,9 +87,9 @@ class CourseController(
     @GetMapping(Uris.STUDENTS_COURSE_PATH)
     fun getStudentsInCourse(
         user: User,
-        @PathVariable("id") id: Int,
+        @PathVariable("courseId") courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.getStudentsInCourse(id)) {
+        return when (val course = courseServices.getStudentsInCourse(courseId)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseWithStudentsOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teacherId, course.value.students)) {
                 clazz("course")
@@ -104,14 +104,14 @@ class CourseController(
     @PutMapping(Uris.ENTER_COURSE_PATH)
     fun enterCourse(
         user: User,
-        @PathVariable("id") id: Int,
+        @PathVariable("courseId") courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.enterCourse(id, user.id)) {
+        return when (val course = courseServices.enterCourse(courseId, user.id)) {
             is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = EnterCourseOutputModel(id = course.value)) {
+            is Either.Right -> siren(value = EnterCourseOutputModel(course.value)) {
                 clazz("course")
-                link(rel = LinkRelation("self"), href = Uris.enterCourse(course.value), needAuthentication = true)
-                action(name = "Leave Course", method = HttpMethod.PUT, href = Uris.leaveCourse(course.value), type = "application/json", block = {})
+                link(rel = LinkRelation("self"), href = Uris.enterCourse(course.value.id), needAuthentication = true)
+                action(name = "Leave Course", method = HttpMethod.PUT, href = Uris.leaveCourse(course.value.id), type = "application/json", block = {})
                 //TODO(Action for Delete Course)
             }
         }
@@ -120,14 +120,14 @@ class CourseController(
     @PutMapping(Uris.LEAVE_COURSE_PATH)
     fun leaveCourse(
         user: User,
-        @PathVariable("id") id: Int,
+        @PathVariable("courseId") courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.leaveCourse(id, user.id)) {
+        return when (val course = courseServices.leaveCourse(courseId, user.id)) {
             is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = LeaveCourseOutputModel(id = course.value)) {
+            is Either.Right -> siren(value = LeaveCourseOutputModel(course.value)) {
                 clazz("course")
-                link(rel = LinkRelation("self"), href = Uris.leaveCourse(course.value), needAuthentication = true)
-                action(name = "Enter Course", method = HttpMethod.PUT, href = Uris.enterCourse(course.value), type = "application/json", block = {})
+                link(rel = LinkRelation("self"), href = Uris.leaveCourse(course.value.id), needAuthentication = true)
+                action(name = "Enter Course", method = HttpMethod.PUT, href = Uris.enterCourse(course.value.id), type = "application/json", block = {})
                 //TODO(Action for Delete Course)
             }
         }

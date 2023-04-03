@@ -5,10 +5,11 @@ import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.repository.AssigmentRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
+import java.sql.Timestamp
 
 class JdbiAssignmentRepository(private val handle: Handle) : AssigmentRepository {
-    override fun createAssignment(assignment: AssignmentInput): Int {
-        return handle.createUpdate(
+    override fun createAssignment(assignment: AssignmentInput): Assigment {
+        val id = handle.createUpdate(
             """
                INSERT INTO assignment (title, description, max_number_elems, max_number_groups,classroom_id,release_date) 
                VALUES (:title, :description, :numb_elems_per_group, :numb_groups,:classroom_id, CURRENT_DATE)
@@ -23,6 +24,7 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssigmentRepository
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Assigment(id, assignment.classroomId, assignment.maxNumberElems, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
     }
 
     override fun getAssignmentById(assignmentId: Int): Assigment? {

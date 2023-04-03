@@ -25,14 +25,16 @@ object Uris {
     const val MENU_PATH = "$API/menu"
     const val TEACHERS_APPROVAL_PATH = "$API/teachers"
     const val STUDENTS_PATH = "$API/students"
-    const val STUDENT_PATH = "$STUDENTS_PATH/{id}"
+    const val STUDENT_PATH = "$STUDENTS_PATH/{studentId}"
     const val COURSES_PATH = "$API/courses"
-    const val COURSE_PATH = "$COURSES_PATH/{id}"
+    const val COURSE_PATH = "$COURSES_PATH/{courseId}"
     const val STUDENTS_COURSE_PATH = "$COURSE_PATH/students"
     const val ENTER_COURSE_PATH = "$COURSE_PATH/enter"
     const val LEAVE_COURSE_PATH = "$COURSE_PATH/leave"
-    const val CLASSROOM_PATH = "$COURSE_PATH/classrooms"
-    const val CLASSROOMS_PATH = "$CLASSROOM_PATH/{id}"
+    const val CLASSROOMS_PATH = "$COURSE_PATH/classrooms"
+    const val CLASSROOM_PATH = "$CLASSROOMS_PATH/{classroomId}"
+    const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assigments"
+    const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assigmentId}"
 
     /** Web Uris **/
 
@@ -61,5 +63,7 @@ object Uris {
     fun enterCourse(courseId: Int): URI = UriTemplate(ENTER_COURSE_PATH).expand(courseId)
     fun leaveCourse(courseId: Int): URI = UriTemplate(LEAVE_COURSE_PATH).expand(courseId)
 
-    fun classroomUri(classroomId: Int): URI = UriTemplate(CLASSROOMS_PATH).expand(classroomId)
+    fun classroomUri(classroomId: Int): URI = UriTemplate(CLASSROOM_PATH).expand(classroomId)
+
+    fun assigmentsUri(): URI = URI(ASSIGMENTS_PATH)
 }

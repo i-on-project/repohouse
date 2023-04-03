@@ -6,10 +6,10 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 
 interface CourseRepository {
-    fun createCourse(course: CourseInput): Int
+    fun createCourse(course: CourseInput): Course
     fun deleteCourse(courseId: Int)
-    fun enterCourse(courseId: Int, studentId: Int)
-    fun leaveCourse(courseId: Int, studentId: Int)
+    fun enterCourse(courseId: Int, studentId: Int): Course
+    fun leaveCourse(courseId: Int, studentId: Int): Course
     fun getCourseClassrooms(courseId: Int): List<Classroom>
     fun getAllTeacherCourses(teacherId: Int): List<Course>
     fun getAllStudentCourses(studentId: Int): List<Course>

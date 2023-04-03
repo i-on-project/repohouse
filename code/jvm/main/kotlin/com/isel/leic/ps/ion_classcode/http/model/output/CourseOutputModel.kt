@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
 import com.isel.leic.ps.ion_classcode.domain.Classroom
+import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.Student
 
@@ -32,16 +33,13 @@ data class CoursesOutputModel(
 )
 
 data class CourseCreatedOutputModel(
-    val created: Boolean = true,
-    val id: Int
+    val course: Course,
 )
 
 data class EnterCourseOutputModel(
-    val entered: Boolean = true,
-    val id: Int
+    val course: Course,
 )
 
 data class LeaveCourseOutputModel(
-    val left: Boolean = true,
-    val id: Int
+    val course: Course,
 )

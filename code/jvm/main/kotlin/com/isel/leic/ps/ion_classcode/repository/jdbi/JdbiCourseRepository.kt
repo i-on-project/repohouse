@@ -9,8 +9,8 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
-    override fun createCourse(course: CourseInput): Int {
-        return handle.createUpdate(
+    override fun createCourse(course: CourseInput): Course {
+        val id = handle.createUpdate(
             """
             INSERT INTO Course (name, org_url, teacher_id)
             VALUES (:name,:org_url,:teacher_id)
@@ -23,6 +23,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Course(id, course.orgUrl, course.name, course.teacherId)
     }
 
     override fun deleteCourse(courseId: Int) {
@@ -36,7 +37,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .execute()
     }
 
-    override fun enterCourse(courseId: Int, studentId: Int) {
+    override fun enterCourse(courseId: Int, studentId: Int): Course {
         handle.createUpdate(
             """
             INSERT INTO student_course (student,course)
@@ -46,9 +47,19 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("student_id", studentId)
             .bind("course_id", courseId)
             .execute()
+
+        return handle.createQuery(
+            """
+                SELECT * FROM Course
+                WHERE id = :course_id
+            """
+        )
+            .bind("course_id", courseId)
+            .mapTo<Course>()
+            .first()
     }
 
-    override fun leaveCourse(courseId: Int, studentId: Int) {
+    override fun leaveCourse(courseId: Int, studentId: Int): Course {
         handle.createUpdate(
             """
             DELETE FROM student_course
@@ -58,6 +69,16 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("student_id", studentId)
             .bind("course_id", courseId)
             .execute()
+
+        return handle.createQuery(
+            """
+                SELECT * FROM Course
+                WHERE id = :course_id
+            """
+        )
+            .bind("course_id", courseId)
+            .mapTo<Course>()
+            .first()
     }
 
     override fun getCourseClassrooms(courseId: Int): List<Classroom> {
