@@ -24,7 +24,7 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssigmentRepository
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Assigment(id, assignment.classroomId, assignment.maxNumberElems, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
+        return Assigment(id, assignment.classroomId, assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
     }
 
     override fun getAssignmentById(assignmentId: Int): Assigment? {

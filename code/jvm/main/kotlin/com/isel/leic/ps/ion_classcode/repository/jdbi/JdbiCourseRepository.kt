@@ -3,6 +3,7 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Student
+import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import org.jdbi.v3.core.Handle
@@ -23,7 +24,16 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Course(id, course.orgUrl, course.name, course.teacherId)
+        val teacher = handle.createQuery(
+            """
+                SELECT * FROM Teacher
+                WHERE id = :teacher_id
+            """,
+        )
+            .bind("teacher_id", course.teacherId)
+            .mapTo<Teacher>()
+            .first()
+        return Course(id, course.orgUrl, course.name, listOf(teacher))
     }
 
     override fun deleteCourse(courseId: Int) {
@@ -101,6 +111,43 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         )
             .bind("course_id", courseId)
             .execute()
+    }
+
+    override fun addTeacherToCourse(teacherId: Int, courseOrgUrl: String): Int {
+        handle.createUpdate(
+            """
+            INSERT INTO teacher_course (teacher,course)
+            VALUES (:teacher_id,:course_id)
+            """,
+        )
+            .bind("teacher_id", teacherId)
+            .bind("course_id", courseOrgUrl)
+            .execute()
+
+        return handle.createQuery(
+            """
+                SELECT id FROM Course
+                WHERE org_url = :course_org_url
+            """,
+        )
+            .bind("course_org_url", courseOrgUrl)
+            .mapTo<Int>()
+            .first()
+    }
+
+    override fun getCourseTeachers(courseId: Int): List<Teacher> {
+        return handle.createQuery(
+            """
+                SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+                JOIN users on teacher.id = users.id
+                JOIN teacher_course on teacher.id = teacher_course.teacher
+                LEFT JOIN course on teacher.id = course.teacher_id
+                WHERE course.id = :course_id
+            """,
+        )
+            .bind("course_id", courseId)
+            .mapTo<Teacher>()
+            .list()
     }
 
     override fun getCourseClassrooms(courseId: Int): List<Classroom> {

@@ -3,6 +3,7 @@ package com.isel.leic.ps.ion_classcode.repository
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Student
+import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 
 interface CourseRepository {
@@ -11,6 +12,8 @@ interface CourseRepository {
     fun enterCourse(courseId: Int, studentId: Int): Course
     fun leaveCourse(courseId: Int, studentId: Int): Course
     fun archiveCourse(courseId: Int)
+    fun addTeacherToCourse(teacherId: Int, courseOrgUrl: String): Int
+    fun getCourseTeachers(courseId: Int): List<Teacher>
     fun getCourseClassrooms(courseId: Int): List<Classroom>
     fun getAllTeacherCourses(teacherId: Int): List<Course>
     fun getAllStudentCourses(studentId: Int): List<Course>

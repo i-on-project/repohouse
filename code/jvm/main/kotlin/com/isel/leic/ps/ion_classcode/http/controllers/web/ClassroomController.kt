@@ -44,10 +44,10 @@ class ClassroomController(
                 clazz("classroom")
                 link(rel = LinkRelation("self"), href = Uris.classroomUri(classroomId), needAuthentication = true)
                 classroom.value.assigments.forEach {
-                    link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(it.id), needAuthentication = true)
+                    link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId,classroomId,it.id), needAuthentication = true)
                 }
                 if (user is Teacher && !classroom.value.isArchived) {
-                    action(name = "create-assigment", href = Uris.createAssigmentUri(classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(name = "create-assigment", href = Uris.createAssigmentUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "edit-classroom", href = Uris.editClassroomUri(classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "sync-classroom", href = Uris.syncClassroomUri(classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "archive-classroom", href = Uris.archiveClassroomUri(classroomId), method = HttpMethod.POST, type = "application/json", block = {})
@@ -63,7 +63,7 @@ class ClassroomController(
         @RequestBody classroomInfo: ClassroomInputModel,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.unauthorized
-        return when (val classroomId = classroomServices.createClassroom(ClassroomInput(name = classroomInfo.name, courseId = courseId))) {
+        return when (val classroomId = classroomServices.createClassroom(ClassroomInput(name = classroomInfo.name, courseId = courseId, teacherId = user.id))) {
             is Either.Left -> problem(classroomId.value)
             is Either.Right -> when (val classroom = classroomServices.getClassroom(classroomId.value)) {
                 is Either.Left -> problem(classroom.value)

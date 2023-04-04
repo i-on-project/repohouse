@@ -24,6 +24,7 @@ sealed class CourseServicesError {
     object NotStudent : CourseServicesError()
     object NotTeacher : CourseServicesError()
     object InvalidInput : CourseServicesError()
+    object CourseArchived : CourseServicesError()
 }
 
 @Component
@@ -39,18 +40,34 @@ class CourseServices(
             if (course == null) {
                 Either.Left(CourseServicesError.CourseNotFound)
             } else {
-                Either.Right(CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId, students, classrooms))
+                val teachers = it.courseRepository.getCourseTeachers(courseId)
+                Either.Right(CourseWithClassrooms(course.id, course.orgUrl, course.name, teachers, course.isArchived, students, classrooms))
             }
         }
     }
 
     fun createCourse(courseInfo: CourseInputModel): CourseCreatedResponse {
         return transactionManager.run {
+            if (it.usersRepository.getTeacher(courseInfo.teacherId) == null) Either.Left(CourseServicesError.NotTeacher)
             if (courseInfo.orgUrl.isEmpty() || courseInfo.name.isEmpty()) Either.Left(CourseServicesError.InvalidInput)
-            if (it.courseRepository.getCourseByOrg(courseInfo.orgUrl) != null) Either.Left(CourseServicesError.CourseAlreadyExists)
-            if (it.courseRepository.getCourseByName(courseInfo.name) != null) Either.Left(CourseServicesError.CourseAlreadyExists)
-            val id = it.courseRepository.createCourse(CourseInput(courseInfo.orgUrl, courseInfo.name, courseInfo.teacherId))
-            Either.Right(id)
+            val courseOrg = it.courseRepository.getCourseByOrg(courseInfo.orgUrl)
+            val id = if (courseOrg != null) {
+                it.courseRepository.addTeacherToCourse(courseInfo.teacherId, courseInfo.orgUrl)
+            } else {
+                it.courseRepository.createCourse(
+                    CourseInput(
+                        courseInfo.orgUrl,
+                        courseInfo.name,
+                        courseInfo.teacherId,
+                    ),
+                ).id
+            }
+            val course = it.courseRepository.getCourse(id)
+            if (course == null) {
+                Either.Left(CourseServicesError.CourseNotFound)
+            } else {
+                Either.Right(course)
+            }
         }
     }
 
@@ -60,7 +77,10 @@ class CourseServices(
             if (it.usersRepository.getTeacher(userId) == null) Either.Left(CourseServicesError.NotTeacher)
             val courses = it.courseRepository.getAllTeacherCourses(userId)
             Either.Right(
-                courses.map { course -> CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId) }, // Empty list of students and classrooms because info is not needed
+                courses.map { course ->
+                    val teachers = it.courseRepository.getCourseTeachers(course.id)
+                    CourseWithClassrooms(course.id, course.orgUrl, course.name, teachers, course.isArchived)
+                }, // Empty list of students and classrooms because info is not needed
             )
         }
     }
@@ -71,7 +91,10 @@ class CourseServices(
             if (it.usersRepository.getStudent(userId) == null) Either.Left(CourseServicesError.NotStudent)
             val courses = it.courseRepository.getAllStudentCourses(userId)
             Either.Right(
-                courses.map { course -> CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId) }, // Empty list of students and classrooms because info is not needed
+                courses.map { course ->
+                    val teachers = it.courseRepository.getCourseTeachers(course.id)
+                    CourseWithClassrooms(course.id, course.orgUrl, course.name, teachers)
+                }, // Empty list of students and classrooms because info is not needed
             )
         }
     }
@@ -79,6 +102,10 @@ class CourseServices(
     fun archiveOrDeleteCourse(courseId: Int): CourseArchivedResponse {
         return transactionManager.run {
             if (it.courseRepository.getCourse(courseId) == null) Either.Left(CourseServicesError.CourseNotFound)
+            val course = it.courseRepository.getCourse(courseId)
+            if (course == null) {
+                Either.Left(CourseServicesError.CourseNotFound)
+            } else if (course.isArchived) Either.Left(CourseServicesError.CourseArchived)
             val classrooms = it.courseRepository.getCourseClassrooms(courseId)
             if (classrooms.isNotEmpty()) {
                 it.courseRepository.archiveCourse(courseId)

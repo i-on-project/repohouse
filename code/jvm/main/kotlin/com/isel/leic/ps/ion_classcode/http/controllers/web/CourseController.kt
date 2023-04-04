@@ -60,7 +60,7 @@ class CourseController(
     ): ResponseEntity<*> {
         return when (val course = courseServices.getCourseById(courseId)) {
             is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teacherId, course.value.classrooms)) {
+            is Either.Right -> siren(value = CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teachers, course.value.isArchived, course.value.classrooms)) {
                 clazz("course")
                 link(rel = LinkRelation("self"), href = Uris.courseUri(course.value.id), needAuthentication = true)
                 course.value.classrooms.forEach {
@@ -132,7 +132,8 @@ class CourseController(
                                 course.value.id,
                                 course.value.orgUrl,
                                 course.value.name,
-                                course.value.teacherId,
+                                course.value.teachers,
+                                course.value.isArchived,
                                 course.value.classrooms,
                             ),
                         ) {
@@ -183,6 +184,7 @@ class CourseController(
             CourseServicesError.NotStudent -> Problem.notStudent
             CourseServicesError.NotTeacher -> Problem.notTeacher
             CourseServicesError.InvalidInput -> Problem.invalidInput
+            CourseServicesError.CourseArchived -> Problem.invalidOperation
         }
     }
 }
