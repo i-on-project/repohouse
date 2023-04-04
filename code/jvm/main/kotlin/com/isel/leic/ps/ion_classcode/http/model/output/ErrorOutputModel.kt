@@ -4,4 +4,4 @@ data class ErrorOutputModel(
     val state: Int,
     val error: String,
     val message: String
-)
+):OutputModel

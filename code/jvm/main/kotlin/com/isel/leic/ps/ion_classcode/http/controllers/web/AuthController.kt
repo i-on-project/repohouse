@@ -70,7 +70,7 @@ class AuthController(
     private val userServices: UserServices,
     private val studentServices: StudentServices,
     private val requestServices: RequestServices,
-    private val outboxServices: OutboxServices
+    private val outboxServices: OutboxServices,
 ) {
 
     @GetMapping(Uris.AUTH_TEACHER_PATH)
@@ -95,18 +95,18 @@ class AuthController(
             .build()
     }
 
-    @GetMapping(Uris.CALLBACK_PATH)
+    @GetMapping(Uris.CALLBACK_PATH, produces = ["application/vnd.siren+json"])
     suspend fun callback(
         @RequestParam code: String,
         @RequestParam state: String,
         @CookieValue userState: String,
         @CookieValue position: String,
-        response: HttpServletResponse
+        response: HttpServletResponse,
     ): ResponseEntity<*> {
         if (state != userState) return Problem.stateMismatch
         val accessToken = fetchAccessToken(code)
         val userGithubInfo = fetchUserInfo(accessToken.access_token)
-        return when(val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
+        return when (val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
             is Either.Right -> {
                 if (userInfo.value.isCreated) {
                     val cookie = ResponseCookie.from(APP_COOKIE_NAME, AESEncrypt.encrypt(userInfo.value.token))
@@ -251,7 +251,7 @@ class AuthController(
         }
     }
 
-    @GetMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH)
+    @GetMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH, produces = ["application/vnd.siren+json"])
     fun authRegisterVerifyStudent(
         @CookieValue("PendingStudent") token: String,
     ): ResponseEntity<*> {
@@ -265,7 +265,7 @@ class AuthController(
         }
     }
 
-    @PostMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH)
+    @PostMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH, produces = ["application/vnd.siren+json"])
     fun authRegisterVerifyStudent(
         @CookieValue("PendingStudent") token: String,
         @RequestBody

@@ -1,12 +1,10 @@
 package com.isel.leic.ps.ion_classcode.domain.input
 
-import java.sql.Timestamp
 
 data class AssignmentInput(
     val classroomId: Int,
     val maxElemsPerGroup: Int,
     val maxNumberGroups: Int,
-    val releaseDate: Timestamp,
     val description: String,
     val title: String,
 ) {

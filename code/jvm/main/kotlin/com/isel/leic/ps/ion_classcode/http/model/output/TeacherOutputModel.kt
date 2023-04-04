@@ -3,7 +3,7 @@ package com.isel.leic.ps.ion_classcode.http.model.output
 
 data class TeachersPendingOutputModel(
     val teachers : List<TeacherPending>
-)
+):OutputModel
 
 
 data class TeacherPending(

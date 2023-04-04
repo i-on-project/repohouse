@@ -1,19 +1,19 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
+import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
-import com.isel.leic.ps.ion_classcode.domain.CourseWithStudents
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
 typealias CourseResponse = Either<CourseServicesError, CourseWithClassrooms>
-typealias CourseCreatedResponse = Either<CourseServicesError, Int>
+typealias CourseCreatedResponse = Either<CourseServicesError, Course>
 typealias UserCoursesResponse = Either<CourseServicesError, List<CourseWithClassrooms>>
-typealias CourseStudentsResponse = Either<CourseServicesError, CourseWithStudents>
-typealias EnterCourseResponse = Either<CourseServicesError, Int>
-typealias LeaveCourseResponse = Either<CourseServicesError, Int>
+typealias CourseArchivedResponse = Either<CourseServicesError, CourseArchivedOutputModel>
+typealias LeaveCourseResponse = Either<CourseServicesError, Course>
 
 sealed class CourseServicesError {
     object CourseNotFound : CourseServicesError()
@@ -26,7 +26,6 @@ sealed class CourseServicesError {
     object InvalidInput : CourseServicesError()
 }
 
-
 @Component
 class CourseServices(
     private val transactionManager: TransactionManager,
@@ -36,10 +35,11 @@ class CourseServices(
         return transactionManager.run {
             val course = it.courseRepository.getCourse(courseId)
             val classrooms = it.courseRepository.getCourseClassrooms(courseId)
+            val students = it.courseRepository.getStudentInCourse(courseId)
             if (course == null) {
                 Either.Left(CourseServicesError.CourseNotFound)
             } else {
-                Either.Right(CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId, classrooms))
+                Either.Right(CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId, students, classrooms))
             }
         }
     }
@@ -60,7 +60,7 @@ class CourseServices(
             if (it.usersRepository.getTeacher(userId) == null) Either.Left(CourseServicesError.NotTeacher)
             val courses = it.courseRepository.getAllTeacherCourses(userId)
             Either.Right(
-                courses.map { course -> CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId, it.courseRepository.getCourseClassrooms(course.id)) }
+                courses.map { course -> CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId) }, // Empty list of students and classrooms because info is not needed
             )
         }
     }
@@ -71,30 +71,22 @@ class CourseServices(
             if (it.usersRepository.getStudent(userId) == null) Either.Left(CourseServicesError.NotStudent)
             val courses = it.courseRepository.getAllStudentCourses(userId)
             Either.Right(
-                courses.map { course -> CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId, it.courseRepository.getCourseClassrooms(course.id)) }
+                courses.map { course -> CourseWithClassrooms(course.id, course.orgUrl, course.name, course.teacherId) }, // Empty list of students and classrooms because info is not needed
             )
         }
     }
 
-    fun getStudentsInCourse(courseId: Int): CourseStudentsResponse {
-        return transactionManager.run {
-            val course = it.courseRepository.getCourse(courseId)
-            if (course == null) {
-                Either.Left(CourseServicesError.CourseNotFound)
-            } else {
-                val students = it.courseRepository.getStudentInCourse(courseId)
-                Either.Right(CourseWithStudents(course.id, course.orgUrl, course.name, course.teacherId, students))
-            }
-        }
-    }
-
-    fun enterCourse(courseId: Int, userId: Int): EnterCourseResponse {
+    fun archiveOrDeleteCourse(courseId: Int): CourseArchivedResponse {
         return transactionManager.run {
             if (it.courseRepository.getCourse(courseId) == null) Either.Left(CourseServicesError.CourseNotFound)
-            if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
-            if (it.courseRepository.isUserInCourse(userId, courseId)) Either.Left(CourseServicesError.UserInCourse)
-            it.courseRepository.enterCourse(courseId, userId)
-            Either.Right(courseId)
+            val classrooms = it.courseRepository.getCourseClassrooms(courseId)
+            if (classrooms.isNotEmpty()) {
+                it.courseRepository.archiveCourse(courseId)
+                Either.Right(CourseArchivedOutputModel.CourseArchived)
+            } else {
+                it.courseRepository.deleteCourse(courseId)
+                Either.Right(CourseArchivedOutputModel.CourseDeleted)
+            }
         }
     }
 
@@ -103,8 +95,8 @@ class CourseServices(
             if (it.courseRepository.getCourse(courseId) == null) Either.Left(CourseServicesError.CourseNotFound)
             if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
             if (!it.courseRepository.isUserInCourse(userId, courseId)) Either.Left(CourseServicesError.UserNotInCourse)
-            it.courseRepository.leaveCourse(courseId, userId)
-            Either.Right(courseId)
+            val course = it.courseRepository.leaveCourse(courseId, userId)
+            Either.Right(course)
         }
     }
 }

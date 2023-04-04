@@ -3,6 +3,7 @@ package com.isel.leic.ps.ion_classcode
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.isel.leic.ps.ion_classcode.http.pipeline.AuthenticationInterceptor
 import com.isel.leic.ps.ion_classcode.http.pipeline.LoggerFilter
 import com.isel.leic.ps.ion_classcode.repository.jdbi.configure
 import com.isel.leic.ps.ion_classcode.http.pipeline.UserArgumentResolver
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 const val DATABASE_URL = "JDBC_DATABASE_URL"
@@ -46,8 +48,14 @@ class IonClassCodeApplication : WebMvcConfigurer {
 
 @Configuration
 class PipelineConfigurer(
-    val userArgumentResolver: UserArgumentResolver
+    val userArgumentResolver: UserArgumentResolver,
+    val authenticationInterceptor: AuthenticationInterceptor,
 ) : WebMvcConfigurer {
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(authenticationInterceptor)
+    }
+
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(userArgumentResolver)
