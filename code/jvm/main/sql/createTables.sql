@@ -27,9 +27,7 @@ CREATE TABLE Course(
     id serial primary key,
     org_url text unique not null,
     name text unique not null,
-    teacher_id int not null,
-    is_archived boolean not null default false,
-    foreign key (teacher_id) references Teacher(id)
+    is_archived boolean not null default false
 );
 
 CREATE TABLE Student_Course(

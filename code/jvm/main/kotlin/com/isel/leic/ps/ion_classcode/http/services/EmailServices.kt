@@ -16,11 +16,12 @@ typealias EmailResponse = Either<EmailServiceError, Response>
 sealed class EmailServiceError {
     object SendEmailError : EmailServiceError()
 }
+
 @Component
 class EmailService {
     companion object {
         private val SENDGRID_API_KEY: String = System.getenv("SENDGRID_CLASSCODE_API_KEY")
-        val sendGrid= SendGrid(SENDGRID_API_KEY)
+        val sendGrid = SendGrid(SENDGRID_API_KEY)
         val FROM = Email("ricardo.freitas.henriques@gmail.com")
         const val SUBJECT = "i-on ClassCode - OTP"
         const val CONTENT_TYPE = "text/plain"
@@ -29,11 +30,13 @@ class EmailService {
     }
 
     fun sendVerificationEmail(name: String, email: String, otp: Int): EmailResponse {
-
         val to = Email(email)
-        val content = Content(CONTENT_TYPE, "Welcome to i-on ClassCode, $name! \nPlease verify your identity through" +
-                " the following otp:\n $otp")
-        val mail = Mail(FROM, SUBJECT, to, content);
+        val content = Content(
+            CONTENT_TYPE,
+            "Welcome to i-on ClassCode, $name! \nPlease verify your identity through" +
+                " the following otp:\n $otp",
+        )
+        val mail = Mail(FROM, SUBJECT, to, content)
         val request = Request()
         try {
             request.method = Method.POST

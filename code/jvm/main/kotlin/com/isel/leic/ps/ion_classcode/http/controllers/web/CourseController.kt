@@ -6,10 +6,11 @@ import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CoursesOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -38,7 +39,6 @@ class CourseController(
         @RequestBody courseInfo: CourseInputModel,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.unauthorized
-        // TODO: Check if course already exists, adds teacher to course
         return when (val course = courseServices.createCourse(courseInfo)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseCreatedOutputModel(course.value)) {
@@ -71,23 +71,6 @@ class CourseController(
                         textField(name = "name")
                     })
                     action(name = "Delete Course", method = HttpMethod.DELETE, href = Uris.courseUri(course.value.id), type = "application/json", block = {})
-                }
-            }
-        }
-    }
-
-    // TODO: Check utility of this method
-    @GetMapping(Uris.COURSES_PATH, produces = ["application/vnd.siren+json"])
-    fun getUserCourses(
-        user: User,
-    ): ResponseEntity<*> {
-        return when (val course = if (user is Teacher) courseServices.getTeacherCourses(user.id) else courseServices.getStudentCourses(user.id)) {
-            is Either.Left -> problem(course.value)
-            is Either.Right -> siren(value = CoursesOutputModel(course.value)) {
-                clazz("course")
-                link(rel = LinkRelation("self"), href = Uris.coursesUri(), needAuthentication = true)
-                course.value.forEach {
-                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(it.id), needAuthentication = true)
                 }
             }
         }
@@ -169,7 +152,10 @@ class CourseController(
                         }
                     }
                 } else {
-                    TODO("What to return when deleted?")
+                    siren(value = CourseDeletedOutputModel(id = courseId, deleted = true)) {
+                        clazz("course-deleted")
+                        link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
+                    }
                 }
         }
     }

@@ -38,3 +38,8 @@ data class CourseCreatedOutputModel(
     val course: Course,
 )
 
+data class CourseDeletedOutputModel(
+    val id: Int,
+    val deleted: Boolean
+) : OutputModel
+

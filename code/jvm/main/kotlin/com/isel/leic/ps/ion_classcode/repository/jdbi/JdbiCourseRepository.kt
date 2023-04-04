@@ -141,8 +141,8 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
                 SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
                 JOIN users on teacher.id = users.id
                 JOIN teacher_course on teacher.id = teacher_course.teacher
-                LEFT JOIN course on teacher.id = course.teacher_id
-                WHERE course.id = :course_id
+                LEFT JOIN teacher_course on teacher.id = teacher_course.teacher
+                WHERE teacher_course.course = :course_id
             """,
         )
             .bind("course_id", courseId)
@@ -165,8 +165,8 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getAllTeacherCourses(teacherId: Int): List<Course> {
         return handle.createQuery(
             """
-            SELECT * FROM Course
-            WHERE teacher_id = :teacher_id
+            SELECT id,org_url,name,teachers FROM Course JOIN teacher_course ON Course.id = teacher_course.course
+            WHERE teacher = :teacher_id
             """,
         )
             .bind("teacher_id", teacherId)
@@ -177,7 +177,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getAllStudentCourses(studentId: Int): List<Course> {
         return handle.createQuery(
             """
-            SELECT id,org_url,name,teacher_id FROM Course JOIN student_course ON Course.id = student_course.course
+            SELECT id,org_url,name FROM Course JOIN student_course ON Course.id = student_course.course
             WHERE student = :student_id
             """,
         )

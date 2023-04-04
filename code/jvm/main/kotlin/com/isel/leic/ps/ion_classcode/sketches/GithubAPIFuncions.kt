@@ -8,7 +8,7 @@ import com.isel.leic.ps.ion_classcode.http.GITHUB_ORG_TEAMS_USER_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_ORG_TEAM_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_ORG_USER_URI
 import com.isel.leic.ps.ion_classcode.http.OkHttp
-import com.isel.leic.ps.ion_classcode.http.controllers.ORG_NAME
+import com.isel.leic.ps.ion_classcode.http.controllers.web.ORG_NAME
 import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.github.GithubRepo

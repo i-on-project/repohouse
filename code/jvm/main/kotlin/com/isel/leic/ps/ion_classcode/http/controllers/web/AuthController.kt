@@ -17,7 +17,6 @@ import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
-import com.isel.leic.ps.ion_classcode.http.model.output.ErrorOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
 import com.isel.leic.ps.ion_classcode.http.model.output.InfoOutputModel
@@ -51,7 +50,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
+import java.util.UUID
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org%20user:email"
@@ -166,7 +165,7 @@ class AuthController(
                             githubUsername = userGithubInfo.login,
                             githubId = userGithubInfo.id,
                             token = generateRandomToken(),
-                            name= userGithubInfo.name
+                            name = userGithubInfo.name
                         )
                     )) {
                         is Either.Right -> {

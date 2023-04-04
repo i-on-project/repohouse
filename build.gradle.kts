@@ -41,7 +41,7 @@ dependencies {
     implementation("org.jdbi:jdbi3-kotlin:3.37.1")
     implementation("org.jdbi:jdbi3-postgres:3.37.1")
     implementation("org.postgresql:postgresql:42.5.4")
-    //for SendGrid
+    // for SendGrid
     implementation("com.sendgrid:sendgrid-java:4.9.3")
 }
 

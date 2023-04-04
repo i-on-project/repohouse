@@ -19,7 +19,6 @@ object Uris {
     const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_PATH/verify"
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
-    const val AUTH_STATUS_PATH = "$AUTH_PATH/status/{id}"
     const val LOGOUT = "$AUTH_PATH/logout"
     const val CALLBACK_PATH = "$AUTH_PATH/callback"
     const val MENU_PATH = "$API/menu"
@@ -48,6 +47,8 @@ object Uris {
     const val DELETE_ASSIGMENT_PATH = "$ASSIGMENT_PATH/delete"
     const val TEAMS_PATH = "$ASSIGMENT_PATH/teams"
     const val TEAM_PATH = "$TEAMS_PATH/{teamId}"
+    const val EDIT_DELIVERY_PATH = "$DELIVERY_PATH/edit"
+    const val SYNC_DELIVERY_PATH = "$DELIVERY_PATH/sync"
 
     /** Web Uris **/
 
@@ -56,7 +57,6 @@ object Uris {
     fun homeUri(): URI = URI(HOME)
     fun creditsUri(): URI = URI(CREDITS)
     fun authUri(): URI = URI(AUTH_PATH)
-    fun authStatusUri(userId: Int): URI = UriTemplate(AUTH_STATUS_PATH).expand(userId)
     fun authUriRegister(): URI = URI(AUTH_REGISTER_PATH)
     fun authUriStudent(): URI = URI(AUTH_STUDENT_PATH)
     fun authUriTeacher(): URI = URI(AUTH_TEACHER_PATH)
@@ -88,6 +88,8 @@ object Uris {
     fun deleteAssigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(DELETE_ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId)
     fun teamsUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(TEAMS_PATH).expand(courseId, classroomId, assigmentId)
     fun teamUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(TEAM_PATH).expand(courseId, classroomId, assigmentId, teamId)
+    fun editDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): URI = UriTemplate(EDIT_DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId)
+    fun syncDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): URI = UriTemplate(SYNC_DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId)
 
     /** Mobile Uris **/
 
