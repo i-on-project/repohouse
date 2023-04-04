@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.pipeline
 
 import com.isel.leic.ps.ion_classcode.domain.User
-import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
+import com.isel.leic.ps.ion_classcode.http.controllers.web.AUTHORIZATION_COOKIE_NAME
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -30,9 +30,5 @@ class AuthenticationInterceptor(
             }
         }
         return true
-    }
-
-    companion object {
-        private const val AUTHORIZATION_COOKIE_NAME = "Session"
     }
 }

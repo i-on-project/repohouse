@@ -3,9 +3,10 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
+import java.sql.Timestamp
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.sql.Timestamp
+
 
 typealias OutboxResponse = Either<OutboxServicesError, Unit>
 
@@ -27,8 +28,8 @@ class OutboxServices(
     private val emailService: EmailService,
 ) {
 
-    fun createUserVerification(userId: Int): OutboxResponse {
-        val otp = createRamdomOtp()
+    fun createUserVerification(userId:Int):OutboxResponse {
+        val otp = createRandomOtp()
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId)
             if (cooldown != null) {
@@ -58,7 +59,7 @@ class OutboxServices(
                     Either.Right(Unit)
                 } else {
                     it.outboxRepository.deleteOutboxRequest(outbox.userId)
-                    it.cooldownRepository.createCooldownRequest(userId, addTime(COOLDOWN_TIME))
+                    it.cooldownRepository.createCooldownRequest(userId, addTime())
                     Either.Left(OutboxServicesError.OtpDifferent)
                 }
             }
@@ -78,7 +79,8 @@ class OutboxServices(
         }
     }
 
-    private fun createRamdomOtp(): Int {
+
+    private fun createRandomOtp(): Int {
         return (100000..999999).random()
     }
 
@@ -86,7 +88,9 @@ class OutboxServices(
         return Timestamp(this)
     }
 
-    private fun addTime(millis: Int): Timestamp {
-        return (System.currentTimeMillis() + millis).toTimestamp()
+    private fun addTime(): Timestamp {
+        return (System.currentTimeMillis() + COOLDOWN_TIME).toTimestamp()
     }
+
 }
+
