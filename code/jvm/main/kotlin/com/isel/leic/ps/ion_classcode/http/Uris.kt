@@ -42,6 +42,12 @@ object Uris {
     const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assigments"
     const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assigmentId}"
     const val CREATE_ASSIGMENT_PATH = "$ASSIGMENTS_PATH/create"
+    const val DELIVERYS_PATH = "$ASSIGMENT_PATH/deliverys"
+    const val DELIVERY_PATH = "$DELIVERYS_PATH/{deliveryId}"
+    const val CREATE_DELIVERY_PATH = "$DELIVERYS_PATH/create"
+    const val DELETE_ASSIGMENT_PATH = "$ASSIGMENT_PATH/delete"
+    const val TEAMS_PATH = "$ASSIGMENT_PATH/teams"
+    const val TEAM_PATH = "$TEAMS_PATH/{teamId}"
 
     /** Web Uris **/
 
@@ -73,9 +79,15 @@ object Uris {
     fun syncClassroomUri(classroomId: Int): URI = UriTemplate(SYNC_CLASSROOM_PATH).expand(classroomId)
     fun editClassroomUri(classroomId: Int): URI = UriTemplate(EDIT_CLASSROOM_PATH).expand(classroomId)
     fun inviteLinkUri(inviteLink: String): URI = UriTemplate(INVITE_LINK_PATH).expand(inviteLink)
-    fun assigmentsUri(): URI = URI(ASSIGMENTS_PATH)
-    fun assigmentUri(assigmentId: Int): URI = UriTemplate(ASSIGMENT_PATH).expand(assigmentId)
-    fun createAssigmentUri(classroomId: Int): URI = UriTemplate(CREATE_ASSIGMENT_PATH).expand(classroomId)
+    fun assigmentsUri(courseId: Int, classroomId: Int): URI = UriTemplate(ASSIGMENTS_PATH).expand(courseId, classroomId)
+    fun assigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId)
+    fun createAssigmentUri(courseId: Int, classroomId: Int): URI = UriTemplate(CREATE_ASSIGMENT_PATH).expand(courseId, classroomId)
+    fun deliverysUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(DELIVERYS_PATH).expand(courseId, classroomId, assigmentId)
+    fun deliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): URI = UriTemplate(DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId)
+    fun createDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(CREATE_DELIVERY_PATH).expand(courseId, classroomId, assigmentId)
+    fun deleteAssigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(DELETE_ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId)
+    fun teamsUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(TEAMS_PATH).expand(courseId, classroomId, assigmentId)
+    fun teamUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(TEAM_PATH).expand(courseId, classroomId, assigmentId, teamId)
 
     /** Mobile Uris **/
 

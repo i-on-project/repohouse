@@ -122,6 +122,10 @@ class ActionBuilderScope(
         fields.add(FieldModel(name, "text"))
     }
 
+    fun timestampField(name: String) {
+        fields.add(FieldModel(name, "timestamp"))
+    }
+
     fun numberField(name: String) {
         fields.add(FieldModel(name, "number"))
     }

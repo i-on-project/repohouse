@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Assigment
+import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentOutputModel
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component
 typealias AssigmentResponse = Either<AssigmentServicesError, AssigmentOutputModel>
 typealias AssigmentCreatedResponse = Either<AssigmentServicesError, Assigment>
 typealias AssigmentDeletedResponse = Either<AssigmentServicesError, Boolean>
+typealias AssigmentStudentTeamResponse = Either<AssigmentServicesError, List<Team>>
 
 sealed class AssigmentServicesError {
     object NotTeacher : AssigmentServicesError()
@@ -92,6 +94,19 @@ class AssigmentServices(
                 }
                 it.assigmentRepository.deleteAssignment(assigmentId)
                 Either.Right(true)
+            }
+        }
+    }
+
+    fun getAssigmentStudentTeams(assigmentId: Int, studentId: Int): AssigmentStudentTeamResponse {
+        return transactionManager.run {
+            val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
+            if (assigment == null) {
+                Either.Left(AssigmentServicesError.AssigmentNotFound)
+            } else {
+                val assigmentTeams = it.teamRepository.getTeamsFromAssignment(assigmentId)
+                val studentTeams = it.teamRepository.getTeamsFromStudent(studentId)
+                Either.Right(assigmentTeams.filter { assigmentTeam -> studentTeams.any { studentTeam -> studentTeam.id == assigmentTeam.id } })
             }
         }
     }
