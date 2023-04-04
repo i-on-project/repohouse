@@ -23,8 +23,6 @@ class ClassroomServices(
     private val transactionManager: TransactionManager,
 ) {
 
-    // TODO: For write operations check if is archived
-
     fun getClassroom(classroomId: Int): ClassroomResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {

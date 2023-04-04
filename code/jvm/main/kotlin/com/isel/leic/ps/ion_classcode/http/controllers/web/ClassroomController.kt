@@ -10,9 +10,10 @@ import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.http.services.ClassroomArchivedResponse
+import com.isel.leic.ps.ion_classcode.http.services.AssigmentServices
 import com.isel.leic.ps.ion_classcode.http.services.ClassroomServices
 import com.isel.leic.ps.ion_classcode.http.services.ClassroomServicesError
+import com.isel.leic.ps.ion_classcode.http.services.TeamServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
@@ -27,7 +28,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class ClassroomController(
     private val classroomServices: ClassroomServices,
+    private val teamServices: TeamServices
 ) {
+    // TODO: syncClassroom : be the last thing to do
 
     @GetMapping(Uris.CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun getClassroom(

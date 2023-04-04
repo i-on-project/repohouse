@@ -4,7 +4,6 @@ import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either

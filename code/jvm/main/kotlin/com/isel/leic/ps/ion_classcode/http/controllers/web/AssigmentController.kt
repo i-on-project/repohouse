@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.controllers
+package com.isel.leic.ps.ion_classcode.http.controllers.web
 
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Uris
@@ -17,11 +17,18 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
-
 @RestController
 class AssigmentController(
     private val assigmentService: AssigmentServices,
 ) {
+
+    // TODO: getAssigmentInfo :
+    //      Teacher:
+    //          with links for each delivery and each team (maybe with a list of students in each team and not in a team)
+    //          with action for createDelivery
+    //      Student:
+    //          with links for each delivery and each team (if not in a team, with a link to join/create a team)
+    // TODO: deleteAssigment if no deliveries exist
 
     @PostMapping(Uris.ASSIGMENTS_PATH)
     fun createAssignment(
@@ -40,9 +47,13 @@ class AssigmentController(
     }
 
     private fun problem(error: AssigmentServicesError): ResponseEntity<ErrorMessageModel> {
-        return when(error) {
+        return when (error) {
             AssigmentServicesError.NotTeacher -> Problem.notTeacher
             AssigmentServicesError.InvalidInput -> Problem.invalidInput
+            AssigmentServicesError.AssigmentNotFound -> Problem.notFound
+            AssigmentServicesError.AssigmentNotDeleted -> Problem.methodNotAllowed
+            AssigmentServicesError.ClassroomArchived -> Problem.invalidOperation
+            AssigmentServicesError.ClassroomNotFound -> Problem.notFound
         }
     }
 }

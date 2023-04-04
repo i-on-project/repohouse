@@ -5,6 +5,8 @@ data class Course(
     val orgUrl: String,
     val name: String,
     val teacherId: Int,
+    // val teachers: List<Teacher>,
+    // val isArchived: Boolean = false
 )
 
 data class CourseWithClassrooms(
@@ -12,6 +14,8 @@ data class CourseWithClassrooms(
     val orgUrl: String,
     val name: String,
     val teacherId: Int,
+    // val teachers: List<Teacher>,
+    // val isArchived: Boolean = false,
     val students: List<Student> = emptyList(),
     val classrooms: List<Classroom> = emptyList()
 )

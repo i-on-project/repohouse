@@ -85,4 +85,19 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .bind("deliveryId", deliveryId)
             .execute()
     }
+
+    override fun getTeamsByDelivery(deliveryId: Int): List<Int> {
+        return handle.createQuery(
+            """
+                SELECT team.id FROM team
+                JOIN repo on team.id = repo.team_id
+                JOIN tags on repo.id = tags.repo_id
+                JOIN delivery on tags.delivery_id = delivery.id
+                WHERE delivery_id = :deliveryId and tags.is_delivered = true 
+                """,
+        )
+            .bind("deliveryId", deliveryId)
+            .mapTo<Int>()
+            .list()
+    }
 }
