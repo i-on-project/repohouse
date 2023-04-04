@@ -5,7 +5,7 @@ import java.sql.Timestamp
 data class Assigment(
     val id: Int,
     val classroomId: Int,
-    val maxNumberElems: Int,
+    val maxElemsPerGroup: Int,
     val maxNumberGroups: Int,
     val releaseDate: Timestamp,
     val description: String,

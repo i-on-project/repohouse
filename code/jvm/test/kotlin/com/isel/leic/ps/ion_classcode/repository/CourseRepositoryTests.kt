@@ -23,6 +23,14 @@ class CourseRepositoryTests {
     }
 
     @Test
+    fun `can get a course classrooms`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val courseId = 1
+        val course = courseRepo.getCourseClassrooms(courseId = courseId)
+        assert(course.size == 2)
+    }
+
+    @Test
     fun `can delete a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
         val courseId = 3

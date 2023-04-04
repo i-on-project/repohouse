@@ -6,6 +6,6 @@ import com.isel.leic.ps.ion_classcode.domain.requests.Apply
 interface ApplyRequestRepository {
     fun createApplyRequest(request: ApplyInput): Int
     fun getApplyRequests(): List<Apply>
-    fun getApplyRequestById(id: Int): Apply
+    fun getApplyRequestById(id: Int): Apply?
     fun getApplyRequestsByUser(teacherId: Int): List<Apply>
 }

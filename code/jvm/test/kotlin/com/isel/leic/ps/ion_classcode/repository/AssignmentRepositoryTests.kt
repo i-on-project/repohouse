@@ -16,7 +16,7 @@ class AssignmentRepositoryTests {
         assignmentRepo.createAssignment(
             assignment = AssignmentInput(
                 classroomId = classroomId,
-                maxNumberElems = 10,
+                maxElemsPerGroup = 10,
                 maxNumberGroups = 10,
                 releaseDate = Timestamp.from(Instant.now()),
                 description = "aaaa",
@@ -92,6 +92,6 @@ class AssignmentRepositoryTests {
         val newElementsMax = 3
         assignmentRepo.updateAssignmentNumbElemsPerGroup(assignmentId = assignmentId, numb = newElementsMax)
         val assignment = assignmentRepo.getAssignmentById(assignmentId = assignmentId) ?: fail("Assignment not found")
-        assert(assignment.maxNumberElems == newElementsMax)
+        assert(assignment.maxElemsPerGroup == newElementsMax)
     }
 }
