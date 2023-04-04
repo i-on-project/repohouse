@@ -10,15 +10,15 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssigmentRepository
     override fun createAssignment(assignment: AssignmentInput): Int {
         return handle.createUpdate(
             """
-               INSERT INTO assignment (title, description, max_number_elems, max_number_groups,classroom_id,release_date) 
-               VALUES (:title, :description, :numb_elems_per_group, :numb_groups,:classroom_id, CURRENT_DATE)
+               INSERT INTO assignment (title, description, max_elems_per_group, max_number_groups,classroom_id,release_date) 
+               VALUES (:title, :description, :max_elems_per_group, :numb_groups,:classroom_id, CURRENT_DATE)
                RETURNING id
                """,
         )
             .bind("title", assignment.title)
             .bind("description", assignment.description)
-            .bind("numb_elems_per_group", assignment.maxNumberElems)
-            .bind("numb_groups", assignment.maxNumberElems)
+            .bind("max_elems_per_group", assignment.maxElemsPerGroup)
+            .bind("numb_groups", assignment.maxNumberGroups)
             .bind("classroom_id", assignment.classroomId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
@@ -63,7 +63,7 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssigmentRepository
     override fun updateAssignmentNumbElemsPerGroup(assignmentId: Int, numb: Int) {
         handle.createUpdate(
             """
-                UPDATE assignment SET max_number_elems = :numb WHERE id = :assigmentId
+                UPDATE assignment SET max_elems_per_group = :numb WHERE id = :assigmentId
             """,
         ).bind("assigmentId", assignmentId).bind("numb", numb).execute()
     }

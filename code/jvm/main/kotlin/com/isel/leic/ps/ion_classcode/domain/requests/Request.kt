@@ -6,6 +6,6 @@ interface Request {
     val state: String
 
     fun checkState(): Boolean {
-        return state == "pending" || state == "accepted" || state == "rejected"
+        return state == "Pending" || state == "Accepted" || state == "Rejected"
     }
 }

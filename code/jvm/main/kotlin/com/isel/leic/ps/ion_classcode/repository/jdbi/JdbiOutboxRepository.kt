@@ -6,21 +6,23 @@ import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
+import java.time.Instant
 
 const val INTERVAL = "10 MINUTES"
 class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
     override fun createOutboxRequest(outbox: OutboxInput): Int? {
         return handle.createUpdate(
             """
-            INSERT INTO Outbox (user_id, otp,status,expired_at)
-            VALUES (:user_id,:otp,:status,:interval::timestamp)
-            RETURNING id
+            INSERT INTO Outbox (user_id, otp, status, expired_at, sent_at)
+            VALUES (:user_id,:otp,:status,:expired_at,:sent_at)
+            RETURNING user_id
             """,
         )
             .bind("user_id", outbox.userId)
             .bind("otp", outbox.otp)
             .bind("status", "Pending")
-            .bind("interval", toTimestamp(INTERVAL))
+            .bind("expired_at", toTimestamp())
+            .bind("sent_at", Timestamp.from(Instant.now()))
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .firstOrNull()
@@ -37,60 +39,48 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .list()
     }
 
-    override fun getOutboxRequest(outboxId: Int): Outbox? {
+    override fun getOutboxRequest(userId: Int): Outbox? {
         return handle.createQuery(
             """
             SELECT * FROM Outbox
-            WHERE id = :id
+            WHERE user_id = :id
             """,
         )
-            .bind("id", outboxId)
+            .bind("id", userId)
             .mapTo<Outbox>()
             .firstOrNull()
     }
 
-    override fun updateOutboxStateRequest(outboxId: Int): Boolean {
+    override fun updateOutboxStateRequest(userId: Int): Boolean {
         return handle.createUpdate(
             """
             UPDATE Outbox
             SET status = 'Sent'
-            WHERE id = :id
+            WHERE user_id = :id
             """,
         )
-            .bind("id", outboxId)
+            .bind("id", userId)
             .execute() == 1
     }
 
-    override fun getOutboxRequestByUserId(userId: Int): Outbox? {
-        return handle.createQuery(
-            """
-            SELECT * FROM Outbox
-            WHERE user_id = :user_id
-            """,
-        )
-            .bind("user_id", userId)
-            .mapTo<Outbox>()
-            .firstOrNull()
-    }
-
-    override fun deleteOutboxRequest(outboxId: Int): Boolean {
+    override fun deleteOutboxRequest(userId: Int): Boolean {
         return handle.createUpdate(
             """
             DELETE FROM Outbox
-            WHERE id = :id
+            WHERE user_id = :id
             """,
         )
-            .bind("id", outboxId)
+            .bind("id", userId)
             .execute() == 1
     }
 
-    private fun toTimestamp(interval: String): Timestamp {
+    private fun toTimestamp(): Timestamp {
         return handle.createQuery(
             """
             SELECT NOW() + :interval::interval AS timestamp
             """,
         )
-            .bind("interval", interval)
+            .bind("interval", INTERVAL)
             .mapTo<Timestamp>()
             .first()
     }

@@ -46,19 +46,19 @@ class OutboxServices(
 
     fun checkOtp(userId:Int, otp:Int):OutboxResponse {
         return transactionManager.run {
-            val outbox = it.outboxRepository.getOutboxRequestByUserId(userId)
+            val outbox = it.outboxRepository.getOutboxRequest(userId)
             if(outbox == null) {
                 Either.Left(OutboxServicesError.OtpNotFound)
             } else {
-                if (outbox.expired_at.before(System.currentTimeMillis().toTimestamp())) {
-                    it.outboxRepository.deleteOutboxRequest(outbox.id)
+                if (outbox.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
+                    it.outboxRepository.deleteOutboxRequest(outbox.userId)
                     Either.Left(OutboxServicesError.OtpExpired)
                 }
                 if(outbox.otp == otp) {
                     it.usersRepository.updateUserStatus(userId)
                     Either.Right(Unit)
                 } else {
-                    it.outboxRepository.deleteOutboxRequest(outbox.id)
+                    it.outboxRepository.deleteOutboxRequest(outbox.userId)
                     it.cooldownRepository.createCooldownRequest(userId, addTime(COOLDOWN_TIME))
                     Either.Left(OutboxServicesError.OtpDifferent)
                 }
@@ -72,7 +72,7 @@ class OutboxServices(
             it.outboxRepository.getOutboxPendingRequests().forEach { outbox ->
                 it.usersRepository.getUserById(outbox.userId)?.let { user ->
                     if (emailService.sendVerificationEmail(user.name,user.email, outbox.otp) is Either.Right) {
-                        it.outboxRepository.updateOutboxStateRequest(outbox.id)
+                        it.outboxRepository.updateOutboxStateRequest(outbox.userId)
                     }
                 }
             }

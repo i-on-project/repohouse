@@ -147,7 +147,7 @@ class AuthController(
                         )
                     )) {
                         is Either.Right -> {
-                            requestServices.createApplyRequest(ApplyInput(user.value.id,null, user.value.id))
+                            requestServices.createApplyRequest(ApplyInput(creator = user.value.id, composite = null))
                             siren(StatusOutputModel("Check user status", "Redirect to status page")) {
                                 link(href = Uris.homeUri(), rel = LinkRelation("home"))
                                 link(href = Uris.creditsUri(), rel = LinkRelation("credits"))

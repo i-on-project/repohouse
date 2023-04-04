@@ -30,11 +30,11 @@ class TeacherServices(
 
     fun getTeachersNeedingApproval(): TeacherPendingResponse {
         return transactionManager.run {
-            val requestsPending = it.applyRequestRepository.getApplyRequests().filter {request -> request.state == "Pending" }
+            val requestsPending = it.applyRequestRepository.getApplyRequests().filter { request -> request.state == "Pending" }
             val teachers = requestsPending
                 .mapNotNull { request ->
                     val teacher = it.usersRepository.getUserById(request.creator)
-                    if (teacher is Teacher){
+                    if (teacher is Teacher) {
                         TeacherPending(teacher.name, teacher.email, teacher.id, request.id)
                     } else {
                         null
@@ -46,14 +46,13 @@ class TeacherServices(
 
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
         return transactionManager.run {
-            teachers.approved.map {  teacherRequest ->
+            teachers.approved.map { teacherRequest ->
                 it.requestRepository.changeStatusRequest(teacherRequest, "Approved")
             }
-            teachers.approved.map {  teacherRequest ->
-                it.requestRepository.changeStatusRequest(teacherRequest, "Approved")
+            teachers.rejected.map { teacherRequest ->
+                it.requestRepository.changeStatusRequest(teacherRequest, "Rejected")
             }
             Either.Right(true)
         }
     }
-
 }

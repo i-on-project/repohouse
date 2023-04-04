@@ -36,21 +36,24 @@ VALUES ('https://daw1.isel.pt', 'DAW2', 2);
 INSERT INTO course (org_url, name, teacher_id)
 VALUES ('https://daw3.isel.pt', 'DAW3', 2);
 
-INSERT INTO classroom (name, last_sync, invite_link, is_archived, course_id)
-VALUES ('DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/a/123', false, 1);
-INSERT INTO classroom (name, last_sync, invite_link, is_archived, course_id)
-VALUES ('PDM-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/b/123', false, 2);
+INSERT INTO classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
+VALUES ('DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/a/123', false, 1, 1);
+INSERT INTO classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
+VALUES ('PDM-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/b/123', false, 2, 1);
+INSERT INTO classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
+VALUES ('TVS-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/c/123', false, 1, 2);
+
 
 INSERT INTO student_course (student, course)
 VALUES (3, 1);
 INSERT INTO student_course (student, course)
 VALUES (4, 1);
 
-INSERT INTO assignment (classroom_id, max_number_elems, max_number_groups, release_date, description, title)
+INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description', 'title');
-INSERT INTO assignment (classroom_id, max_number_elems, max_number_groups, release_date, description, title)
+INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description1', 'title1');
-INSERT INTO assignment (classroom_id, max_number_elems, max_number_groups, release_date, description, title)
+INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description2', 'title2');
 
 INSERT INTO team (name, is_created, assignment)
@@ -97,7 +100,37 @@ INSERT INTO cooldown (user_id, end_date)
 VALUES (1, CURRENT_TIMESTAMP);
 
 INSERT INTO outbox (user_id, otp, status, expired_at, sent_at)
-VALUES (1, 123456, 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (3, 123456, 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO outbox (user_id, otp, status, expired_at, sent_at)
-VALUES (1, 123456, 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (4, 123456, 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO request(creator, composite, state)
+VALUES (1, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (1, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (3, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (3, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+
+
+INSERT INTO apply(id, teacher_id)
+VALUES (1, 1);
+INSERT INTO apply(id, teacher_id)
+VALUES (2, 1);
+
+INSERT INTO archiverepo(id, repo_id)
+VALUES (3, 1);
+INSERT INTO archiverepo(id, repo_id)
+VALUES (4, 1);
+
+INSERT INTO createrepo(id, repo_id)
+VALUES (5, 1);
+INSERT INTO createrepo(id, repo_id)
+VALUES (6, 1);
+
 COMMIT;

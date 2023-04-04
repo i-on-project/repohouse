@@ -1,11 +1,13 @@
 package com.isel.leic.ps.ion_classcode.domain.input.request
 
 data class ApplyInput(
-    val teacherId: Int,
     override val composite: Int? = null,
-    override val creator: Int
+    override val creator: Int,
 ) : RequestInput {
     init {
-        require(teacherId > 0) { "Teacher id must be greater than 0" }
+        require(creator > 0) { "Creator id must be greater than 0" }
+        if (composite != null) {
+            require(composite > 0) { "Composite id must be greater than 0" }
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Apply
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiApplyRequestRepository(
     private val handle: Handle,
@@ -12,58 +13,62 @@ class JdbiApplyRequestRepository(
     override fun createApplyRequest(request: ApplyInput): Int {
         val requestId = handle.createUpdate(
             """
-            INSERT INTO request (creator, composite,state)
-            VALUES (:creator, :compositeId,'pending')
+            INSERT INTO request (creator, composite, state)
+            VALUES (:creator, :compositeId, 'Pending')
             RETURNING id
             """,
         )
             .bind("creator", request.creator)
             .bind("compositeId", request.composite)
-            .execute()
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
 
         return handle.createUpdate(
             """
-            INSERT INTO apply (id,teacher_id)
-            VALUES (:creator, :teacher_id)
+            INSERT INTO apply (id, teacher_id)
+            VALUES (:id, :teacher_id)
             RETURNING id
             """,
         )
             .bind("id", requestId)
-            .bind("teacher_id", request.teacherId)
-            .execute()
+            .bind("teacher_id", request.creator)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
     override fun getApplyRequests(): List<Apply> {
         return handle.createQuery(
             """
-            SELECT * FROM apply
+            SELECT r.id, r.creator, r.state, r.composite FROM apply JOIN request r on r.id = apply.id
             """,
         )
             .mapTo(Apply::class.java)
             .list()
     }
 
-    override fun getApplyRequestById(id: Int): Apply {
+    override fun getApplyRequestById(id: Int): Apply? {
         return handle.createQuery(
             """
-            SELECT * FROM apply
-            WHERE id = :id
+            SELECT r.id, r.creator, r.state, r.composite FROM apply JOIN request r on r.id = apply.id
+            WHERE apply.id = :id
             """,
         )
             .bind("id", id)
-            .mapTo(Apply::class.java)
-            .first()
+            .mapTo<Apply>()
+            .firstOrNull()
     }
 
     override fun getApplyRequestsByUser(teacherId: Int): List<Apply> {
         return handle.createQuery(
             """
-            SELECT * FROM apply
-            WHERE teacher_id = :teacherId
+            SELECT r.id, r.creator, r.state, r.composite FROM apply JOIN request r on r.id = apply.id
+            WHERE apply.teacher_id = :teacherId
             """,
         )
             .bind("teacherId", teacherId)
-            .mapTo(Apply::class.java)
+            .mapTo<Apply>()
             .list()
     }
 }

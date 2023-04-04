@@ -23,39 +23,30 @@ class OutboxRepositoryTests {
     @Test
     fun `can get a request`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
-        val outboxId = 1
+        val userId = 3
         val otp = 123456
-        val request = outboxRepo.getOutboxRequest(outboxId = outboxId) ?: fail("Request not found")
+        val request = outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
         assert(request.otp == otp)
     }
 
     @Test
     fun `can update a request`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
-        val outboxId = 1
+        val userId = 3
         val status = "Sent"
-        val result = outboxRepo.updateOutboxStateRequest(outboxId = outboxId)
+        val result = outboxRepo.updateOutboxStateRequest(userId = userId)
         assert(result)
-        val request = outboxRepo.getOutboxRequest(outboxId = outboxId) ?: fail("Request not found")
+        val request = outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
         assert(request.status == status)
-    }
-
-    @Test
-    fun `can get a request by user id`() = testWithHandleAndRollback { handle ->
-        val outboxRepo = JdbiOutboxRepository(handle = handle)
-        val userId = 1
-        val otp = 123456
-        val request = outboxRepo.getOutboxRequestByUserId(userId = userId) ?: fail("Request not found")
-        assert(request.otp == otp)
     }
 
     @Test
     fun `can delete a request`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
-        val outboxId = 1
-        val result = outboxRepo.deleteOutboxRequest(outboxId = outboxId)
+        val userId = 3
+        val result = outboxRepo.deleteOutboxRequest(userId = userId)
         assert(result)
-        val request = outboxRepo.getOutboxRequest(outboxId = outboxId)
+        val request = outboxRepo.getOutboxRequest(userId = userId)
         assert(request == null)
     }
 }

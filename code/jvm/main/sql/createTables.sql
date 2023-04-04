@@ -28,6 +28,7 @@ CREATE TABLE Course(
     org_url text unique not null,
     name text unique not null,
     teacher_id int not null,
+    is_archived boolean not null default false,
     foreign key (teacher_id) references Teacher(id)
 );
 
@@ -39,6 +40,14 @@ CREATE TABLE Student_Course(
     foreign key (course) references Course(id)
 );
 
+CREATE TABLE Teacher_Course(
+    teacher int,
+    course int,
+    primary key (teacher, course),
+    foreign key (teacher) references Teacher(id),
+    foreign key (course) references Course(id)
+);
+
 CREATE TABLE Classroom(
     id serial primary key,
     name text not null,
@@ -46,14 +55,16 @@ CREATE TABLE Classroom(
     invite_link text unique not null,
     is_archived boolean not null,
     course_id int not null,
-    foreign key (course_id) references Course(id)
+    teacher_id int not null,
+    foreign key (course_id) references Course(id),
+    foreign key (teacher_id) references Teacher(id)
 );
 
 CREATE TABLE Request(
     id serial primary key,
     creator int not null,
     composite integer default null,
-    state text not null check ( state in ('pending', 'accepted', 'rejected') ),
+    state text not null check ( state in ('Pending', 'Accepted', 'Rejected') ),
     foreign key (creator) references Users(id),
     foreign key (composite) references Request(id)
 );
@@ -177,8 +188,7 @@ CREATE TABLE Cooldown(
 );
 
 Create TABLE Outbox(
-    id serial primary key,
-    user_id int not null,
+    user_id int primary key,
     otp int not null,
     status text not null check ( status in ('Pending', 'Sent') ),
     expired_at timestamp not null,
