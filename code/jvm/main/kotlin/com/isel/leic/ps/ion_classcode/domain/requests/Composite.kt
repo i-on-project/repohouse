@@ -5,6 +5,7 @@ data class Composite(
     override val creator: Int,
     override val state: String = "pending",
     val requests: List<Int>,
+    override val composite: Int? = null,
 ) : Request {
     init {
         require(checkState()) { "Invalid state" }

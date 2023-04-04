@@ -60,7 +60,21 @@ class AssigmentController(
                         is Either.Left -> problem(studentTeams.value)
                         is Either.Right -> {
                             studentTeams.value.forEach {
-                                link(rel = LinkRelation("team"), href = Uris.teamUri(courseId, classroomId, assigmentId, it.id), needAuthentication = true)
+                                action(
+                                    "join-team",
+                                    Uris.joinTeamUri(courseId, classroomId, assigmentId,it.id),
+                                    method = HttpMethod.POST,
+                                    type = "application/json"
+                                ) {
+                                    hiddenField("assigmentId", assigmentId.toString())
+                                    numberField("teamId", it.id)
+                                }
+                            }
+
+                            if (studentTeams.value.size < assigment.value.assigment.maxNumberGroups){
+                                action("create-team", Uris.createTeamUri(courseId, classroomId, assigmentId), method = HttpMethod.POST, type = "application/json") {
+                                    hiddenField("assigmentId", assigmentId.toString())
+                                }
                             }
                         }
                     }
