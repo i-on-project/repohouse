@@ -98,7 +98,6 @@ CREATE TABLE JoinTeam(
 
 CREATE TABLE CreateTeam(
      id int primary key,
-     team_id int not null,
      foreign key (id) references Request(id)
 );
 

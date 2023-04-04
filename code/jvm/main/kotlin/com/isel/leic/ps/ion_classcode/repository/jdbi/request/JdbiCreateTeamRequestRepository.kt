@@ -1,8 +1,8 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
-import com.isel.leic.ps.ion_classcode.domain.requests.*
-import com.isel.leic.ps.ion_classcode.repository.request.*
+import com.isel.leic.ps.ion_classcode.domain.requests.CreateTeam
+import com.isel.leic.ps.ion_classcode.repository.request.CreateTeamRepository
 import org.jdbi.v3.core.Handle
 
 class JdbiCreateTeamRequestRepository(
@@ -23,12 +23,11 @@ class JdbiCreateTeamRequestRepository(
 
         return handle.createUpdate(
             """
-            INSERT INTO createteam (id, team_id)
-            VALUES (:id, :teamId)
+            INSERT INTO createteam (id)
+            VALUES (:id)
             """,
         )
             .bind("id", id)
-            .bind("teamId", request.teamId)
             .execute()
     }
 

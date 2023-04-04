@@ -2,7 +2,6 @@ package com.isel.leic.ps.ion_classcode.http.controllers.web
 
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
-import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
@@ -12,7 +11,6 @@ import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.FeedbackOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestChangeStatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestCreatedOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel

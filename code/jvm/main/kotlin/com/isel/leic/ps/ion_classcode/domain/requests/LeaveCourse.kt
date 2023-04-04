@@ -5,7 +5,7 @@ data class LeaveCourse(
     override val creator: Int,
     override val state: String = "pending",
     val courseId: Int,
-    val compositeId: Int? = null
+    override val composite: Int? = null
 ) : Request {
     init {
         require(checkState()) { "Invalid state" }

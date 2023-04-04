@@ -22,4 +22,3 @@ data class TeamRequestsOutputModel (
     val leaveTeam: List<LeaveTeam>
 )
 
-

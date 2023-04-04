@@ -3,10 +3,9 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
-import java.sql.Timestamp
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-
+import java.sql.Timestamp
 
 typealias OutboxResponse = Either<OutboxServicesError, Unit>
 
@@ -78,8 +77,6 @@ class OutboxServices(
             }
         }
     }
-
-
     private fun createRandomOtp(): Int {
         return (100000..999999).random()
     }
@@ -93,4 +90,3 @@ class OutboxServices(
     }
 
 }
-

@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
+import java.util.UUID
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org%20user:email"
@@ -114,7 +114,7 @@ class AuthController(
                         .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
                         .body(EMPTY_REQUEST)
                 } else {
-                    when(position) {
+                    when (position) {
                         "Teacher" -> siren(StatusOutputModel("Needing approval", "Wait for approval from other teachers")) {
                             link(href = Uris.homeUri(), rel = LinkRelation("home"))
                             link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
@@ -135,7 +135,8 @@ class AuthController(
             is Either.Left -> {
                 val userEmail = fetchUserEmails(accessToken.access_token).first { it.primary }
                 if (position == "Teacher") {
-                    when (val user = userServices.createTeacher(
+                    when (
+                        val user = userServices.createTeacher(
                             TeacherInput(
                                 userEmail.email,
                                 userGithubInfo.login,
@@ -143,7 +144,7 @@ class AuthController(
                                 generateRandomToken(),
                                 userGithubInfo.name,
                                 accessToken.access_token,
-                            ),
+                            )
                         )
                     ) {
                         is Either.Right -> {
@@ -156,14 +157,15 @@ class AuthController(
                         is Either.Left -> problemUser(user.value)
                     }
                 } else {
-                    when (val user = userServices.createStudent(
+                    when (
+                        val user = userServices.createStudent(
                             StudentInput(
                                 email = userEmail.email,
                                 githubUsername = userGithubInfo.login,
                                 githubId = userGithubInfo.id,
                                 token = generateRandomToken(),
                                 name = userGithubInfo.name,
-                            ),
+                            )
                         )
                     ) {
                         is Either.Right -> {
