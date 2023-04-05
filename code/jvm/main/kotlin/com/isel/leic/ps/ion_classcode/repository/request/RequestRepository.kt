@@ -9,4 +9,5 @@ interface RequestRepository {
     fun getRequests(): List<Request>
     fun getRequestById(id: Int): Request?
     fun getRequestsByUser(userId: Int): List<Request>
+    fun checkIfIsComposite(id: Int): Boolean
 }

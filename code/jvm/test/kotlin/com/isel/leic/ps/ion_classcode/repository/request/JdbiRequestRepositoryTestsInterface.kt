@@ -47,4 +47,15 @@ class JdbiRequestRepositoryTestsInterface {
         val requests = requestRep.getRequestsByUser(userId = userId)
         assert(requests.size == 2)
     }
+
+    @Test
+    fun `checkIfIsComposite should return true if a request is a composite`() = testWithHandleAndRollback { handle ->
+        val requestRep = JdbiRequestRepository(handle = handle)
+        val id1 = 1
+        val id2 = 20
+        val request = requestRep.checkIfIsComposite(id = id1)
+        val request1 = requestRep.checkIfIsComposite(id = id2)
+        assert(!request)
+        assert(request1)
+    }
 }

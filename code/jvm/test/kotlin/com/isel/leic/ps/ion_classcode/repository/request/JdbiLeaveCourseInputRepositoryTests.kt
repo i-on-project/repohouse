@@ -1,16 +1,16 @@
 package com.isel.leic.ps.ion_classcode.repository.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveCourseInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveCourseInput
 import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiLeaveCourseRequestRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
-class JdbiLeaveCourseRepositoryTests {
+class JdbiLeaveCourseInputRepositoryTests {
     @Test
     fun `createLeaveCourseRequest should create a new leaveCourse request`() = testWithHandleAndRollback { handle ->
         val leaveCourseReq = JdbiLeaveCourseRequestRepository(handle = handle)
-        val request = LeaveCourseInputInterface(courseId = 1, creator = 3)
+        val request = LeaveCourseInput(courseId = 1, creator = 3)
         leaveCourseReq.createLeaveCourseRequest(request = request)
     }
 

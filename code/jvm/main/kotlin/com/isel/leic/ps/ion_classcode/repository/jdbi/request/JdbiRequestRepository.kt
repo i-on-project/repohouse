@@ -59,6 +59,18 @@ class JdbiRequestRepository(
             .list()
     }
 
+    override fun checkIfIsComposite(id: Int): Boolean {
+        return handle.createQuery(
+            """
+            SELECT * FROM composite
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
     override fun getRequestById(id: Int): Request? {
         return handle.createQuery(
             """

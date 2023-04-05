@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.JoinTeamInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ion_classcode.domain.requests.JoinTeam
 import com.isel.leic.ps.ion_classcode.repository.request.JoinTeamRepository
 import org.jdbi.v3.core.Handle
@@ -10,7 +10,7 @@ class JdbiJoinTeamRequestRepository(
     private val handle: Handle,
 ) : JoinTeamRepository {
 
-    override fun createJoinTeamRequest(request: JoinTeamInputInterface): Int {
+    override fun createJoinTeamRequest(request: JoinTeamInput): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite,state)

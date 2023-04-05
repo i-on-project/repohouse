@@ -20,6 +20,8 @@ typealias TeamUpdateRequestResponse = Either<TeamServicesError, Boolean>
 typealias TeamFeedbackResponse = Either<TeamServicesError, Int>
 
 sealed class TeamServicesError{
+    object RequestNotFound: TeamServicesError()
+
     object TeamNotFound: TeamServicesError()
     object RequestNotRejected: TeamServicesError()
 }
@@ -80,21 +82,23 @@ class TeamServices(
         }
     }
 
-    fun updateTeamRequestStatus(requestId: Int,teamId: Int): TeamUpdateRequestResponse {
+    fun updateTeamRequestStatus(requestId: Int, teamId: Int): TeamUpdateRequestResponse {
         return transactionManager.run {
-            when(it.teamRepository.getTeamById(teamId)){
+            when (it.teamRepository.getTeamById(teamId)){
                 null -> Either.Left(TeamServicesError.TeamNotFound)
                 else -> {
                     val request = it.requestRepository.getRequestById(requestId)
+                        ?: return@run Either.Left(TeamServicesError.RequestNotFound)
                     if (request.state != "Rejected") {
                         Either.Left(TeamServicesError.RequestNotRejected)
                     }
-                    if (request is Composite){
-                        request.requests.forEach {reqId ->
-                            it.requestRepository.changeStatusRequest(reqId, "Pending")
+                    val compositeRequests = it.compositeRepository.getCompositeRequestById(id = requestId)
+                    if (compositeRequests != null) {
+                        compositeRequests.requests.forEach {reqId ->
+                            it.requestRepository.changeStateRequest(reqId, "Pending")
                         }
                     }else{
-                        it.requestRepository.changeStatusRequest(requestId, "Pending")
+                        it.requestRepository.changeStateRequest(requestId, "Pending")
                     }
                     Either.Right(true)
                 }
@@ -119,10 +123,9 @@ class TeamServices(
             when(val team = it.teamRepository.getTeamById(teamId)){
                 null -> Either.Left(TeamServicesError.TeamNotFound)
                 else -> {
-                    val createTeam = it.createTeamRepository.getCreateTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
                     val joinTeam = it.joinTeamRepository.getJoinTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
                     val leaveTeam = it.leaveTeamRepository.getLeaveTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
-                    Either.Right(TeamRequestsOutputModel(team, createTeam, joinTeam, leaveTeam))
+                    Either.Right(TeamRequestsOutputModel(team, joinTeam, leaveTeam))
                 }
             }
         }

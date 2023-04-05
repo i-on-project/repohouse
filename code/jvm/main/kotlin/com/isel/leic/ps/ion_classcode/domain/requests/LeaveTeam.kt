@@ -5,7 +5,7 @@ data class LeaveTeam(
     override val creator: Int,
     override val state: String = "Pending",
     val teamId: Int,
-    override val compositeId: Int? = null
+    override val composite: Int? = null
 ) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }

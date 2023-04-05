@@ -5,7 +5,7 @@ data class CreateRepo(
     override val creator: Int,
     override val state: String = "pending",
     val repoId: Int,
-    override val compositeId: Int? = null
+    override val composite: Int? = null
 ) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }

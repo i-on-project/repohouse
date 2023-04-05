@@ -4,7 +4,7 @@ data class ArchiveRepo(
     override val id: Int,
     override val creator: Int,
     override val state: String = "Pending",
-    override val compositeId: Int? = null,
+    override val composite: Int? = null,
     val repoId: Int,
 ) : RequestInterface {
     init {

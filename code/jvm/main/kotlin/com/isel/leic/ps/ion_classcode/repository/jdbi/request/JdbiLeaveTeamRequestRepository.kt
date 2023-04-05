@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ion_classcode.domain.requests.LeaveTeam
 import com.isel.leic.ps.ion_classcode.repository.request.LeaveTeamRepository
 import org.jdbi.v3.core.Handle
@@ -10,7 +10,7 @@ class JdbiLeaveTeamRequestRepository(
     private val handle: Handle,
 ) : LeaveTeamRepository {
 
-    override fun createLeaveTeamRequest(request: LeaveTeamInputInterface): Int {
+    override fun createLeaveTeamRequest(request: LeaveTeamInput): Int {
         val id = handle.createUpdate(
             """
                 INSERT INTO request (creator, composite,state)

@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiCreateTeamRequestRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
@@ -10,7 +10,7 @@ class JdbiCreateTeamRequestRepositoryTestsInterface {
     @Test
     fun `createCreateTeamRequest should create a new createTeam request`() = testWithHandleAndRollback { handle ->
         val createTeamReq = JdbiCreateTeamRequestRepository(handle = handle)
-        val request = CreateTeamInputInterface(teamId = 1, creator = 3)
+        val request = CreateTeamInput(creator = 3)
         createTeamReq.createCreateTeamRequest(request = request)
     }
 

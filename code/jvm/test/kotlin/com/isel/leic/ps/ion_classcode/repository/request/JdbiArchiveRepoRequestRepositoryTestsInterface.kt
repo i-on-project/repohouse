@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.ArchiveRepoInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.ArchiveRepoInput
 import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiArchiveRepoRequestRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
@@ -10,7 +10,7 @@ class JdbiArchiveRepoRequestRepositoryTestsInterface {
     @Test
     fun `createArchiveRepoRequest should create a new archiveRepo request`() = testWithHandleAndRollback { handle ->
         val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
-        val request = ArchiveRepoInputInterface(repoId = 1, creator = 3)
+        val request = ArchiveRepoInput(repoId = 1, creator = 3)
         archiveReq.createArchiveRepoRequest(request = request)
     }
 

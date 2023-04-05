@@ -1,16 +1,16 @@
 package com.isel.leic.ps.ion_classcode.repository.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiLeaveTeamRequestRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
-class JdbiLeaveTeamRepositoryTests {
+class JdbiLeaveTeamInputRepositoryTests {
     @Test
     fun `createLeaveTeamRequest should create a new leaveTeam request`() = testWithHandleAndRollback { handle ->
         val leaveTeamReq = JdbiLeaveTeamRequestRepository(handle = handle)
-        val request = LeaveTeamInputInterface(teamId = 1, creator = 3)
+        val request = LeaveTeamInput(teamId = 1, creator = 3)
         leaveTeamReq.createLeaveTeamRequest(request = request)
     }
 

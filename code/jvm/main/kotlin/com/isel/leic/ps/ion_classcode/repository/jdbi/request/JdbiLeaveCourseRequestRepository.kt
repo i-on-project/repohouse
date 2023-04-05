@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveCourseInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveCourseInput
 import com.isel.leic.ps.ion_classcode.domain.requests.LeaveCourse
 import com.isel.leic.ps.ion_classcode.repository.request.LeaveCourseRepository
 import org.jdbi.v3.core.Handle
@@ -10,7 +10,7 @@ class JdbiLeaveCourseRequestRepository(
     private val handle: Handle,
 ) : LeaveCourseRepository {
 
-    override fun createLeaveCourseRequest(request: LeaveCourseInputInterface): Int {
+    override fun createLeaveCourseRequest(request: LeaveCourseInput): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite,state)

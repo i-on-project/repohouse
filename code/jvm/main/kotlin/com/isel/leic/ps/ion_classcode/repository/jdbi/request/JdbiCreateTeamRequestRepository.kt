@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ion_classcode.domain.requests.CreateTeam
 import com.isel.leic.ps.ion_classcode.repository.request.CreateTeamRepository
 import org.jdbi.v3.core.Handle
@@ -10,7 +10,7 @@ class JdbiCreateTeamRequestRepository(
     private val handle: Handle,
 ) : CreateTeamRepository {
 
-    override fun createCreateTeamRequest(request: CreateTeamInputInterface): Int {
+    override fun createCreateTeamRequest(request: CreateTeamInput): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)
@@ -39,7 +39,7 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequests(): List<CreateTeam> {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, c.team_id, r.composite FROM createteam as c JOIN request r on r.id = c.id
+            SELECT c.id, r.creator, r.state, r.composite FROM createteam as c JOIN request r on r.id = c.id
             """,
         )
             .mapTo<CreateTeam>()
@@ -49,7 +49,7 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequestById(id: Int): CreateTeam? {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, c.team_id, r.composite FROM createteam as c JOIN request r on r.id = c.id
+            SELECT c.id, r.creator, r.state, r.composite FROM createteam as c JOIN request r on r.id = c.id
             WHERE c.id = :id
             """,
         )
@@ -61,7 +61,7 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequestsByUser(userId: Int): List<CreateTeam> {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, c.team_id, r.composite FROM createteam as c JOIN request r on r.id = c.id
+            SELECT c.id, r.creator, r.state, r.composite FROM createteam as c JOIN request r on r.id = c.id
             WHERE r.creator = :userId
             """,
         )

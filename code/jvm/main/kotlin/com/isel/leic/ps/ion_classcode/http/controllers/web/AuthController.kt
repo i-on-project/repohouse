@@ -144,7 +144,7 @@ class AuthController(
                                 generateRandomToken(),
                                 userGithubInfo.name,
                                 accessToken.access_token,
-                            )
+                            ),
                         )
                     ) {
                         is Either.Right -> {
@@ -165,7 +165,7 @@ class AuthController(
                                 githubId = userGithubInfo.id,
                                 token = generateRandomToken(),
                                 name = userGithubInfo.name,
-                            )
+                            ),
                         )
                     ) {
                         is Either.Right -> {

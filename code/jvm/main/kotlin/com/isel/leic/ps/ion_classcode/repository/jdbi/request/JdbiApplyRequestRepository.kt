@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInputInterface
+import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Apply
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import org.jdbi.v3.core.Handle
@@ -10,7 +10,7 @@ class JdbiApplyRequestRepository(
     private val handle: Handle,
 ) : ApplyRequestRepository {
 
-    override fun createApplyRequest(request: ApplyInputInterface): Int {
+    override fun createApplyRequest(request: ApplyInput): Int {
         val requestId = handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)
