@@ -18,14 +18,13 @@ class UserArgumentResolver : HandlerMethodArgumentResolver {
         parameter: MethodParameter,
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
-        binderFactory: WebDataBinderFactory?
+        binderFactory: WebDataBinderFactory?,
     ): Any? {
         val request = webRequest.getNativeRequest(HttpServletRequest::class.java) ?: TODO("Obtain request failed")
-        return getUserFrom(request) // TODO ?: throw FailException("Server error")
+        return getUserFrom(request)
     }
 
     companion object {
-        private const val KEY_HEADER = "User"
         private const val KEY_ATTRIBUTE = "UserArgumentResolver"
 
         fun addUserTo(user: User, request: HttpServletRequest) {

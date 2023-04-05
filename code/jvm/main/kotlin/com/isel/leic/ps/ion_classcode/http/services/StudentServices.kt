@@ -9,7 +9,6 @@ typealias StudentCoursesResponse = Either<StudentServicesError, List<Course>>
 typealias StudentSchoolIdResponse = Either<StudentServicesError, Int>
 typealias StudentSchoolIdUpdateResponse = Either<StudentServicesError, Unit>
 
-
 sealed class StudentServicesError {
     object CourseNotFound : StudentServicesError()
     object UserNotFound : StudentServicesError()
@@ -38,11 +37,10 @@ class StudentServices(
         }
     }
 
-    fun updateStudent(userId:Int,schoolId:Int): StudentSchoolIdUpdateResponse {
+    fun updateStudent(userId: Int, schoolId: Int): StudentSchoolIdUpdateResponse {
         return transactionManager.run {
-            val school= it.usersRepository.updateStudentSchoolId(userId, schoolId)
+            val school = it.usersRepository.updateStudentSchoolId(userId, schoolId)
             Either.Right(school)
         }
     }
-
 }

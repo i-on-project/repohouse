@@ -12,3 +12,8 @@ data class ClassroomOutputModel(
     val assigments: List<Assigment>,
     val students: List<Student>,
 ) : OutputModel
+
+data class ClassroomDeletedOutputModel(
+    val id: Int,
+    val deleted: Boolean
+) : OutputModel

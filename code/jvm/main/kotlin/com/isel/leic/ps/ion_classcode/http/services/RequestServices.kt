@@ -7,10 +7,7 @@ import org.springframework.stereotype.Component
 
 typealias CreateApplyRequestResult = Either<RequestServicesError, Int>
 
-
-sealed class RequestServicesError {
-
-}
+sealed class RequestServicesError
 
 @Component
 class RequestServices(
@@ -23,5 +20,4 @@ class RequestServices(
             Either.Right(request)
         }
     }
-
 }

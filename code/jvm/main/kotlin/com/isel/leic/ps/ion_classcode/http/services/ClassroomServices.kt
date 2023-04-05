@@ -12,6 +12,7 @@ typealias ClassroomResponse = Either<ClassroomServicesError, ClassroomOutputMode
 typealias ClassroomArchivedResponse = Either<ClassroomServicesError, ClassroomArchivedOutputModel>
 typealias ClassroomCreateResponse = Either<ClassroomServicesError, Int>
 typealias ClassroomEnterResponse = Either<ClassroomServicesError, ClassroomOutputModel>
+typealias ClassroomSyncResponse = Either<ClassroomServicesError, Boolean>
 
 sealed class ClassroomServicesError {
     object ClasroomNotFound : ClassroomServicesError()
@@ -92,6 +93,10 @@ class ClassroomServices(
                 }
             }
         }
+    }
+
+    fun syncClassroom(classroomId: Int, userId: Int): ClassroomSyncResponse {
+        TODO()
     }
 
     private fun generateRandomInviteLink(otherInviteLinks: List<String>): String {

@@ -8,9 +8,9 @@ import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomInputModel
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.http.services.AssigmentServices
 import com.isel.leic.ps.ion_classcode.http.services.ClassroomServices
 import com.isel.leic.ps.ion_classcode.http.services.ClassroomServicesError
 import com.isel.leic.ps.ion_classcode.http.services.TeamServices
@@ -27,8 +27,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ClassroomController(
-    private val classroomServices: ClassroomServices,
-    private val teamServices: TeamServices
+    private val classroomServices: ClassroomServices
 ) {
     // TODO: syncClassroom : be the last thing to do
 
@@ -44,7 +43,7 @@ class ClassroomController(
                 clazz("classroom")
                 link(rel = LinkRelation("self"), href = Uris.classroomUri(classroomId), needAuthentication = true)
                 classroom.value.assigments.forEach {
-                    link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId,classroomId,it.id), needAuthentication = true)
+                    link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher && !classroom.value.isArchived) {
                     action(name = "create-assigment", href = Uris.createAssigmentUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
@@ -91,10 +90,14 @@ class ClassroomController(
                         is Either.Right -> siren(value = ClassroomOutputModel(id = classroom.value.id, name = classroom.value.name, isArchived = classroom.value.isArchived, lastSync = classroom.value.lastSync, assigments = classroom.value.assigments, students = classroom.value.students)) {
                             clazz("classroom")
                             link(rel = LinkRelation("classroom"), href = Uris.classroomUri(classroomId), needAuthentication = true)
+                            link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
                         }
                     }
                 } else {
-                    TODO("What to return when deleted?")
+                    siren(value = ClassroomDeletedOutputModel(id = classroomId, deleted = true)) {
+                        clazz("classroom-deleted")
+                        link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
+                    }
                 }
         }
     }
@@ -114,16 +117,6 @@ class ClassroomController(
         }
     }
 
-    @PostMapping(Uris.SYNC_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
-    fun syncClassroom(
-        user: User,
-        @PathVariable classroomId: Int,
-        @PathVariable courseId: Int,
-    ): ResponseEntity<*> {
-        if (user !is Teacher) return Problem.unauthorized
-        TODO("Let this be the last thing to do")
-    }
-
     @PostMapping(Uris.EDIT_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun editClassroom(
         user: User,
@@ -139,6 +132,16 @@ class ClassroomController(
                 link(rel = LinkRelation("classroom"), href = Uris.classroomUri(classroomId), needAuthentication = true)
             }
         }
+    }
+
+    @PostMapping(Uris.SYNC_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
+    fun syncClassroom(
+        user: User,
+        @PathVariable classroomId: Int,
+        @PathVariable courseId: Int,
+    ): ResponseEntity<*> {
+        if (user !is Teacher) return Problem.unauthorized
+        return TODO()
     }
 
     private fun problem(error: ClassroomServicesError): ResponseEntity<*> {

@@ -8,7 +8,7 @@ import java.sql.Timestamp
 import java.time.Instant
 
 class CooldownRepositoryTests {
-    /*
+
     @Test
     fun `can create a cooldown request`() = testWithHandleAndRollback { handle ->
         val cooldownRepo = JdbiCooldownRepository(handle)
@@ -32,6 +32,4 @@ class CooldownRepositoryTests {
         val id = cooldownRepo.getCooldownRequest(userId = userId) ?: fail("No cooldown request found")
         assert(id == 1)
     }
-    
-     */
 }

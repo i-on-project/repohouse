@@ -3,9 +3,9 @@ package com.isel.leic.ps.ion_classcode.domain.requests
 data class CreateTeam(
     override val id: Int,
     override val creator: Int,
-    override val state: String = "Pending",
+    override val state: String = "pending",
     val teamId: Int,
-    val compositeId: Int? = null
+    override val compositeId: Int? = null
 ) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }

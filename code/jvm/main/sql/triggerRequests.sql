@@ -8,13 +8,13 @@ declare
     teacher_id integer;
 begin
     if (new.state = 'Accepted') then
-        select teacher_id from apply where id = new.id into teacher_id;
+        select apply.teacher_id from apply where id = new.id into teacher_id;
         if (teacher_id is not null) then
             update users set is_created = true where id = teacher_id;
             return new;
         end if;
     else if (new.state = 'Rejected') then
-        select teacher_id from apply where id = new.id into teacher_id;
+        select apply.teacher_id from apply where id = new.id into teacher_id;
         if (teacher_id is not null) then
             delete from teacher where id = teacher_id;
             return new;

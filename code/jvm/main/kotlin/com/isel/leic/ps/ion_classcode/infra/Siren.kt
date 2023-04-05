@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import java.net.URI
+import java.sql.Timestamp
 
 /**
  * This code was made by the teacher Pedro Felix in DAW class.
@@ -41,7 +42,7 @@ data class ActionModel(
 data class FieldModel(
     val name: String,
     val type: String,
-    val value: String? = null,
+    val value: Any? = null,
 )
 
 class SirenBuilderScope<T>(
@@ -118,19 +119,19 @@ class ActionBuilderScope(
 ) {
     private val fields = mutableListOf<FieldModel>()
 
-    fun textField(name: String) {
-        fields.add(FieldModel(name, "text"))
+    fun textField(name: String, value: String? = null) {
+        fields.add(FieldModel(name, "text", value))
     }
 
-    fun timestampField(name: String) {
-        fields.add(FieldModel(name, "timestamp"))
+    fun timestampField(name: String, value: Timestamp? = null) {
+        fields.add(FieldModel(name, "timestamp", value))
     }
 
-    fun numberField(name: String) {
-        fields.add(FieldModel(name, "number"))
+    fun numberField(name: String, value: Int? = null) {
+        fields.add(FieldModel(name, "number", value))
     }
 
-    fun hiddenField(name: String, value: String) {
+    fun hiddenField(name: String, value: Any? = null) {
         fields.add(FieldModel(name, "hidden", value))
     }
 

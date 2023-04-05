@@ -12,21 +12,20 @@ object Uris {
 
     /** Common Uris **/
 
-    const val HOME = "$API/home"
-    const val CREDITS = "$API/credits"
-    const val AUTH_PATH = "$API/auth"
+    const val HOME = "$WEB/home"
+    const val CREDITS = "$WEB/credits"
+    const val AUTH_PATH = "$WEB/auth"
     const val AUTH_REGISTER_PATH = "$AUTH_PATH/register"
     const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_PATH/verify"
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
-    const val AUTH_STATUS_PATH = "$AUTH_PATH/status/{id}"
     const val LOGOUT = "$AUTH_PATH/logout"
     const val CALLBACK_PATH = "$AUTH_PATH/callback"
-    const val MENU_PATH = "$API/menu"
-    const val TEACHERS_APPROVAL_PATH = "$API/teachers"
-    const val STUDENTS_PATH = "$API/students"
+    const val MENU_PATH = "$WEB/menu"
+    const val TEACHERS_APPROVAL_PATH = "$WEB/teachers"
+    const val STUDENTS_PATH = "$WEB/students"
     const val STUDENT_PATH = "$STUDENTS_PATH/{id}"
-    const val COURSES_PATH = "$API/courses"
+    const val COURSES_PATH = "$WEB/courses"
     const val COURSE_PATH = "$COURSES_PATH/{courseId}"
     const val STUDENTS_COURSE_PATH = "$COURSE_PATH/students"
     const val ENTER_COURSE_PATH = "$COURSE_PATH/enter"
@@ -48,6 +47,14 @@ object Uris {
     const val DELETE_ASSIGMENT_PATH = "$ASSIGMENT_PATH/delete"
     const val TEAMS_PATH = "$ASSIGMENT_PATH/teams"
     const val TEAM_PATH = "$TEAMS_PATH/{teamId}"
+    const val CREATE_TEAM_PATH = "$TEAM_PATH/create"
+    const val JOIN_TEAM_PATH = "$TEAM_PATH/join"
+    const val EXIT_TEAM_PATH = "$TEAM_PATH/exit"
+    const val EDIT_DELIVERY_PATH = "$DELIVERY_PATH/edit"
+    const val SYNC_DELIVERY_PATH = "$DELIVERY_PATH/sync"
+    const val TEAM_REQUESTS_PATH = "$TEAM_PATH/requests"
+    const val TEAM_CHANGE_REQUEST_PATH = "$TEAM_REQUESTS_PATH/{requestId}"
+    const val POST_FEEDBACK_PATH = "$TEAM_PATH/feedback"
 
     /** Web Uris **/
 
@@ -56,7 +63,6 @@ object Uris {
     fun homeUri(): URI = URI(HOME)
     fun creditsUri(): URI = URI(CREDITS)
     fun authUri(): URI = URI(AUTH_PATH)
-    fun authStatusUri(userId: Int): URI = UriTemplate(AUTH_STATUS_PATH).expand(userId)
     fun authUriRegister(): URI = URI(AUTH_REGISTER_PATH)
     fun authUriStudent(): URI = URI(AUTH_STUDENT_PATH)
     fun authUriTeacher(): URI = URI(AUTH_TEACHER_PATH)
@@ -88,8 +94,15 @@ object Uris {
     fun deleteAssigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(DELETE_ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId)
     fun teamsUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(TEAMS_PATH).expand(courseId, classroomId, assigmentId)
     fun teamUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(TEAM_PATH).expand(courseId, classroomId, assigmentId, teamId)
+    fun editDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): URI = UriTemplate(EDIT_DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId)
+    fun syncDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): URI = UriTemplate(SYNC_DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId)
+    fun createTeamUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(CREATE_TEAM_PATH).expand(courseId, classroomId, assigmentId)
+    fun joinTeamUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(JOIN_TEAM_PATH).expand(courseId, classroomId, assigmentId, teamId)
+    fun teamRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(TEAM_REQUESTS_PATH).expand(courseId, classroomId, assigmentId, teamId)
+    fun teamChangeStatusRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int,requestId:Int): URI = UriTemplate(
+        TEAM_CHANGE_REQUEST_PATH).expand(courseId, classroomId, assigmentId, teamId,requestId)
+    fun postFeedbackUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(POST_FEEDBACK_PATH).expand(courseId, classroomId, assigmentId, teamId)
 
     /** Mobile Uris **/
 
-    fun leaveCourseRequestUri(requestId: Int): URI = UriTemplate(LEAVE_COURSE_REQUEST_PATH).expand(requestId)
 }

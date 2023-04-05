@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
+import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
 import com.isel.leic.ps.ion_classcode.repository.TeamRepository
@@ -44,6 +45,19 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .bind("id", id)
             .mapTo<Team>()
             .firstOrNull()
+    }
+
+    override fun getStudentsFromTeam(teamId: Int): List<Student> {
+        return handle.createQuery(
+            """
+            SELECT * FROM student
+            JOIN student_team on student.id = student_team.student
+            WHERE student_team.team = :teamId
+            """,
+        )
+            .bind("teamId", teamId)
+            .mapTo<Student>()
+            .list()
     }
 
     override fun enterTeam(teamId: Int, studentId: Int) {

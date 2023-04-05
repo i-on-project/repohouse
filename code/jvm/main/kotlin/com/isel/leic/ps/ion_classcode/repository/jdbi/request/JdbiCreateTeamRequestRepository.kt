@@ -1,8 +1,8 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInputInterface
-import com.isel.leic.ps.ion_classcode.domain.requests.*
-import com.isel.leic.ps.ion_classcode.repository.request.*
+import com.isel.leic.ps.ion_classcode.domain.requests.CreateTeam
+import com.isel.leic.ps.ion_classcode.repository.request.CreateTeamRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
@@ -26,12 +26,11 @@ class JdbiCreateTeamRequestRepository(
 
         return handle.createUpdate(
             """
-            INSERT INTO createteam (id, team_id)
-            VALUES (:id, :teamId)
+            INSERT INTO createteam (id)
+            VALUES (:id)
             """,
         )
             .bind("id", id)
-            .bind("teamId", request.teamId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
