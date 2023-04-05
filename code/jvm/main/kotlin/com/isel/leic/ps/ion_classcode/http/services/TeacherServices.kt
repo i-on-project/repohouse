@@ -47,10 +47,10 @@ class TeacherServices(
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
         return transactionManager.run {
             teachers.approved.map { teacherRequest ->
-                it.requestRepository.changeStatusRequest(teacherRequest, "Approved")
+                it.requestRepository.changeStateRequest(teacherRequest, "Approved")
             }
             teachers.rejected.map { teacherRequest ->
-                it.requestRepository.changeStatusRequest(teacherRequest, "Rejected")
+                it.requestRepository.changeStateRequest(teacherRequest, "Rejected")
             }
             Either.Right(true)
         }

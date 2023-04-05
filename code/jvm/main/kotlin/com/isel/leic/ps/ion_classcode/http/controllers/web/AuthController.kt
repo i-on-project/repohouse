@@ -3,7 +3,7 @@ package com.isel.leic.ps.ion_classcode.http.controllers
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInputModel
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
-import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInputInterface
 import com.isel.leic.ps.ion_classcode.http.GITHUB_ACCESS_TOKEN_URI
 import com.isel.leic.ps.ion_classcode.http.GITHUB_API_BASE_URL
 import com.isel.leic.ps.ion_classcode.http.GITHUB_BASE_URL
@@ -17,7 +17,6 @@ import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
-import com.isel.leic.ps.ion_classcode.http.model.output.ErrorOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
 import com.isel.leic.ps.ion_classcode.http.model.output.InfoOutputModel
@@ -147,7 +146,7 @@ class AuthController(
                         )
                     )) {
                         is Either.Right -> {
-                            requestServices.createApplyRequest(ApplyInput(creator = user.value.id, composite = null))
+                            requestServices.createApplyRequest(ApplyInputInterface(creator = user.value.id, composite = null))
                             siren(StatusOutputModel("Check user status", "Redirect to status page")) {
                                 link(href = Uris.homeUri(), rel = LinkRelation("home"))
                                 link(href = Uris.creditsUri(), rel = LinkRelation("credits"))

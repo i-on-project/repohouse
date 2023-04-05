@@ -5,7 +5,7 @@ data class Apply(
     override val creator: Int,
     override val state: String = "Pending",
     val compositeId: Int? = null
-) : Request {
+) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }
     }

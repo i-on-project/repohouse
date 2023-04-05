@@ -1,25 +1,28 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInputInterface
 import com.isel.leic.ps.ion_classcode.domain.requests.LeaveTeam
 import com.isel.leic.ps.ion_classcode.repository.request.LeaveTeamRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiLeaveTeamRequestRepository(
     private val handle: Handle,
 ) : LeaveTeamRepository {
 
-    override fun createLeaveTeamRequest(request: LeaveTeamInput): Int {
+    override fun createLeaveTeamRequest(request: LeaveTeamInputInterface): Int {
         val id = handle.createUpdate(
             """
                 INSERT INTO request (creator, composite,state)
-                VALUES (:creator, :compositeId,'pending')
+                VALUES (:creator, :compositeId, 'Pending')
                 RETURNING id
                 """,
         )
             .bind("creator", request.creator)
-            .bind("composite", request.composite)
-            .execute()
+            .bind("compositeId", request.composite)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
 
         return handle.createUpdate(
             """
@@ -29,43 +32,42 @@ class JdbiLeaveTeamRequestRepository(
         )
             .bind("id", id)
             .bind("teamId", request.teamId)
-            .execute()
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
     override fun getLeaveTeamRequests(): List<LeaveTeam> {
         return handle.createQuery(
             """
-                SELECT * FROM leaveteam
+                SELECT l.id, r.creator, r.state, l.team_id, r.composite FROM leaveteam as l JOIN request r on r.id = l.id
                 """,
         )
-            .mapTo(LeaveTeam::class.java)
+            .mapTo<LeaveTeam>()
             .list()
     }
 
-    override fun getLeaveTeamRequestById(id: Int): LeaveTeam {
+    override fun getLeaveTeamRequestById(id: Int): LeaveTeam? {
         return handle.createQuery(
             """
-                SELECT * FROM leaveteam
-                WHERE id = :id
+                SELECT l.id, r.creator, r.state, l.team_id, r.composite FROM leaveteam as l JOIN request r on r.id = l.id
+                WHERE l.id = :id
                 """,
         )
             .bind("id", id)
-            .mapTo(LeaveTeam::class.java)
-            .first()
+            .mapTo<LeaveTeam>()
+            .firstOrNull()
     }
 
     override fun getLeaveTeamRequestsByUser(userId: Int): List<LeaveTeam> {
         return handle.createQuery(
             """
-                SELECT * FROM leaveteam
-                WHERE id IN (
-                    SELECT id FROM request
-                    WHERE creator = :creator
-                )
+                SELECT l.id, r.creator, r.state, l.team_id, r.composite FROM leaveteam as l JOIN request r on r.id = l.id
+                WHERE r.creator = :creator
                 """,
         )
             .bind("creator", userId)
-            .mapTo(LeaveTeam::class.java)
+            .mapTo<LeaveTeam>()
             .list()
     }
 }

@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInputInterface
 import com.isel.leic.ps.ion_classcode.domain.requests.CreateRepo
 import com.isel.leic.ps.ion_classcode.repository.request.CreateRepoRepository
 import org.jdbi.v3.core.Handle
@@ -10,7 +10,7 @@ class JdbiCreateRepoRequestRepository(
     private val handle: Handle,
 ) : CreateRepoRepository {
 
-    override fun createCreateRepoRequest(request: CreateRepoInput): Int {
+    override fun createCreateRepoRequest(request: CreateRepoInputInterface): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)

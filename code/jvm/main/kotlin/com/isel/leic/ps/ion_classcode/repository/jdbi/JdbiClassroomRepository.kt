@@ -10,17 +10,18 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository {
-    override fun createClassroom(classroom: ClassroomInput,inviteLink: String): Int =
+    override fun createClassroom(classroom: ClassroomInput, inviteLink: String): Int =
         handle.createUpdate(
             """
-            INSERT INTO Classroom (name, last_sync, invite_link, is_archived, course_id)
-            VALUES (:name,CURRENT_DATE,:invite_link,false,:course_id)
+            INSERT INTO Classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
+            VALUES (:name, CURRENT_DATE, :invite_link, false, :course_id, :teacher_id)
             RETURNING id
             """,
         )
             .bind("name", classroom.name)
             .bind("invite_link", inviteLink)
             .bind("course_id", classroom.courseId)
+            .bind("teacher_id", classroom.teacherId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()

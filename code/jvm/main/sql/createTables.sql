@@ -65,14 +65,18 @@ CREATE TABLE Request(
     creator int not null,
     composite integer default null,
     state text not null check ( state in ('Pending', 'Accepted', 'Rejected') ),
-    foreign key (creator) references Users(id),
-    foreign key (composite) references Request(id)
+    foreign key (creator) references Users(id)
 );
 
 CREATE TABLE Composite(
     id int primary key,
     foreign key (id) references Request(id)
 );
+
+ALTER TABLE Request
+    ADD CONSTRAINT fk_composite
+        FOREIGN KEY (composite)
+            REFERENCES Composite(id);
 
 CREATE TABLE CreateRepo(
     id int primary key,

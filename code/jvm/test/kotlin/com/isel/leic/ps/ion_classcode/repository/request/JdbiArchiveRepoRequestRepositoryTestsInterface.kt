@@ -1,16 +1,16 @@
 package com.isel.leic.ps.ion_classcode.repository.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.ArchiveRepoInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.ArchiveRepoInputInterface
 import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiArchiveRepoRequestRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
-class JdbiArchiveRepoRequestRepositoryTests {
+class JdbiArchiveRepoRequestRepositoryTestsInterface {
     @Test
     fun `createArchiveRepoRequest should create a new archiveRepo request`() = testWithHandleAndRollback { handle ->
         val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
-        val request = ArchiveRepoInput(repoId = 1, creator = 3)
+        val request = ArchiveRepoInputInterface(repoId = 1, creator = 3)
         archiveReq.createArchiveRepoRequest(request = request)
     }
 
@@ -31,7 +31,7 @@ class JdbiArchiveRepoRequestRepositoryTests {
     }
 
     @Test
-    fun `getArchiveRepoRequestsByUser should return apply requests for a user`() = testWithHandleAndRollback { handle ->
+    fun `getArchiveRepoRequestsByUser should return archiveRepo requests for a user`() = testWithHandleAndRollback { handle ->
         val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
         val userId = 3
         val requests = archiveReq.getArchiveRepoRequestsByUser(userId = userId)

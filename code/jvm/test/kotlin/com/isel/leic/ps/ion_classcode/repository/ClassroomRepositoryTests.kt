@@ -10,7 +10,7 @@ class ClassroomRepositoryTests {
     @Test
     fun `can create classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
-        classroomRepo.createClassroom(classroom = ClassroomInput(name = "Classroom 1", courseId = 1, inviteLink = "linking link", teacherId = 1))
+        classroomRepo.createClassroom(classroom = ClassroomInput(name = "Classroom 1", courseId = 1, teacherId = 1), inviteLink = "linking link")
     }
 
     @Test

@@ -116,7 +116,34 @@ INSERT INTO request(creator, composite, state)
 VALUES (4, null, 'Pending');
 INSERT INTO request(creator, composite, state)
 VALUES (4, null, 'Pending');
-
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
 
 INSERT INTO apply(id, teacher_id)
 VALUES (1, 1);
@@ -132,5 +159,59 @@ INSERT INTO createrepo(id, repo_id)
 VALUES (5, 1);
 INSERT INTO createrepo(id, repo_id)
 VALUES (6, 1);
+
+INSERT INTO createteam(id, team_id)
+VALUES (7, 1);
+INSERT INTO createteam(id, team_id)
+VALUES (8, 1);
+
+INSERT INTO jointeam(id, team_id)
+VALUES (9, 1);
+INSERT INTO jointeam(id, team_id)
+VALUES (10, 1);
+
+INSERT INTO leavecourse(id, course_id)
+VALUES (11, 1);
+INSERT INTO leavecourse(id, course_id)
+VALUES (12, 1);
+
+INSERT INTO leaveteam(id, team_id)
+VALUES (13, 1);
+INSERT INTO leaveteam(id, team_id)
+VALUES (14, 1);
+
+INSERT INTO composite(id)
+VALUES (15);
+INSERT INTO composite(id)
+VALUES (16);
+INSERT INTO composite(id)
+VALUES (17);
+INSERT INTO composite(id)
+VALUES (18);
+INSERT INTO composite(id)
+VALUES (19);
+INSERT INTO composite(id)
+VALUES (20);
+
+INSERT INTO request(creator, composite, state)
+VALUES (4, 17, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 18, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 18, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 19, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 20, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 17, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 20, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 20, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 15, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 16, 'Pending');
 
 COMMIT;

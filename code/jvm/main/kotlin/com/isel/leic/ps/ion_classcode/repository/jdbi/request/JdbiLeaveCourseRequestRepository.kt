@@ -1,25 +1,28 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveCourseInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveCourseInputInterface
 import com.isel.leic.ps.ion_classcode.domain.requests.LeaveCourse
 import com.isel.leic.ps.ion_classcode.repository.request.LeaveCourseRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiLeaveCourseRequestRepository(
     private val handle: Handle,
 ) : LeaveCourseRepository {
 
-    override fun createLeaveCourseRequest(request: LeaveCourseInput): Int {
+    override fun createLeaveCourseRequest(request: LeaveCourseInputInterface): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite,state)
-            VALUES (:creator, :compositeId,'pending')
+            VALUES (:creator, :compositeId, 'Pending')
             RETURNING id
             """,
         )
             .bind("creator", request.creator)
-            .bind("composite", request.composite)
-            .execute()
+            .bind("compositeId", request.composite)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
 
         return handle.createUpdate(
             """
@@ -29,43 +32,42 @@ class JdbiLeaveCourseRequestRepository(
         )
             .bind("id", id)
             .bind("courseId", request.courseId)
-            .execute()
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
     override fun getLeaveCourseRequests(): List<LeaveCourse> {
         return handle.createQuery(
             """
-            SELECT * FROM leavecourse
+            SELECT l.id, r.creator, r.state, l.course_id, r.composite FROM leavecourse as l JOIN request as r ON l.id = r.id
             """,
         )
-            .mapTo(LeaveCourse::class.java)
+            .mapTo<LeaveCourse>()
             .list()
     }
 
-    override fun getLeaveCourseRequestById(id: Int): LeaveCourse {
+    override fun getLeaveCourseRequestById(id: Int): LeaveCourse? {
         return handle.createQuery(
             """
-            SELECT * FROM leavecourse
-            WHERE id = :id
+            SELECT l.id, r.creator, r.state, l.course_id, r.composite FROM leavecourse as l JOIN request as r ON l.id = r.id
+            WHERE l.id = :id
             """,
         )
             .bind("id", id)
-            .mapTo(LeaveCourse::class.java)
-            .first()
+            .mapTo<LeaveCourse>()
+            .firstOrNull()
     }
 
     override fun getLeaveCourseRequestsByUser(userId: Int): List<LeaveCourse> {
         return handle.createQuery(
             """
-            SELECT * FROM leavecourse
-            WHERE id IN (
-                SELECT id FROM request
-                WHERE creator = :creator
-            )
+            SELECT l.id, r.creator, r.state, l.course_id, r.composite FROM leavecourse as l JOIN request as r ON l.id = r.id
+            WHERE r.creator = :creator 
             """,
         )
             .bind("creator", userId)
-            .mapTo(LeaveCourse::class.java)
+            .mapTo<LeaveCourse>()
             .list()
     }
 }

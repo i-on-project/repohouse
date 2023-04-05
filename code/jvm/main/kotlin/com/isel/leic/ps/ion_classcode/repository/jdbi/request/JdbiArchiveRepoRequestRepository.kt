@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.ArchiveRepoInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.ArchiveRepoInputInterface
 import com.isel.leic.ps.ion_classcode.domain.requests.ArchiveRepo
 import com.isel.leic.ps.ion_classcode.repository.request.ArchiveRepoRequestRepository
 import org.jdbi.v3.core.Handle
@@ -10,7 +10,7 @@ class JdbiArchiveRepoRequestRepository(
     private val handle: Handle,
 ) : ArchiveRepoRequestRepository {
 
-    override fun createArchiveRepoRequest(request: ArchiveRepoInput): Int {
+    override fun createArchiveRepoRequest(request: ArchiveRepoInputInterface): Int {
         val requestId = handle.createUpdate(
             """
            INSERT INTO request (creator, composite, state)

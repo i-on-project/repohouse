@@ -4,6 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.request.RequestInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Request
 import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiRequestRepository(
     private val handle: Handle,
@@ -11,26 +12,28 @@ class JdbiRequestRepository(
     override fun createRequest(request: RequestInput): Int {
         return handle.createUpdate(
             """
-            INSERT INTO request (creator, composite,state)
-            VALUES (:creator, :compositeId,'pending')
+            INSERT INTO request (creator, composite, state)
+            VALUES (:creator, :compositeId, 'Pending')
             RETURNING id
             """,
         )
             .bind("creator", request.creator)
-            .bind("composite", request.composite)
-            .execute()
+            .bind("compositeId", request.composite)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
     }
 
-    override fun changeStatusRequest(id: Int, status: String) {
+    override fun changeStateRequest(id: Int, state: String) {
         handle.createUpdate(
             """
             UPDATE request
-            SET state = :status
+            SET state = :state
             WHERE id = :id
             """,
         )
             .bind("id", id)
-            .bind("status", status)
+            .bind("state", state)
             .execute()
     }
 
@@ -40,7 +43,7 @@ class JdbiRequestRepository(
             SELECT * FROM request
             """,
         )
-            .mapTo(Request::class.java)
+            .mapTo<Request>()
             .list()
     }
 
@@ -52,11 +55,11 @@ class JdbiRequestRepository(
             """,
         )
             .bind("userId", userId)
-            .mapTo(Request::class.java)
+            .mapTo<Request>()
             .list()
     }
 
-    override fun getRequestById(id: Int): Request {
+    override fun getRequestById(id: Int): Request? {
         return handle.createQuery(
             """
             SELECT * FROM request
@@ -64,7 +67,7 @@ class JdbiRequestRepository(
             """,
         )
             .bind("id", id)
-            .mapTo(Request::class.java)
-            .first()
+            .mapTo<Request>()
+            .firstOrNull()
     }
 }

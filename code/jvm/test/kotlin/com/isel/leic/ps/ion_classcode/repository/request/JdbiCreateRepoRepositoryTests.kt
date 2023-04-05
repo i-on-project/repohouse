@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInputInterface
 import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiCreateRepoRequestRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
@@ -10,19 +10,19 @@ class JdbiCreateRepoRepositoryTests {
     @Test
     fun `createCreateRepoRequest should create a new createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
-        val request = CreateRepoInput(repoId = 1, creator = 3)
+        val request = CreateRepoInputInterface(repoId = 1, creator = 3)
         createRepoReq.createCreateRepoRequest(request = request)
     }
 
     @Test
-    fun `getArchiveRepoRequests should return all archiveRepo requests`() = testWithHandleAndRollback { handle ->
+    fun `getCreateRepoRequests should return all createRepo requests`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val requests = createRepoReq.getCreateRepoRequests()
         assert(requests.size == 2)
     }
 
     @Test
-    fun `getArchiveRepoRequestById should return the specific archiveRepo request`() = testWithHandleAndRollback { handle ->
+    fun `getCreateRepoRequestById should return the specific createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val id = 5
         val creator = 4
@@ -31,7 +31,7 @@ class JdbiCreateRepoRepositoryTests {
     }
 
     @Test
-    fun `getArchiveRepoRequestsByUser should return apply requests for a user`() = testWithHandleAndRollback { handle ->
+    fun `getCreateRepoRequestsByUser should return createRepo requests for a user`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val userId = 4
         val requests = createRepoReq.getCreateRepoRequestsByUser(userId = userId)

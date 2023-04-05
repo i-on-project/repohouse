@@ -4,7 +4,7 @@ data class CompositeInput(
     val requests: List<Int>,
     override val creator: Int,
     override val composite: Int? = null
-) : RequestInput {
+) : RequestInputInterface {
     init {
         require(requests.isNotEmpty()) { "Requests must not be empty" }
     }
