@@ -17,3 +17,12 @@ data class ClassroomDeletedOutputModel(
     val id: Int,
     val deleted: Boolean
 ) : OutputModel
+
+data class ClassroomModel(
+    val id: Int,
+    val name: String,
+    val isArchived: Boolean,
+    val lastSync: Timestamp,
+    val assigments: List<Assigment>,
+    val students: List<Student>,
+) : OutputModel

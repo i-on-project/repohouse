@@ -6,7 +6,7 @@ import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
-class JdbiApplyRequestRepositoryTests {
+class JdbiApplyRequestRepositoryTestsInterface {
     @Test
     fun `createApplyRequest should create a new apply request`() = testWithHandleAndRollback { handle ->
         val applyReq = JdbiApplyRequestRepository(handle = handle)

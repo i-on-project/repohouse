@@ -4,8 +4,8 @@ data class CreateTeam(
     override val id: Int,
     override val creator: Int,
     override val state: String = "pending",
-    override val composite: Int?
-) : Request {
+    override val composite: Int? = null
+) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }
     }

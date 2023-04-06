@@ -5,8 +5,6 @@ import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiAssignmentRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import java.sql.Timestamp
-import java.time.Instant
 
 class AssignmentRepositoryTests {
     @Test
@@ -18,7 +16,6 @@ class AssignmentRepositoryTests {
                 classroomId = classroomId,
                 maxElemsPerGroup = 10,
                 maxNumberGroups = 10,
-                releaseDate = Timestamp.from(Instant.now()),
                 description = "aaaa",
                 title = "aaa",
             ),

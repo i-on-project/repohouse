@@ -29,12 +29,12 @@ INSERT INTO student (id)
 VALUES (5);
 
 
-INSERT INTO course (org_url, name, teacher_id)
-VALUES ('https://daw.isel.pt', 'DAW', 1);
-INSERT INTO course (org_url, name, teacher_id)
-VALUES ('https://daw1.isel.pt', 'DAW2', 2);
-INSERT INTO course (org_url, name, teacher_id)
-VALUES ('https://daw3.isel.pt', 'DAW3', 2);
+INSERT INTO course (org_url, name)
+VALUES ('https://daw.isel.pt', 'DAW');
+INSERT INTO course (org_url, name)
+VALUES ('https://daw1.isel.pt', 'DAW2');
+INSERT INTO course (org_url, name)
+VALUES ('https://daw3.isel.pt', 'DAW3');
 
 INSERT INTO classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
 VALUES ('DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/a/123', false, 1, 1);
@@ -97,7 +97,7 @@ INSERT INTO tags (name, is_delivered, tag_date, delivery_id, repo_id)
 VALUES ('tag3', false, CURRENT_TIMESTAMP, 1, 2);
 
 INSERT INTO cooldown (user_id, end_date)
-VALUES (1, CURRENT_TIMESTAMP);
+VALUES (1, NOW() + INTERVAL '1 day');
 
 INSERT INTO outbox (user_id, otp, status, expired_at, sent_at)
 VALUES (3, 123456, 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
@@ -116,7 +116,34 @@ INSERT INTO request(creator, composite, state)
 VALUES (4, null, 'Pending');
 INSERT INTO request(creator, composite, state)
 VALUES (4, null, 'Pending');
-
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, null, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (5, null, 'Pending');
 
 INSERT INTO apply(id, teacher_id)
 VALUES (1, 1);
@@ -132,5 +159,59 @@ INSERT INTO createrepo(id, repo_id)
 VALUES (5, 1);
 INSERT INTO createrepo(id, repo_id)
 VALUES (6, 1);
+
+INSERT INTO createteam(id)
+VALUES (7);
+INSERT INTO createteam(id)
+VALUES (8);
+
+INSERT INTO jointeam(id, team_id)
+VALUES (9, 1);
+INSERT INTO jointeam(id, team_id)
+VALUES (10, 1);
+
+INSERT INTO leavecourse(id, course_id)
+VALUES (11, 1);
+INSERT INTO leavecourse(id, course_id)
+VALUES (12, 1);
+
+INSERT INTO leaveteam(id, team_id)
+VALUES (13, 1);
+INSERT INTO leaveteam(id, team_id)
+VALUES (14, 1);
+
+INSERT INTO composite(id)
+VALUES (15);
+INSERT INTO composite(id)
+VALUES (16);
+INSERT INTO composite(id)
+VALUES (17);
+INSERT INTO composite(id)
+VALUES (18);
+INSERT INTO composite(id)
+VALUES (19);
+INSERT INTO composite(id)
+VALUES (20);
+
+INSERT INTO request(creator, composite, state)
+VALUES (4, 17, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 18, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 18, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 19, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 20, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 17, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 20, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 20, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 15, 'Pending');
+INSERT INTO request(creator, composite, state)
+VALUES (4, 16, 'Pending');
 
 COMMIT;

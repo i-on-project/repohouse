@@ -4,7 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 typealias CourseResponse = Either<CourseServicesError, CourseWithClassrooms>
 typealias CourseCreatedResponse = Either<CourseServicesError, Course>
 typealias UserCoursesResponse = Either<CourseServicesError, List<CourseWithClassrooms>>
-typealias CourseArchivedResponse = Either<CourseServicesError, CourseArchivedOutputModel>
+typealias CourseArchivedResponse = Either<CourseServicesError, CourseArchivedModel>
 typealias LeaveCourseResponse = Either<CourseServicesError, Course>
 
 sealed class CourseServicesError {
@@ -109,10 +109,10 @@ class CourseServices(
             val classrooms = it.courseRepository.getCourseClassrooms(courseId)
             if (classrooms.isNotEmpty()) {
                 it.courseRepository.archiveCourse(courseId)
-                Either.Right(CourseArchivedOutputModel.CourseArchived)
+                Either.Right(CourseArchivedModel.CourseArchived)
             } else {
                 it.courseRepository.deleteCourse(courseId)
-                Either.Right(CourseArchivedOutputModel.CourseDeleted)
+                Either.Right(CourseArchivedModel.CourseDeleted)
             }
         }
     }

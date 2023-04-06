@@ -63,8 +63,7 @@ CREATE TABLE Request(
     creator int not null,
     composite integer default null,
     state text not null check ( state in ('Pending', 'Accepted', 'Rejected') ),
-    foreign key (creator) references Users(id),
-    foreign key (composite) references Request(id)
+    foreign key (creator) references Users(id)
 );
 
 CREATE TABLE Composite(
@@ -72,9 +71,13 @@ CREATE TABLE Composite(
     foreign key (id) references Request(id)
 );
 
+ALTER TABLE Request
+    ADD CONSTRAINT fk_composite
+        FOREIGN KEY (composite)
+            REFERENCES Composite(id);
+
 CREATE TABLE CreateRepo(
     id int primary key,
-    repo_id int not null,
     foreign key (id) references Request(id)
 );
 
@@ -152,7 +155,7 @@ CREATE TABLE Delivery(
 CREATE TABLE Repo(
     id serial primary key,
     name text not null,
-    url text unique not null,
+    url text unique default null,
     is_created boolean not null,
     team_id int not null,
     foreign key (team_id) references Team(id)
@@ -194,4 +197,6 @@ Create TABLE Outbox(
 );
 
 COMMIT;
+
+update users set is_created = true where id = 1;
 

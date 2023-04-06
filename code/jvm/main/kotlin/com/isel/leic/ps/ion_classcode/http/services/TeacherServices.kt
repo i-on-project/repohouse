@@ -14,6 +14,7 @@ typealias TeachersApproveResponse = Either<TeacherServicesError, Boolean>
 
 sealed class TeacherServicesError {
     object CourseNotFound : TeacherServicesError()
+    object TeacherNotFound : TeacherServicesError()
 }
 
 @Component
@@ -47,12 +48,23 @@ class TeacherServices(
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
         return transactionManager.run {
             teachers.approved.map { teacherRequest ->
-                it.requestRepository.changeStatusRequest(teacherRequest, "Approved")
+                it.requestRepository.changeStateRequest(teacherRequest, "Approved")
             }
             teachers.rejected.map { teacherRequest ->
-                it.requestRepository.changeStatusRequest(teacherRequest, "Rejected")
+                it.requestRepository.changeStateRequest(teacherRequest, "Rejected")
             }
             Either.Right(true)
+        }
+    }
+
+    fun getTeacherGithubToken(teacherId: Int): Either<TeacherServicesError, String> {
+        return transactionManager.run {
+            val teacher = it.usersRepository.getTeacherGithubToken(teacherId)
+            if (teacher == null) {
+                Either.Left(TeacherServicesError.TeacherNotFound)
+            } else {
+                Either.Right(teacher)
+            }
         }
     }
 }

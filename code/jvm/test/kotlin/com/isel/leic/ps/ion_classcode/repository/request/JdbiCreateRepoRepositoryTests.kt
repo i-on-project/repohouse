@@ -15,14 +15,14 @@ class JdbiCreateRepoRepositoryTests {
     }
 
     @Test
-    fun `getArchiveRepoRequests should return all archiveRepo requests`() = testWithHandleAndRollback { handle ->
+    fun `getCreateRepoRequests should return all createRepo requests`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val requests = createRepoReq.getCreateRepoRequests()
         assert(requests.size == 2)
     }
 
     @Test
-    fun `getArchiveRepoRequestById should return the specific archiveRepo request`() = testWithHandleAndRollback { handle ->
+    fun `getCreateRepoRequestById should return the specific createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val id = 5
         val creator = 4
@@ -31,7 +31,7 @@ class JdbiCreateRepoRepositoryTests {
     }
 
     @Test
-    fun `getArchiveRepoRequestsByUser should return apply requests for a user`() = testWithHandleAndRollback { handle ->
+    fun `getCreateRepoRequestsByUser should return createRepo requests for a user`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val userId = 4
         val requests = createRepoReq.getCreateRepoRequestsByUser(userId = userId)

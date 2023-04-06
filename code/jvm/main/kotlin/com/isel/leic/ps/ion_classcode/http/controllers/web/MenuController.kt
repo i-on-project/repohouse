@@ -136,6 +136,7 @@ class MenuController(
     private fun problemTeacher(error: TeacherServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             is TeacherServicesError.CourseNotFound -> Problem.courseNotFound
+            is TeacherServicesError.TeacherNotFound -> Problem.userNotFound
         }
     }
 }

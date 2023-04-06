@@ -162,7 +162,7 @@ class DeliveryController(
     }
 
     @PostMapping(Uris.SYNC_DELIVERY_PATH)
-    fun syncDelivery(
+    suspend fun syncDelivery(
         user: User,
         @PathVariable deliveryId: Int,
         @PathVariable assigmentId: Int,
@@ -170,7 +170,15 @@ class DeliveryController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return TODO()
+        return when(val syncDelivery = deliveryServices.syncDelivery(deliveryId,user.id,courseId)){
+            is Either.Left -> problem(syncDelivery.value)
+            is Either.Right -> when(val delivery = deliveryServices.getDeliveryInfo(deliveryId)){
+                is Either.Left -> problem(delivery.value)
+                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery,delivery.value.teamsDelivered,delivery.value.teamsNotDelivered)){
+                    link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
+                }
+            }
+        }
     }
 
     private fun problem(error: DeliveryServicesError): ResponseEntity<ErrorMessageModel> {
@@ -179,6 +187,7 @@ class DeliveryController(
             DeliveryServicesError.InvalidInput -> Problem.invalidInput
             DeliveryServicesError.NotTeacher -> Problem.notTeacher
             DeliveryServicesError.DeliveryWithTeams -> Problem.invalidOperation
+            DeliveryServicesError.CourseNotFound -> Problem.notFound
         }
     }
 }

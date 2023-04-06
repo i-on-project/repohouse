@@ -4,8 +4,9 @@ data class LeaveCourseInput(
     val courseId: Int,
     override val composite: Int? = null,
     override val creator: Int
-) : RequestInput {
+) : RequestInputInterface {
     init {
         require(courseId > 0) { "Course id must be greater than 0" }
+        require(creator > 0) { "Creator id must be greater than 0" }
     }
 }

@@ -165,7 +165,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getAllTeacherCourses(teacherId: Int): List<Course> {
         return handle.createQuery(
             """
-            SELECT id,org_url,name,teachers FROM Course JOIN teacher_course ON Course.id = teacher_course.course
+            SELECT id, org_url, name, teacher_course FROM Course JOIN teacher_course ON Course.id = teacher_course.course
             WHERE teacher = :teacher_id
             """,
         )

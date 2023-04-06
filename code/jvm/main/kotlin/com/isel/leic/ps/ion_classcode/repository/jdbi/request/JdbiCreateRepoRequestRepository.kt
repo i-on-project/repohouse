@@ -26,12 +26,11 @@ class JdbiCreateRepoRequestRepository(
 
         return handle.createUpdate(
             """
-            INSERT INTO createrepo (id, repo_id)
-            VALUES (:id, :repoId)
+            INSERT INTO createrepo (id)
+            VALUES (:id)
             """,
         )
             .bind("id", id)
-            .bind("repoId", request.repoId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()

@@ -217,6 +217,18 @@ class JdbiUsersRepository(
             .bind("id", id)
             .execute()
     }
+
+    override fun getTeacherGithubToken(id: Int): String? {
+        return handle.createQuery(
+            """
+            SELECT github_token FROM teacher
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .mapTo<String>()
+            .firstOrNull()
+    }
 }
 private fun helper(handle: Handle, id: Int): User? {
     return handle.createQuery(

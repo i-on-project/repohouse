@@ -39,20 +39,20 @@ class TeamController(
         @PathVariable teamId: Int,
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
-        @PathVariable assigmentId: Int
-    ):ResponseEntity<*> {
-        return when(val team = teamService.getTeamInfo(teamId)) {
+        @PathVariable assigmentId: Int,
+    ): ResponseEntity<*> {
+        return when (val team = teamService.getTeamInfo(teamId)) {
             is Either.Left -> problem(team.value)
-            is Either.Right -> siren(TeamOutputModel(team.value.team, team.value.students,team.value.repos,team.value.feedbacks)){
-                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("self"),needAuthentication = true)
-                link(href = Uris.teamRequestsUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("requestsHistory"),needAuthentication = true)
-                link(href = Uris.assigmentUri(courseId, classroomId, assigmentId), rel = LinkRelation("assigment"),needAuthentication = true)
-                if (user is Student){
+            is Either.Right -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repos, team.value.feedbacks)) {
+                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
+                link(href = Uris.teamRequestsUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("requestsHistory"), needAuthentication = true)
+                link(href = Uris.assigmentUri(courseId, classroomId, assigmentId), rel = LinkRelation("assigment"), needAuthentication = true)
+                if (user is Student) {
                     action(name = "exitTeam", href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), method = HttpMethod.PUT, type = "application/json", block = {})
                 }
-                if (user is Teacher){
-                    action(name = "postFeedback", href = Uris.postFeedbackUri(courseId, classroomId, assigmentId, teamId), method = HttpMethod.POST, type = "application/json"){
-                       hiddenField(name = "teamId", teamId)
+                if (user is Teacher) {
+                    action(name = "postFeedback", href = Uris.postFeedbackUri(courseId, classroomId, assigmentId, teamId), method = HttpMethod.POST, type = "application/json") {
+                        hiddenField(name = "teamId", teamId)
                         textField(name = "description")
                         textField(name = "label")
                     }
@@ -68,13 +68,13 @@ class TeamController(
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
         @PathVariable assigmentId: Int,
-        @RequestBody joinTeamInfo: JoinTeamInput
-    ):ResponseEntity<*>{
+        @RequestBody joinTeamInfo: JoinTeamInput,
+    ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when(val join = teamService.joinTeamRequest(joinTeamInfo)){
+        return when (val join = teamService.joinTeamRequest(joinTeamInfo)) {
             is Either.Left -> problem(join.value)
-            is Either.Right -> siren(RequestCreatedOutputModel(join.value,true)){
-                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"),needAuthentication = true)
+            is Either.Right -> siren(RequestCreatedOutputModel(join.value, true)) {
+                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
             }
         }
     }
@@ -85,13 +85,13 @@ class TeamController(
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
         @PathVariable assigmentId: Int,
-        @RequestBody createTeamInfo: CreateTeamInput
-    ):ResponseEntity<*>{
+        @RequestBody createTeamInfo: CreateTeamInput,
+    ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when(val create = teamService.createTeamRequest(createTeamInfo)){
+        return when (val create = teamService.createTeamRequest(createTeamInfo)) {
             is Either.Left -> problem(create.value)
-            is Either.Right -> siren(TeamOutputModel(create.value.team,create.value.students,create.value.repos,create.value.feedbacks)){
-                link(href = Uris.teamUri(courseId, classroomId, assigmentId, create.value.team.id), rel = LinkRelation("team"),needAuthentication = true)
+            is Either.Right -> siren(TeamOutputModel(create.value.team, create.value.students, create.value.repos, create.value.feedbacks)) {
+                link(href = Uris.teamUri(courseId, classroomId, assigmentId, create.value.team.id), rel = LinkRelation("team"), needAuthentication = true)
             }
         }
     }
@@ -102,21 +102,18 @@ class TeamController(
         @PathVariable teamId: Int,
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
-        @PathVariable assigmentId: Int
-    ):ResponseEntity<*>{
-        return when(val requests = teamService.getTeamsRequests(teamId)){
+        @PathVariable assigmentId: Int,
+    ): ResponseEntity<*> {
+        return when (val requests = teamService.getTeamsRequests(teamId)) {
             is Either.Left -> problem(requests.value)
-            is Either.Right -> siren(RequestsOutputModel(requests.value.createTeam,requests.value.joinTeam,requests.value.leaveTeam)){
-                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"),needAuthentication = true)
-                if (user is Teacher){
-                    requests.value.createTeam.forEach {
-                        if (it.state == "Rejected") action(name = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId,it.id), method = HttpMethod.POST, type = "application/json", block = {})
-                    }
+            is Either.Right -> siren(RequestsOutputModel(requests.value.joinTeam, requests.value.leaveTeam)) {
+                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
+                if (user is Teacher) {
                     requests.value.joinTeam.forEach {
-                        if (it.state == "Rejected") action(name = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId,it.id), method = HttpMethod.POST, type = "application/json", block = {})
+                        if (it.state == "Rejected") action(name = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
                     }
                     requests.value.leaveTeam.forEach {
-                        if (it.state == "Rejected") action(name = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId,it.id), method = HttpMethod.POST, type = "application/json", block = {})
+                        if (it.state == "Rejected") action(name = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
                     }
                 }
             }
@@ -131,17 +128,16 @@ class TeamController(
         @PathVariable classroomId: Int,
         @PathVariable assigmentId: Int,
         @PathVariable requestId: Int,
-    ):ResponseEntity<*>{
+    ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when(val change = teamService.updateTeamRequestStatus(requestId, teamId)){
+        return when (val change = teamService.updateTeamRequestStatus(requestId, teamId)) {
             is Either.Left -> problem(change.value)
-            is Either.Right -> siren(RequestChangeStatusOutputModel(requestId,change.value)){
-                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"),needAuthentication = true)
-                link(href = Uris.teamRequestsUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("requestsHistory"),needAuthentication = true)
+            is Either.Right -> siren(RequestChangeStatusOutputModel(requestId, change.value)) {
+                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
+                link(href = Uris.teamRequestsUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("requestsHistory"), needAuthentication = true)
             }
         }
     }
-
 
     @PostMapping(Uris.EXIT_TEAM_PATH)
     fun exitTeam(
@@ -150,13 +146,13 @@ class TeamController(
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
         @PathVariable assigmentId: Int,
-        @RequestBody leaveTeamInfo:LeaveTeamInput
-    ):ResponseEntity<*>{
+        @RequestBody leaveTeamInfo: LeaveTeamInput,
+    ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when(val exit = teamService.leaveTeamRequest(leaveTeamInfo)){
+        return when (val exit = teamService.leaveTeamRequest(leaveTeamInfo)) {
             is Either.Left -> problem(exit.value)
-            is Either.Right -> siren(RequestCreatedOutputModel(exit.value,true)){
-                link(href = Uris.assigmentUri(courseId, classroomId, assigmentId), rel = LinkRelation("assigment"),needAuthentication = true)
+            is Either.Right -> siren(RequestCreatedOutputModel(exit.value, true)) {
+                link(href = Uris.assigmentUri(courseId, classroomId, assigmentId), rel = LinkRelation("assigment"), needAuthentication = true)
             }
         }
     }
@@ -168,21 +164,22 @@ class TeamController(
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
         @PathVariable assigmentId: Int,
-        @RequestBody feedbackInfo: FeedbackInput
-    ):ResponseEntity<*>{
+        @RequestBody feedbackInfo: FeedbackInput,
+    ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when(val feedback = teamService.postFeedback(feedbackInfo)){
+        return when (val feedback = teamService.postFeedback(feedbackInfo)) {
             is Either.Left -> problem(feedback.value)
-            is Either.Right -> siren(FeedbackOutputModel(feedback.value,true)){
-                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"),needAuthentication = true)
+            is Either.Right -> siren(FeedbackOutputModel(feedback.value, true)) {
+                link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
             }
         }
     }
 
-    private fun problem(error:TeamServicesError):ResponseEntity<ErrorMessageModel>{
-        return when(error){
-                is TeamServicesError.TeamNotFound -> Problem.notFound
-                is TeamServicesError.RequestNotRejected -> Problem.invalidOperation
+    private fun problem(error: TeamServicesError): ResponseEntity<ErrorMessageModel> {
+        return when (error) {
+            is TeamServicesError.TeamNotFound -> Problem.notFound
+            is TeamServicesError.RequestNotRejected -> Problem.invalidOperation
+            is TeamServicesError.RequestNotFound -> Problem.notFound
         }
     }
 }

@@ -5,8 +5,9 @@ import com.isel.leic.ps.ion_classcode.domain.requests.Request
 
 interface RequestRepository {
     fun createRequest(request: RequestInput): Int
-    fun changeStatusRequest(id: Int, status: String)
+    fun changeStateRequest(id: Int, state: String)
     fun getRequests(): List<Request>
-    fun getRequestById(id: Int): Request
+    fun getRequestById(id: Int): Request?
     fun getRequestsByUser(userId: Int): List<Request>
+    fun checkIfIsComposite(id: Int): Boolean
 }
