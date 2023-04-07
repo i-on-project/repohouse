@@ -12,20 +12,20 @@ object Uris {
 
     /** Common Uris **/
 
-    const val HOME = "$WEB/home"
-    const val CREDITS = "$WEB/credits"
-    const val AUTH_PATH = "$WEB/auth"
+    const val HOME = "$API/home"
+    const val CREDITS = "$API/credits"
+    const val AUTH_PATH = "$API/auth"
     const val AUTH_REGISTER_PATH = "$AUTH_PATH/register"
     const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_PATH/verify"
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
     const val LOGOUT = "$AUTH_PATH/logout"
     const val CALLBACK_PATH = "$AUTH_PATH/callback"
-    const val MENU_PATH = "$WEB/menu"
-    const val TEACHERS_APPROVAL_PATH = "$WEB/teachers"
-    const val STUDENTS_PATH = "$WEB/students"
+    const val MENU_PATH = "$API/menu"
+    const val TEACHERS_APPROVAL_PATH = "$API/teachers"
+    const val STUDENTS_PATH = "$API/students"
     const val STUDENT_PATH = "$STUDENTS_PATH/{id}"
-    const val COURSES_PATH = "$WEB/courses"
+    const val COURSES_PATH = "$API/courses"
     const val COURSE_PATH = "$COURSES_PATH/{courseId}"
     const val STUDENTS_COURSE_PATH = "$COURSE_PATH/students"
     const val ENTER_COURSE_PATH = "$COURSE_PATH/enter"
@@ -37,7 +37,7 @@ object Uris {
     const val ARCHIVE_CLASSROOM_PATH = "$CLASSROOM_PATH/archive"
     const val SYNC_CLASSROOM_PATH = "$CLASSROOM_PATH/sync"
     const val EDIT_CLASSROOM_PATH = "$CLASSROOM_PATH/edit"
-    const val INVITE_LINK_PATH = "$API/enter-classroom/{inviteLink}"
+    const val INVITE_LINK_PATH = "$COURSE_PATH/enter-classroom/{inviteLink}"
     const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assigments"
     const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assigmentId}"
     const val CREATE_ASSIGMENT_PATH = "$ASSIGMENTS_PATH/create"
@@ -79,12 +79,12 @@ object Uris {
     fun courseStudentsUri(courseId: Int): URI = UriTemplate(STUDENTS_COURSE_PATH).expand(courseId)
     fun enterCourse(courseId: Int): URI = UriTemplate(ENTER_COURSE_PATH).expand(courseId)
     fun leaveCourse(courseId: Int): URI = UriTemplate(LEAVE_COURSE_PATH).expand(courseId)
-    fun classroomUri(classroomId: Int): URI = UriTemplate(CLASSROOMS_PATH).expand(classroomId)
+    fun classroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(CLASSROOMS_PATH).expand(courseId,classroomId)
     fun createClassroomUri(courseId: Int): URI = UriTemplate(CREATE_CLASSROOM_PATH).expand(courseId)
-    fun archiveClassroomUri(classroomId: Int): URI = UriTemplate(ARCHIVE_CLASSROOM_PATH).expand(classroomId)
-    fun syncClassroomUri(classroomId: Int): URI = UriTemplate(SYNC_CLASSROOM_PATH).expand(classroomId)
-    fun editClassroomUri(classroomId: Int): URI = UriTemplate(EDIT_CLASSROOM_PATH).expand(classroomId)
-    fun inviteLinkUri(inviteLink: String): URI = UriTemplate(INVITE_LINK_PATH).expand(inviteLink)
+    fun archiveClassroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(ARCHIVE_CLASSROOM_PATH).expand(courseId,classroomId)
+    fun syncClassroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(SYNC_CLASSROOM_PATH).expand(courseId,classroomId)
+    fun editClassroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(EDIT_CLASSROOM_PATH).expand(courseId,classroomId)
+    fun inviteLinkUri(courseId: Int,inviteLink: String): URI = UriTemplate(INVITE_LINK_PATH).expand(courseId,inviteLink)
     fun assigmentsUri(courseId: Int, classroomId: Int): URI = UriTemplate(ASSIGMENTS_PATH).expand(courseId, classroomId)
     fun assigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId)
     fun createAssigmentUri(courseId: Int, classroomId: Int): URI = UriTemplate(CREATE_ASSIGMENT_PATH).expand(courseId, classroomId)

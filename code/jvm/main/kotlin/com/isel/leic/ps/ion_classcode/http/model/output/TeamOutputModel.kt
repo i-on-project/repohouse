@@ -19,3 +19,16 @@ data class TeamRequestsOutputModel(
     val joinTeam: List<JoinTeam>,
     val leaveTeam: List<LeaveTeam>,
 )
+
+data class TeamModel(
+    val team: Team,
+    val students: List<Student>,
+    val repos: List<Repo>,
+    val feedbacks: List<Feedback>,
+)
+
+data class TeamRequestsModel(
+    val team: Team,
+    val joinTeam: List<JoinTeam>,
+    val leaveTeam: List<LeaveTeam>,
+)

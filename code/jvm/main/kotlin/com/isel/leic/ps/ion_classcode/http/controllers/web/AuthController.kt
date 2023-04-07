@@ -50,8 +50,8 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 const val ORG_NAME = "test-project-isel"
-const val GITHUB_TEACHER_SCOPE = "read:org%20user:email"
-const val GITHUB_STUDENT_SCOPE = "repo%20user:email"
+const val GITHUB_TEACHER_SCOPE = "read:org user:email repo"
+const val GITHUB_STUDENT_SCOPE = "repo user:email"
 
 const val STUDENT_COOKIE_NAME = "Student"
 const val TEACHER_COOKIE_NAME = "Teacher"

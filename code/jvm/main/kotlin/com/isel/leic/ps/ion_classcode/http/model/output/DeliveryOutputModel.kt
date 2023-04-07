@@ -13,3 +13,9 @@ data class DeliveryDeleteOutputModel(
     val id: Int,
     val deleted: Boolean,
 )
+
+data class DeliveryModel(
+    val delivery: Delivery,
+    val teamsDelivered: List<Team>,
+    val teamsNotDelivered: List<Team>,
+)

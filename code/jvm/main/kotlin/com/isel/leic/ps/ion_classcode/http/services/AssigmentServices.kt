@@ -4,12 +4,13 @@ import com.isel.leic.ps.ion_classcode.domain.Assigment
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentOutputModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
-typealias AssigmentResponse = Either<AssigmentServicesError, AssigmentOutputModel>
+typealias AssigmentResponse = Either<AssigmentServicesError, AssigmentModel>
 typealias AssigmentCreatedResponse = Either<AssigmentServicesError, Assigment>
 typealias AssigmentDeletedResponse = Either<AssigmentServicesError, Boolean>
 typealias AssigmentStudentTeamResponse = Either<AssigmentServicesError, List<Team>>
@@ -68,7 +69,7 @@ class AssigmentServices(
             } else {
                 val deliveries = it.deliveryRepository.getDeliveriesByAssigment(assigmentId)
                 val teams = it.teamRepository.getTeamsFromAssignment(assigmentId)
-                Either.Right(AssigmentOutputModel(assigment, deliveries, teams))
+                Either.Right(AssigmentModel(assigment, deliveries, teams))
             }
         }
     }

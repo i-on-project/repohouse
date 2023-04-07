@@ -1,19 +1,20 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.CompositeInput
+import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
-import com.isel.leic.ps.ion_classcode.domain.requests.Composite
-import com.isel.leic.ps.ion_classcode.http.model.output.TeamOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.TeamModel
+import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
-typealias TeamResponse = Either<TeamServicesError, TeamOutputModel>
-typealias TeamRequestsResponse = Either<TeamServicesError, TeamRequestsOutputModel>
-typealias TeamCreateRequestResponse = Either<TeamServicesError, TeamOutputModel>
+typealias TeamResponse = Either<TeamServicesError, TeamModel>
+typealias TeamRequestsResponse = Either<TeamServicesError, TeamRequestsModel>
+typealias TeamCreateRequestResponse = Either<TeamServicesError, TeamModel>
 typealias TeamLeaveRequestResponse = Either<TeamServicesError, Int>
 typealias TeamJoinRequestResponse = Either<TeamServicesError, Int>
 typealias TeamUpdateRequestResponse = Either<TeamServicesError, Boolean>
@@ -39,7 +40,7 @@ class TeamServices(
                 val students = it.teamRepository.getStudentsFromTeam(teamId)
                 val repos = it.repoRepository.getReposByTeam(teamId)
                 val feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId)
-                Either.Right(TeamOutputModel(team, students, repos, feedbacks))
+                Either.Right(TeamModel(team, students, repos, feedbacks))
             }
         }
     }
@@ -50,10 +51,17 @@ class TeamServices(
             val team = it.teamRepository.getTeamById(teamId)
             if(team == null) Either.Left(TeamServicesError.TeamNotFound)
             else {
+                // Join all requests in one composite request
+                val composite = it.compositeRepository.createCompositeRequest(
+                    CompositeInput(listOf(teamId), createTeamInfo.creator))
+                it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(teamId,composite, createTeamInfo.creator))
+                it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(composite, createTeamInfo.creator))
+
+                // Get all info about the team
                 val students = it.teamRepository.getStudentsFromTeam(teamId)
                 val repos = it.repoRepository.getReposByTeam(teamId)
                 val feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId)
-                Either.Right(TeamOutputModel(team, students, repos, feedbacks))
+                Either.Right(TeamModel(team, students, repos, feedbacks))
             }
         }
     }
@@ -125,7 +133,7 @@ class TeamServices(
                 else -> {
                     val joinTeam = it.joinTeamRepository.getJoinTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
                     val leaveTeam = it.leaveTeamRepository.getLeaveTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
-                    Either.Right(TeamRequestsOutputModel(team, joinTeam, leaveTeam))
+                    Either.Right(TeamRequestsModel(team, joinTeam, leaveTeam))
                 }
             }
         }

@@ -6,8 +6,7 @@ import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomDeletedOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
@@ -64,7 +63,7 @@ class CourseController(
                 clazz("course")
                 link(rel = LinkRelation("self"), href = Uris.courseUri(course.value.id), needAuthentication = true)
                 course.value.classrooms.forEach {
-                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(it.id), needAuthentication = true)
+                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,it.id), needAuthentication = true)
                 }
                 if (user is Teacher) {
                     action(name = "create-classroom", method = HttpMethod.POST, href = Uris.createClassroomUri(course.value.id), type = "x-www-form-urlencoded", block = {
@@ -107,7 +106,7 @@ class CourseController(
         return when (val archive = courseServices.archiveOrDeleteCourse(courseId)) {
             is Either.Left -> problem(CourseServicesError.CourseNotFound)
             is Either.Right ->
-                if (archive.value is CourseArchivedOutputModel.CourseArchived) {
+                if (archive.value is CourseArchivedModel.CourseArchived) {
                     when (val course = courseServices.getCourseById(courseId)) {
                         is Either.Left -> problem(course.value)
                         is Either.Right -> siren(
@@ -129,7 +128,7 @@ class CourseController(
                             course.value.classrooms.forEach {
                                 link(
                                     rel = LinkRelation("classroom"),
-                                    href = Uris.classroomUri(it.id),
+                                    href = Uris.classroomUri(courseId,it.id),
                                     needAuthentication = true,
                                 )
                             }

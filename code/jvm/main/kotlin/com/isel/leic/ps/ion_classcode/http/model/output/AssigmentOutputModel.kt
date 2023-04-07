@@ -12,3 +12,9 @@ data class AssigmentOutputModel(
 data class AssigmentCreatedOutputModel(
     val assigment: Assigment,
 )
+
+data class AssigmentModel(
+    val assigment: Assigment,
+    val deliveries: List<Delivery>,
+    val teams: List<Team>,
+)
