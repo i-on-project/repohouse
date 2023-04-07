@@ -48,7 +48,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .firstOrNull()
     }
 
-    override fun getDeliveriesByAssigment(assignmentId: Int): List<Delivery> {
+    override fun getDeliveriesByAssigment(assigmentId: Int): List<Delivery> {
         return handle.createQuery(
             """
                 SELECT * FROM DELIVERY
@@ -56,7 +56,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
                 ORDER BY due_date
                 """,
         )
-            .bind("assigmentId", assignmentId)
+            .bind("assigmentId", assigmentId)
             .mapTo<Delivery>()
             .list()
     }
@@ -91,25 +91,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
         return handle.createQuery(
             """
                 SELECT team.id, team.name, team.is_created, team.assignment FROM team
-                JOIN repo on team.id = repo.team_id
-                JOIN tags on repo.id = tags.repo_id
-                JOIN delivery on tags.delivery_id = delivery.id
-                WHERE delivery_id = :deliveryId and tags.is_delivered = true 
-                """,
-        )
-            .bind("deliveryId", deliveryId)
-            .mapTo<Team>()
-            .list()
-    }
-
-    override fun getTeams(deliveryId: Int): List<Team> {
-        return handle.createQuery(
-            """
-                SELECT team.id, team.name, team.is_created, team.assignment FROM team
-                JOIN repo on team.id = repo.team_id
-                JOIN tags on repo.id = tags.repo_id
-                JOIN delivery on tags.delivery_id = delivery.id
-                WHERE delivery_id = :deliveryId
+                JOIN assignment  on team.assignment = assignment.id
+                JOIN delivery  on assignment.id = delivery.assignment_id
+                WHERE delivery.id = :deliveryId
                 """,
         )
             .bind("deliveryId", deliveryId)

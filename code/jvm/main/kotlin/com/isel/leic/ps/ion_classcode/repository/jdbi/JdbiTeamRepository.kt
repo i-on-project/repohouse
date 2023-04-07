@@ -50,7 +50,8 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
     override fun getStudentsFromTeam(teamId: Int): List<Student> {
         return handle.createQuery(
             """
-            SELECT * FROM student
+            SELECT users.name,users.email,users.id,users.github_username,users.github_id,users.is_created,users.token, school_id  FROM student
+            join users on student.id = users.id
             JOIN student_team on student.id = student_team.student
             WHERE student_team.team = :teamId
             """,

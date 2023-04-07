@@ -6,6 +6,12 @@ import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 
 typealias ClassroomResponse = Either<ClassroomServicesError, ClassroomModel>
@@ -13,6 +19,7 @@ typealias ClassroomArchivedResponse = Either<ClassroomServicesError, ClassroomAr
 typealias ClassroomCreateResponse = Either<ClassroomServicesError, Int>
 typealias ClassroomEnterResponse = Either<ClassroomServicesError, ClassroomModel>
 typealias ClassroomSyncResponse = Either<ClassroomServicesError, Boolean>
+typealias ClassroomLocalCopyResponse = Either<ClassroomServicesError, Boolean>
 
 sealed class ClassroomServicesError {
     object ClasroomNotFound : ClassroomServicesError()
@@ -115,13 +122,45 @@ class ClassroomServices(
     }
 
     suspend fun syncClassroom(classroomId: Int, userId: Int,courseId:Int): ClassroomSyncResponse {
-        return transactionManager.run {
+        val scopeMain = CoroutineScope(Job())
+        val couroutines = mutableListOf<Job>()
+
+        transactionManager.run {
             val assginments = it.assigmentRepository.getAssignmentsByClassroom(classroomId)
             assginments.forEach {assigment ->
                 val deliveries = it.deliveryRepository.getDeliveriesByAssigment(assigment.id)
                 deliveries.forEach { delivery ->
-                    //TODO: Check first from delivery
-                    // deliveryServices.syncDelivery(delivery.id, userId, courseId)
+                    val scope = scopeMain.launch {
+                        deliveryServices.syncDelivery(delivery.id, userId, courseId)
+                    }
+                    couroutines.add(scope)
+                }
+            }
+
+        }
+        couroutines.forEach { scope -> scope.join() }
+        return Either.Right(true)
+    }
+
+    fun localCopy(classroomId: Int,path:String): ClassroomLocalCopyResponse{
+        return transactionManager.run {
+            val classroom = it.classroomRepository.getClassroomById(classroomId)
+                ?: return@run Either.Left(ClassroomServicesError.ClasroomNotFound)
+            it.assigmentRepository.getAssignmentsByClassroom(classroomId).forEach { assigment ->
+                it.deliveryRepository.getDeliveriesByAssigment(assigment.id).forEach { delivery ->
+                    it.deliveryRepository.getTeamsByDelivery(delivery.id).forEach { team ->
+                        it.repoRepository.getReposByTeam(team.id).forEach { repo ->
+                            val directory = "$path\\ClassCode\\${classroom.name}\\${team.name}"
+                            if (File(directory).exists()) {
+                                File(directory).listFiles()?.forEach { file ->
+                                    deleteDirectoryRecursion(file)
+                                }
+                            }
+                            File(directory).mkdirs()
+                            // TODO: If need just folders, user :folder-name
+                            ProcessBuilder("git", "clone", repo.url, directory).start()
+                        }
+                    }
                 }
             }
             Either.Right(true)
@@ -138,5 +177,12 @@ class ClassroomServices(
         } else {
             inviteLink
         }
+    }
+
+    private fun deleteDirectoryRecursion(file: File) {
+        if (file.isDirectory) {
+            file.listFiles()?.forEach { deleteDirectoryRecursion(it) }
+        }
+        file.delete()
     }
 }

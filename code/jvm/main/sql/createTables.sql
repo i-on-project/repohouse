@@ -198,5 +198,14 @@ Create TABLE Outbox(
 
 COMMIT;
 
+
 update users set is_created = true where id = 1;
 
+insert into course (org_url, name) values ('https://github.com/test-project-isel', 'test-project-isel');
+insert into classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id) VALUES ('test-classroom', '2019-01-01 00:00:00', 'https://classroom.github.com/a/1', false, 1, 1);
+insert into assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title) values (3, 2, 2, '2019-01-01 00:00:00', 'test-description', 'test-title');
+insert into team (name, is_created, assignment) values ('gay-squad-no-repository', true, 2);
+insert into repo (name, url,is_created, team_id) values ('gay-squad-no-repository', 'https://github.com/test-project-isel/gay-squad-no-repository',true, 2);
+insert into team (name, is_created, assignment) values ('testPrefix-testRepo', true, 2);
+insert into repo (name, url,is_created, team_id) values ('testPrefix-testRepo','https://github.com/test-project-isel/testPrefix-testRepo', true, 3);
+insert into delivery (due_date, tag_control, assignment_id) values ('2019-01-01 00:00:00', 'test-tag-control', 2);

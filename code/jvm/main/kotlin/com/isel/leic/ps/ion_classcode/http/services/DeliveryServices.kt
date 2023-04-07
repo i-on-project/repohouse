@@ -5,12 +5,10 @@ import com.isel.leic.ps.ion_classcode.domain.Tags
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
 import com.isel.leic.ps.ion_classcode.domain.input.TagInput
 import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryModel
-import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryOutputModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 
@@ -33,7 +31,6 @@ class DeliveryServices(
     val transactionManager: TransactionManager,
     val githubServices: GithubServices
 ) {
-    // TODO: syncDelivery
     fun createDelivery(deliveryInfo: DeliveryInput, userId: Int): DeliveryCreatedResponse {
         if (
             deliveryInfo.assigmentId > 0 &&
@@ -62,9 +59,9 @@ class DeliveryServices(
             } else {
                 val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
                 val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
-                val teams = it.deliveryRepository.getTeams(deliveryId = deliveryId)
+                val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
                 Either.Right(
-                    DeliveryOutputModel(
+                    DeliveryModel(
                         delivery = delivery,
                         teamsDelivered = teamsDelivered,
                         teams.filter { team -> team.id !in teamsDeliveredIds },
@@ -118,48 +115,62 @@ class DeliveryServices(
 
         transactionManager.run {
             val delivery = it.deliveryRepository.getDeliveryById(deliveryId) ?: return@run Either.Left(DeliveryServicesError.DeliveryNotFound)
-            val teacher = it.usersRepository.getTeacher(userId) ?: return@run Either.Left(DeliveryServicesError.NotTeacher)
-            val teacherToken = teacher.token
+            val teacherToken = it.usersRepository.getTeacherGithubToken(userId) ?: return@run Either.Left(DeliveryServicesError.NotTeacher)
             val course = it.courseRepository.getCourse(courseId) ?: return@run Either.Left(DeliveryServicesError.CourseNotFound)
             val courseName = course.name
-            it.deliveryRepository.getTeamsByDelivery(deliveryId).forEach { teamId ->
-                val repo = it.repoRepository.getReposByTeam(teamId).first() //TODO: Check if there is only one repo
-                val studentsList = it.teamRepository.getStudentsFromTeam(teamId)
+            val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId)
+            teams.forEach { team->
+                val repo = it.repoRepository.getReposByTeam(team.id).first() //TODO: Check if there is only one repo
+                val studentsList = it.teamRepository.getStudentsFromTeam(team.id)
                 val tagsList = it.tagRepository.getTagsByDelivery(deliveryId)
+                var studentsToAdd =listOf<Collaborator>()
+                var studentsToRemove = listOf<Student>()
+                var tagsToAdd = listOf<Tag>()
+
+
                 val scope = scopeMain.launch {
                     val githubTruth = githubServices.getRepository(repo.name, teacherToken, courseName)
 
-                    val studentsToAdd:List<Student> = studentsList.filter { student ->
-                        githubTruth.collaborators.filter { collaborator -> !collaborator.permissions.admin }.map { collaborator -> collaborator.id }.contains(student.githubId.toInt())
-                    }
-                    val studentsToRemove:List<Student>  = studentsList.filter { student ->
-                        !githubTruth.collaborators.filter { collaborator -> !collaborator.permissions.admin }.map { collaborator -> collaborator.id }.contains(student.githubId.toInt())
+                    studentsToAdd = githubTruth.collaborators.filter { collaborator ->
+                        !studentsList.map { student -> student.githubId.toInt() }.contains(collaborator.id)
+                                && !collaborator.permissions.admin
                     }
 
-                    val tagsToAdd:List<Tags> = tagsList.filter { tag ->
-                        !githubTruth.tags.map { githubTag -> githubTag.name }.contains(tag.name)
+                    studentsToRemove = studentsList.filter { student ->
+                        !githubTruth.collaborators.filter { collaborator -> !collaborator.permissions.admin }
+                            .map { collaborator -> collaborator.id }.contains(student.githubId.toInt())
                     }
 
-                    studentsToAdd.forEach { student ->
-                        it.teamRepository.enterTeam(teamId,student.id)
-                    }
-
-                    studentsToRemove.forEach { student ->
-                        it.teamRepository.leaveTeam(teamId,student.id)
-                    }
-
-                    tagsToAdd.forEach { tag ->
-                        val isDelivered = tag.tagDate.before(delivery.dueDate) && tag.name.startsWith(delivery.tagControl)
-                        it.tagRepository.createTag(TagInput(tag.name,isDelivered,tag.tagDate,deliveryId, repo.id))
+                    tagsToAdd = githubTruth.tags.filter { githubTag ->
+                        !tagsList.map { tag -> tag.name }.contains(githubTag.name)
                     }
                 }
+
                 couroutines.add(scope)
+
                 scope.invokeOnCompletion {
-                    couroutines.remove(scope)
+                    transactionManager.run {
+                        studentsToAdd.forEach { studentGithub ->
+                            val student = it.usersRepository.getUserByGithubId(studentGithub.id.toLong())
+                            if (student != null && student is Student) {
+                                it.teamRepository.enterTeam(team.id, student.id)
+                            }
+                            //TODO: else create student ????
+                        }
+
+                        studentsToRemove.forEach { student ->
+                            it.teamRepository.leaveTeam(team.id, student.id)
+                        }
+
+                        tagsToAdd.forEach { tag ->
+                            val isDelivered = tag.date.before(delivery.dueDate) && tag.name.startsWith(delivery.tagControl)
+                            it.tagRepository.createTag(TagInput(tag.name, isDelivered, tag.date, deliveryId, repo.id))
+                        }
+                    }
                 }
+
             }
         }
-
         couroutines.forEach { it.join() }
 
         //TODO: Update last sync date

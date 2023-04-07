@@ -39,7 +39,7 @@ class DeliveryRepositoryTests {
     fun `can get list of deliveries using assignmentId`() = testWithHandleAndRollback { handle ->
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
         val assignmentId = 1
-        val list = deliveryRepository.getDeliveriesByAssigment(assignmentId = assignmentId)
+        val list = deliveryRepository.getDeliveriesByAssigment(assigmentId = assignmentId)
         assert(list.size == 2)
     }
 
@@ -70,7 +70,7 @@ class DeliveryRepositoryTests {
     fun `can get teams a delivery`() = testWithHandleAndRollback { handle ->
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
         val deliveryId = 1
-        val teams = deliveryRepository.getTeams(deliveryId = deliveryId)
+        val teams = deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
         assert(teams.size == 2)
     }
 
