@@ -65,4 +65,20 @@ class DeliveryRepositoryTests {
         val delivery = deliveryRepository.getDeliveryById(deliveryId = deliveryId) ?: fail("Delivery not found")
         assert(delivery.tagControl == newTag)
     }
+
+    @Test
+    fun `can get teams a delivery`() = testWithHandleAndRollback { handle ->
+        val deliveryRepository = JdbiDeliveryRepository(handle = handle)
+        val deliveryId = 1
+        val teams = deliveryRepository.getTeams(deliveryId = deliveryId)
+        assert(teams.size == 2)
+    }
+
+    @Test
+    fun `can get teams that have already delivered`() = testWithHandleAndRollback { handle ->
+        val deliveryRepository = JdbiDeliveryRepository(handle = handle)
+        val deliveryId = 1
+        val teams = deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
+        assert(teams.size == 1)
+    }
 }

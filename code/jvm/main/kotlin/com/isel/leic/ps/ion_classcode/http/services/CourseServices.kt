@@ -50,9 +50,9 @@ class CourseServices(
         return transactionManager.run {
             if (it.usersRepository.getTeacher(courseInfo.teacherId) == null) Either.Left(CourseServicesError.NotTeacher)
             if (courseInfo.orgUrl.isEmpty() || courseInfo.name.isEmpty()) Either.Left(CourseServicesError.InvalidInput)
-            val courseOrg = it.courseRepository.getCourseByOrg(courseInfo.orgUrl)
-            val id = if (courseOrg != null) {
-                it.courseRepository.addTeacherToCourse(courseInfo.teacherId, courseInfo.orgUrl)
+            val courseByOrg = it.courseRepository.getCourseByOrg(courseInfo.orgUrl)
+            val id = if (courseByOrg != null) {
+                return@run Either.Right(it.courseRepository.addTeacherToCourse(teacherId = courseInfo.teacherId, courseId = courseByOrg.id))
             } else {
                 it.courseRepository.createCourse(
                     CourseInput(
@@ -75,7 +75,7 @@ class CourseServices(
         return transactionManager.run {
             if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
             if (it.usersRepository.getTeacher(userId) == null) Either.Left(CourseServicesError.NotTeacher)
-            val courses = it.courseRepository.getAllTeacherCourses(userId)
+            val courses = it.courseRepository.getAllUserCourses(userId = userId)
             Either.Right(
                 courses.map { course ->
                     val teachers = it.courseRepository.getCourseTeachers(course.id)
@@ -89,7 +89,7 @@ class CourseServices(
         return transactionManager.run {
             if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
             if (it.usersRepository.getStudent(userId) == null) Either.Left(CourseServicesError.NotStudent)
-            val courses = it.courseRepository.getAllStudentCourses(userId)
+            val courses = it.courseRepository.getAllUserCourses(userId = userId)
             Either.Right(
                 courses.map { course ->
                     val teachers = it.courseRepository.getCourseTeachers(course.id)
@@ -121,7 +121,7 @@ class CourseServices(
         return transactionManager.run {
             if (it.courseRepository.getCourse(courseId) == null) Either.Left(CourseServicesError.CourseNotFound)
             if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
-            if (!it.courseRepository.isUserInCourse(userId, courseId)) Either.Left(CourseServicesError.UserNotInCourse)
+            if (!it.courseRepository.isStudentInCourse(userId, courseId)) Either.Left(CourseServicesError.UserNotInCourse)
             val course = it.courseRepository.leaveCourse(courseId, userId)
             Either.Right(course)
         }

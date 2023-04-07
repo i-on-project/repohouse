@@ -50,13 +50,14 @@ class DeliveryServices(
             if (delivery == null) {
                 Either.Left(DeliveryServicesError.DeliveryNotFound)
             } else {
-                val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId)
-                val teams = it.teamRepository.getTeamsFromAssignment(delivery.assignmentId)
+                val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
+                val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
+                val teams = it.deliveryRepository.getTeams(deliveryId = deliveryId)
                 Either.Right(
                     DeliveryOutputModel(
-                        delivery,
-                        teams.filter { team -> team.id in teamsDelivered },
-                        teams.filter { team -> team.id !in teamsDelivered },
+                        delivery = delivery,
+                        teamsDelivered = teamsDelivered,
+                        teams.filter { team -> team.id !in teamsDeliveredIds },
                     ),
                 )
             }

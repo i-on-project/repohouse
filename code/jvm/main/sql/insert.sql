@@ -13,6 +13,8 @@ INSERT INTO users (email, is_created, github_username, github_id, token, name)
 VALUES ('test4@alunos.isel.pt', false, 'test12345a', 12341527, 'token4', 'student3');
 INSERT INTO users (email, is_created, github_username, github_id, token, name)
 VALUES ('test7@alunos.isel.pt', false, 'test123as', 1234187, 'token7', 'teacher3');
+INSERT INTO users (email, is_created, github_username, github_id, token, name)
+VALUES ('test8@alunos.isel.pt', false, 'test1aa23as', 12341837, 'token8', 'teacher4');
 
 INSERT INTO teacher (id, github_token)
 VALUES (1, 'token');
@@ -20,6 +22,8 @@ INSERT INTO teacher (id, github_token)
 VALUES (2, 'token1');
 INSERT INTO teacher (id, github_token)
 VALUES (6, 'token2');
+INSERT INTO teacher (id, github_token)
+VALUES (7, 'token3');
 
 INSERT INTO student (id, school_id)
 VALUES (3, 1234);
@@ -35,6 +39,17 @@ INSERT INTO course (org_url, name)
 VALUES ('https://daw1.isel.pt', 'DAW2');
 INSERT INTO course (org_url, name)
 VALUES ('https://daw3.isel.pt', 'DAW3');
+
+INSERT INTO teacher_course (teacher, course)
+VALUES (1, 1);
+INSERT INTO teacher_course (teacher, course)
+VALUES (2, 1);
+INSERT INTO teacher_course (teacher, course)
+VALUES (6, 1);
+INSERT INTO teacher_course (teacher, course)
+VALUES (1, 2);
+INSERT INTO teacher_course (teacher, course)
+VALUES (2, 2);
 
 INSERT INTO classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
 VALUES ('DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/a/123', false, 1, 1);
@@ -85,12 +100,12 @@ VALUES ('description2', 'label2', 1);
 INSERT INTO repo (name, url, is_created, team_id)
 VALUES ('repo1', 'https://repo.github.com/a/123', false, 1);
 INSERT INTO repo (name, url, is_created, team_id)
-VALUES ('repo2', 'https://repo.github.com/ab/123', false, 1);
+VALUES ('repo2', 'https://repo.github.com/ab/123', false, 2);
 INSERT INTO repo (name, url, is_created, team_id)
-VALUES ('repo3', 'https://repo.github.com/abc/123', false, 1);
+VALUES ('repo3', 'https://repo.github.com/abc/123', false, 3);
 
 INSERT INTO tags (name, is_delivered, tag_date, delivery_id, repo_id)
-VALUES ('tag1', false, CURRENT_TIMESTAMP, 1, 1);
+VALUES ('tag1', true, CURRENT_TIMESTAMP, 1, 1);
 INSERT INTO tags (name, is_delivered, tag_date, delivery_id, repo_id)
 VALUES ('tag2', false, CURRENT_TIMESTAMP, 1, 1);
 INSERT INTO tags (name, is_delivered, tag_date, delivery_id, repo_id)
@@ -215,3 +230,8 @@ INSERT INTO request(creator, composite, state)
 VALUES (4, 16, 'Pending');
 
 COMMIT;
+
+SELECT classroom.id FROM classroom
+    INNER JOIN course ON course.id = classroom.course_id
+    INNER JOIN student_course ON student_course.course = course.id
+WHERE student_course.student = 3 AND course.id = 2

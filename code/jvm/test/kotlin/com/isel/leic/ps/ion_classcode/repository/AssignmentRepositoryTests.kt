@@ -91,4 +91,12 @@ class AssignmentRepositoryTests {
         val assignment = assignmentRepo.getAssignmentById(assignmentId = assignmentId) ?: fail("Assignment not found")
         assert(assignment.maxElemsPerGroup == newElementsMax)
     }
+
+    @Test
+    fun `can get all the assignments for a classroom`() = testWithHandleAndRollback { handle ->
+        val assignmentRepo = JdbiAssignmentRepository(handle = handle)
+        val classroomId = 1
+        val assignments = assignmentRepo.getAssignmentsByClassroom(classroomId = classroomId)
+        assert(assignments.size == 3)
+    }
 }

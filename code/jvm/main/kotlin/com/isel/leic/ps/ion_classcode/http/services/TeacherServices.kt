@@ -23,7 +23,7 @@ class TeacherServices(
 
     fun getCourses(teacherId: Int): TeacherCoursesResponse {
         return transactionManager.run {
-            val courses = it.courseRepository.getAllTeacherCourses(teacherId)
+            val courses = it.courseRepository.getAllUserCourses(userId = teacherId)
             Either.Right(courses)
         }
     }

@@ -12,14 +12,13 @@ interface CourseRepository {
     fun enterCourse(courseId: Int, studentId: Int): Course
     fun leaveCourse(courseId: Int, studentId: Int): Course
     fun archiveCourse(courseId: Int)
-    fun addTeacherToCourse(teacherId: Int, courseOrgUrl: String): Int
+    fun addTeacherToCourse(teacherId: Int, courseId: Int): Course
     fun getCourseTeachers(courseId: Int): List<Teacher>
     fun getCourseClassrooms(courseId: Int): List<Classroom>
-    fun getAllTeacherCourses(teacherId: Int): List<Course>
-    fun getAllStudentCourses(studentId: Int): List<Course>
+    fun getAllUserCourses(userId: Int): List<Course>
     fun getStudentInCourse(courseId: Int): List<Student>
     fun getCourse(courseId: Int): Course?
     fun getCourseByOrg(orgUrl: String): Course?
     fun getCourseByName(name: String): Course?
-    fun isUserInCourse(userId: Int, courseId: Int): Boolean
+    fun isStudentInCourse(studentId: Int, courseId: Int): Boolean
 }

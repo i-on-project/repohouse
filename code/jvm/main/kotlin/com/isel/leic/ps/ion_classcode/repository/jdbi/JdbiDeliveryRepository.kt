@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Delivery
+import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
 import org.jdbi.v3.core.Handle
@@ -86,10 +87,10 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .execute()
     }
 
-    override fun getTeamsByDelivery(deliveryId: Int): List<Int> {
+    override fun getTeamsByDelivery(deliveryId: Int): List<Team> {
         return handle.createQuery(
             """
-                SELECT team.id FROM team
+                SELECT team.id, team.name, team.is_created, team.assignment FROM team
                 JOIN repo on team.id = repo.team_id
                 JOIN tags on repo.id = tags.repo_id
                 JOIN delivery on tags.delivery_id = delivery.id
@@ -97,7 +98,22 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
                 """,
         )
             .bind("deliveryId", deliveryId)
-            .mapTo<Int>()
+            .mapTo<Team>()
+            .list()
+    }
+
+    override fun getTeams(deliveryId: Int): List<Team> {
+        return handle.createQuery(
+            """
+                SELECT team.id, team.name, team.is_created, team.assignment FROM team
+                JOIN repo on team.id = repo.team_id
+                JOIN tags on repo.id = tags.repo_id
+                JOIN delivery on tags.delivery_id = delivery.id
+                WHERE delivery_id = :deliveryId
+                """,
+        )
+            .bind("deliveryId", deliveryId)
+            .mapTo<Team>()
             .list()
     }
 }

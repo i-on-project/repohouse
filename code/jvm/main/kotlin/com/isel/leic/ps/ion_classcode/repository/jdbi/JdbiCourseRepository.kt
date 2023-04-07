@@ -4,30 +4,31 @@ import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
+import com.isel.leic.ps.ion_classcode.domain.dto.CourseDTO
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
+
     override fun createCourse(course: CourseInput): Course {
         val id = handle.createUpdate(
             """
-            INSERT INTO Course (name, org_url, teacher_id)
-            VALUES (:name,:org_url,:teacher_id)
+            INSERT INTO Course (name, org_url)
+            VALUES (:name,:org_url)
             RETURNING id
             """,
         )
             .bind("name", course.name)
             .bind("org_url", course.orgUrl)
-            .bind("teacher_id", course.teacherId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
         val teacher = handle.createQuery(
             """
-                SELECT * FROM Teacher
-                WHERE id = :teacher_id
+                SELECT u.name, u.email, t.id, u.github_username, u.github_id, u.token, u.is_created FROM Teacher as t JOIN users u on t.id = u.id
+                WHERE t.id = :teacher_id
             """,
         )
             .bind("teacher_id", course.teacherId)
@@ -58,15 +59,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("course_id", courseId)
             .execute()
 
-        return handle.createQuery(
-            """
-                SELECT * FROM Course
-                WHERE id = :course_id
-            """,
-        )
-            .bind("course_id", courseId)
-            .mapTo<Course>()
-            .first()
+        return getTheCourse(courseId = courseId)
     }
 
     override fun leaveCourse(courseId: Int, studentId: Int): Course {
@@ -80,15 +73,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("course_id", courseId)
             .execute()
 
-        return handle.createQuery(
-            """
-                SELECT * FROM Course
-                WHERE id = :course_id
-            """,
-        )
-            .bind("course_id", courseId)
-            .mapTo<Course>()
-            .first()
+        return getTheCourse(courseId = courseId)
     }
 
     override fun archiveCourse(courseId: Int) {
@@ -113,7 +98,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .execute()
     }
 
-    override fun addTeacherToCourse(teacherId: Int, courseOrgUrl: String): Int {
+    override fun addTeacherToCourse(teacherId: Int, courseId: Int): Course {
         handle.createUpdate(
             """
             INSERT INTO teacher_course (teacher,course)
@@ -121,33 +106,34 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             """,
         )
             .bind("teacher_id", teacherId)
-            .bind("course_id", courseOrgUrl)
+            .bind("course_id", courseId)
             .execute()
 
-        return handle.createQuery(
-            """
-                SELECT id FROM Course
-                WHERE org_url = :course_org_url
-            """,
-        )
-            .bind("course_org_url", courseOrgUrl)
-            .mapTo<Int>()
-            .first()
+        return getTheCourse(courseId = courseId)
     }
 
     override fun getCourseTeachers(courseId: Int): List<Teacher> {
-        return handle.createQuery(
+        val teachersIds = handle.createQuery(
             """
-                SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
-                JOIN users on teacher.id = users.id
-                JOIN teacher_course on teacher.id = teacher_course.teacher
-                LEFT JOIN teacher_course on teacher.id = teacher_course.teacher
-                WHERE teacher_course.course = :course_id
+            SELECT teacher FROM teacher_course
+            WHERE course = :course_id
             """,
         )
             .bind("course_id", courseId)
-            .mapTo<Teacher>()
+            .mapTo<Int>()
             .list()
+        return teachersIds.map { id ->
+            handle.createQuery(
+                """
+                SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+                JOIN users on teacher.id = users.id
+                WHERE teacher.id = :teacher_id
+                """,
+            )
+                .bind("teacher_id", id)
+                .mapTo<Teacher>()
+                .first()
+        }
     }
 
     override fun getCourseClassrooms(courseId: Int): List<Classroom> {
@@ -162,28 +148,33 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .list()
     }
 
-    override fun getAllTeacherCourses(teacherId: Int): List<Course> {
-        return handle.createQuery(
+    override fun getAllUserCourses(userId: Int): List<Course> {
+        val dto = handle.createQuery(
             """
-            SELECT id, org_url, name, teacher_course FROM Course JOIN teacher_course ON Course.id = teacher_course.course
-            WHERE teacher = :teacher_id
+            SELECT id, org_url, name, (
+                SELECT array(SELECT teacher FROM teacher_course WHERE course = Course.id) as teachers
+                ), is_archived FROM teacher_course JOIN course ON course.id = teacher_course.course
+                WHERE teacher_course.teacher = :teacher_id
             """,
         )
-            .bind("teacher_id", teacherId)
-            .mapTo<Course>()
+            .bind("teacher_id", userId)
+            .mapTo<CourseDTO>()
             .list()
-    }
-
-    override fun getAllStudentCourses(studentId: Int): List<Course> {
-        return handle.createQuery(
-            """
-            SELECT id,org_url,name FROM Course JOIN student_course ON Course.id = student_course.course
-            WHERE student = :student_id
-            """,
-        )
-            .bind("student_id", studentId)
-            .mapTo<Course>()
-            .list()
+        return dto.map { courseTemp ->
+            val teachers = courseTemp.teachers.map { teacherId ->
+                handle.createQuery(
+                    """
+                    SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+                    JOIN users on teacher.id = users.id
+                    WHERE teacher.id = :teacher_id
+                    """,
+                )
+                    .bind("teacher_id", teacherId)
+                    .mapTo<Teacher>()
+                    .first()
+            }
+            Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, isArchived = courseTemp.isArchived)
+        }
     }
 
     override fun getStudentInCourse(courseId: Int): List<Student> {
@@ -199,52 +190,92 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     }
 
     override fun getCourse(courseId: Int): Course? {
-        return handle.createQuery(
+        val dto = handle.createQuery(
             """
-            SELECT * FROM course 
+            SELECT c.id, c.org_url, c.name, (
+            SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
+            ), is_archived
+            FROM course AS c
             WHERE id = :course_id
             """,
         )
             .bind("course_id", courseId)
-            .mapTo<Course>()
-            .firstOrNull()
+            .mapTo<CourseDTO>()
+            .firstOrNull() ?: return null
+        val teachers = dto.teachers.map { teacherId ->
+            handle.createQuery(
+                """
+                SELECT u.name, email, u.id, github_username, github_id, is_created, github_token,token FROM Teacher as t
+                JOIN users as u on t.id = u.id
+                WHERE t.id = :teacher_id
+                """,
+            )
+                .bind("teacher_id", teacherId)
+                .mapTo<Teacher>()
+                .first()
+        }
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
     }
 
     override fun getCourseByOrg(orgUrl: String): Course? {
-        return handle.createQuery(
+        val dto = handle.createQuery(
             """
-            SELECT * FROM course 
-            WHERE org_url = :orgUrl
-            """,
+                SELECT c.id, c.org_url, c.name, (
+                SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
+                ), is_archived
+                FROM course AS c
+                WHERE org_url = :orgUrl
+                """,
         )
             .bind("orgUrl", orgUrl)
-            .mapTo<Course>()
-            .firstOrNull()
+            .mapTo<CourseDTO>()
+            .firstOrNull() ?: return null
+        val teachers = getCourseTeachers(courseId = dto.id)
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
     }
 
     override fun getCourseByName(name: String): Course? {
-        return handle.createQuery(
+        val dto = handle.createQuery(
             """
-            SELECT * FROM course 
-            WHERE name = :name
-            """,
+                SELECT c.id, c.org_url, c.name, (
+                SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
+                ), is_archived
+                FROM course AS c
+                WHERE name = :name
+                """,
         )
             .bind("name", name)
-            .mapTo<Course>()
-            .firstOrNull()
+            .mapTo<CourseDTO>()
+            .firstOrNull() ?: return null
+        val teachers = getCourseTeachers(courseId = dto.id)
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
     }
 
-    override fun isUserInCourse(userId: Int, courseId: Int): Boolean {
-        val student = handle.createQuery(
+    override fun isStudentInCourse(studentId: Int, courseId: Int): Boolean =
+        handle.createQuery(
             """
             SELECT student FROM student_course 
             WHERE student = :studentId AND course = :courseId
             """,
         )
-            .bind("student", userId)
-            .bind("course", courseId)
+            .bind("studentId", studentId)
+            .bind("courseId", courseId)
             .mapTo<Int>()
-            .firstOrNull()
-        return student != null
+            .firstOrNull() != null
+    private fun getTheCourse(courseId: Int): Course {
+        val dto = handle.createQuery(
+            """
+                SELECT c.id, c.org_url, c.name, (
+                SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
+                ), is_archived
+                FROM course AS c
+                WHERE id = :course_id
+                """,
+        )
+            .bind("course_id", courseId)
+            .mapTo<CourseDTO>()
+            .first()
+        val teachers = getCourseTeachers(courseId = dto.id)
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
     }
 }

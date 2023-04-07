@@ -16,7 +16,7 @@ interface ClassroomRepository {
     fun getStudentClassroomId(courseId: Int, studentId: Int): Int?
     fun getClassroomInviteLink(classroomId: Int): String?
     fun getClassroomByInviteLink(inviteLink: String): Classroom?
-    fun getStudentsByClassroom(clasroomId: Int): List<Student>
+    fun getStudentsByClassroom(classroomId: Int): List<Student>
     fun addStudentToClassroom(classroomId: Int, studentId: Int)
     fun getAllInviteLinks(): List<String>
 }

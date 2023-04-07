@@ -21,7 +21,7 @@ class StudentServices(
 
     fun getCourses(studentId: Int): StudentCoursesResponse {
         return transactionManager.run {
-            val courses = it.courseRepository.getAllStudentCourses(studentId)
+            val courses = it.courseRepository.getAllUserCourses(userId = studentId)
             Either.Right(courses)
         }
     }

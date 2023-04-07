@@ -124,7 +124,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .mapTo<Classroom>()
             .firstOrNull()
     }
-    override fun getStudentsByClassroom(clasroomId: Int): List<Student> {
+    override fun getStudentsByClassroom(classroomId: Int): List<Student> {
         return handle.createQuery(
             """
             SELECT name, email, Users.id, github_username, github_id, is_created, school_id,token FROM Student
@@ -134,7 +134,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             WHERE classroom.id = :classroom_id
             """,
         )
-            .bind("classroom_id", clasroomId)
+            .bind("classroom_id", classroomId)
             .mapTo<Student>()
             .list()
     }
