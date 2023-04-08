@@ -7,8 +7,6 @@ import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -128,7 +126,7 @@ class ClassroomServices(
         transactionManager.run {
             val assginments = it.assigmentRepository.getAssignmentsByClassroom(classroomId)
             assginments.forEach {assigment ->
-                val deliveries = it.deliveryRepository.getDeliveriesByAssigment(assigment.id)
+                val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assigment.id)
                 deliveries.forEach { delivery ->
                     val scope = scopeMain.launch {
                         deliveryServices.syncDelivery(delivery.id, userId, courseId)
@@ -147,7 +145,7 @@ class ClassroomServices(
             val classroom = it.classroomRepository.getClassroomById(classroomId)
                 ?: return@run Either.Left(ClassroomServicesError.ClasroomNotFound)
             it.assigmentRepository.getAssignmentsByClassroom(classroomId).forEach { assigment ->
-                it.deliveryRepository.getDeliveriesByAssigment(assigment.id).forEach { delivery ->
+                it.deliveryRepository.getDeliveriesByAssignment(assigment.id).forEach { delivery ->
                     it.deliveryRepository.getTeamsByDelivery(delivery.id).forEach { team ->
                         it.repoRepository.getReposByTeam(team.id).forEach { repo ->
                             val directory = "$path\\ClassCode\\${classroom.name}\\${team.name}"

@@ -5,7 +5,6 @@ import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentModel
-import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentOutputModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
@@ -67,7 +66,7 @@ class AssigmentServices(
             if (assigment == null) {
                 Either.Left(AssigmentServicesError.AssigmentNotFound)
             } else {
-                val deliveries = it.deliveryRepository.getDeliveriesByAssigment(assigmentId)
+                val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assigmentId)
                 val teams = it.teamRepository.getTeamsFromAssignment(assigmentId)
                 Either.Right(AssigmentModel(assigment, deliveries, teams))
             }
@@ -88,7 +87,7 @@ class AssigmentServices(
                     Either.Left(AssigmentServicesError.ClassroomArchived)
                 }
 
-                if (it.deliveryRepository.getDeliveriesByAssigment(assigmentId).isNotEmpty()) {
+                if (it.deliveryRepository.getDeliveriesByAssignment(assigmentId).isNotEmpty()) {
                     Either.Left(
                         AssigmentServicesError.AssigmentNotDeleted,
                     )

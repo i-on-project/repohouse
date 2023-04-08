@@ -48,7 +48,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .firstOrNull()
     }
 
-    override fun getDeliveriesByAssigment(assigmentId: Int): List<Delivery> {
+    override fun getDeliveriesByAssignment(assignmentId: Int): List<Delivery> {
         return handle.createQuery(
             """
                 SELECT * FROM DELIVERY
@@ -56,7 +56,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
                 ORDER BY due_date
                 """,
         )
-            .bind("assigmentId", assigmentId)
+            .bind("assigmentId", assignmentId)
             .mapTo<Delivery>()
             .list()
     }
