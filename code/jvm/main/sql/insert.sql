@@ -77,6 +77,8 @@ INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, re
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description1', 'title1');
 INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description2', 'title2');
+INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (2, 2, 3, CURRENT_TIMESTAMP, 'description3', 'title3');
 
 INSERT INTO team (name, is_created, assignment)
 VALUES ('team1', false, 1);

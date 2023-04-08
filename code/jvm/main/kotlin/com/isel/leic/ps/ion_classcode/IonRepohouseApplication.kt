@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.isel.leic.ps.ion_classcode.http.pipeline.AuthenticationInterceptor
 import com.isel.leic.ps.ion_classcode.http.pipeline.LoggerFilter
-import com.isel.leic.ps.ion_classcode.repository.jdbi.configure
 import com.isel.leic.ps.ion_classcode.http.pipeline.UserArgumentResolver
+import com.isel.leic.ps.ion_classcode.repository.jdbi.configure
 import okhttp3.OkHttpClient
 import org.jdbi.v3.core.Jdbi
 import org.postgresql.ds.PGSimpleDataSource
@@ -30,7 +30,7 @@ class IonClassCodeApplication : WebMvcConfigurer {
     fun jdbi() = Jdbi.create(
         PGSimpleDataSource().apply {
             setURL(System.getenv(DATABASE_URL))
-        }
+        },
     ).configure()
 
     @Bean
@@ -43,7 +43,6 @@ class IonClassCodeApplication : WebMvcConfigurer {
 
     @Bean
     fun getLogger(): Logger = LoggerFactory.getLogger(LoggerFilter::class.java)
-
 }
 
 @Configuration
@@ -55,7 +54,6 @@ class PipelineConfigurer(
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authenticationInterceptor)
     }
-
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(userArgumentResolver)

@@ -26,7 +26,7 @@ class ClassroomRepositoryTests {
     @Test
     fun `can delete classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
-        val classroomId = 2
+        val classroomId = 3
         classroomRepo.deleteClassroom(classroomId = classroomId)
     }
 
@@ -116,7 +116,7 @@ class ClassroomRepositoryTests {
     fun `can add a student in a classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
         val classroomId = 1
-        val studentId = 5
+        val studentId = 8
         classroomRepo.addStudentToClassroom(classroomId = classroomId, studentId = studentId)
     }
 

@@ -79,6 +79,6 @@ class DeliveryRepositoryTests {
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
         val deliveryId = 1
         val teams = deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
-        assert(teams.size == 1)
+        assert(teams.size == 2)
     }
 }
