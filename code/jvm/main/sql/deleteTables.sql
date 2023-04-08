@@ -29,5 +29,3 @@ DELETE FROM Users;
 
 COMMIT TRANSACTION;
 
-
-update request set state = 'Accepted' where id=1;

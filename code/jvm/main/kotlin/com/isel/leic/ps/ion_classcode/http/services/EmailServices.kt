@@ -22,7 +22,7 @@ class EmailService {
     companion object {
         private val SENDGRID_API_KEY: String = System.getenv("SENDGRID_CLASSCODE_API_KEY")
         val sendGrid = SendGrid(SENDGRID_API_KEY)
-        val FROM = Email("ricardo.freitas.henriques@gmail.com")
+        val FROM = Email("i-on-classcode@outlook.pt")
         const val SUBJECT = "i-on ClassCode - OTP"
         const val CONTENT_TYPE = "text/plain"
         const val ENDPOINT = "mail/send"
@@ -38,15 +38,15 @@ class EmailService {
         )
         val mail = Mail(FROM, SUBJECT, to, content)
         val request = Request()
-        try {
+        return try {
             request.method = Method.POST
             request.baseUri = BASE_URI
             request.endpoint = ENDPOINT
             request.body = mail.build()
 
-            return Either.Right(sendGrid.api(request))
+            Either.Right(sendGrid.api(request))
         } catch (ex: IOException) {
-            return Either.Left(EmailServiceError.SendEmailError)
+            Either.Left(EmailServiceError.SendEmailError)
         }
     }
 }

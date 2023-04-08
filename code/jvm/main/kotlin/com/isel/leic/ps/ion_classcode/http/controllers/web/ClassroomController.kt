@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController
 class ClassroomController(
     private val classroomServices: ClassroomServices
 ) {
-    // TODO: syncClassroom : be the last thing to do
 
     @GetMapping(Uris.CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun getClassroom(
@@ -46,6 +45,7 @@ class ClassroomController(
                     link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher && !classroom.value.isArchived) {
+                    link(rel = LinkRelation("local-copy"), href = Uris.localCopyUri(courseId, classroomId), needAuthentication = true)
                     action(name = "create-assigment", href = Uris.createAssigmentUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "edit-classroom", href = Uris.editClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "sync-classroom", href = Uris.syncClassroomUri(courseId,classroomId), method = HttpMethod.POST, type = "application/json", block = {})
@@ -151,6 +151,22 @@ class ClassroomController(
                     clazz("classroom")
                     link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
                 }
+            }
+        }
+    }
+
+    @GetMapping(Uris.LOCAL_COPY_PATH)
+    fun localCopy(
+        user: User,
+        @PathVariable classroomId: Int,
+        @PathVariable courseId: Int,
+    ):ResponseEntity<*>{
+        if (user !is Teacher) return Problem.notTeacher
+        return when(val localCopy = classroomServices.localCopy(classroomId,"C:\\Users\\ricar\\OneDrive\\Documentos")){
+            is Either.Left -> problem(localCopy.value)
+            is Either.Right -> siren("oi"){
+                clazz("classroom")
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
             }
         }
     }

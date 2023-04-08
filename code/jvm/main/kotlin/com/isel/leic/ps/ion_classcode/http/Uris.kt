@@ -41,7 +41,7 @@ object Uris {
     const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assigments"
     const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assigmentId}"
     const val CREATE_ASSIGMENT_PATH = "$ASSIGMENTS_PATH/create"
-    const val DELIVERYS_PATH = "$ASSIGMENT_PATH/deliverys"
+    const val DELIVERYS_PATH = "$ASSIGMENT_PATH/deliveries"
     const val DELIVERY_PATH = "$DELIVERYS_PATH/{deliveryId}"
     const val CREATE_DELIVERY_PATH = "$DELIVERYS_PATH/create"
     const val DELETE_ASSIGMENT_PATH = "$ASSIGMENT_PATH/delete"
@@ -52,6 +52,7 @@ object Uris {
     const val EXIT_TEAM_PATH = "$TEAM_PATH/exit"
     const val EDIT_DELIVERY_PATH = "$DELIVERY_PATH/edit"
     const val SYNC_DELIVERY_PATH = "$DELIVERY_PATH/sync"
+    const val LOCAL_COPY_PATH = "$CLASSROOM_PATH/copy"
     const val TEAM_REQUESTS_PATH = "$TEAM_PATH/requests"
     const val TEAM_CHANGE_REQUEST_PATH = "$TEAM_REQUESTS_PATH/{requestId}"
     const val POST_FEEDBACK_PATH = "$TEAM_PATH/feedback"
@@ -102,6 +103,7 @@ object Uris {
     fun teamChangeStatusRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int,requestId:Int): URI = UriTemplate(
         TEAM_CHANGE_REQUEST_PATH).expand(courseId, classroomId, assigmentId, teamId,requestId)
     fun postFeedbackUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(POST_FEEDBACK_PATH).expand(courseId, classroomId, assigmentId, teamId)
+    fun localCopyUri(courseId: Int, classroomId: Int): URI = UriTemplate(LOCAL_COPY_PATH).expand(courseId, classroomId)
 
     /** Mobile Uris **/
 

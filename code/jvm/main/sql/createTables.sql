@@ -197,4 +197,3 @@ Create TABLE Outbox(
 );
 
 COMMIT;
-
