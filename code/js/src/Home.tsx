@@ -1,0 +1,62 @@
+import * as React from "react";
+import { useAsync } from "./siren/Fetch";
+import { useState } from "react";
+import { ErrorMessageModel } from "./domain/response-models/Error";
+import { SirenEntity } from "./siren/Siren";
+import { SystemServices } from "./services/SystemServices";
+import { Typography } from "@mui/material";
+
+export function ShowHomeFetch({
+                                  systemServices,
+                              }: {
+    systemServices: SystemServices;
+}) {
+    const content = useAsync(async () => {
+        return await systemServices.home();
+    });
+    const [error, setError] = useState<ErrorMessageModel>(null);
+
+    if (!content) {
+        return (
+            <Typography
+                variant="h6"
+                gutterBottom
+            >
+                ...loading...
+            </Typography>
+        );
+    }
+
+    if (content instanceof ErrorMessageModel && !error) {
+        setError(content);
+    }
+
+    return (
+        <div
+            style={{
+                alignItems: "center",
+                justifyContent: "space-evenly",
+            }}
+        >
+            {content instanceof SirenEntity ? (
+                <>
+                    <Typography
+                        variant="h2"
+                    >
+                        {content.properties.title}
+                    </Typography>
+                    <Typography
+                        variant="h5"
+                    >
+                        {content.properties.description}
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                    >
+                        {"est: "+ content.properties.est}
+                    </Typography>
+                </>
+            ) : null}
+        </div>
+    );
+}
