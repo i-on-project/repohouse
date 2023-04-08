@@ -101,7 +101,7 @@ class CourseRepositoryTests {
         val courseRepo = JdbiCourseRepository(handle = handle)
         val courseId = 1
         val students = courseRepo.getStudentInCourse(courseId = courseId)
-        assert(students.size == 2)
+        assert(students.size == 3)
     }
 
     @Test

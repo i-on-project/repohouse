@@ -198,5 +198,3 @@ Create TABLE Outbox(
 
 COMMIT;
 
-update users set is_created = true where id = 1;
-

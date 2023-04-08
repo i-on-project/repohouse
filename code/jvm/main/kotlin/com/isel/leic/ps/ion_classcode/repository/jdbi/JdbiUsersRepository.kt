@@ -205,6 +205,15 @@ class JdbiUsersRepository(
         )
             .bind("id", id)
             .execute()
+
+        handle.createUpdate(
+            """
+            DELETE FROM users
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .execute()
     }
 
     override fun deleteTeacher(id: Int) {

@@ -64,7 +64,7 @@ class DeliveryServices(
                 val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
                 val teams = it.deliveryRepository.getTeams(deliveryId = deliveryId)
                 Either.Right(
-                    DeliveryOutputModel(
+                    DeliveryModel(
                         delivery = delivery,
                         teamsDelivered = teamsDelivered,
                         teams.filter { team -> team.id !in teamsDeliveredIds },
@@ -123,8 +123,8 @@ class DeliveryServices(
             val course = it.courseRepository.getCourse(courseId) ?: return@run Either.Left(DeliveryServicesError.CourseNotFound)
             val courseName = course.name
             it.deliveryRepository.getTeamsByDelivery(deliveryId).forEach { teamId ->
-                val repo = it.repoRepository.getReposByTeam(teamId).first() //TODO: Check if there is only one repo
-                val studentsList = it.teamRepository.getStudentsFromTeam(teamId)
+                val repo = it.repoRepository.getReposByTeam(teamId.id).first() //TODO: Check if there is only one repo
+                val studentsList = it.teamRepository.getStudentsFromTeam(teamId.id)
                 val tagsList = it.tagRepository.getTagsByDelivery(deliveryId)
                 val scope = scopeMain.launch {
                     val githubTruth = githubServices.getRepository(repo.name, teacherToken, courseName)
@@ -141,11 +141,11 @@ class DeliveryServices(
                     }
 
                     studentsToAdd.forEach { student ->
-                        it.teamRepository.enterTeam(teamId,student.id)
+                        it.teamRepository.enterTeam(teamId.id,student.id)
                     }
 
                     studentsToRemove.forEach { student ->
-                        it.teamRepository.leaveTeam(teamId,student.id)
+                        it.teamRepository.leaveTeam(teamId.id,student.id)
                     }
 
                     tagsToAdd.forEach { tag ->

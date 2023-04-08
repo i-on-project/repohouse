@@ -15,6 +15,9 @@ INSERT INTO users (email, is_created, github_username, github_id, token, name)
 VALUES ('test7@alunos.isel.pt', false, 'test123as', 1234187, 'token7', 'teacher3');
 INSERT INTO users (email, is_created, github_username, github_id, token, name)
 VALUES ('test8@alunos.isel.pt', false, 'test1aa23as', 12341837, 'token8', 'teacher4');
+INSERT INTO users (email, is_created, github_username, github_id, token, name)
+VALUES ('test9@alunos.isel.pt', false, 'test1aas', 123418378, 'token9', 'student3');
+
 
 INSERT INTO teacher (id, github_token)
 VALUES (1, 'token');
@@ -29,9 +32,10 @@ INSERT INTO student (id, school_id)
 VALUES (3, 1234);
 INSERT INTO student (id, school_id)
 VALUES (4, 1235);
-INSERT INTO student (id)
-VALUES (5);
-
+INSERT INTO student (id, school_id)
+VALUES (5, 1236);
+INSERT INTO student (id, school_id)
+VALUES (8, 1237);
 
 INSERT INTO course (org_url, name)
 VALUES ('https://daw.isel.pt', 'DAW');
@@ -63,6 +67,8 @@ INSERT INTO student_course (student, course)
 VALUES (3, 1);
 INSERT INTO student_course (student, course)
 VALUES (4, 1);
+INSERT INTO student_course (student, course)
+VALUES (5, 1);
 
 INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description', 'title');
@@ -70,13 +76,18 @@ INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, re
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description1', 'title1');
 INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description2', 'title2');
+INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (3, 2, 3, CURRENT_TIMESTAMP, 'description3', 'title3');
+
 
 INSERT INTO team (name, is_created, assignment)
 VALUES ('team1', false, 1);
 INSERT INTO team (name, is_created, assignment)
-VALUES ('team2', false, 1);
+VALUES ('team2', false, 2);
 INSERT INTO team (name, is_created, assignment)
-VALUES ('team3', false, 2);
+VALUES ('team3', false, 1);
+INSERT INTO team (name, is_created, assignment)
+VALUES ('team4', false, 4);
 
 INSERT INTO student_team (student, team)
 VALUES (4, 1);
@@ -84,6 +95,8 @@ INSERT INTO student_team (student, team)
 VALUES (4, 2);
 INSERT INTO student_team (student, team)
 VALUES (3, 1);
+INSERT INTO student_team (student, team)
+VALUES (3, 4);
 
 INSERT INTO delivery (due_date, tag_control, assignment_id)
 VALUES (CURRENT_TIMESTAMP, 'tag', 1);
@@ -102,7 +115,7 @@ VALUES ('repo1', 'https://repo.github.com/a/123', false, 1);
 INSERT INTO repo (name, url, is_created, team_id)
 VALUES ('repo2', 'https://repo.github.com/ab/123', false, 2);
 INSERT INTO repo (name, url, is_created, team_id)
-VALUES ('repo3', 'https://repo.github.com/abc/123', false, 3);
+VALUES ('repo3', 'https://repo.github.com/abc/123', false, 4);
 
 INSERT INTO tags (name, is_delivered, tag_date, delivery_id, repo_id)
 VALUES ('tag1', true, CURRENT_TIMESTAMP, 1, 1);
@@ -170,10 +183,10 @@ VALUES (3, 1);
 INSERT INTO archiverepo(id, repo_id)
 VALUES (4, 1);
 
-INSERT INTO createrepo(id, repo_id)
-VALUES (5, 1);
-INSERT INTO createrepo(id, repo_id)
-VALUES (6, 1);
+INSERT INTO createrepo(id)
+VALUES (5);
+INSERT INTO createrepo(id)
+VALUES (6);
 
 INSERT INTO createteam(id)
 VALUES (7);
@@ -231,7 +244,4 @@ VALUES (4, 16, 'Pending');
 
 COMMIT;
 
-SELECT classroom.id FROM classroom
-    INNER JOIN course ON course.id = classroom.course_id
-    INNER JOIN student_course ON student_course.course = course.id
-WHERE student_course.student = 3 AND course.id = 2
+

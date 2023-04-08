@@ -39,7 +39,7 @@ class JdbiCreateRepoRequestRepository(
     override fun getCreateRepoRequests(): List<CreateRepo> {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, c.repo_id, r.composite FROM createrepo as c JOIN request as r ON r.id = c.id
+            SELECT c.id, r.creator, r.state, r.composite FROM createrepo as c JOIN request as r ON r.id = c.id
             """,
         )
             .mapTo<CreateRepo>()
@@ -49,7 +49,7 @@ class JdbiCreateRepoRequestRepository(
     override fun getCreateRepoRequestById(id: Int): CreateRepo? {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, c.repo_id, r.composite FROM createrepo as c JOIN request as r ON r.id = c.id
+            SELECT c.id, r.creator, r.state, r.composite FROM createrepo as c JOIN request as r ON r.id = c.id
             WHERE c.id = :id
             """,
         )
@@ -61,7 +61,7 @@ class JdbiCreateRepoRequestRepository(
     override fun getCreateRepoRequestsByUser(userId: Int): List<CreateRepo> {
         return handle.createQuery(
             """
-            SELECT createrepo.id, creator, state, createrepo.repo_id, composite FROM createrepo
+            SELECT createrepo.id, creator, state, composite FROM createrepo
             JOIN request ON request.id = createrepo.id
             WHERE request.creator = :userId
             """,

@@ -1,5 +1,7 @@
 package com.isel.leic.ps.ion_classcode.repository
 
+import com.isel.leic.ps.ion_classcode.domain.Student
+import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiUsersRepository
@@ -34,7 +36,21 @@ class UsersRepositoryTests {
     fun `can get all students`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val list = userRepo.getAllStudents()
-        assert(list.size == 3)
+        assert(list.size == 4)
+    }
+    @Test
+    fun `can get a student`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val id = 3
+        val teacher = userRepo.getUserById(id = id) ?: fail("Teacher not found")
+        assert(teacher is Student)
+    }
+    @Test
+    fun `can get a teacher`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val id = 1
+        val teacher = userRepo.getUserById(id = id) ?: fail("Teacher not found")
+        assert(teacher is Teacher)
     }
 
     @Test
@@ -50,7 +66,7 @@ class UsersRepositoryTests {
     fun `can get all teachers`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val list = userRepo.getAllTeachers()
-        assert(list.size == 3)
+        assert(list.size == 4)
     }
 
     @Test
@@ -95,7 +111,7 @@ class UsersRepositoryTests {
     @Test
     fun `can eliminate a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id = 7
+        val id = 8
         userRepo.deleteStudent(id = id)
         val student = userRepo.getUserById(id = id)
         assert(student == null)

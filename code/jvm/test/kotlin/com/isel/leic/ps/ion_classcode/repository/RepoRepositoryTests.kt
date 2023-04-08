@@ -37,7 +37,7 @@ class RepoRepositoryTests {
         val repoRepo = JdbiRepoRepository(handle = handle)
         val teamId = 1
         val list = repoRepo.getReposByTeam(teamId = teamId)
-        assert(list.size == 3)
+        assert(list.size == 1)
     }
 
     @Test
