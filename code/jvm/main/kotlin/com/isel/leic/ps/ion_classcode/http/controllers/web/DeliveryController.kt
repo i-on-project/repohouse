@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController
 class DeliveryController(
     private val deliveryServices: DeliveryServices,
 ) {
-    // TODO: syncDelivery
 
     @GetMapping(Uris.DELIVERY_PATH)
     fun getDeliveryInfo(
@@ -188,6 +187,9 @@ class DeliveryController(
             DeliveryServicesError.NotTeacher -> Problem.notTeacher
             DeliveryServicesError.DeliveryWithTeams -> Problem.invalidOperation
             DeliveryServicesError.CourseNotFound -> Problem.notFound
+            DeliveryServicesError.AssignmentNotFound -> Problem.notFound
+            DeliveryServicesError.ClassroomArchived -> Problem.invalidOperation
+            DeliveryServicesError.ClassroomNotFound -> Problem.notFound
         }
     }
 }

@@ -29,8 +29,7 @@ class UsersRepositoryTests {
     @Test
     fun `can create a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val x = userRepo.createTeacher(teacher = TeacherInput(name = "test142", email = "test5@alunos.isel.pt", githubUsername = "test1239", githubToken = "token5", githubId = 123415, token = "token5"))
-        val y = 8
+        userRepo.createTeacher(teacher = TeacherInput(name = "test142", email = "test5@alunos.isel.pt", githubUsername = "test1239", githubToken = "token5", githubId = 123415, token = "token5"))
     }
 
     @Test
@@ -39,6 +38,7 @@ class UsersRepositoryTests {
         val list = userRepo.getAllStudents()
         assert(list.size == 4)
     }
+
     @Test
     fun `can get a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
@@ -46,6 +46,7 @@ class UsersRepositoryTests {
         val teacher = userRepo.getUserById(id = id) ?: fail("Teacher not found")
         assert(teacher is Student)
     }
+
     @Test
     fun `can get a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)

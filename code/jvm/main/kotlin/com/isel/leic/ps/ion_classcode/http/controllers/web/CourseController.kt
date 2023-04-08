@@ -57,7 +57,7 @@ class CourseController(
         user: User,
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.getCourseById(courseId)) {
+        return when (val course = courseServices.getCourseById(courseId,user.id)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teachers, course.value.isArchived, course.value.classrooms)) {
                 clazz("course")
@@ -107,7 +107,7 @@ class CourseController(
             is Either.Left -> problem(CourseServicesError.CourseNotFound)
             is Either.Right ->
                 if (archive.value is CourseArchivedModel.CourseArchived) {
-                    when (val course = courseServices.getCourseById(courseId)) {
+                    when (val course = courseServices.getCourseById(courseId,user.id)) {
                         is Either.Left -> problem(course.value)
                         is Either.Right -> siren(
                             value = CourseWithClassroomOutputModel(

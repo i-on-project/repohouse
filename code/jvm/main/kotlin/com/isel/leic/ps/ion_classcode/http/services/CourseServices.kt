@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 
 typealias CourseResponse = Either<CourseServicesError, CourseWithClassrooms>
 typealias CourseCreatedResponse = Either<CourseServicesError, Course>
-typealias UserCoursesResponse = Either<CourseServicesError, List<CourseWithClassrooms>>
 typealias CourseArchivedResponse = Either<CourseServicesError, CourseArchivedModel>
 typealias LeaveCourseResponse = Either<CourseServicesError, Course>
 
@@ -32,10 +31,10 @@ class CourseServices(
     private val transactionManager: TransactionManager,
 ) {
 
-    fun getCourseById(courseId: Int): CourseResponse {
+    fun getCourseById(courseId: Int,userId: Int): CourseResponse {
         return transactionManager.run {
             val course = it.courseRepository.getCourse(courseId)
-            val classrooms = it.courseRepository.getCourseClassrooms(courseId)
+            val classrooms = it.courseRepository.getCourseUserClassrooms(courseId,userId)
             val students = it.courseRepository.getStudentInCourse(courseId)
             if (course == null) {
                 Either.Left(CourseServicesError.CourseNotFound)
@@ -71,34 +70,6 @@ class CourseServices(
         }
     }
 
-    fun getTeacherCourses(userId: Int): UserCoursesResponse {
-        return transactionManager.run {
-            if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
-            if (it.usersRepository.getTeacher(userId) == null) Either.Left(CourseServicesError.NotTeacher)
-            val courses = it.courseRepository.getAllUserCourses(userId = userId)
-            Either.Right(
-                courses.map { course ->
-                    val teachers = it.courseRepository.getCourseTeachers(course.id)
-                    CourseWithClassrooms(course.id, course.orgUrl, course.name, teachers, course.isArchived)
-                }, // Empty list of students and classrooms because info is not needed
-            )
-        }
-    }
-
-    fun getStudentCourses(userId: Int): UserCoursesResponse {
-        return transactionManager.run {
-            if (it.usersRepository.getUserById(userId) == null) Either.Left(CourseServicesError.UserNotFound)
-            if (it.usersRepository.getStudent(userId) == null) Either.Left(CourseServicesError.NotStudent)
-            val courses = it.courseRepository.getAllUserCourses(userId = userId)
-            Either.Right(
-                courses.map { course ->
-                    val teachers = it.courseRepository.getCourseTeachers(course.id)
-                    CourseWithClassrooms(course.id, course.orgUrl, course.name, teachers)
-                }, // Empty list of students and classrooms because info is not needed
-            )
-        }
-    }
-
     fun archiveOrDeleteCourse(courseId: Int): CourseArchivedResponse {
         return transactionManager.run {
             if (it.courseRepository.getCourse(courseId) == null) Either.Left(CourseServicesError.CourseNotFound)
@@ -106,7 +77,7 @@ class CourseServices(
             if (course == null) {
                 Either.Left(CourseServicesError.CourseNotFound)
             } else if (course.isArchived) Either.Left(CourseServicesError.CourseArchived)
-            val classrooms = it.courseRepository.getCourseClassrooms(courseId)
+            val classrooms = it.courseRepository.getCourseAllClassrooms(courseId)
             if (classrooms.isNotEmpty()) {
                 it.courseRepository.archiveCourse(courseId)
                 Either.Right(CourseArchivedModel.CourseArchived)

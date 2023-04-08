@@ -73,4 +73,12 @@ class DeliveryRepositoryTests {
         val teams = deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
         assert(teams.size == 2)
     }
+
+    @Test
+    fun `can get teams that have already delivered`() = testWithHandleAndRollback { handle ->
+        val deliveryRepository = JdbiDeliveryRepository(handle = handle)
+        val deliveryId = 1
+        val teams = deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
+        assert(teams.size == 1)
+    }
 }

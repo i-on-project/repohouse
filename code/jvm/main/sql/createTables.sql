@@ -58,6 +58,25 @@ CREATE TABLE Classroom(
     foreign key (teacher_id) references Teacher(id)
 );
 
+CREATE TABLE Assignment(
+                           id serial primary key,
+                           classroom_id int not null,
+                           max_elems_per_group int not null,
+                           max_number_groups int not null,
+                           release_date timestamp not null,
+                           description text unique not null,
+                           title text unique not null,
+                           foreign key (classroom_id) references Classroom(id)
+);
+
+CREATE TABLE Team(
+                     id serial primary key,
+                     name text not null,
+                     is_Created boolean not null,
+                     assignment int not null,
+                     foreign key (assignment) references Assignment(id)
+);
+
 CREATE TABLE Request(
     id serial primary key,
     creator int not null,
@@ -78,7 +97,9 @@ ALTER TABLE Request
 
 CREATE TABLE CreateRepo(
     id int primary key,
-    foreign key (id) references Request(id)
+    team_id int not null,
+    foreign key (id) references Request(id),
+    foreign key (team_id) references Team(id)
 );
 
 CREATE TABLE ArchiveRepo(
@@ -96,7 +117,10 @@ CREATE TABLE LeaveCourse(
 CREATE TABLE JoinTeam(
     id int primary key,
     team_id int not null,
-    foreign key (id) references Request(id)
+    assigment_id int not null,
+    foreign key (id) references Request(id),
+    foreign key (assigment_id) references Assignment(id),
+    foreign key (team_id) references Team(id)
 );
 
 CREATE TABLE CreateTeam(
@@ -115,25 +139,6 @@ CREATE TABLE Apply(
     teacher_id int not null,
     foreign key (id) references Request(id),
     foreign key (teacher_id) references Users(id)
-);
-
-CREATE TABLE Assignment(
-    id serial primary key,
-    classroom_id int not null,
-    max_elems_per_group int not null,
-    max_number_groups int not null,
-    release_date timestamp not null,
-    description text unique not null,
-    title text unique not null,
-    foreign key (classroom_id) references Classroom(id)
-);
-
-CREATE TABLE Team(
-    id serial primary key,
-    name text not null,
-    is_Created boolean not null,
-    assignment int not null,
-    foreign key (assignment) references Assignment(id)
 );
 
 CREATE TABLE Student_Team(

@@ -53,21 +53,6 @@ class ClassroomServices(
         }
     }
 
-    fun enterClassroom(studentId: Int, inviteLink: String): ClassroomEnterResponse {
-        return transactionManager.run {
-            when (val classroom = it.classroomRepository.getClassroomByInviteLink(inviteLink)) {
-                null -> Either.Left(ClassroomServicesError.ClasroomNotFound)
-                else -> {
-                    if (classroom.isArchived) Either.Left(ClassroomServicesError.ClassroomArchived)
-                    it.classroomRepository.addStudentToClassroom(classroom.id, studentId)
-                    val assigments = it.assigmentRepository.getAssignmentsByClassroom(classroom.id)
-                    val students = it.classroomRepository.getStudentsByClassroom(classroom.id)
-                    Either.Right(ClassroomModel(classroom.id, classroom.name, classroom.isArchived, classroom.lastSync, assigments, students))
-                }
-            }
-        }
-    }
-
     fun archiveOrDeleteClassroom(classroomId: Int): ClassroomArchivedResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) { // Safety check
@@ -109,7 +94,7 @@ class ClassroomServices(
                 else -> {
                     if (classroom.isArchived) Either.Left(ClassroomServicesError.ClassroomArchived)
                     val prevStudents = it.classroomRepository.getStudentsByClassroom(classroom.id)
-                    if(prevStudents.any { it.id == studentId }) Either.Left(ClassroomServicesError.AlreadyInClassroom)
+                    if(prevStudents.any { prevStudent -> prevStudent.id == studentId }) Either.Left(ClassroomServicesError.AlreadyInClassroom)
                     it.classroomRepository.addStudentToClassroom(classroom.id,studentId)
                     val assigments = it.assigmentRepository.getAssignmentsByClassroom(classroom.id)
                     val students = it.classroomRepository.getStudentsByClassroom(classroom.id)

@@ -25,7 +25,6 @@ class SystemController {
             link(rel = LinkRelation("authStudent"), href = Uris.authUriStudent())
             link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
             link(rel = LinkRelation("logout"), href = Uris.logoutUri(), needAuthentication = true)
-            link(rel = LinkRelation("sync-test"), href = Uris.syncDeliveryUri(1,1,1,1,), needAuthentication = true) //TODO: REMOVE
         }
     }
 

@@ -26,6 +26,9 @@ sealed class DeliveryServicesError {
     object DeliveryNotFound : DeliveryServicesError()
     object DeliveryWithTeams : DeliveryServicesError()
     object CourseNotFound : DeliveryServicesError()
+    object AssignmentNotFound : DeliveryServicesError()
+    object ClassroomNotFound : DeliveryServicesError()
+    object ClassroomArchived : DeliveryServicesError()
 }
 
 @Component
@@ -41,6 +44,9 @@ class DeliveryServices(
             return Either.Left(DeliveryServicesError.InvalidInput)
         }
         return transactionManager.run {
+            val isArchived = checkIfArchived(deliveryInfo.assigmentId)
+            if (isArchived is Either.Left) return@run isArchived
+            if (isArchived is Either.Right && isArchived.value) return@run Either.Left(DeliveryServicesError.ClassroomArchived)
             if (it.usersRepository.getTeacher(userId) == null) Either.Left(DeliveryServicesError.NotTeacher)
             val deliveryId = it.deliveryRepository.createDelivery(
                 DeliveryInput(
@@ -80,6 +86,9 @@ class DeliveryServices(
             if (delivery == null) {
                 Either.Left(DeliveryServicesError.DeliveryNotFound)
             } else {
+                val isArchived = checkIfArchived(delivery.assignmentId)
+                if (isArchived is Either.Left) return@run isArchived
+                if (isArchived is Either.Right && isArchived.value) return@run Either.Left(DeliveryServicesError.ClassroomArchived)
                 if (it.deliveryRepository.getTeamsByDelivery(deliveryId).isNotEmpty()) Either.Left(DeliveryServicesError.DeliveryWithTeams)
                 it.deliveryRepository.deleteDelivery(deliveryId)
                 Either.Right(true)
@@ -100,6 +109,9 @@ class DeliveryServices(
             if (delivery == null) {
                 Either.Left(DeliveryServicesError.DeliveryNotFound)
             } else {
+                val isArchived = checkIfArchived(delivery.assignmentId)
+                if (isArchived is Either.Left) return@run isArchived
+                if (isArchived is Either.Right && isArchived.value) return@run Either.Left(DeliveryServicesError.ClassroomArchived)
                 if (delivery.tagControl != deliveryInfo.tagControl) {
                     it.deliveryRepository.updateTagControlFromDelivery(deliveryId, deliveryInfo.tagControl)
                 }
@@ -178,5 +190,17 @@ class DeliveryServices(
         //TODO: Update last sync date
 
         return Either.Right(true)
+    }
+
+    private fun checkIfArchived(assignmentId: Int): Either<DeliveryServicesError, Boolean> {
+        val assignment = transactionManager.run {
+            it.assigmentRepository.getAssignmentById(assignmentId)
+        } ?: return Either.Left(DeliveryServicesError.AssignmentNotFound)
+
+        val classroom = transactionManager.run {
+            it.classroomRepository.getClassroomById(assignment.classroomId)
+        } ?: return Either.Left(DeliveryServicesError.ClassroomNotFound)
+
+        return Either.Right(classroom.isArchived)
     }
 }

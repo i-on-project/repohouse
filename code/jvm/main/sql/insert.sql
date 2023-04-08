@@ -37,6 +37,7 @@ VALUES (5, 1236);
 INSERT INTO student (id, school_id)
 VALUES (8, 1237);
 
+
 INSERT INTO course (org_url, name)
 VALUES ('https://daw.isel.pt', 'DAW');
 INSERT INTO course (org_url, name)
@@ -76,9 +77,6 @@ INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, re
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description1', 'title1');
 INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 2, 3, CURRENT_TIMESTAMP, 'description2', 'title2');
-INSERT INTO assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (3, 2, 3, CURRENT_TIMESTAMP, 'description3', 'title3');
-
 
 INSERT INTO team (name, is_created, assignment)
 VALUES ('team1', false, 1);
@@ -183,20 +181,20 @@ VALUES (3, 1);
 INSERT INTO archiverepo(id, repo_id)
 VALUES (4, 1);
 
-INSERT INTO createrepo(id)
-VALUES (5);
-INSERT INTO createrepo(id)
-VALUES (6);
+INSERT INTO createrepo(id, team_id)
+VALUES (5, 1);
+INSERT INTO createrepo(id, team_id)
+VALUES (6, 1);
 
 INSERT INTO createteam(id)
 VALUES (7);
 INSERT INTO createteam(id)
 VALUES (8);
 
-INSERT INTO jointeam(id, team_id)
-VALUES (9, 1);
-INSERT INTO jointeam(id, team_id)
-VALUES (10, 1);
+INSERT INTO jointeam(id, team_id, assigment_id)
+VALUES (9, 1,1);
+INSERT INTO jointeam(id, team_id, assigment_id)
+VALUES (10, 1,1);
 
 INSERT INTO leavecourse(id, course_id)
 VALUES (11, 1);
@@ -242,6 +240,4 @@ VALUES (4, 15, 'Pending');
 INSERT INTO request(creator, composite, state)
 VALUES (4, 16, 'Pending');
 
-COMMIT;
-
-
+COMMIT TRANSACTION;
