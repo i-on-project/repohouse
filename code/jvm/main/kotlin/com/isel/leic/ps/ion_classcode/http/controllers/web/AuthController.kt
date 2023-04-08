@@ -111,7 +111,7 @@ class AuthController(
                     return ResponseEntity
                         .status(Status.REDIRECT)
                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, Uris.HOME) //TODO: change to menu
+                        .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
                         .body(EMPTY_REQUEST)
                 } else {
                     when (position) {

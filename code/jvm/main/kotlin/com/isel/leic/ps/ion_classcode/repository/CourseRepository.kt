@@ -14,7 +14,9 @@ interface CourseRepository {
     fun archiveCourse(courseId: Int)
     fun addTeacherToCourse(teacherId: Int, courseId: Int): Course
     fun getCourseTeachers(courseId: Int): List<Teacher>
-    fun getCourseClassrooms(courseId: Int): List<Classroom>
+    fun getCourseAllClassrooms(courseId: Int): List<Classroom>
+
+    fun getCourseUserClassrooms(courseId: Int, userId: Int): List<Classroom>
     fun getAllUserCourses(userId: Int): List<Course>
     fun getStudentInCourse(courseId: Int): List<Student>
     fun getCourse(courseId: Int): Course?

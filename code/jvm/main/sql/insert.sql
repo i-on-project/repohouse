@@ -29,8 +29,8 @@ INSERT INTO student (id, school_id)
 VALUES (3, 1234);
 INSERT INTO student (id, school_id)
 VALUES (4, 1235);
-INSERT INTO student (id)
-VALUES (5);
+INSERT INTO student (id,school_id)
+VALUES (5, 1236);
 
 
 INSERT INTO course (org_url, name)
@@ -170,9 +170,9 @@ VALUES (3, 1);
 INSERT INTO archiverepo(id, repo_id)
 VALUES (4, 1);
 
-INSERT INTO createrepo(id, repo_id)
+INSERT INTO createrepo(id, team_id)
 VALUES (5, 1);
-INSERT INTO createrepo(id, repo_id)
+INSERT INTO createrepo(id, team_id)
 VALUES (6, 1);
 
 INSERT INTO createteam(id)
@@ -180,10 +180,10 @@ VALUES (7);
 INSERT INTO createteam(id)
 VALUES (8);
 
-INSERT INTO jointeam(id, team_id)
-VALUES (9, 1);
-INSERT INTO jointeam(id, team_id)
-VALUES (10, 1);
+INSERT INTO jointeam(id, team_id,assigment_id)
+VALUES (9, 1,1);
+INSERT INTO jointeam(id, team_id,assigment_id)
+VALUES (10, 1,1);
 
 INSERT INTO leavecourse(id, course_id)
 VALUES (11, 1);
@@ -229,9 +229,4 @@ VALUES (4, 15, 'Pending');
 INSERT INTO request(creator, composite, state)
 VALUES (4, 16, 'Pending');
 
-COMMIT;
-
-SELECT classroom.id FROM classroom
-    INNER JOIN course ON course.id = classroom.course_id
-    INNER JOIN student_course ON student_course.course = course.id
-WHERE student_course.student = 3 AND course.id = 2
+COMMIT TRANSACTION;

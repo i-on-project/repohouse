@@ -115,7 +115,7 @@ class ClassroomRepositoryTests {
     @Test
     fun `can add a student in a classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
-        val classroomId = 2
+        val classroomId = 1
         val studentId = 5
         classroomRepo.addStudentToClassroom(classroomId = classroomId, studentId = studentId)
         val students = classroomRepo.getStudentsByClassroom(classroomId = classroomId)

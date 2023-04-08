@@ -22,9 +22,11 @@ typealias TeamFeedbackResponse = Either<TeamServicesError, Int>
 
 sealed class TeamServicesError{
     object RequestNotFound: TeamServicesError()
-
     object TeamNotFound: TeamServicesError()
     object RequestNotRejected: TeamServicesError()
+    object ClassroomNotFound: TeamServicesError()
+    object ClassroomArchived: TeamServicesError()
+    object AssignmentNotFound: TeamServicesError()
 }
 
 @Component
@@ -45,17 +47,22 @@ class TeamServices(
         }
     }
 
-    fun createTeamRequest(createTeamInfo: CreateTeamInput):TeamCreateRequestResponse{
+    fun createTeamRequest(createTeamInfo: CreateTeamInput,assigmentId:Int,classroomId:Int):TeamCreateRequestResponse{
         return transactionManager.run {
+            val classroom = it.classroomRepository.getClassroomById(classroomId)
+                ?: return@run Either.Left(TeamServicesError.ClassroomNotFound)
+            if (classroom.isArchived) return@run Either.Left(TeamServicesError.ClassroomArchived)
+
             val teamId = it.createTeamRepository.createCreateTeamRequest(createTeamInfo)
             val team = it.teamRepository.getTeamById(teamId)
             if(team == null) Either.Left(TeamServicesError.TeamNotFound)
             else {
+
                 // Join all requests in one composite request
                 val composite = it.compositeRepository.createCompositeRequest(
                     CompositeInput(listOf(teamId), createTeamInfo.creator))
-                it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(teamId,composite, createTeamInfo.creator))
-                it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(composite, createTeamInfo.creator))
+                it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(assigmentId,teamId,composite, createTeamInfo.creator))
+                it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(teamId,composite, createTeamInfo.creator))
 
                 // Get all info about the team
                 val students = it.teamRepository.getStudentsFromTeam(teamId)
@@ -80,6 +87,11 @@ class TeamServices(
 
     fun joinTeamRequest(joinInfo:JoinTeamInput):TeamJoinRequestResponse{
         return transactionManager.run {
+            val assigment = it.assigmentRepository.getAssignmentById(joinInfo.assigmentId)
+                ?: return@run Either.Left(TeamServicesError.AssignmentNotFound)
+            val classroom = it.classroomRepository.getClassroomById(assigment.classroomId)
+                ?: return@run Either.Left(TeamServicesError.ClassroomNotFound)
+            if (classroom.isArchived) return@run Either.Left(TeamServicesError.ClassroomArchived)
             when(it.teamRepository.getTeamById(joinInfo.teamId)){
                 null -> Either.Left(TeamServicesError.TeamNotFound)
                 else -> {
@@ -90,8 +102,11 @@ class TeamServices(
         }
     }
 
-    fun updateTeamRequestStatus(requestId: Int, teamId: Int): TeamUpdateRequestResponse {
+    fun updateTeamRequestStatus(requestId: Int, teamId: Int,classroomId: Int): TeamUpdateRequestResponse {
         return transactionManager.run {
+            val classroom = it.classroomRepository.getClassroomById(classroomId)
+                ?: return@run Either.Left(TeamServicesError.ClassroomNotFound)
+            if (classroom.isArchived) return@run Either.Left(TeamServicesError.ClassroomArchived)
             when (it.teamRepository.getTeamById(teamId)){
                 null -> Either.Left(TeamServicesError.TeamNotFound)
                 else -> {
@@ -114,8 +129,11 @@ class TeamServices(
         }
     }
 
-    fun postFeedback(feedbackInfo: FeedbackInput): TeamFeedbackResponse {
+    fun postFeedback(feedbackInfo: FeedbackInput,classroomId: Int): TeamFeedbackResponse {
         return transactionManager.run {
+            val classroom = it.classroomRepository.getClassroomById(classroomId)
+                ?: return@run Either.Left(TeamServicesError.ClassroomNotFound)
+            if (classroom.isArchived) return@run Either.Left(TeamServicesError.ClassroomArchived)
             when(it.teamRepository.getTeamById(feedbackInfo.teamId)){
                 null -> Either.Left(TeamServicesError.TeamNotFound)
                 else -> {

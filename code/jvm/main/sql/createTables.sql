@@ -58,6 +58,25 @@ CREATE TABLE Classroom(
     foreign key (teacher_id) references Teacher(id)
 );
 
+CREATE TABLE Assignment(
+                           id serial primary key,
+                           classroom_id int not null,
+                           max_elems_per_group int not null,
+                           max_number_groups int not null,
+                           release_date timestamp not null,
+                           description text unique not null,
+                           title text unique not null,
+                           foreign key (classroom_id) references Classroom(id)
+);
+
+CREATE TABLE Team(
+                     id serial primary key,
+                     name text not null,
+                     is_Created boolean not null,
+                     assignment int not null,
+                     foreign key (assignment) references Assignment(id)
+);
+
 CREATE TABLE Request(
     id serial primary key,
     creator int not null,
@@ -78,7 +97,9 @@ ALTER TABLE Request
 
 CREATE TABLE CreateRepo(
     id int primary key,
-    foreign key (id) references Request(id)
+    team_id int not null,
+    foreign key (id) references Request(id),
+    foreign key (team_id) references Team(id)
 );
 
 CREATE TABLE ArchiveRepo(
@@ -96,7 +117,10 @@ CREATE TABLE LeaveCourse(
 CREATE TABLE JoinTeam(
     id int primary key,
     team_id int not null,
-    foreign key (id) references Request(id)
+    assigment_id int not null,
+    foreign key (id) references Request(id),
+    foreign key (assigment_id) references Assignment(id),
+    foreign key (team_id) references Team(id)
 );
 
 CREATE TABLE CreateTeam(
@@ -115,25 +139,6 @@ CREATE TABLE Apply(
     teacher_id int not null,
     foreign key (id) references Request(id),
     foreign key (teacher_id) references Users(id)
-);
-
-CREATE TABLE Assignment(
-    id serial primary key,
-    classroom_id int not null,
-    max_elems_per_group int not null,
-    max_number_groups int not null,
-    release_date timestamp not null,
-    description text unique not null,
-    title text unique not null,
-    foreign key (classroom_id) references Classroom(id)
-);
-
-CREATE TABLE Team(
-    id serial primary key,
-    name text not null,
-    is_Created boolean not null,
-    assignment int not null,
-    foreign key (assignment) references Assignment(id)
 );
 
 CREATE TABLE Student_Team(
@@ -197,15 +202,3 @@ Create TABLE Outbox(
 );
 
 COMMIT;
-
-
-update users set is_created = true where id = 1;
-
-insert into course (org_url, name) values ('https://github.com/test-project-isel', 'test-project-isel');
-insert into classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id) VALUES ('test-classroom', '2019-01-01 00:00:00', 'https://classroom.github.com/a/1', false, 1, 1);
-insert into assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title) values (3, 2, 2, '2019-01-01 00:00:00', 'test-description', 'test-title');
-insert into team (name, is_created, assignment) values ('gay-squad-no-repository', true, 2);
-insert into repo (name, url,is_created, team_id) values ('gay-squad-no-repository', 'https://github.com/test-project-isel/gay-squad-no-repository',true, 2);
-insert into team (name, is_created, assignment) values ('testPrefix-testRepo', true, 2);
-insert into repo (name, url,is_created, team_id) values ('testPrefix-testRepo','https://github.com/test-project-isel/testPrefix-testRepo', true, 3);
-insert into delivery (due_date, tag_control, assignment_id) values ('2019-01-01 00:00:00', 'test-tag-control', 2);

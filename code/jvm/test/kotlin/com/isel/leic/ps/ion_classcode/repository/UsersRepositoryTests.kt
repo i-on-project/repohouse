@@ -50,7 +50,7 @@ class UsersRepositoryTests {
     fun `can get all teachers`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val list = userRepo.getAllTeachers()
-        assert(list.size == 3)
+        assert(list.size == 4)
     }
 
     @Test
@@ -95,7 +95,7 @@ class UsersRepositoryTests {
     @Test
     fun `can eliminate a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id = 7
+        val id = 5
         userRepo.deleteStudent(id = id)
         val student = userRepo.getUserById(id = id)
         assert(student == null)

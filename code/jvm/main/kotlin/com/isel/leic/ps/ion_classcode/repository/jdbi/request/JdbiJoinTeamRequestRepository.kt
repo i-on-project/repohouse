@@ -26,12 +26,13 @@ class JdbiJoinTeamRequestRepository(
 
         return handle.createUpdate(
             """
-            INSERT INTO jointeam (id, team_id)
-            VALUES (:id, :teamId)
+            INSERT INTO jointeam (id, team_id, assigment_id)
+            VALUES (:id, :teamId, :assigmentId)
             """,
         )
             .bind("id", id)
             .bind("teamId", request.teamId)
+            .bind("assigmentId", request.assigmentId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()

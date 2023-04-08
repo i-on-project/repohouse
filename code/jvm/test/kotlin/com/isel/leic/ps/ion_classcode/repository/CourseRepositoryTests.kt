@@ -34,7 +34,7 @@ class CourseRepositoryTests {
     fun `can get a course classrooms`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
         val courseId = 1
-        val course = courseRepo.getCourseClassrooms(courseId = courseId)
+        val course = courseRepo.getCourseAllClassrooms(courseId = courseId)
         assert(course.size == 2)
     }
 

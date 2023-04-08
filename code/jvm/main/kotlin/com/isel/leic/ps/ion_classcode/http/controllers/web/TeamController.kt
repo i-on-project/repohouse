@@ -88,7 +88,7 @@ class TeamController(
         @RequestBody createTeamInfo: CreateTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val create = teamService.createTeamRequest(createTeamInfo)) {
+        return when (val create = teamService.createTeamRequest(createTeamInfo,assigmentId,classroomId)) {
             is Either.Left -> problem(create.value)
             is Either.Right -> siren(TeamOutputModel(create.value.team, create.value.students, create.value.repos, create.value.feedbacks)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, create.value.team.id), rel = LinkRelation("team"), needAuthentication = true)
@@ -130,7 +130,7 @@ class TeamController(
         @PathVariable requestId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val change = teamService.updateTeamRequestStatus(requestId, teamId)) {
+        return when (val change = teamService.updateTeamRequestStatus(requestId, teamId,classroomId)) {
             is Either.Left -> problem(change.value)
             is Either.Right -> siren(RequestChangeStatusOutputModel(requestId, change.value)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
@@ -167,7 +167,7 @@ class TeamController(
         @RequestBody feedbackInfo: FeedbackInput,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val feedback = teamService.postFeedback(feedbackInfo)) {
+        return when (val feedback = teamService.postFeedback(feedbackInfo,classroomId)) {
             is Either.Left -> problem(feedback.value)
             is Either.Right -> siren(FeedbackOutputModel(feedback.value, true)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
@@ -180,6 +180,9 @@ class TeamController(
             is TeamServicesError.TeamNotFound -> Problem.notFound
             is TeamServicesError.RequestNotRejected -> Problem.invalidOperation
             is TeamServicesError.RequestNotFound -> Problem.notFound
+            is TeamServicesError.ClassroomArchived -> Problem.invalidOperation
+            is TeamServicesError.ClassroomNotFound -> Problem.notFound
+            is TeamServicesError.AssignmentNotFound -> Problem.notFound
         }
     }
 }

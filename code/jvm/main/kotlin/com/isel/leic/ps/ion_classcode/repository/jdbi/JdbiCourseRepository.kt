@@ -136,7 +136,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         }
     }
 
-    override fun getCourseClassrooms(courseId: Int): List<Classroom> {
+    override fun getCourseAllClassrooms(courseId: Int): List<Classroom> {
         return handle.createQuery(
             """
                 SELECT * FROM classroom
@@ -144,6 +144,22 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             """,
         )
             .bind("course_id", courseId)
+            .mapTo<Classroom>()
+            .list()
+    }
+
+    override fun getCourseUserClassrooms(courseId: Int, userId: Int): List<Classroom> {
+        return handle.createQuery(
+            """
+                SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_link,classroom.is_archived,course_id FROM classroom
+                JOIN assignment on classroom.id = assignment.classroom_id
+                JOIN team  on assignment.id = team.assignment
+                JOIN student_team on team.id = student_team.team
+                WHERE course_id = :course_id AND student_team.student = :user_id
+            """,
+        )
+            .bind("course_id", courseId)
+            .bind("user_id", userId)
             .mapTo<Classroom>()
             .list()
     }
