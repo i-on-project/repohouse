@@ -9,6 +9,7 @@ import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -24,7 +25,7 @@ class SystemController {
             link(rel = LinkRelation("authTeacher"), href = Uris.authUriTeacher())
             link(rel = LinkRelation("authStudent"), href = Uris.authUriStudent())
             link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
-            link(rel = LinkRelation("logout"), href = Uris.logoutUri(), needAuthentication = true)
+            action(name = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
         }
     }
 

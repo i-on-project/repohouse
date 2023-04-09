@@ -37,12 +37,12 @@ Um utilizador identificado como _'Aluno'_, poderá ter duas categorias de experi
 
 Onde o aluno ao iniciar a aplicação, terá acesso a todas as disciplinas às quais se encontra inscrito, onde poderá depois em cada uma delas verificar poderá ter acesso à uma secção com todos os trabalhos já expostos pelo docente, podendo depois ir ao detalhe de cada um; como pode ter acesso ao repositório de GitHub, sobre o qual onde devem ser realizados os trabalhos.
 
-![Detailed Student Flow](../docs/img/web-student-flow.png)*Detailed Student Flow*
+![Detailed User Flow](../docs/img/web-student-flow.png)*Detailed User Flow*
 
 E outra maneira de experiência de utilização que um aluno poderá presenciar, é através de um convite para a integração de uma disciplina, onde o mesmo poderá criar ou integrar-se num grupo e ser encaminhado para o mesmo, aonde irá então ter acesso ao seu repositório.
 
 O aluno ao iniciar a aplicação através de um convite, terá acesso a uma página onde irá ser questionado sobre a intenção de intregrar a disciplina, caso o deseje e após a sua autenticação caso seja necessária, será reencaminhado para uma página onde poderá criar um grupo ou integrar-se a um, ao qual após a sua escolha, será reencaminhado para o repositório da disciplina.
 
-![Detailed Student Invite Flow](../docs/img/web-invite-student-flow.png)*Detailed Student Invite Flow*
+![Detailed User Invite Flow](../docs/img/web-invite-student-flow.png)*Detailed User Invite Flow*
 
 Se o mesmo já se tiver inscrito em um grupo e pretender recuar no fluxo de utilização, o mesmo será reencaminhado para o início do fluxo anterior, para a página das suas disciplinas.

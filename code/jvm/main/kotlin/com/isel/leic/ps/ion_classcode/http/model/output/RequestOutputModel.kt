@@ -1,6 +1,5 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
-import com.isel.leic.ps.ion_classcode.domain.requests.CreateTeam
 import com.isel.leic.ps.ion_classcode.domain.requests.JoinTeam
 import com.isel.leic.ps.ion_classcode.domain.requests.LeaveTeam
 
@@ -10,7 +9,7 @@ data class RequestOutputModel(
     val title: String,
 ) : OutputModel
 
-data class RequestsOutputModel(
+data class TeamRequestsOutputModel(
     val joinTeam: List<JoinTeam>,
     val leaveTeam: List<LeaveTeam>,
 ) : OutputModel

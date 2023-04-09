@@ -1,16 +1,18 @@
-export interface ErrorMessageModel{
-    type: ResponseEntity<Problem>,
-    title:string,
-    detail:string,
-    data:any
+export interface Error{
+    state: number,
+    error: string,
+    message: string
 }
 
 export class ErrorMessageModel{
-    constructor(type:ResponseEntity<Problem>,title:string,detail:string,data:any = null){
-        this.type=type;
-        this.title=title;
-        this.detail=detail;
-        this.data=data;
+    constructor(
+        public state: number,
+        public error: string,
+        public message: string
+    ) {
+        this.state = state;
+        this.error = error;
+        this.message = message;
     }
 }
 

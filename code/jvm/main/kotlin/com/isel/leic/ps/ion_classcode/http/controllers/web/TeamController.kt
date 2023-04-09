@@ -11,7 +11,7 @@ import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.FeedbackOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestChangeStatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestCreatedOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.RequestsOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -106,7 +106,7 @@ class TeamController(
     ): ResponseEntity<*> {
         return when (val requests = teamService.getTeamsRequests(teamId)) {
             is Either.Left -> problem(requests.value)
-            is Either.Right -> siren(RequestsOutputModel(requests.value.joinTeam, requests.value.leaveTeam)) {
+            is Either.Right -> siren(TeamRequestsOutputModel(requests.value.joinTeam, requests.value.leaveTeam)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
                 if (user is Teacher) {
                     requests.value.joinTeam.forEach {

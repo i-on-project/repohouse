@@ -21,7 +21,7 @@ DELETE FROM Request;
 DELETE FROM Classroom;
 DELETE FROM Student_Course;
 DELETE FROM Course;
-DELETE FROM Student;
+DELETE FROM User;
 DELETE FROM Teacher;
 DELETE FROM outbox;
 DELETE From cooldown;

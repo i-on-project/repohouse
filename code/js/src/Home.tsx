@@ -1,20 +1,31 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import { useState } from "react";
+import {useCallback, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import { SystemServices } from "./services/SystemServices";
-import { Typography } from "@mui/material";
+import {Typography} from "@mui/material";
+import {Button} from "react-bootstrap";
+import {useNavigate} from "react-router-dom";
 
 export function ShowHomeFetch({
-                                  systemServices,
-                              }: {
+  systemServices,
+}: {
     systemServices: SystemServices;
 }) {
     const content = useAsync(async () => {
         return await systemServices.home();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
+    const navigate = useNavigate();
+
+    const handleAuthTeacherClick = useCallback(() => {
+        navigate("/auth/teacher")
+    }, [navigate])
+
+    const handleAuthStudentClick = useCallback (() => {
+        navigate("/auth/student")
+    }, [navigate])
 
     if (!content) {
         return (
@@ -55,6 +66,8 @@ export function ShowHomeFetch({
                     >
                         {"est: "+ content.properties.est}
                     </Typography>
+                    <Button onClick={handleAuthTeacherClick}> {"Teacher"} </Button>
+                    <Button onClick={handleAuthStudentClick}> {"Student"} </Button>
                 </>
             ) : null}
         </div>
