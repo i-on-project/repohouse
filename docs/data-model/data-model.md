@@ -38,7 +38,7 @@ Restrições
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Users``.
 - github_token - não pode ser vazio ou null. Valor único.
 
-``Student`` - especialização de ``Users``
+``User`` - especialização de ``Users``
 > Entidade que representa um aluno do sistema.
 - id - identificador do utilizador.
 - school_id - identificador da escola do aluno.

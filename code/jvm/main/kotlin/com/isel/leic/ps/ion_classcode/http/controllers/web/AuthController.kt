@@ -254,7 +254,7 @@ class AuthController(
         }
     }
 
-    @GetMapping(Uris.LOGOUT)
+    @PostMapping(Uris.LOGOUT)
     fun logout(
         response: HttpServletResponse,
     ): ResponseEntity<Any> {

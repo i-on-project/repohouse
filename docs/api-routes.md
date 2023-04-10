@@ -39,7 +39,7 @@ All web API routes are prefixed with `/api/web`.
 - POST `./courses/:id/classrooms/:id/teams/:id/sync` - Sync a team
 
 
-#### Student
+#### User
 
 - GET `./login/student/approval` - Get the student approval status page
 - POST `./courses/:id/classrooms/:id/teams/create` - Create a new team

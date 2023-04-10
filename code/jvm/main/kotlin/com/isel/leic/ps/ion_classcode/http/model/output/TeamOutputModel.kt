@@ -14,12 +14,6 @@ data class TeamOutputModel(
     val feedbacks: List<Feedback>,
 )
 
-data class TeamRequestsOutputModel(
-    val team: Team,
-    val joinTeam: List<JoinTeam>,
-    val leaveTeam: List<LeaveTeam>,
-)
-
 data class TeamModel(
     val team: Team,
     val students: List<Student>,

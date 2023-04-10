@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### React ###
+code/js/node_modules/
+
