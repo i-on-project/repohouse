@@ -13,8 +13,6 @@ import com.isel.leic.ps.ion_classcode.http.services.AssigmentServices
 import com.isel.leic.ps.ion_classcode.http.services.AssigmentServicesError
 import com.isel.leic.ps.ion_classcode.http.services.GithubServices
 import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
@@ -42,7 +40,7 @@ class AssigmentController(
     ): ResponseEntity<*> {
         return when (val assigment = assigmentService.getAssigmentInfo(assigmentId)) {
             is Either.Left -> problem(assigment.value)
-            is Either.Right -> siren(value = AssigmentOutputModel(assigment.value.assigment, assigment.value.deliveries, assigment.value.teams)) {
+            is Either.Right -> siren(value = AssigmentOutputModel(assigment.value.assignment, assigment.value.deliveries, assigment.value.teams)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assigmentId), needAuthentication = true)
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
@@ -77,7 +75,7 @@ class AssigmentController(
                                 }
                             }
 
-                            if (studentTeams.value.size < assigment.value.assigment.maxNumberGroups){
+                            if (studentTeams.value.size < assigment.value.assignment.maxNumberGroups){
                                 action("create-team", Uris.createTeamUri(courseId, classroomId, assigmentId), method = HttpMethod.POST, type = "application/json") {
                                     hiddenField("assigmentId", assigmentId.toString())
                                 }

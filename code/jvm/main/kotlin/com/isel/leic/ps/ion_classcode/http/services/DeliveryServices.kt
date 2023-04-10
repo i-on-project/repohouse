@@ -1,16 +1,13 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Student
-import com.isel.leic.ps.ion_classcode.domain.Tags
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
 import com.isel.leic.ps.ion_classcode.domain.input.TagInput
 import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryModel
-import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryOutputModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 
@@ -194,7 +191,7 @@ class DeliveryServices(
 
     private fun checkIfArchived(assignmentId: Int): Either<DeliveryServicesError, Boolean> {
         val assignment = transactionManager.run {
-            it.assigmentRepository.getAssignmentById(assignmentId)
+            it.assignmentRepository.getAssignmentById(assignmentId)
         } ?: return Either.Left(DeliveryServicesError.AssignmentNotFound)
 
         val classroom = transactionManager.run {

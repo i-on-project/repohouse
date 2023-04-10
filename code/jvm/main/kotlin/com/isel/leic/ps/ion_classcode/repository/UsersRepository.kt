@@ -7,9 +7,15 @@ import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 
 interface UsersRepository {
-    fun createStudent(student: StudentInput): Int
+    fun checkIfEmailExists(email: String): Boolean
+    fun checkIfGithubUsernameExists(githubUsername: String): Boolean
+    fun checkIfGithubIdExists(githubId: Long): Boolean
+    fun checkIfTokenExists(token: String): Boolean
+    fun checkIfGithubTokenExists(githubToken: String): Boolean
+    fun checkIfSchoolIdExists(schoolId: Int): Boolean
+    fun createStudent(student: StudentInput): Student?
+    fun createTeacher(teacher: TeacherInput): Teacher?
     fun updateStudentSchoolId(userId: Int, schoolId: Int)
-    fun createTeacher(teacher: TeacherInput): Int
     fun getStudent(studentId: Int): Student?
     fun getTeacher(teacherId: Int): Teacher?
     fun getAllStudents(): List<Student>

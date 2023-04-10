@@ -12,7 +12,79 @@ import org.jdbi.v3.core.kotlin.mapTo
 class JdbiUsersRepository(
     private val handle: Handle,
 ) : UsersRepository {
-    override fun createStudent(student: StudentInput): Int {
+    override fun checkIfEmailExists(email: String): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM Users
+            WHERE email = :email
+            """,
+        )
+            .bind("email", email)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
+    override fun checkIfGithubUsernameExists(githubUsername: String): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM Users
+            WHERE github_username = :github_username
+            """,
+        )
+            .bind("github_username", githubUsername)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
+    override fun checkIfGithubIdExists(githubId: Long): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM Users
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
+    override fun checkIfTokenExists(token: String): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM Users
+            WHERE token = :token
+            """,
+        )
+            .bind("token", token)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
+    override fun checkIfGithubTokenExists(githubToken: String): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM teacher
+            WHERE github_token = :github_token
+            """,
+        )
+            .bind("github_token", githubToken)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
+    override fun checkIfSchoolIdExists(schoolId: Int): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM student
+            WHERE school_id = :school_id
+            """,
+        )
+            .bind("school_id", schoolId)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
+    override fun createStudent(student: StudentInput): Student? {
         val id = handle.createUpdate(
             """
             INSERT INTO Users (email, github_username, github_id, token, name)
@@ -28,7 +100,7 @@ class JdbiUsersRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-
+        if (id < 0) return null
         handle.createUpdate(
             """
             INSERT INTO student (id, school_id)
@@ -38,7 +110,17 @@ class JdbiUsersRepository(
             .bind("id", id)
             .bind("schoolId", student.schoolId)
             .execute()
-        return id
+
+        return Student(
+            id = id,
+            name = student.name,
+            email = student.email,
+            githubUsername = student.githubUsername,
+            githubId = student.githubId,
+            token = student.token,
+            schoolId = student.schoolId,
+            isCreated = false,
+        )
     }
 
     override fun getAllStudents(): List<Student> {
@@ -131,7 +213,7 @@ class JdbiUsersRepository(
             .execute()
     }
 
-    override fun createTeacher(teacher: TeacherInput): Int {
+    override fun createTeacher(teacher: TeacherInput): Teacher? {
         val id = handle.createUpdate(
             """
             INSERT INTO Users (email, github_username, github_id, token, name)
@@ -147,7 +229,7 @@ class JdbiUsersRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-
+        if (id < 0) return null
         handle.createUpdate(
             """
             INSERT INTO teacher (id, github_token)
@@ -157,7 +239,7 @@ class JdbiUsersRepository(
             .bind("id", id)
             .bind("github_token", teacher.githubToken)
             .execute()
-        return id
+        return Teacher(name = teacher.name, email = teacher.email, id = id, githubUsername = teacher.githubUsername, githubId = teacher.githubId, isCreated = true, token = teacher.githubToken)
     }
 
     override fun getStudent(studentId: Int): Student? {

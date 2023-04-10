@@ -7,6 +7,23 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class CourseRepositoryTests {
+
+    @Test
+    fun `can check if a course name already exists`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val name = "DAW"
+        val res = courseRepo.checkIfCourseNameExists(name = name) ?: fail("Should be able to get a course")
+        assert(res)
+    }
+
+    @Test
+    fun `can check if a course org url already exists`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val orgUrl = "https://daw.isel.pt"
+        val res = courseRepo.checkIfOrgUrlExists(orgUrl = orgUrl) ?: fail("Should be able to get a course")
+        assert(res)
+    }
+
     @Test
     fun `can create a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)

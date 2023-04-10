@@ -7,6 +7,8 @@ import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 
 interface CourseRepository {
+    fun checkIfOrgUrlExists(orgUrl: String): Boolean
+    fun checkIfCourseNameExists(name: String): Boolean
     fun createCourse(course: CourseInput): Course
     fun deleteCourse(courseId: Int)
     fun enterCourse(courseId: Int, studentId: Int): Course
@@ -15,7 +17,6 @@ interface CourseRepository {
     fun addTeacherToCourse(teacherId: Int, courseId: Int): Course
     fun getCourseTeachers(courseId: Int): List<Teacher>
     fun getCourseAllClassrooms(courseId: Int): List<Classroom>
-
     fun getCourseUserClassrooms(courseId: Int, userId: Int): List<Classroom>
     fun getAllUserCourses(userId: Int): List<Course>
     fun getStudentInCourse(courseId: Int): List<Student>

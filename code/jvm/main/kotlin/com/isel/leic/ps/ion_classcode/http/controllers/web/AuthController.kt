@@ -363,6 +363,13 @@ class AuthController(
             UserServicesError.UserNotAuthenticated -> Problem.unauthenticated
             UserServicesError.ErrorCreatingUser -> Problem.internalError
             UserServicesError.InvalidGithubId -> Problem.invalidInput
+            UserServicesError.InvalidBearerToken -> Problem.invalidInput
+            UserServicesError.GithubIdInUse -> Problem.conflict
+            UserServicesError.TokenInUse -> Problem.conflict
+            UserServicesError.EmailInUse -> Problem.conflict
+            UserServicesError.GithubUserNameInUse -> Problem.conflict
+            UserServicesError.GithubTokenInUse -> Problem.conflict
+            UserServicesError.SchoolIdInUse -> Problem.conflict
         }
     }
 

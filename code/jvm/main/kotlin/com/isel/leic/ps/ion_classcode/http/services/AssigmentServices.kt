@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
-import com.isel.leic.ps.ion_classcode.domain.Assigment
+import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
@@ -10,7 +10,7 @@ import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
 typealias AssigmentResponse = Either<AssigmentServicesError, AssigmentModel>
-typealias AssigmentCreatedResponse = Either<AssigmentServicesError, Assigment>
+typealias AssigmentCreatedResponse = Either<AssigmentServicesError, Assignment>
 typealias AssigmentDeletedResponse = Either<AssigmentServicesError, Boolean>
 typealias AssigmentStudentTeamResponse = Either<AssigmentServicesError, List<Team>>
 
@@ -47,7 +47,7 @@ class AssigmentServices(
             } else if (classroom.isArchived) {
                 Either.Left(AssigmentServicesError.ClassroomArchived)
             }
-            val assigment = it.assigmentRepository.createAssignment(
+            val assigment = it.assignmentRepository.createAssignment(
                 AssignmentInput(
                     assigmentInfo.classroomId,
                     assigmentInfo.maxNumberElems,
@@ -62,7 +62,7 @@ class AssigmentServices(
 
     fun getAssigmentInfo(assigmentId: Int): AssigmentResponse {
         return transactionManager.run {
-            val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
+            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
             if (assigment == null) {
                 Either.Left(AssigmentServicesError.AssigmentNotFound)
             } else {
@@ -75,7 +75,7 @@ class AssigmentServices(
 
     fun deleteAssigment(assigmentId: Int): AssigmentDeletedResponse {
         return transactionManager.run {
-            val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
+            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
             if (assigment == null) {
                 Either.Left(AssigmentServicesError.AssigmentNotFound)
             } else {
@@ -92,7 +92,7 @@ class AssigmentServices(
                         AssigmentServicesError.AssigmentNotDeleted,
                     )
                 }
-                it.assigmentRepository.deleteAssignment(assigmentId)
+                it.assignmentRepository.deleteAssignment(assigmentId)
                 Either.Right(true)
             }
         }
@@ -100,7 +100,7 @@ class AssigmentServices(
 
     fun getAssigmentStudentTeams(assigmentId: Int, studentId: Int): AssigmentStudentTeamResponse {
         return transactionManager.run {
-            val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
+            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
             if (assigment == null) {
                 Either.Left(AssigmentServicesError.AssigmentNotFound)
             } else {

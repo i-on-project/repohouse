@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.transaction
 
+
 import com.isel.leic.ps.ion_classcode.repository.*
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import com.isel.leic.ps.ion_classcode.repository.request.CompositeRepository
@@ -11,7 +12,7 @@ import com.isel.leic.ps.ion_classcode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 
 interface Transaction {
-    val assigmentRepository: AssigmentRepository
+    val assignmentRepository: AssignmentRepository
     val classroomRepository: ClassroomRepository
     val feedbackRepository: FeedbackRepository
     val repoRepository: RepoRepository
@@ -21,7 +22,7 @@ interface Transaction {
     val courseRepository: CourseRepository
     val deliveryRepository: DeliveryRepository
     val applyRequestRepository: ApplyRequestRepository
-    val archiveRepoRepository: AssigmentRepository
+    val archiveRepoRepository: AssignmentRepository
     val compositeRepository: CompositeRepository
     val createRepoRepository: CreateRepoRepository
     val createTeamRepository: CreateTeamRepository

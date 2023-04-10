@@ -11,6 +11,54 @@ import org.junit.jupiter.api.fail
 
 class UsersRepositoryTests {
     @Test
+    fun `can check if email is already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val email = "test@alunos.isel.pt"
+        val res = userRepo.checkIfEmailExists(email = email)
+        assert(res)
+    }
+
+    @Test
+    fun `can check if github id is already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val githubId = 12345L
+        val res = userRepo.checkIfGithubIdExists(githubId = githubId)
+        assert(res)
+    }
+
+    @Test
+    fun `can check if github username is already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val githubUsername = "test123"
+        val res = userRepo.checkIfGithubUsernameExists(githubUsername = githubUsername)
+        assert(res)
+    }
+
+    @Test
+    fun `can check if token is already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val token = "token"
+        val res = userRepo.checkIfTokenExists(token = token)
+        assert(res)
+    }
+
+    @Test
+    fun `can check if github token is already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val githubToken = "token"
+        val res = userRepo.checkIfGithubTokenExists(githubToken = githubToken)
+        assert(res)
+    }
+
+    @Test
+    fun `can check if schoolId is already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val schoolId = 1234
+        val res = userRepo.checkIfSchoolIdExists(schoolId = schoolId)
+        assert(res)
+    }
+
+    @Test
     fun `can create a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         userRepo.createStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))

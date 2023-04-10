@@ -2,7 +2,7 @@ package com.isel.leic.ps.ion_classcode.domain
 
 import java.sql.Timestamp
 
-data class Assigment(
+data class Assignment(
     val id: Int,
     val classroomId: Int,
     val maxElemsPerGroup: Int,

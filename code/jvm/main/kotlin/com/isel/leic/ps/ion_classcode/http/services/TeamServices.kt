@@ -87,7 +87,7 @@ class TeamServices(
 
     fun joinTeamRequest(joinInfo:JoinTeamInput):TeamJoinRequestResponse{
         return transactionManager.run {
-            val assigment = it.assigmentRepository.getAssignmentById(joinInfo.assigmentId)
+            val assigment = it.assignmentRepository.getAssignmentById(joinInfo.assigmentId)
                 ?: return@run Either.Left(TeamServicesError.AssignmentNotFound)
             val classroom = it.classroomRepository.getClassroomById(assigment.classroomId)
                 ?: return@run Either.Left(TeamServicesError.ClassroomNotFound)

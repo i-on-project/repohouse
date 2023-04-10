@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
-import com.isel.leic.ps.ion_classcode.domain.Assigment
+import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
@@ -62,7 +62,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .firstOrNull()
     }
 
-    override fun getAssignmentsOfAClassroom(classroomId: Int): List<Assigment> {
+    override fun getAssignmentsOfAClassroom(classroomId: Int): List<Assignment> {
         return handle.createQuery(
             """
             SELECT * FROM assignment
@@ -70,7 +70,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             """,
         )
             .bind("classroom_id", classroomId)
-            .mapTo<Assigment>()
+            .mapTo<Assignment>()
             .list()
     }
 

@@ -8,11 +8,7 @@ data class TeacherInput(
     val name: String,
     val githubToken: String,
 ) {
-    init {
-        require(name.isNotBlank() && name.length in (5..20)) { "Invalid name" }
-        require(email.isNotBlank() && email.length in (5..100) && email.contains(char = '@')) { "Invalid email" }
-        require(githubUsername.isNotBlank()) { "Invalid github username" }
-        require(githubToken.isNotBlank()) { "Invalid github token" }
-        require(githubId > 0) { "Invalid github id" }
+    fun isNotValid(): Boolean {
+        return !(name.isNotEmpty() && email.isNotEmpty() && githubUsername.isNotEmpty() && token.isNotEmpty() && githubId >= 0 && githubToken.isNotEmpty())
     }
 }

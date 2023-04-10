@@ -170,6 +170,7 @@ class CourseController(
             CourseServicesError.NotTeacher -> Problem.notTeacher
             CourseServicesError.InvalidInput -> Problem.invalidInput
             CourseServicesError.CourseArchived -> Problem.invalidOperation
+            CourseServicesError.CourseNameAlreadyExists -> Problem.conflict
         }
     }
 }
