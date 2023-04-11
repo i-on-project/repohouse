@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.model.github
 
+/**
+ * GitHub Repository model.
+ */
 data class GithubRepo(
     val id: Int,
     val name: String,
@@ -74,6 +77,9 @@ data class GithubRepo(
     val default_branch: String,
 )
 
+/**
+ * GitHub Repository Owner model.
+ */
 data class Owner(
     val login: String,
     val id: Int,
@@ -95,6 +101,9 @@ data class Owner(
     val site_admin: Boolean,
 )
 
+/**
+ * GitHub Repository License model.
+ */
 data class License(
     val key: String,
     val name: String,

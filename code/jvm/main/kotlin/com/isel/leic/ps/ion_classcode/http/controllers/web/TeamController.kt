@@ -28,11 +28,18 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Team Controller
+ * All thw write operations are done by the teacher and need to ensure the classrooms are not archived
+ */
 @RestController
 class TeamController(
     private val teamService: TeamServices,
 ) {
 
+    /**
+     * Get all information about a team
+     */
     @GetMapping(Uris.TEAM_PATH)
     fun getTeamInfo(
         user: User,
@@ -61,6 +68,10 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a request for a student to join a team
+     * Needs then to be accepted by the teacher
+     */
     @PostMapping(Uris.JOIN_TEAM_PATH)
     fun joinTeam(
         user: User,
@@ -79,6 +90,10 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a request for a student to create a team
+     * Needs then to be accepted by the teacher
+     */
     @PostMapping(Uris.CREATE_TEAM_PATH)
     fun createTeam(
         user: User,
@@ -96,6 +111,9 @@ class TeamController(
         }
     }
 
+    /**
+     * List all the requests history for a team
+     */
     @GetMapping(Uris.TEAM_REQUESTS_PATH)
     fun teamRequests(
         user: User,
@@ -120,6 +138,9 @@ class TeamController(
         }
     }
 
+    /**
+     * Change the status of a request declined to pending again
+     */
     @PostMapping(Uris.TEAM_CHANGE_REQUEST_PATH)
     fun changeStatusRequest(
         user: User,
@@ -139,6 +160,10 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a request for a student to leave a team
+     * Needs then to be accepted by the teacher
+     */
     @PostMapping(Uris.EXIT_TEAM_PATH)
     fun exitTeam(
         user: User,
@@ -157,6 +182,9 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a feedback post for a team
+     */
     @PostMapping(Uris.POST_FEEDBACK_PATH)
     fun postFeedback(
         user: User,
@@ -175,6 +203,9 @@ class TeamController(
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: TeamServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             is TeamServicesError.TeamNotFound -> Problem.notFound

@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.model.github
 
+/**
+ * Represents a GitHub Organization Repository Created.
+ */
 data class OrgRepoCreated(
     val id: Int,
     val node_id: String,
@@ -90,6 +93,9 @@ data class OrgRepoCreated(
     val security_and_analysis: SecurityAndAnalysis,
 )
 
+/**
+ * Represents a GitHub Organization Repository Created Owner.
+ */
 data class CodeOfConduct(
     val key: String,
     val name: String,
@@ -98,20 +104,32 @@ data class CodeOfConduct(
     val body: String
 )
 
+/**
+ * Represents a Security and Analysis GitHub model.
+ */
 data class SecurityAndAnalysis(
     val advanced_security: AdvancedSecurity,
     val secret_scanning: SecretScanning,
     val secret_scanning_push_protection: SecretScanningPushProtection,
 )
 
+/**
+ * Represents a Secret Scanning Push Protection GitHub model.
+ */
 data class SecretScanningPushProtection(
     val enabled: String
 )
 
+/**
+ * Represents a Secret Scanning GitHub model.
+ */
 data class SecretScanning(
     val enabled: String
 )
 
+/**
+ * Represents a Advanced Security GitHub model.
+ */
 data class AdvancedSecurity(
     val enabled: String
 )

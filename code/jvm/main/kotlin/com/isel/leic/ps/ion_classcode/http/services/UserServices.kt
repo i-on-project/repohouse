@@ -9,12 +9,18 @@ import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
+/**
+ * Alias for the response of the services
+ */
 typealias UserAuthenticationResult = Either<UserServicesError, User>
 typealias UserByIdResult = Either<UserServicesError, User>
 typealias UserByGithubIdResult = Either<UserServicesError, User>
 typealias TeacherCreationResult = Either<UserServicesError, Teacher>
 typealias StudentCreationResult = Either<UserServicesError, Student>
 
+/**
+ * Error codes for the services
+ */
 sealed class UserServicesError {
     object UserNotFound : UserServicesError()
     object UserNotAuthenticated : UserServicesError()
@@ -23,10 +29,16 @@ sealed class UserServicesError {
     object ErrorCreatingUser : UserServicesError()
 }
 
+/**
+ * Service to the user services
+ */
 @Component
 class UserServices(
     private val transactionManager: TransactionManager,
 ) {
+    /**
+     * Method to check the token from a user
+     */
     fun checkAuthentication(bearerToken: String): UserAuthenticationResult {
         return transactionManager.run {
             val user = it.usersRepository.getUserByToken(bearerToken)
@@ -38,6 +50,9 @@ class UserServices(
         }
     }
 
+    /**
+     * Method to get a user by id
+     */
     fun getUserById(userId: Int): UserByIdResult {
         if (userId <= 0) return Either.Left(UserServicesError.InvalidData)
         return transactionManager.run {
@@ -50,6 +65,9 @@ class UserServices(
         }
     }
 
+    /**
+     * Method to create a request to create a user as teacher
+     */
     fun createTeacher(teacher: TeacherInput): TeacherCreationResult {
         if (teacher.name.isEmpty() || teacher.email.isEmpty()) return Either.Left(UserServicesError.InvalidData)
         return transactionManager.run {
@@ -62,6 +80,10 @@ class UserServices(
         }
     }
 
+
+    /**
+     * Method to create a user as student
+     */
     fun createStudent(student: StudentInput): StudentCreationResult {
         if (student.name.isEmpty() || student.email.isEmpty()) return Either.Left(UserServicesError.InvalidData)
         return transactionManager.run {
@@ -74,6 +96,9 @@ class UserServices(
         }
     }
 
+    /**
+     * Method to get a user by GitHub id
+     */
     fun getUserByGithubId(githubId: Long): UserByGithubIdResult {
         if (githubId <= 0) return Either.Left(UserServicesError.InvalidGithubId)
         return transactionManager.run {

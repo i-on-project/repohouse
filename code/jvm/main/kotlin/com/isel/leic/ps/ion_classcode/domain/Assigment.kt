@@ -2,6 +2,9 @@ package com.isel.leic.ps.ion_classcode.domain
 
 import java.sql.Timestamp
 
+/**
+ * Assigment Domain Interface
+ */
 data class Assigment(
     val id: Int,
     val classroomId: Int,

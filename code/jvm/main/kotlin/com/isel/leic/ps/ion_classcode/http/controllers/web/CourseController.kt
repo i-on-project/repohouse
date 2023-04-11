@@ -27,11 +27,20 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Course Controller
+ * All the write operations are only for Teachers
+ */
 @RestController
 class CourseController(
     private val courseServices: CourseServices,
 ) {
 
+    /**
+     * Create a course
+     * It will get from GitHub organizations from the Teacher's GitHub account
+     * If some of the organizations are already in the database, the Teacher is just added to the course
+     */
     @PostMapping(Uris.COURSES_PATH, produces = ["application/vnd.siren+json"])
     fun createCourse(
         user: User,
@@ -52,6 +61,9 @@ class CourseController(
         }
     }
 
+    /**
+     * Get all information about the course
+     */
     @GetMapping(Uris.COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun getCourse(
         user: User,
@@ -75,6 +87,11 @@ class CourseController(
         }
     }
 
+    /**
+     * Leave a course
+     * Only Student
+     * It will create a request to be the teacher to approve it
+     */
     @PutMapping(Uris.LEAVE_COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun leaveCourse(
         user: User,
@@ -97,6 +114,10 @@ class CourseController(
         }
     }
 
+    /**
+     * Archive a course
+     * It will archive the course and all the classrooms included in it
+     */
     @PutMapping(Uris.COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun archiveCourse(
         user: User,
@@ -159,6 +180,9 @@ class CourseController(
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: CourseServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             CourseServicesError.CourseNotFound -> Problem.courseNotFound

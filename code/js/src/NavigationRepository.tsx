@@ -31,6 +31,7 @@ export class NavigationRepository implements NavigationRepository {
 
     async ensureLink(key: string, fetchLink: () => any): Promise<SirenLink> {
         if (this.getLink(key) == null) {
+            console.log("Fetching link: " + key)
             await fetchLink()
         }
         return this.getLink(key)

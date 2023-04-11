@@ -2,6 +2,9 @@ package com.isel.leic.ps.ion_classcode.domain.input
 
 import java.sql.Timestamp
 
+/**
+ * Delivery Input Interface
+ */
 data class DeliveryInput(
     val dueDate: Timestamp,
     val assigmentId: Int,

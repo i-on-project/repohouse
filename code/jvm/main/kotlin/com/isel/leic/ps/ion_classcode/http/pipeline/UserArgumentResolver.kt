@@ -9,6 +9,10 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 
+/**
+ * Request Authentication Argument Resolver.
+ * For every required authentication operation a request header is set with user data information.
+ */
 @Component
 class UserArgumentResolver : HandlerMethodArgumentResolver {
 

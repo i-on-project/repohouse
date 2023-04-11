@@ -10,6 +10,7 @@ import java.sql.Timestamp
 import okhttp3.Request
 import org.springframework.stereotype.Component
 
+// TODO: Change the data classes to different files
 data class RepoOrg(
     val name: String,
     val full_name:String,
@@ -61,10 +62,16 @@ data class Author(
     val date:String
 )
 
+/**
+ * Service to get the repositories from GitHub
+ */
 @Component
 class GithubServices(
     val okHttp: OkHttp,
 ) {
+    /**
+     * Method to get the repositories from GitHub based on the organization and respective repository name
+     */
     suspend fun getRepository(repoName:String,token:String,orgName: String): RepoReponse {
         val tagsList = mutableListOf<Tag>()
 
@@ -104,6 +111,9 @@ class GithubServices(
     }
 
 
+    /**
+     * Method to convert the time from GitHub to Timestamp
+     */
     private fun convertGithubTime(time:String):Timestamp{
         val year = time.substring(0,4).toInt()
         val month = time.substring(5,7).toInt()

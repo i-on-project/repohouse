@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.input
 
+/**
+ * Assignment Input Interface
+ */
 data class AssignmentInput(
     val classroomId: Int,
     val maxElemsPerGroup: Int,

@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.input
 
+/**
+ * Outbox Input Interface
+ */
 data class OutboxInput(
     val userId: Int,
     val otp: Int,

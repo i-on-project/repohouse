@@ -5,7 +5,7 @@ import { SirenEntity } from './Siren'
 
 export async function fetchGet<T>(url: string) {
     const options = {
-        method:"GET",
+        method:"GET"
     }
     return await myFetch<T>(url, options)
 }

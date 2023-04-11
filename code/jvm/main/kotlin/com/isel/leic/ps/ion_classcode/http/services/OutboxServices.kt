@@ -7,8 +7,14 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
 
+/**
+ * Alias for the response of the services
+ */
 typealias OutboxResponse = Either<OutboxServicesError, Unit>
 
+/**
+ * Services for the outbox
+ */
 sealed class OutboxServicesError {
     object UserNotFound : OutboxServicesError()
     object OtpNotFound : OutboxServicesError()
@@ -21,12 +27,18 @@ sealed class OutboxServicesError {
 
 private const val COOLDOWN_TIME = 500000 // 5 minutes cooldown
 
+/**
+ * Service to the outbox services
+ */
 @Component
 class OutboxServices(
     private val transactionManager: TransactionManager,
     private val emailService: EmailService,
 ) {
 
+    /**
+     * Method to create a new outbox request
+     */
     fun createUserVerification(userId:Int):OutboxResponse {
         val otp = createRandomOtp()
         return transactionManager.run {
@@ -43,6 +55,9 @@ class OutboxServices(
         }
     }
 
+    /**
+     * Method to check the otp
+     */
     fun checkOtp(userId: Int, otp: Int): OutboxResponse {
         return transactionManager.run {
             val outbox = it.outboxRepository.getOutboxRequest(userId)
@@ -65,6 +80,9 @@ class OutboxServices(
         }
     }
 
+    /**
+     * Method scheduled to send the emails
+     */
     @Scheduled(fixedRate = 10000)
     fun sendEmails() {
         transactionManager.run {
@@ -77,14 +95,24 @@ class OutboxServices(
             }
         }
     }
+
+    /**
+     * Method to create a random otp
+     */
     private fun createRandomOtp(): Int {
         return (100000..999999).random()
     }
 
+    /**
+     * Method to convert a long to a timestamp
+     */
     private fun Long.toTimestamp(): Timestamp {
         return Timestamp(this)
     }
 
+    /**
+     * Method to add the cooldown time
+     */
     private fun addTime(): Timestamp {
         return (System.currentTimeMillis() + COOLDOWN_TIME).toTimestamp()
     }

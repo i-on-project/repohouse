@@ -14,9 +14,15 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * System Controller
+ */
 @RestController
 class SystemController {
 
+    /**
+     * Home page
+     */
     @GetMapping(Uris.HOME, produces = ["application/vnd.siren+json"])
     fun home(): ResponseEntity<SirenModel<OutputModel>> {
         return siren(value = HomeOutputModel()) {
@@ -29,6 +35,9 @@ class SystemController {
         }
     }
 
+    /**
+     * Credits page
+     */
     @GetMapping(Uris.CREDITS, produces = ["application/vnd.siren+json"])
     fun credits(): ResponseEntity<SirenModel<OutputModel>> {
         return siren(value = CreditsOutputModel()) {
@@ -38,6 +47,9 @@ class SystemController {
         }
     }
 
+    /**
+     * Fallback from api to redirect to home
+     */
     @GetMapping("*")
     fun getFallback(): ResponseEntity<Any> {
         return ResponseEntity

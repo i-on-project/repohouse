@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain
 
+/**
+ * Feedback Domain Interface
+ */
 data class Feedback(
     val id: Int,
     val description: String,

@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.requests
 
+/**
+ * Create Repo Request Interface
+ */
 data class CreateRepo(
     override val id: Int,
     val teamId:Int,

@@ -14,12 +14,18 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 
+/**
+ * Alias for the response of the services
+ */
 typealias DeliveryResponse = Either<DeliveryServicesError, DeliveryModel>
 typealias DeliveryCreatedResponse = Either<DeliveryServicesError, Int>
 typealias DeliveryDeletedResponse = Either<DeliveryServicesError, Boolean>
 typealias DeliveryUpdateResponse = Either<DeliveryServicesError, Boolean>
 typealias DeliverySyncResponse = Either<DeliveryServicesError, Boolean>
 
+/**
+ * Error codes for the services
+ */
 sealed class DeliveryServicesError {
     object NotTeacher : DeliveryServicesError()
     object InvalidInput : DeliveryServicesError()
@@ -31,11 +37,17 @@ sealed class DeliveryServicesError {
     object ClassroomArchived : DeliveryServicesError()
 }
 
+/**
+ * Services for the delivery
+ */
 @Component
 class DeliveryServices(
     val transactionManager: TransactionManager,
     val githubServices: GithubServices
 ) {
+    /**
+     * Method that creates a delivery
+     */
     fun createDelivery(deliveryInfo: DeliveryInput, userId: Int): DeliveryCreatedResponse {
         if (
             deliveryInfo.assigmentId > 0 &&
@@ -59,6 +71,9 @@ class DeliveryServices(
         }
     }
 
+    /**
+     * Method to get a delivery
+     */
     fun getDeliveryInfo(deliveryId: Int): DeliveryResponse {
         return transactionManager.run {
             val delivery = it.deliveryRepository.getDeliveryById(deliveryId)
@@ -79,6 +94,10 @@ class DeliveryServices(
         }
     }
 
+    /**
+     * Method to delete a delivery
+     * Only if the delivery has no teams
+     */
     fun deleteDelivery(deliveryId: Int, userId: Int): DeliveryDeletedResponse {
         return transactionManager.run {
             if (it.usersRepository.getTeacher(userId) == null) Either.Left(DeliveryServicesError.NotTeacher)
@@ -96,6 +115,9 @@ class DeliveryServices(
         }
     }
 
+    /**
+     * Method to update a delivery
+     */
     fun updateDelivery(deliveryId: Int, deliveryInfo: DeliveryInput, userId: Int): DeliveryUpdateResponse {
         if (
             deliveryInfo.assigmentId > 0 &&
@@ -123,6 +145,9 @@ class DeliveryServices(
         }
     }
 
+    /**
+     * Method to sync a delivery with the GitHub truth
+     */
     suspend fun syncDelivery(deliveryId: Int, userId: Int, courseId:Int): DeliverySyncResponse {
         val scopeMain = CoroutineScope(Job())
         val couroutines = mutableListOf<Job>()
@@ -192,6 +217,9 @@ class DeliveryServices(
         return Either.Right(true)
     }
 
+    /**
+     * Method to check if the classroom is archived
+     */
     private fun checkIfArchived(assignmentId: Int): Either<DeliveryServicesError, Boolean> {
         val assignment = transactionManager.run {
             it.assigmentRepository.getAssignmentById(assignmentId)

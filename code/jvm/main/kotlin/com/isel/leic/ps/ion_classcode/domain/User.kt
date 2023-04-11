@@ -1,5 +1,9 @@
 package com.isel.leic.ps.ion_classcode.domain
 
+
+/**
+ * User Interface
+ */
 sealed class User {
     abstract val id: Int
     abstract val name: String
@@ -10,6 +14,9 @@ sealed class User {
     abstract val token: String
 }
 
+/**
+ * Student Domain Interface
+ */
 data class Student(
     override val name: String,
     override val email: String,
@@ -21,6 +28,9 @@ data class Student(
     val schoolId: Int?,
 ) : User()
 
+/**
+ * Teacher Domain Interface
+ */
 data class Teacher(
     override val name: String,
     override val email: String,

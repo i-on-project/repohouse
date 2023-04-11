@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.requests
 
+/**
+ * Leave Team Request Interface
+ */
 data class LeaveTeam(
     override val id: Int,
     override val creator: Int,

@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.input
 
+/**
+ * Teacher Input Interface
+ */
 data class TeacherInput(
     val email: String,
     val githubUsername: String,

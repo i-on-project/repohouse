@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
+/**
+ * Represents a Credits Output Model.
+ */
 data class CreditsOutputModel(
     val teacher: CreditsTeacher = CreditsTeacher("Pedro Félix", "pedro.felix@isel.pt"),
     val students:List<CreditsStudent> = listOf<CreditsStudent>(
@@ -10,12 +13,18 @@ data class CreditsOutputModel(
 ):OutputModel
 
 
+/**
+ * Represents a Credits Student Output Model.
+ */
 data class CreditsStudent(
     val name:String,
     val schoolNumber:Int,
     val email:String
 )
 
+/**
+ * Represents a Credits Teacher Output Model.
+ */
 data class CreditsTeacher(
     val name:String,
     val email:String

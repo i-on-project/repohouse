@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.model.github
 
+/**
+ * Represents a GitHub Organization Membership.
+ */
 data class OrgMembership(
     val state: String,
     val role: String,
@@ -8,6 +11,9 @@ data class OrgMembership(
     val user: User,
 )
 
+/**
+ * Represents a GitHub Organization.
+ */
 data class Organization(
     val login: String,
     val id: Int,
@@ -23,6 +29,9 @@ data class Organization(
     val description: String,
 )
 
+/**
+ * Represents a GitHub User.
+ */
 data class User(
     val name: String? = null,
     val email: String? = null,

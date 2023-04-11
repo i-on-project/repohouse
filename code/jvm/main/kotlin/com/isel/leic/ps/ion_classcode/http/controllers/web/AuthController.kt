@@ -16,6 +16,7 @@ import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.AuthRedirect
 import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
@@ -48,6 +49,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.servlet.view.RedirectView
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org user:email repo"
@@ -62,6 +65,11 @@ const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
 
+/**
+ * This controller is responsible for the authentication of the users.
+ * It uses the OAuth2 protocol to authenticate the users.
+ * It also handles the callback from the OAuth2 provider.
+ */
 @RestController
 class AuthController(
     private val okHttp: OkHttp,
@@ -71,28 +79,43 @@ class AuthController(
     private val outboxServices: OutboxServices,
 ) {
 
+    /**
+     * Teacher authentication with the respective scope.
+     */
     @GetMapping(Uris.AUTH_TEACHER_PATH)
-    fun authTeacher(): ResponseEntity<Any> {
+    fun authTeacher(
+        response: HttpServletResponse
+    ): ResponseEntity<*> {
         val state = generateUserState()
-        return ResponseEntity
-            .status(Status.REDIRECT)
-            .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
-            .header(HttpHeaders.SET_COOKIE, generateUserPosition(TEACHER_COOKIE_NAME).toString())
-            .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")
-            .build()
+        response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
+        response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(TEACHER_COOKIE_NAME).toString())
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")){
+            link(href = Uris.authUriTeacher(), rel = LinkRelation("self"))
+            link(href = Uris.callbackUri(), rel = LinkRelation("authCallback"))
+        }
     }
 
+    /**
+     * Student authentication with the respective scope.
+     */
     @GetMapping(Uris.AUTH_STUDENT_PATH)
-    fun authStudent(): ResponseEntity<Any> {
+    fun authStudent(
+        response: HttpServletResponse
+    ): ResponseEntity<*> {
         val state = generateUserState()
-        return ResponseEntity
-            .status(Status.REDIRECT)
-            .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
-            .header(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
-            .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")
-            .build()
+        response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
+        response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")){
+            link(href = Uris.authUriStudent(), rel = LinkRelation("self"))
+            link(href = Uris.callbackUri(), rel = LinkRelation("authCallback"))
+        }
     }
 
+    /**
+     * Callback from the OAuth2 provider.
+     * It fetches the access token and the user info.
+     * Check if the user is created and verified, and computes accordingly.
+     */
     @GetMapping(Uris.CALLBACK_PATH, produces = ["application/vnd.siren+json"])
     suspend fun callback(
         @RequestParam code: String,
@@ -186,6 +209,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Register a student with a school id.
+     */
     @PostMapping(Uris.AUTH_REGISTER_PATH)
     fun authRegisterStudent(
         @CookieValue("PendingStudent") token: String,
@@ -225,6 +251,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Verify a student, using the OTP sent.
+     */
     @PostMapping(Uris.AUTH_REGISTER_VERIFICATION_PATH, produces = ["application/vnd.siren+json"])
     fun authRegisterVerifyStudent(
         @CookieValue("PendingStudent") token: String,
@@ -254,6 +283,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Logout the user.
+     */
     @PostMapping(Uris.LOGOUT)
     fun logout(
         response: HttpServletResponse,
@@ -285,6 +317,9 @@ class AuthController(
         return OAuthState(state, cookie)
     }
 
+    /**
+     * Create a session cookie.
+     */
     private fun generateSessionCookie(token: String): ResponseCookie {
         return ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, AESEncrypt.encrypt(token))
             .httpOnly(true)
@@ -295,6 +330,9 @@ class AuthController(
             .build()
     }
 
+    /**
+     * Create a pending student cookie.
+     */
     private fun generatePendingStudentCookie(token: String): ResponseCookie {
         return ResponseCookie.from(PENDING_STUDENT_COOKIE_NAME, token)
             .httpOnly(true)
@@ -305,6 +343,9 @@ class AuthController(
             .build()
     }
 
+    /**
+     * Remove the pending student cookie.
+     */
     private fun removePendingStudentCookie(): ResponseCookie {
         return ResponseCookie.from(PENDING_STUDENT_COOKIE_NAME, "")
             .httpOnly(true)
@@ -315,6 +356,9 @@ class AuthController(
             .build()
     }
 
+    /**
+     * Create a user position cookie.
+     */
     private fun generateUserPosition(position: String): ResponseCookie {
         return ResponseCookie.from("position", position)
             .path(STATE_COOKIE_PATH)
@@ -325,6 +369,9 @@ class AuthController(
             .build()
     }
 
+    /**
+     * Method to fetch the user access token from GitHub.
+     */
     private suspend fun fetchAccessToken(code: String): ClientToken {
         val request = Request.Builder().url("$GITHUB_BASE_URL${GITHUB_ACCESS_TOKEN_URI(code)}")
             .addHeader("Accept", "application/json")
@@ -334,6 +381,9 @@ class AuthController(
         return okHttp.makeCallToObject(request)
     }
 
+    /**
+     * Method to fetch the user info from GitHub.
+     */
     private suspend fun fetchUserInfo(accessToken: String): GitHubUserInfo {
         val request = Request.Builder().url("$GITHUB_API_BASE_URL$GITHUB_USERINFO_URI")
             .addHeader("Authorization", "Bearer $accessToken")
@@ -343,6 +393,9 @@ class AuthController(
         return okHttp.makeCallToObject(request)
     }
 
+    /**
+     * Method to fetch the user emails from GitHub.
+     */
     private suspend fun fetchUserEmails(accessToken: String): List<GitHubUserEmail> {
         val request = Request.Builder().url("$GITHUB_API_BASE_URL$GITHUB_USERMAILS_URI")
             .addHeader("Authorization", "Bearer $accessToken")
@@ -352,10 +405,16 @@ class AuthController(
         return okHttp.makeCallToList(request)
     }
 
+    /**
+     * Generate a random token.
+     */
     private fun generateRandomToken(): String {
         return UUID.randomUUID().toString()
     }
 
+    /**
+     * Function to handle errors about the user.
+     */
     private fun problemUser(error: UserServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             UserServicesError.InvalidData -> Problem.invalidInput
@@ -366,6 +425,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Function to handle errors about the OTP.
+     */
     private fun problemOtp(error: OutboxServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             OutboxServicesError.OtpExpired -> Problem.gone
@@ -378,6 +440,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Function to handle errors about the student.
+     */
     private fun problemStudent(error: StudentServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             is StudentServicesError.UserNotFound -> Problem.userNotFound

@@ -1,8 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.awt.print.Book
 import java.io.IOException
 import okhttp3.Call
 import okhttp3.Callback
@@ -15,6 +13,9 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 
+/**
+ * Interface to be implemented by classes that make http calls.
+ */
 interface Caller {
     suspend fun <T : Any> makeCallToObject(request: Request, kClass: Class<T>): T
     suspend fun <T : Any> makeCallToList(request: Request, kClass: Class<T>): List<T>
@@ -23,6 +24,11 @@ interface Caller {
 suspend inline fun <reified T : Any> Caller.makeCallToObject(request: Request): T = makeCallToObject(request, T::class.java)
 suspend inline fun <reified T : Any> Caller.makeCallToList(request: Request): List<T> = makeCallToList(request, T::class.java)
 
+/**
+ * OkHttp's implementation of Caller interface.
+ * @param okHttpClient client to be used to make requests
+ * @param jsonMapper mapper to be used to map json responses to objects
+ */
 @Component
 class OkHttp(
     private val okHttpClient: OkHttpClient,

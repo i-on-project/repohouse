@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.requests
 
+/**
+ * Request Interface
+ */
 interface RequestInterface {
     val id: Int
     val creator: Int
@@ -11,6 +14,9 @@ interface RequestInterface {
     }
 }
 
+/**
+ * Request Data Class
+ */
 data class Request(
     override val id: Int,
     override val creator: Int,

@@ -27,12 +27,17 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Assigment controller
+ * All the write operations are only for teachers and need to ensure that the classroom is not archived
+ */
 @RestController
 class AssigmentController(
-    private val assigmentService: AssigmentServices,
-    private val githubServices: GithubServices,
-    private val userServices: TeacherServices
+    private val assigmentService: AssigmentServices
 ) {
+    /**
+     * Get all information about an assigment
+     */
     @GetMapping(Uris.ASSIGMENT_PATH)
     fun getAssigmentInfo(
         user: User,
@@ -89,6 +94,10 @@ class AssigmentController(
         }
     }
 
+    /**
+     * Create a new assigment
+     * Only Teacher
+     */
     @PostMapping(Uris.ASSIGMENTS_PATH)
     fun createAssignment(
         user: User,
@@ -96,6 +105,7 @@ class AssigmentController(
         @PathVariable("classroomId") classroomId: Int,
         @RequestBody assigmentInfo: AssigmentInputModel,
     ): ResponseEntity<*> {
+        if (user !is Teacher) return Problem.notTeacher
         return when (val assigment = assigmentService.createAssigment(assigmentInfo, user.id)) {
             is Either.Left -> problem(assigment.value)
             is Either.Right -> siren(value = AssigmentCreatedOutputModel(assigment.value)) {
@@ -108,6 +118,10 @@ class AssigmentController(
         }
     }
 
+    /**
+     * Delete an assigment need to not have deliveries
+     * Only Teacher
+     */
     @DeleteMapping(Uris.DELETE_ASSIGMENT_PATH)
     fun deleteAssigment(
         user: User,
@@ -127,6 +141,9 @@ class AssigmentController(
         }
     }
 
+    /**
+     * Function to handle errors
+     */
     private fun problem(error: AssigmentServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             AssigmentServicesError.NotTeacher -> Problem.notTeacher

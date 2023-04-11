@@ -12,6 +12,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 
+/**
+ * Alias for the response of the services
+ */
 typealias ClassroomResponse = Either<ClassroomServicesError, ClassroomModel>
 typealias ClassroomArchivedResponse = Either<ClassroomServicesError, ClassroomArchivedModel>
 typealias ClassroomCreateResponse = Either<ClassroomServicesError, Int>
@@ -19,18 +22,27 @@ typealias ClassroomEnterResponse = Either<ClassroomServicesError, ClassroomModel
 typealias ClassroomSyncResponse = Either<ClassroomServicesError, Boolean>
 typealias ClassroomLocalCopyResponse = Either<ClassroomServicesError, Boolean>
 
+/**
+ * Error codes for the services
+ */
 sealed class ClassroomServicesError {
     object ClasroomNotFound : ClassroomServicesError()
     object ClassroomArchived : ClassroomServicesError()
     object AlreadyInClassroom : ClassroomServicesError()
 }
 
+/**
+ * Services for the classroom
+ */
 @Component
 class ClassroomServices(
     private val transactionManager: TransactionManager,
     private val deliveryServices: DeliveryServices
 ) {
 
+    /**
+     * Method that gets a classroom
+     */
     fun getClassroom(classroomId: Int): ClassroomResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {
@@ -44,6 +56,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method that creates a classroom
+     */
     fun createClassroom(classroomInput: ClassroomInput): ClassroomCreateResponse {
         return transactionManager.run {
             val otherInviteLinks = it.classroomRepository.getAllInviteLinks()
@@ -53,6 +68,10 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method that archives or deletes a classroom
+     * If the classroom has no assignments, it is deleted
+     */
     fun archiveOrDeleteClassroom(classroomId: Int): ClassroomArchivedResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) { // Safety check
@@ -72,6 +91,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method that edits a classroom
+     */
     fun editClassroom(classroomId: Int, classroomUpdateInput: ClassroomUpdateInputModel): ClassroomResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {
@@ -87,6 +109,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to enter a classroom with an invitation link
+     */
     fun enterClassroomWithInvite(inviteLink: String,studentId: Int): ClassroomEnterResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomByInviteLink(inviteLink)) {
@@ -104,6 +129,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to sync the classroom with the GitHub truth
+     */
     suspend fun syncClassroom(classroomId: Int, userId: Int,courseId:Int): ClassroomSyncResponse {
         val scopeMain = CoroutineScope(Job())
         val couroutines = mutableListOf<Job>()
@@ -125,6 +153,9 @@ class ClassroomServices(
         return Either.Right(true)
     }
 
+    /**
+     * Method to get the local copy of the classroom to path in the personal computer
+     */
     fun localCopy(classroomId: Int,path:String): ClassroomLocalCopyResponse{
         return transactionManager.run {
             val classroom = it.classroomRepository.getClassroomById(classroomId)
@@ -150,6 +181,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to generate a random invite link
+     */
     private fun generateRandomInviteLink(otherInviteLinks: List<String>): String {
         val chars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         val inviteLink = (10..30)
@@ -162,6 +196,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to delete a directory recursively
+     */
     private fun deleteDirectoryRecursion(file: File) {
         if (file.isDirectory) {
             file.listFiles()?.forEach { deleteDirectoryRecursion(it) }

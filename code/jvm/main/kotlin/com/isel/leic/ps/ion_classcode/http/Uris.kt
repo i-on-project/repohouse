@@ -3,6 +3,9 @@ package com.isel.leic.ps.ion_classcode.http
 import org.springframework.web.util.UriTemplate
 import java.net.URI
 
+/**
+ * Uris used in the application.
+ */
 object Uris {
 
     private const val API = "/api"
@@ -47,7 +50,7 @@ object Uris {
     const val DELETE_ASSIGMENT_PATH = "$ASSIGMENT_PATH/delete"
     const val TEAMS_PATH = "$ASSIGMENT_PATH/teams"
     const val TEAM_PATH = "$TEAMS_PATH/{teamId}"
-    const val CREATE_TEAM_PATH = "$TEAM_PATH/create"
+    const val CREATE_TEAM_PATH = "$TEAMS_PATH/create"
     const val JOIN_TEAM_PATH = "$TEAM_PATH/join"
     const val EXIT_TEAM_PATH = "$TEAM_PATH/exit"
     const val EDIT_DELIVERY_PATH = "$DELIVERY_PATH/edit"

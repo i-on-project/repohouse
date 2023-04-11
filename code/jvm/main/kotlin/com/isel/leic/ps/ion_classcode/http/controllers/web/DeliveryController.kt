@@ -22,11 +22,18 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Delivery Controller
+ * All the write operations are done by the teacher and need to ensure the classroom is not archived
+ */
 @RestController
 class DeliveryController(
     private val deliveryServices: DeliveryServices,
 ) {
 
+    /**
+     * Get all information about a delivery
+     */
     @GetMapping(Uris.DELIVERY_PATH)
     fun getDeliveryInfo(
         user: User,
@@ -73,6 +80,9 @@ class DeliveryController(
         }
     }
 
+    /**
+     * Create a new delivery
+     */
     @PostMapping(Uris.CREATE_DELIVERY_PATH)
     fun createDelivery(
         user: User,
@@ -121,6 +131,9 @@ class DeliveryController(
         }
     }
 
+    /**
+     * Delete a delivery
+     */
     @DeleteMapping(Uris.DELIVERY_PATH)
     fun deleteDelivery(
         user: User,
@@ -139,6 +152,9 @@ class DeliveryController(
         }
     }
 
+    /**
+     * Edit a delivery
+     */
     @PostMapping(Uris.EDIT_DELIVERY_PATH)
     fun editDelivery(
         user: User,
@@ -160,6 +176,9 @@ class DeliveryController(
         }
     }
 
+    /**
+     * Sync a delivery with the GitHub truth
+     */
     @PostMapping(Uris.SYNC_DELIVERY_PATH)
     suspend fun syncDelivery(
         user: User,
@@ -180,6 +199,9 @@ class DeliveryController(
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: DeliveryServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             DeliveryServicesError.DeliveryNotFound -> Problem.notFound

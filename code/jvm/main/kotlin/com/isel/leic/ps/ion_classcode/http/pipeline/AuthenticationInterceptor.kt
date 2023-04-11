@@ -12,6 +12,10 @@ import org.springframework.web.util.WebUtils
 
 class AuthenticationFailed: Exception()
 
+/**
+ * Authorization Interceptor that guarantees authentication for operations that require authentication.
+ * @param authorizationHeaderProcessor Request Authorization Header Bearer Token Processor
+ */
 @Component
 class AuthenticationInterceptor(
     private val authorizationHeaderProcessor: AuthorizationHeaderProcessor

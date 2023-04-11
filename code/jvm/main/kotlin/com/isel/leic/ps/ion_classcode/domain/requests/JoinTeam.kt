@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.requests
 
+/**
+ * Join Team Request Interface
+ */
 data class JoinTeam(
     override val id: Int,
     override val creator: Int,

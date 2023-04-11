@@ -8,20 +8,32 @@ import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
+/**
+ * Alias for the response of the services
+ */
 typealias TeacherCoursesResponse = Either<TeacherServicesError, List<Course>>
 typealias TeacherPendingResponse = Either<TeacherServicesError, List<TeacherPending>>
 typealias TeachersApproveResponse = Either<TeacherServicesError, Boolean>
 
+/**
+ * Error codes for the services
+ */
 sealed class TeacherServicesError {
     object CourseNotFound : TeacherServicesError()
     object TeacherNotFound : TeacherServicesError()
 }
 
+/**
+ * Service to the teacher services
+ */
 @Component
 class TeacherServices(
     private val transactionManager: TransactionManager,
 ) {
 
+    /**
+     * Method to get all the courses of a teacher
+     */
     fun getCourses(teacherId: Int): TeacherCoursesResponse {
         return transactionManager.run {
             val courses = it.courseRepository.getAllUserCourses(userId = teacherId)
@@ -29,6 +41,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to get all the teachers that need approval
+     */
     fun getTeachersNeedingApproval(): TeacherPendingResponse {
         return transactionManager.run {
             val requestsPending = it.applyRequestRepository.getApplyRequests().filter { request -> request.state == "Pending" }
@@ -45,6 +60,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to approve or reject a teacher
+     */
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
         return transactionManager.run {
             teachers.approved.map { teacherRequest ->
@@ -57,6 +75,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to get the GitHub token of a teacher
+     */
     fun getTeacherGithubToken(teacherId: Int): Either<TeacherServicesError, String> {
         return transactionManager.run {
             val teacher = it.usersRepository.getTeacherGithubToken(teacherId)

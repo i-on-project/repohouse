@@ -26,12 +26,18 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Menu Controller
+ */
 @RestController
 class MenuController(
     private val teacherServices: TeacherServices,
     private val studentServices: StudentServices,
 ) {
 
+    /**
+     * Get all courses belonging to the user
+     */
     @GetMapping(Uris.MENU_PATH, produces = ["application/vnd.siren+json"])
     fun menu(
         user: User,
@@ -43,6 +49,10 @@ class MenuController(
         }
     }
 
+    /**
+     * Menu for teachers
+     * Link to approve teachers
+     */
     private fun menuTeacher(
         user: User,
     ): ResponseEntity<*> {
@@ -63,6 +73,9 @@ class MenuController(
         }
     }
 
+    /**
+     * Menu for students
+     */
     private fun menuStudent(
         user: User,
     ): ResponseEntity<*> {
@@ -82,6 +95,9 @@ class MenuController(
         }
     }
 
+    /**
+     * Get all teachers needing approval
+     */
     @GetMapping(Uris.TEACHERS_APPROVAL_PATH, produces = ["application/vnd.siren+json"])
     fun teachersApproval(
         user: User,
@@ -110,6 +126,9 @@ class MenuController(
         }
     }
 
+    /**
+     * Approve teacher
+     */
     @PostMapping(Uris.TEACHERS_APPROVAL_PATH, produces = ["application/vnd.siren+json"])
     fun teacherApproved(
         input: TeachersPendingInputModel,
@@ -126,6 +145,10 @@ class MenuController(
                     .build()
         }
     }
+
+    /**
+     * Function to handle errors from student
+     */
     private fun problemStudent(error: StudentServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             is StudentServicesError.UserNotFound -> Problem.userNotFound
@@ -133,6 +156,9 @@ class MenuController(
         }
     }
 
+    /**
+     * Function to handle errors from teacher
+     */
     private fun problemTeacher(error: TeacherServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             is TeacherServicesError.CourseNotFound -> Problem.courseNotFound

@@ -1,18 +1,21 @@
 export interface Error{
     state: number,
     error: string,
-    message: string
+    message: string,
+    data: any
 }
 
 export class ErrorMessageModel{
     constructor(
         public state: number,
         public error: string,
-        public message: string
+        public message: string,
+        public data: any
     ) {
         this.state = state;
         this.error = error;
         this.message = message;
+        this.data = data;
     }
 }
 

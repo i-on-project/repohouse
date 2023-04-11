@@ -9,11 +9,17 @@ import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
+/**
+ * Alias for the response of the services
+ */
 typealias AssigmentResponse = Either<AssigmentServicesError, AssigmentModel>
 typealias AssigmentCreatedResponse = Either<AssigmentServicesError, Assigment>
 typealias AssigmentDeletedResponse = Either<AssigmentServicesError, Boolean>
 typealias AssigmentStudentTeamResponse = Either<AssigmentServicesError, List<Team>>
 
+/**
+ * Error codes for the services
+ */
 sealed class AssigmentServicesError {
     object NotTeacher : AssigmentServicesError()
     object InvalidInput : AssigmentServicesError()
@@ -23,11 +29,17 @@ sealed class AssigmentServicesError {
     object ClassroomNotFound : AssigmentServicesError()
 }
 
+/**
+ * Services for the assigment
+ */
 @Component
 class AssigmentServices(
     val transactionManager: TransactionManager,
 ) {
 
+    /**
+     * Method that creates an assigment
+     */
     fun createAssigment(assigmentInfo: AssigmentInputModel, userId: Int): AssigmentCreatedResponse {
         if (
             assigmentInfo.classroomId > 0 &&
@@ -60,6 +72,9 @@ class AssigmentServices(
         }
     }
 
+    /**
+     * Method that gets an assigment
+     */
     fun getAssigmentInfo(assigmentId: Int): AssigmentResponse {
         return transactionManager.run {
             val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
@@ -73,6 +88,10 @@ class AssigmentServices(
         }
     }
 
+    /**
+     * Method that deletes an assigment
+     * Checks if the classroom is not archived
+     */
     fun deleteAssigment(assigmentId: Int): AssigmentDeletedResponse {
         return transactionManager.run {
             val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
@@ -98,6 +117,9 @@ class AssigmentServices(
         }
     }
 
+    /**
+     * Method that gets the teams from a student of an assigment
+     */
     fun getAssigmentStudentTeams(assigmentId: Int, studentId: Int): AssigmentStudentTeamResponse {
         return transactionManager.run {
             val assigment = it.assigmentRepository.getAssignmentById(assigmentId)

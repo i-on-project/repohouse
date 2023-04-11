@@ -6,6 +6,9 @@ import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 
+/**
+ * Represents a Course Output Model.
+ */
 data class CourseOutputModel(
     val id: Int,
     val orgUrl: String,
@@ -13,6 +16,9 @@ data class CourseOutputModel(
     val teacher: List<Teacher>,
 ) : OutputModel
 
+/**
+ * Represents a Course with the respective classrooms included Output Model.
+ */
 data class CourseWithClassroomOutputModel(
     val id: Int,
     val orgUrl: String,
@@ -22,22 +28,17 @@ data class CourseWithClassroomOutputModel(
     val classrooms: List<Classroom>,
 ) : OutputModel
 
-data class CourseWithStudentsOutputModel(
-    val id: Int,
-    val orgUrl: String,
-    val name: String,
-    val teacher: List<Teacher>,
-    val students: List<Student>,
-) : OutputModel
 
-data class CoursesOutputModel(
-    val courses: List<CourseWithClassrooms>,
-) : OutputModel
-
+/**
+ * Represents a Course Created Output Model.
+ */
 data class CourseCreatedOutputModel(
     val course: Course,
 )
 
+/**
+ * Represents a Course Deleted Output Model.
+ */
 data class CourseDeletedOutputModel(
     val id: Int,
     val deleted: Boolean

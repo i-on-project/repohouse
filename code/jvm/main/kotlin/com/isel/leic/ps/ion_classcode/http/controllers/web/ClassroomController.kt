@@ -25,11 +25,18 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Classrooms Controller
+ * All the write operations are done by the teacher
+ */
 @RestController
 class ClassroomController(
     private val classroomServices: ClassroomServices
 ) {
 
+    /**
+     * Get all classroom information
+     */
     @GetMapping(Uris.CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun getClassroom(
         user: User,
@@ -45,7 +52,7 @@ class ClassroomController(
                     link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher && !classroom.value.isArchived) {
-                    link(rel = LinkRelation("local-copy"), href = Uris.localCopyUri(courseId, classroomId), needAuthentication = true)
+                    action(name = "local-copy", href = Uris.localCopyUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "create-assigment", href = Uris.createAssigmentUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "edit-classroom", href = Uris.editClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "sync-classroom", href = Uris.syncClassroomUri(courseId,classroomId), method = HttpMethod.POST, type = "application/json", block = {})
@@ -55,6 +62,9 @@ class ClassroomController(
         }
     }
 
+    /**
+     * Create a new classroom
+     */
     @PostMapping(Uris.CREATE_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun createClassroom(
         user: User,
@@ -74,6 +84,10 @@ class ClassroomController(
         }
     }
 
+    /**
+     * Archive a classroom
+     * Possible if no assigments are created
+     */
     @PostMapping(Uris.ARCHIVE_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun archiveClassroom(
         user: User,
@@ -102,6 +116,10 @@ class ClassroomController(
         }
     }
 
+    /**
+     * Edit a classroom
+     * Only Teacher
+     */
     @PostMapping(Uris.EDIT_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun editClassroom(
         user: User,
@@ -119,6 +137,9 @@ class ClassroomController(
         }
     }
 
+    /**
+     * Enter a classroom with an invitation link
+     */
     @PostMapping(Uris.INVITE_LINK_PATH, produces = ["application/vnd.siren+json"])
     fun inviteLink(
         user: User,
@@ -136,6 +157,9 @@ class ClassroomController(
     }
 
 
+    /**
+     * Sync a classroom with the GitHub truth
+     */
     @PostMapping(Uris.SYNC_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     suspend fun syncClassroom(
         user: User,
@@ -155,7 +179,11 @@ class ClassroomController(
         }
     }
 
-    @GetMapping(Uris.LOCAL_COPY_PATH)
+    /**
+     * Create a local copy of a classroom to the personal computer
+     * Only Teacher
+     */
+    @PostMapping(Uris.LOCAL_COPY_PATH)
     fun localCopy(
         user: User,
         @PathVariable classroomId: Int,
@@ -171,6 +199,9 @@ class ClassroomController(
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: ClassroomServicesError): ResponseEntity<*> {
         return when (error) {
             ClassroomServicesError.ClasroomNotFound -> Problem.notFound
