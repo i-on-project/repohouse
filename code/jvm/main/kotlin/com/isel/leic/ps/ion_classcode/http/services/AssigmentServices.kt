@@ -59,7 +59,7 @@ class AssigmentServices(
             } else if (classroom.isArchived) {
                 Either.Left(AssigmentServicesError.ClassroomArchived)
             }
-            val assigment = it.assigmentRepository.createAssignment(
+            val assigment = it.assignmentRepository.createAssignment(
                 AssignmentInput(
                     assigmentInfo.classroomId,
                     assigmentInfo.maxNumberElems,
@@ -77,7 +77,7 @@ class AssigmentServices(
      */
     fun getAssigmentInfo(assigmentId: Int): AssigmentResponse {
         return transactionManager.run {
-            val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
+            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
             if (assigment == null) {
                 Either.Left(AssigmentServicesError.AssigmentNotFound)
             } else {
@@ -94,7 +94,7 @@ class AssigmentServices(
      */
     fun deleteAssigment(assigmentId: Int): AssigmentDeletedResponse {
         return transactionManager.run {
-            val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
+            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
             if (assigment == null) {
                 Either.Left(AssigmentServicesError.AssigmentNotFound)
             } else {
@@ -111,7 +111,7 @@ class AssigmentServices(
                         AssigmentServicesError.AssigmentNotDeleted,
                     )
                 }
-                it.assigmentRepository.deleteAssignment(assigmentId)
+                it.assignmentRepository.deleteAssignment(assigmentId)
                 Either.Right(true)
             }
         }
@@ -122,7 +122,7 @@ class AssigmentServices(
      */
     fun getAssigmentStudentTeams(assigmentId: Int, studentId: Int): AssigmentStudentTeamResponse {
         return transactionManager.run {
-            val assigment = it.assigmentRepository.getAssignmentById(assigmentId)
+            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
             if (assigment == null) {
                 Either.Left(AssigmentServicesError.AssigmentNotFound)
             } else {

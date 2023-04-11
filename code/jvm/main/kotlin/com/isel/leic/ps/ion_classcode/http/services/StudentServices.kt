@@ -38,7 +38,6 @@ class StudentServices(
         }
     }
 
-
     /**
      * Method to get the school id of a student
      */

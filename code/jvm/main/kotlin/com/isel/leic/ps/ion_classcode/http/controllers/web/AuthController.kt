@@ -49,8 +49,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.servlet.view.RedirectView
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org user:email repo"
@@ -89,7 +87,7 @@ class AuthController(
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(TEACHER_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")){
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")) {
             link(href = Uris.authUriTeacher(), rel = LinkRelation("self"))
             link(href = Uris.callbackUri(), rel = LinkRelation("authCallback"))
         }
@@ -105,7 +103,7 @@ class AuthController(
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")){
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")) {
             link(href = Uris.authUriStudent(), rel = LinkRelation("self"))
             link(href = Uris.callbackUri(), rel = LinkRelation("authCallback"))
         }
@@ -422,6 +420,13 @@ class AuthController(
             UserServicesError.UserNotAuthenticated -> Problem.unauthenticated
             UserServicesError.ErrorCreatingUser -> Problem.internalError
             UserServicesError.InvalidGithubId -> Problem.invalidInput
+            UserServicesError.InvalidBearerToken -> Problem.invalidInput
+            UserServicesError.GithubIdInUse -> Problem.conflict
+            UserServicesError.TokenInUse -> Problem.conflict
+            UserServicesError.EmailInUse -> Problem.conflict
+            UserServicesError.GithubUserNameInUse -> Problem.conflict
+            UserServicesError.GithubTokenInUse -> Problem.conflict
+            UserServicesError.SchoolIdInUse -> Problem.conflict
         }
     }
 

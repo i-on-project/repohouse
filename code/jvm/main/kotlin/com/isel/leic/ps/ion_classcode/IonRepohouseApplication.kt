@@ -21,7 +21,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
-
 const val DATABASE_URL = "JDBC_DATABASE_URL"
 
 @SpringBootApplication

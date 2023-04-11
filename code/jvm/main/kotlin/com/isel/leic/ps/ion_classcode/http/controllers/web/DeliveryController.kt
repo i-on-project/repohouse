@@ -92,11 +92,11 @@ class DeliveryController(
         @RequestBody deliveryInfo: DeliveryInput,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val deliveryId = deliveryServices.createDelivery(deliveryInfo,user.id)){
+        return when (val deliveryId = deliveryServices.createDelivery(deliveryInfo, user.id)) {
             is Either.Left -> problem(deliveryId.value)
-            is Either.Right -> when(val delivery = deliveryServices.getDeliveryInfo(deliveryId.value)){
+            is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId.value)) {
                 is Either.Left -> problem(delivery.value)
-                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery,delivery.value.teamsDelivered,delivery.value.teamsNotDelivered)){
+                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId.value), rel = LinkRelation("self"), needAuthentication = true)
                     link(href = Uris.deliverysUri(courseId, classroomId, assigmentId), rel = LinkRelation("deliveries"), needAuthentication = true)
                     delivery.value.teamsNotDelivered.forEach {
@@ -143,11 +143,11 @@ class DeliveryController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val delivery = deliveryServices.deleteDelivery(deliveryId,user.id)) {
+        return when (val delivery = deliveryServices.deleteDelivery(deliveryId, user.id)) {
             is Either.Left -> problem(delivery.value)
-            is Either.Right -> siren(DeliveryDeleteOutputModel(deliveryId,delivery.value)){
+            is Either.Right -> siren(DeliveryDeleteOutputModel(deliveryId, delivery.value)) {
                 clazz("delivery-deleted")
-                link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId,classroomId, assigmentId), needAuthentication = true)
+                link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, assigmentId), needAuthentication = true)
             }
         }
     }
@@ -165,11 +165,11 @@ class DeliveryController(
         @RequestBody deliveryInfo: DeliveryInput,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val updateDelivery = deliveryServices.updateDelivery(deliveryId,deliveryInfo,user.id)){
+        return when (val updateDelivery = deliveryServices.updateDelivery(deliveryId, deliveryInfo, user.id)) {
             is Either.Left -> problem(updateDelivery.value)
-            is Either.Right -> when(val delivery = deliveryServices.getDeliveryInfo(deliveryId)){
+            is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
                 is Either.Left -> problem(delivery.value)
-                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery,delivery.value.teamsDelivered,delivery.value.teamsNotDelivered)){
+                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
                 }
             }
@@ -188,11 +188,11 @@ class DeliveryController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when(val syncDelivery = deliveryServices.syncDelivery(deliveryId,user.id,courseId)){
+        return when (val syncDelivery = deliveryServices.syncDelivery(deliveryId, user.id, courseId)) {
             is Either.Left -> problem(syncDelivery.value)
-            is Either.Right -> when(val delivery = deliveryServices.getDeliveryInfo(deliveryId)){
+            is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
                 is Either.Left -> problem(delivery.value)
-                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery,delivery.value.teamsDelivered,delivery.value.teamsNotDelivered)){
+                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
                 }
             }

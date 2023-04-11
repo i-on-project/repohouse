@@ -4,9 +4,8 @@ package com.isel.leic.ps.ion_classcode.http.model.output
  * Represents a Teachers Pending Output Model.
  */
 data class TeachersPendingOutputModel(
-    val teachers : List<TeacherPending>
-):OutputModel
-
+    val teachers: List<TeacherPending>
+) : OutputModel
 
 /**
  * Represents a Teacher Pending Model for inner functions.

@@ -8,7 +8,7 @@ data class MenuStudentOutputModel(
     val schoolNumber: Int,
     val email: String,
     val courses: List<CourseOutputModel>
-): OutputModel
+) : OutputModel
 
 /**
  * Represents a Menu Teacher Output Model.
@@ -17,4 +17,4 @@ data class MenuTeacherOutputModel(
     val name: String,
     val email: String,
     val courses: List<CourseOutputModel>
-):OutputModel
+) : OutputModel

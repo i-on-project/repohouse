@@ -7,4 +7,8 @@ data class CourseInputModel(
     val orgUrl: String,
     val name: String,
     val teacherId: Int
-)
+) {
+    fun isNotValid(): Boolean {
+        return !(orgUrl.isNotEmpty() && name.isNotEmpty() && teacherId > 0)
+    }
+}

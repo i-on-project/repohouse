@@ -1,6 +1,5 @@
 package com.isel.leic.ps.ion_classcode.domain
 
-
 /**
  * User Interface
  */

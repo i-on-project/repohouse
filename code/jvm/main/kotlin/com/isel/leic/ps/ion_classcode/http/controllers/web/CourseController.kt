@@ -6,7 +6,7 @@ import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
@@ -69,13 +69,13 @@ class CourseController(
         user: User,
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.getCourseById(courseId,user.id)) {
+        return when (val course = courseServices.getCourseById(courseId, user.id)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teachers, course.value.isArchived, course.value.classrooms)) {
                 clazz("course")
                 link(rel = LinkRelation("self"), href = Uris.courseUri(course.value.id), needAuthentication = true)
                 course.value.classrooms.forEach {
-                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,it.id), needAuthentication = true)
+                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher) {
                     action(name = "create-classroom", method = HttpMethod.POST, href = Uris.createClassroomUri(course.value.id), type = "x-www-form-urlencoded", block = {
@@ -127,8 +127,8 @@ class CourseController(
         return when (val archive = courseServices.archiveOrDeleteCourse(courseId)) {
             is Either.Left -> problem(CourseServicesError.CourseNotFound)
             is Either.Right ->
-                if (archive.value is CourseArchivedModel.CourseArchived) {
-                    when (val course = courseServices.getCourseById(courseId,user.id)) {
+                if (archive.value is CourseArchivedOutputModel.CourseArchived) {
+                    when (val course = courseServices.getCourseById(courseId, user.id)) {
                         is Either.Left -> problem(course.value)
                         is Either.Right -> siren(
                             value = CourseWithClassroomOutputModel(
@@ -149,7 +149,7 @@ class CourseController(
                             course.value.classrooms.forEach {
                                 link(
                                     rel = LinkRelation("classroom"),
-                                    href = Uris.classroomUri(courseId,it.id),
+                                    href = Uris.classroomUri(courseId, it.id),
                                     needAuthentication = true,
                                 )
                             }
@@ -194,6 +194,7 @@ class CourseController(
             CourseServicesError.NotTeacher -> Problem.notTeacher
             CourseServicesError.InvalidInput -> Problem.invalidInput
             CourseServicesError.CourseArchived -> Problem.invalidOperation
+            CourseServicesError.CourseNameAlreadyExists -> Problem.conflict
         }
     }
 }

@@ -23,7 +23,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 /** Finding place to this functions **/
 
-class GithubAPIFuncions (
+class GithubAPIFuncions(
     private val okHttp: OkHttp
 ) {
     private suspend fun getOrgRepos(

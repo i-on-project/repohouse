@@ -3,7 +3,7 @@ package com.isel.leic.ps.ion_classcode.repository
 import com.isel.leic.ps.ion_classcode.domain.Assigment
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 
-interface AssigmentRepository {
+interface AssignmentRepository {
     fun createAssignment(assignment: AssignmentInput): Assigment
     fun getAssignmentById(assignmentId: Int): Assigment?
     fun getAssignmentsByClassroom(classroomId: Int): List<Assigment>

@@ -11,6 +11,29 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
 class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
+    override fun checkIfOrgUrlExists(orgUrl: String): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM Course
+            WHERE org_url = :org_url
+            """,
+        )
+            .bind("org_url", orgUrl)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
+
+    override fun checkIfCourseNameExists(name: String): Boolean {
+        return handle.createQuery(
+            """
+            SELECT id FROM Course
+            WHERE name = :name
+            """,
+        )
+            .bind("name", name)
+            .mapTo<Int>()
+            .firstOrNull() != null
+    }
 
     override fun createCourse(course: CourseInput): Course {
         val id = handle.createUpdate(

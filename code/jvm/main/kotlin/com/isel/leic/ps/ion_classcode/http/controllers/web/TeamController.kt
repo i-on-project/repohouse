@@ -11,8 +11,8 @@ import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.FeedbackOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestChangeStatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestCreatedOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.TeamServices
@@ -103,7 +103,7 @@ class TeamController(
         @RequestBody createTeamInfo: CreateTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val create = teamService.createTeamRequest(createTeamInfo,assigmentId,classroomId)) {
+        return when (val create = teamService.createTeamRequest(createTeamInfo, assigmentId, classroomId)) {
             is Either.Left -> problem(create.value)
             is Either.Right -> siren(TeamOutputModel(create.value.team, create.value.students, create.value.repos, create.value.feedbacks)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, create.value.team.id), rel = LinkRelation("team"), needAuthentication = true)
@@ -151,7 +151,7 @@ class TeamController(
         @PathVariable requestId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val change = teamService.updateTeamRequestStatus(requestId, teamId,classroomId)) {
+        return when (val change = teamService.updateTeamRequestStatus(requestId, teamId, classroomId)) {
             is Either.Left -> problem(change.value)
             is Either.Right -> siren(RequestChangeStatusOutputModel(requestId, change.value)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
@@ -195,7 +195,7 @@ class TeamController(
         @RequestBody feedbackInfo: FeedbackInput,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val feedback = teamService.postFeedback(feedbackInfo,classroomId)) {
+        return when (val feedback = teamService.postFeedback(feedbackInfo, classroomId)) {
             is Either.Left -> problem(feedback.value)
             is Either.Right -> siren(FeedbackOutputModel(feedback.value, true)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)

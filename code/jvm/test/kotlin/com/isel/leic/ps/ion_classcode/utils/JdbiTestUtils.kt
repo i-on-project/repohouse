@@ -23,19 +23,19 @@ fun testWithHandleAndRollback(block: (Handle) -> Unit) = jdbi().useTransaction<E
 }
 
 fun testWithTransactionManagerAndRollback(block: (TransactionManager) -> Unit) = jdbi().useTransaction<Exception>
-    { handle ->
+{ handle ->
 
-        val transaction = JdbiTransaction(handle)
+    val transaction = JdbiTransaction(handle)
 
-        // a test TransactionManager that never commits
-        val transactionManager = object : TransactionManager {
-            override fun <R> run(block: (Transaction) -> R): R {
-                return block(transaction)
-                // n.b. no commit happens
-            }
+    // a test TransactionManager that never commits
+    val transactionManager = object : TransactionManager {
+        override fun <R> run(block: (Transaction) -> R): R {
+            return block(transaction)
+            // n.b. no commit happens
         }
-        block(transactionManager)
-
-        // finally, we rollback everything
-        handle.rollback()
     }
+    block(transactionManager)
+
+    // finally, we rollback everything
+    handle.rollback()
+}

@@ -12,7 +12,7 @@ data class ClassroomOutputModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
-    val assigments: List<Assigment>,
+    val assignments: List<Assigment>,
     val students: List<Student>,
 ) : OutputModel
 
@@ -32,6 +32,6 @@ data class ClassroomModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
-    val assigments: List<Assigment>,
+    val assignments: List<Assigment>,
     val students: List<Student>,
 ) : OutputModel

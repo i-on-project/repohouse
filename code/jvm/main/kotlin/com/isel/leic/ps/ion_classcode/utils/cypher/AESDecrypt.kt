@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.utils.cypher
 
-import java.util.*
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec
 /**
  * Class that decrypts a string using a simple AES algorithm.
  */
-class AESDecrypt{
+class AESDecrypt {
 
     companion object {
 

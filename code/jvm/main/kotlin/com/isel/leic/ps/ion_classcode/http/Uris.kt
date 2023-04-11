@@ -83,12 +83,12 @@ object Uris {
     fun courseStudentsUri(courseId: Int): URI = UriTemplate(STUDENTS_COURSE_PATH).expand(courseId)
     fun enterCourse(courseId: Int): URI = UriTemplate(ENTER_COURSE_PATH).expand(courseId)
     fun leaveCourse(courseId: Int): URI = UriTemplate(LEAVE_COURSE_PATH).expand(courseId)
-    fun classroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(CLASSROOMS_PATH).expand(courseId,classroomId)
+    fun classroomUri(courseId: Int, classroomId: Int): URI = UriTemplate(CLASSROOMS_PATH).expand(courseId, classroomId)
     fun createClassroomUri(courseId: Int): URI = UriTemplate(CREATE_CLASSROOM_PATH).expand(courseId)
-    fun archiveClassroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(ARCHIVE_CLASSROOM_PATH).expand(courseId,classroomId)
-    fun syncClassroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(SYNC_CLASSROOM_PATH).expand(courseId,classroomId)
-    fun editClassroomUri(courseId: Int,classroomId: Int): URI = UriTemplate(EDIT_CLASSROOM_PATH).expand(courseId,classroomId)
-    fun inviteLinkUri(courseId: Int,inviteLink: String): URI = UriTemplate(INVITE_LINK_PATH).expand(courseId,inviteLink)
+    fun archiveClassroomUri(courseId: Int, classroomId: Int): URI = UriTemplate(ARCHIVE_CLASSROOM_PATH).expand(courseId, classroomId)
+    fun syncClassroomUri(courseId: Int, classroomId: Int): URI = UriTemplate(SYNC_CLASSROOM_PATH).expand(courseId, classroomId)
+    fun editClassroomUri(courseId: Int, classroomId: Int): URI = UriTemplate(EDIT_CLASSROOM_PATH).expand(courseId, classroomId)
+    fun inviteLinkUri(courseId: Int, inviteLink: String): URI = UriTemplate(INVITE_LINK_PATH).expand(courseId, inviteLink)
     fun assigmentsUri(courseId: Int, classroomId: Int): URI = UriTemplate(ASSIGMENTS_PATH).expand(courseId, classroomId)
     fun assigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId)
     fun createAssigmentUri(courseId: Int, classroomId: Int): URI = UriTemplate(CREATE_ASSIGMENT_PATH).expand(courseId, classroomId)
@@ -103,11 +103,11 @@ object Uris {
     fun createTeamUri(courseId: Int, classroomId: Int, assigmentId: Int): URI = UriTemplate(CREATE_TEAM_PATH).expand(courseId, classroomId, assigmentId)
     fun joinTeamUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(JOIN_TEAM_PATH).expand(courseId, classroomId, assigmentId, teamId)
     fun teamRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(TEAM_REQUESTS_PATH).expand(courseId, classroomId, assigmentId, teamId)
-    fun teamChangeStatusRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int,requestId:Int): URI = UriTemplate(
-        TEAM_CHANGE_REQUEST_PATH).expand(courseId, classroomId, assigmentId, teamId,requestId)
+    fun teamChangeStatusRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int, requestId: Int): URI = UriTemplate(
+        TEAM_CHANGE_REQUEST_PATH
+    ).expand(courseId, classroomId, assigmentId, teamId, requestId)
     fun postFeedbackUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(POST_FEEDBACK_PATH).expand(courseId, classroomId, assigmentId, teamId)
     fun localCopyUri(courseId: Int, classroomId: Int): URI = UriTemplate(LOCAL_COPY_PATH).expand(courseId, classroomId)
 
     /** Mobile Uris **/
-
 }

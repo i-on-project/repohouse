@@ -8,7 +8,7 @@ import com.isel.leic.ps.ion_classcode.domain.Team
  * Represents a Assigment Output Model.
  */
 data class AssigmentOutputModel(
-    val assigment: Assigment,
+    val assignment: Assigment,
     val deliveries: List<Delivery>,
     val teams: List<Team>,
 )
@@ -17,14 +17,14 @@ data class AssigmentOutputModel(
  * Represents a Assigment Created Output Model.
  */
 data class AssigmentCreatedOutputModel(
-    val assigment: Assigment,
+    val assignment: Assigment,
 )
 
 /**
  * Represents a Assigment Model for inner functions.
  */
 data class AssigmentModel(
-    val assigment: Assigment,
+    val assignment: Assigment,
     val deliveries: List<Delivery>,
     val teams: List<Team>,
 )

@@ -1,17 +1,16 @@
 package com.isel.leic.ps.ion_classcode.http
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.io.IOException
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.springframework.stereotype.Component
+import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-
 
 /**
  * Interface to be implemented by classes that make http calls.
@@ -65,7 +64,7 @@ class OkHttp(
         val body = send(request)
         val listType = jsonMapper.typeFactory.constructCollectionType(ArrayList::class.java, kClass)
         try {
-            return jsonMapper.readValue(body, listType);
+            return jsonMapper.readValue(body, listType)
         } catch (e: Exception) {
             throw e
         }

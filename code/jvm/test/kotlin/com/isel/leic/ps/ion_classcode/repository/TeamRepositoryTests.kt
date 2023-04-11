@@ -2,8 +2,6 @@ package com.isel.leic.ps.ion_classcode.repository
 
 import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiTeamRepository
-import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiCreateRepoRequestRepository
-import com.isel.leic.ps.ion_classcode.repository.request.JdbiCreateRepoRepositoryTests
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail

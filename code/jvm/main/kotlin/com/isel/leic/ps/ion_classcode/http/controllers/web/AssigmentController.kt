@@ -11,10 +11,6 @@ import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.AssigmentServices
 import com.isel.leic.ps.ion_classcode.http.services.AssigmentServicesError
-import com.isel.leic.ps.ion_classcode.http.services.GithubServices
-import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
@@ -47,11 +43,11 @@ class AssigmentController(
     ): ResponseEntity<*> {
         return when (val assigment = assigmentService.getAssigmentInfo(assigmentId)) {
             is Either.Left -> problem(assigment.value)
-            is Either.Right -> siren(value = AssigmentOutputModel(assigment.value.assigment, assigment.value.deliveries, assigment.value.teams)) {
+            is Either.Right -> siren(value = AssigmentOutputModel(assigment.value.assignment, assigment.value.deliveries, assigment.value.teams)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assigmentId), needAuthentication = true)
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
                 assigment.value.deliveries.forEach {
                     link(rel = LinkRelation("delivery"), href = Uris.deliveryUri(courseId, classroomId, assigmentId, it.id), needAuthentication = true)
@@ -73,7 +69,7 @@ class AssigmentController(
                             studentTeams.value.forEach {
                                 action(
                                     "join-team",
-                                    Uris.joinTeamUri(courseId, classroomId, assigmentId,it.id),
+                                    Uris.joinTeamUri(courseId, classroomId, assigmentId, it.id),
                                     method = HttpMethod.POST,
                                     type = "application/json"
                                 ) {
@@ -82,7 +78,7 @@ class AssigmentController(
                                 }
                             }
 
-                            if (studentTeams.value.size < assigment.value.assigment.maxNumberGroups){
+                            if (studentTeams.value.size < assigment.value.assignment.maxNumberGroups) {
                                 action("create-team", Uris.createTeamUri(courseId, classroomId, assigmentId), method = HttpMethod.POST, type = "application/json") {
                                     hiddenField("assigmentId", assigmentId.toString())
                                 }
@@ -112,7 +108,7 @@ class AssigmentController(
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assigment.value.id), needAuthentication = true)
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
             }
         }
@@ -135,7 +131,7 @@ class AssigmentController(
             is Either.Right -> siren(value = delete.value) {
                 clazz("assigment-deleted")
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
             }
         }
@@ -154,5 +150,4 @@ class AssigmentController(
             AssigmentServicesError.ClassroomNotFound -> Problem.notFound
         }
     }
-
 }

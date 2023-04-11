@@ -2,12 +2,12 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Assigment
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
-import com.isel.leic.ps.ion_classcode.repository.AssigmentRepository
+import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
 
-class JdbiAssignmentRepository(private val handle: Handle) : AssigmentRepository {
+class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepository {
     override fun createAssignment(assignment: AssignmentInput): Assigment {
         val id = handle.createUpdate(
             """

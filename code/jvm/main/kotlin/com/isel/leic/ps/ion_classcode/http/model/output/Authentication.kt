@@ -38,4 +38,3 @@ data class GitHubUserEmail(
     val primary: Boolean,
     val visibility: String?
 )
-

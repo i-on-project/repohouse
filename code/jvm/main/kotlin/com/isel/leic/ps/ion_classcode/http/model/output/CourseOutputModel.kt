@@ -2,8 +2,6 @@ package com.isel.leic.ps.ion_classcode.http.model.output
 
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
-import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
-import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 
 /**
@@ -28,7 +26,6 @@ data class CourseWithClassroomOutputModel(
     val classrooms: List<Classroom>,
 ) : OutputModel
 
-
 /**
  * Represents a Course Created Output Model.
  */
@@ -43,4 +40,3 @@ data class CourseDeletedOutputModel(
     val id: Int,
     val deleted: Boolean
 ) : OutputModel
-

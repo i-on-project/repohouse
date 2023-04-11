@@ -120,5 +120,4 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .mapTo<Team>()
             .list()
     }
-
 }

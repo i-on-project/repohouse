@@ -10,7 +10,7 @@ import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.util.WebUtils
 
-class AuthenticationFailed: Exception()
+class AuthenticationFailed : Exception()
 
 /**
  * Authorization Interceptor that guarantees authentication for operations that require authentication.

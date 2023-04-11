@@ -39,7 +39,7 @@ class OutboxServices(
     /**
      * Method to create a new outbox request
      */
-    fun createUserVerification(userId:Int):OutboxResponse {
+    fun createUserVerification(userId: Int): OutboxResponse {
         val otp = createRandomOtp()
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId)
@@ -116,5 +116,4 @@ class OutboxServices(
     private fun addTime(): Timestamp {
         return (System.currentTimeMillis() + COOLDOWN_TIME).toTimestamp()
     }
-
 }

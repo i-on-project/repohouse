@@ -12,4 +12,6 @@ data class ClassroomInputModel(
  */
 data class ClassroomUpdateInputModel(
     val name: String,
-)
+) {
+    fun isNotValid() = name.isBlank()
+}
