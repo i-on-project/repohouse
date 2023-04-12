@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
-import com.isel.leic.ps.ion_classcode.domain.Assigment
+import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Delivery
 import com.isel.leic.ps.ion_classcode.domain.Team
 
@@ -8,7 +8,7 @@ import com.isel.leic.ps.ion_classcode.domain.Team
  * Represents a Assigment Output Model.
  */
 data class AssigmentOutputModel(
-    val assignment: Assigment,
+    val assignment: Assignment,
     val deliveries: List<Delivery>,
     val teams: List<Team>,
 )
@@ -16,15 +16,15 @@ data class AssigmentOutputModel(
 /**
  * Represents a Assigment Created Output Model.
  */
-data class AssigmentCreatedOutputModel(
-    val assignment: Assigment,
+data class AssignmentCreatedOutputModel(
+    val assignment: Assignment,
 )
 
 /**
  * Represents a Assigment Model for inner functions.
  */
-data class AssigmentModel(
-    val assignment: Assigment,
+data class AssignmentModel(
+    val assignment: Assignment,
     val deliveries: List<Delivery>,
     val teams: List<Team>,
 )

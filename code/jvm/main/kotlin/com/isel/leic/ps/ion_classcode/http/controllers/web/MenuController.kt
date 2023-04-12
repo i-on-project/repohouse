@@ -153,6 +153,7 @@ class MenuController(
         return when (error) {
             is StudentServicesError.UserNotFound -> Problem.userNotFound
             is StudentServicesError.CourseNotFound -> Problem.courseNotFound
+            is StudentServicesError.InvalidInput -> Problem.invalidInput
         }
     }
 
@@ -163,6 +164,7 @@ class MenuController(
         return when (error) {
             is TeacherServicesError.CourseNotFound -> Problem.courseNotFound
             is TeacherServicesError.TeacherNotFound -> Problem.userNotFound
+            is TeacherServicesError.InvalidData -> Problem.invalidInput
         }
     }
 }

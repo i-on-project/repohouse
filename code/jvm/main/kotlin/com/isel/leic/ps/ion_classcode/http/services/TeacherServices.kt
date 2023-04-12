@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 typealias TeacherCoursesResponse = Either<TeacherServicesError, List<Course>>
 typealias TeacherPendingResponse = Either<TeacherServicesError, List<TeacherPending>>
 typealias TeachersApproveResponse = Either<TeacherServicesError, Boolean>
+typealias TeachersGetGithubTokenResponse = Either<TeacherServicesError, String>
 
 /**
  * Error codes for the services
@@ -21,11 +22,9 @@ typealias TeachersApproveResponse = Either<TeacherServicesError, Boolean>
 sealed class TeacherServicesError {
     object CourseNotFound : TeacherServicesError()
     object TeacherNotFound : TeacherServicesError()
+    object InvalidData : TeacherServicesError()
 }
 
-/**
- * Service to the teacher services
- */
 @Component
 class TeacherServices(
     private val transactionManager: TransactionManager,
@@ -35,9 +34,10 @@ class TeacherServices(
      * Method to get all the courses of a teacher
      */
     fun getCourses(teacherId: Int): TeacherCoursesResponse {
+        if (teacherId < 0) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
             val courses = it.courseRepository.getAllUserCourses(userId = teacherId)
-            Either.Right(courses)
+            Either.Right(value = courses)
         }
     }
 
@@ -56,7 +56,7 @@ class TeacherServices(
                         null
                     }
                 }
-            Either.Right(teachers)
+            Either.Right(value = teachers)
         }
     }
 
@@ -64,6 +64,7 @@ class TeacherServices(
      * Method to approve or reject a teacher
      */
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
+        if (teachers.isNotValid()) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
             teachers.approved.map { teacherRequest ->
                 it.requestRepository.changeStateRequest(teacherRequest, "Approved")
@@ -71,20 +72,21 @@ class TeacherServices(
             teachers.rejected.map { teacherRequest ->
                 it.requestRepository.changeStateRequest(teacherRequest, "Rejected")
             }
-            Either.Right(true)
+            Either.Right(value = true)
         }
     }
 
     /**
      * Method to get the GitHub token of a teacher
      */
-    fun getTeacherGithubToken(teacherId: Int): Either<TeacherServicesError, String> {
+    fun getTeacherGithubToken(teacherId: Int): TeachersGetGithubTokenResponse {
+        if (teacherId < 0) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
             val teacher = it.usersRepository.getTeacherGithubToken(teacherId)
             if (teacher == null) {
-                Either.Left(TeacherServicesError.TeacherNotFound)
+                Either.Left(value = TeacherServicesError.TeacherNotFound)
             } else {
-                Either.Right(teacher)
+                Either.Right(value = teacher)
             }
         }
     }

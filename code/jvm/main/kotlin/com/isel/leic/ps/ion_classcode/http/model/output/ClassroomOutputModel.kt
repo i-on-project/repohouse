@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.model.output
 
-import com.isel.leic.ps.ion_classcode.domain.Assigment
+import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Student
 import java.sql.Timestamp
 
@@ -12,7 +12,7 @@ data class ClassroomOutputModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
-    val assignments: List<Assigment>,
+    val assignments: List<Assignment>,
     val students: List<Student>,
 ) : OutputModel
 
@@ -32,6 +32,6 @@ data class ClassroomModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
-    val assignments: List<Assigment>,
+    val assignments: List<Assignment>,
     val students: List<Student>,
 ) : OutputModel

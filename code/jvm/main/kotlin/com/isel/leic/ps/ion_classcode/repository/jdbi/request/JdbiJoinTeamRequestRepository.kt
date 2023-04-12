@@ -38,7 +38,7 @@ class JdbiJoinTeamRequestRepository(
         )
             .bind("id", id)
             .bind("teamId", request.teamId)
-            .bind("assigmentId", request.assigmentId)
+            .bind("assigmentId", request.assignmentId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
@@ -60,7 +60,7 @@ class JdbiJoinTeamRequestRepository(
     /**
      * Method to get a Join Team Request by is id
      */
-    override fun getJoinTeamRequestById(id: Int): JoinTeam {
+    override fun getJoinTeamRequestById(id: Int): JoinTeam? {
         return handle.createQuery(
             """
             SELECT j.id, r.creator, r.state, j.team_id, r.composite FROM jointeam as j JOIN request r on r.id = j.id
@@ -69,7 +69,7 @@ class JdbiJoinTeamRequestRepository(
         )
             .bind("id", id)
             .mapTo<JoinTeam>()
-            .first()
+            .firstOrNull()
     }
 
     /**

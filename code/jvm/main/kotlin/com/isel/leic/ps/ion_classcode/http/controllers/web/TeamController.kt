@@ -214,6 +214,7 @@ class TeamController(
             is TeamServicesError.ClassroomArchived -> Problem.invalidOperation
             is TeamServicesError.ClassroomNotFound -> Problem.notFound
             is TeamServicesError.AssignmentNotFound -> Problem.notFound
+            is TeamServicesError.InvalidData -> Problem.invalidInput
         }
     }
 }

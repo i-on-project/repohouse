@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
  */
 typealias StudentCoursesResponse = Either<StudentServicesError, List<Course>>
 typealias StudentSchoolIdResponse = Either<StudentServicesError, Int>
-typealias StudentSchoolIdUpdateResponse = Either<StudentServicesError, Unit>
+typealias StudentSchoolIdUpdateResponse = Either<StudentServicesError, Boolean>
 
 /**
  * Error codes for the services
@@ -18,6 +18,7 @@ typealias StudentSchoolIdUpdateResponse = Either<StudentServicesError, Unit>
 sealed class StudentServicesError {
     object CourseNotFound : StudentServicesError()
     object UserNotFound : StudentServicesError()
+    object InvalidInput : StudentServicesError()
 }
 
 /**
@@ -32,9 +33,10 @@ class StudentServices(
      * Method to get all the courses of a student
      */
     fun getCourses(studentId: Int): StudentCoursesResponse {
+        if (studentId <= 0) return Either.Left(value = StudentServicesError.InvalidInput)
         return transactionManager.run {
             val courses = it.courseRepository.getAllUserCourses(userId = studentId)
-            Either.Right(courses)
+            Either.Right(value = courses)
         }
     }
 
@@ -42,12 +44,13 @@ class StudentServices(
      * Method to get the school id of a student
      */
     fun getStudentSchoolId(studentId: Int): StudentSchoolIdResponse {
+        if (studentId <= 0) return Either.Left(value = StudentServicesError.InvalidInput)
         return transactionManager.run {
-            val schoolId = it.usersRepository.getStudentSchoolId(studentId)
+            val schoolId = it.usersRepository.getStudentSchoolId(id = studentId)
             if (schoolId != null) {
-                Either.Right(schoolId)
+                Either.Right(value = schoolId)
             } else {
-                Either.Left(StudentServicesError.UserNotFound)
+                Either.Left(value = StudentServicesError.UserNotFound)
             }
         }
     }
@@ -56,9 +59,10 @@ class StudentServices(
      * Method to update the school id of a student
      */
     fun updateStudent(userId: Int, schoolId: Int): StudentSchoolIdUpdateResponse {
+        if (userId <= 0 || schoolId <= 0) return Either.Left(value = StudentServicesError.InvalidInput)
         return transactionManager.run {
-            val school = it.usersRepository.updateStudentSchoolId(userId, schoolId)
-            Either.Right(school)
+            it.usersRepository.updateStudentSchoolId(userId = userId, schoolId = schoolId)
+            Either.Right(value = true)
         }
     }
 }
