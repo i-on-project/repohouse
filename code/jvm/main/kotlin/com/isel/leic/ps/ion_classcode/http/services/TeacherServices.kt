@@ -11,10 +11,12 @@ import org.springframework.stereotype.Component
 typealias TeacherCoursesResponse = Either<TeacherServicesError, List<Course>>
 typealias TeacherPendingResponse = Either<TeacherServicesError, List<TeacherPending>>
 typealias TeachersApproveResponse = Either<TeacherServicesError, Boolean>
+typealias TeachersGetGithubTokenResponse = Either<TeacherServicesError, String>
 
 sealed class TeacherServicesError {
     object CourseNotFound : TeacherServicesError()
     object TeacherNotFound : TeacherServicesError()
+    object InvalidData : TeacherServicesError()
 }
 
 @Component
@@ -23,9 +25,10 @@ class TeacherServices(
 ) {
 
     fun getCourses(teacherId: Int): TeacherCoursesResponse {
+        if (teacherId < 0) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
             val courses = it.courseRepository.getAllUserCourses(userId = teacherId)
-            Either.Right(courses)
+            Either.Right(value = courses)
         }
     }
 
@@ -41,11 +44,12 @@ class TeacherServices(
                         null
                     }
                 }
-            Either.Right(teachers)
+            Either.Right(value = teachers)
         }
     }
 
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
+        if (teachers.isNotValid()) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
             teachers.approved.map { teacherRequest ->
                 it.requestRepository.changeStateRequest(teacherRequest, "Approved")
@@ -53,17 +57,18 @@ class TeacherServices(
             teachers.rejected.map { teacherRequest ->
                 it.requestRepository.changeStateRequest(teacherRequest, "Rejected")
             }
-            Either.Right(true)
+            Either.Right(value = true)
         }
     }
 
-    fun getTeacherGithubToken(teacherId: Int): Either<TeacherServicesError, String> {
+    fun getTeacherGithubToken(teacherId: Int): TeachersGetGithubTokenResponse {
+        if (teacherId < 0) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
             val teacher = it.usersRepository.getTeacherGithubToken(teacherId)
             if (teacher == null) {
-                Either.Left(TeacherServicesError.TeacherNotFound)
+                Either.Left(value = TeacherServicesError.TeacherNotFound)
             } else {
-                Either.Right(teacher)
+                Either.Right(value = teacher)
             }
         }
     }

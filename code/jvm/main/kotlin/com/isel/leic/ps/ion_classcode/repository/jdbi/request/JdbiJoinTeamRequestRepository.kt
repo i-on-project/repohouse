@@ -32,7 +32,7 @@ class JdbiJoinTeamRequestRepository(
         )
             .bind("id", id)
             .bind("teamId", request.teamId)
-            .bind("assigmentId", request.assigmentId)
+            .bind("assigmentId", request.assignmentId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()

@@ -389,6 +389,7 @@ class AuthController(
         return when (error) {
             is StudentServicesError.UserNotFound -> Problem.userNotFound
             is StudentServicesError.CourseNotFound -> Problem.courseNotFound
+            is StudentServicesError.InvalidInput -> Problem.invalidInput
         }
     }
 }

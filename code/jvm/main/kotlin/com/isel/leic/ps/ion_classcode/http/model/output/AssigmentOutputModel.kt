@@ -13,7 +13,7 @@ data class AssigmentCreatedOutputModel(
     val assignment: Assignment,
 )
 
-data class AssigmentModel(
+data class AssignmentModel(
     val assignment: Assignment,
     val deliveries: List<Delivery>,
     val teams: List<Team>,

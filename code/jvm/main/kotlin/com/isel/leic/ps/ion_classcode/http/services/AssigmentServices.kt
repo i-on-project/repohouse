@@ -3,24 +3,24 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
-import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentModel
+import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
-typealias AssigmentResponse = Either<AssigmentServicesError, AssigmentModel>
-typealias AssigmentCreatedResponse = Either<AssigmentServicesError, Assignment>
-typealias AssigmentDeletedResponse = Either<AssigmentServicesError, Boolean>
-typealias AssigmentStudentTeamResponse = Either<AssigmentServicesError, List<Team>>
+typealias AssigmentResponse = Either<AssignmentServicesError, AssignmentModel>
+typealias AssignmentCreatedResponse = Either<AssignmentServicesError, Assignment>
+typealias AssignmentDeletedResponse = Either<AssignmentServicesError, Boolean>
+typealias AssignmentStudentTeamResponse = Either<AssignmentServicesError, List<Team>>
 
-sealed class AssigmentServicesError {
-    object NotTeacher : AssigmentServicesError()
-    object InvalidInput : AssigmentServicesError()
-    object AssigmentNotFound : AssigmentServicesError()
-    object AssigmentNotDeleted : AssigmentServicesError()
-    object ClassroomArchived : AssigmentServicesError()
-    object ClassroomNotFound : AssigmentServicesError()
+sealed class AssignmentServicesError {
+    object NotTeacher : AssignmentServicesError()
+    object InvalidInput : AssignmentServicesError()
+    object AssignmentNotFound : AssignmentServicesError()
+    object AssignmentNotDeleted : AssignmentServicesError()
+    object ClassroomArchived : AssignmentServicesError()
+    object ClassroomNotFound : AssignmentServicesError()
 }
 
 @Component
@@ -28,85 +28,82 @@ class AssigmentServices(
     val transactionManager: TransactionManager,
 ) {
 
-    fun createAssigment(assigmentInfo: AssigmentInputModel, userId: Int): AssigmentCreatedResponse {
-        if (
-            assigmentInfo.classroomId > 0 &&
-            assigmentInfo.maxNumberElems > 0 &&
-            assigmentInfo.maxNumberGroups > 0 &&
-            assigmentInfo.description.isNotBlank() &&
-            assigmentInfo.title.isNotBlank()
-        ) {
-            return Either.Left(AssigmentServicesError.InvalidInput)
+    fun createAssignment(assignmentInfo: AssignmentInputModel, userId: Int): AssignmentCreatedResponse {
+        if (assignmentInfo.isNotValid() || userId <= 0) {
+            return Either.Left(value = AssignmentServicesError.InvalidInput)
         }
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(userId) == null) Either.Left(AssigmentServicesError.NotTeacher)
-            val classroom = it.classroomRepository.getClassroomById(assigmentInfo.classroomId)
+            if (it.usersRepository.getTeacher(teacherId = userId) == null) return@run Either.Left(value = AssignmentServicesError.NotTeacher)
+            val classroom = it.classroomRepository.getClassroomById(classroomId = assignmentInfo.classroomId)
 
             if (classroom == null) {
-                Either.Left(AssigmentServicesError.ClassroomNotFound)
+                return@run Either.Left(value = AssignmentServicesError.ClassroomNotFound)
             } else if (classroom.isArchived) {
-                Either.Left(AssigmentServicesError.ClassroomArchived)
+                return@run Either.Left(value = AssignmentServicesError.ClassroomArchived)
             }
-            val assigment = it.assignmentRepository.createAssignment(
+            val assignment = it.assignmentRepository.createAssignment(
                 AssignmentInput(
-                    assigmentInfo.classroomId,
-                    assigmentInfo.maxNumberElems,
-                    assigmentInfo.maxNumberGroups,
-                    assigmentInfo.description,
-                    assigmentInfo.title,
+                    classroomId = assignmentInfo.classroomId,
+                    maxElemsPerGroup = assignmentInfo.maxNumberElems,
+                    maxNumberGroups = assignmentInfo.maxNumberGroups,
+                    description = assignmentInfo.description,
+                    title = assignmentInfo.title,
                 ),
             )
-            Either.Right(assigment)
+            Either.Right(value = assignment)
         }
     }
 
-    fun getAssigmentInfo(assigmentId: Int): AssigmentResponse {
+    fun getAssigmentInfo(assignmentId: Int): AssigmentResponse {
+        if (assignmentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
-            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
-            if (assigment == null) {
-                Either.Left(AssigmentServicesError.AssigmentNotFound)
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
+            if (assignment == null) {
+                Either.Left(value = AssignmentServicesError.AssignmentNotFound)
             } else {
-                val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assigmentId)
-                val teams = it.teamRepository.getTeamsFromAssignment(assigmentId)
-                Either.Right(AssigmentModel(assigment, deliveries, teams))
+                val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assignmentId = assignmentId)
+                val teams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
+                Either.Right(value = AssignmentModel(assignment = assignment, deliveries = deliveries, teams = teams))
             }
         }
     }
 
-    fun deleteAssigment(assigmentId: Int): AssigmentDeletedResponse {
+    fun deleteAssignment(assignmentId: Int): AssignmentDeletedResponse {
+        if (assignmentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
-            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
-            if (assigment == null) {
-                Either.Left(AssigmentServicesError.AssigmentNotFound)
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
+            if (assignment == null) {
+                return@run Either.Left(value = AssignmentServicesError.AssignmentNotFound)
             } else {
-                val classroom = it.classroomRepository.getClassroomById(assigment.classroomId)
+                val classroom = it.classroomRepository.getClassroomById(classroomId = assignment.classroomId)
 
                 if (classroom == null) {
-                    Either.Left(AssigmentServicesError.ClassroomNotFound)
+                    return@run Either.Left(value = AssignmentServicesError.ClassroomNotFound)
                 } else if (classroom.isArchived) {
-                    Either.Left(AssigmentServicesError.ClassroomArchived)
+                    return@run Either.Left(value = AssignmentServicesError.ClassroomArchived)
                 }
 
-                if (it.deliveryRepository.getDeliveriesByAssignment(assigmentId).isNotEmpty()) {
-                    Either.Left(
-                        AssigmentServicesError.AssigmentNotDeleted,
+                if (it.deliveryRepository.getDeliveriesByAssignment(assignmentId = assignmentId).isNotEmpty()) {
+                    return@run Either.Left(
+                        value = AssignmentServicesError.AssignmentNotDeleted,
                     )
                 }
-                it.assignmentRepository.deleteAssignment(assigmentId)
+                it.assignmentRepository.deleteAssignment(assignmentId = assignmentId)
                 Either.Right(true)
             }
         }
     }
 
-    fun getAssigmentStudentTeams(assigmentId: Int, studentId: Int): AssigmentStudentTeamResponse {
+    fun getAssignmentStudentTeams(assignmentId: Int, studentId: Int): AssignmentStudentTeamResponse {
+        if (assignmentId <= 0 || studentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
-            val assigment = it.assignmentRepository.getAssignmentById(assigmentId)
-            if (assigment == null) {
-                Either.Left(AssigmentServicesError.AssigmentNotFound)
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
+            if (assignment == null) {
+                Either.Left(value = AssignmentServicesError.AssignmentNotFound)
             } else {
-                val assigmentTeams = it.teamRepository.getTeamsFromAssignment(assigmentId)
-                val studentTeams = it.teamRepository.getTeamsFromStudent(studentId)
-                Either.Right(assigmentTeams.filter { assigmentTeam -> studentTeams.any { studentTeam -> studentTeam.id == assigmentTeam.id } })
+                val assigmentTeams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
+                val studentTeams = it.teamRepository.getTeamsFromStudent(studentId = studentId)
+                Either.Right(value = assigmentTeams.filter { assigmentTeam -> studentTeams.any { studentTeam -> studentTeam.id == assigmentTeam.id } })
             }
         }
     }

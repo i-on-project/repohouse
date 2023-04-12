@@ -9,7 +9,7 @@ interface DeliveryRepository {
     fun createDelivery(delivery: DeliveryInput): Int //
     fun deleteDelivery(deliveryId: Int)
     fun getDeliveryById(deliveryId: Int): Delivery? //
-    fun getDeliveriesByAssignment(assigmentId: Int): List<Delivery> //
+    fun getDeliveriesByAssignment(assignmentId: Int): List<Delivery> //
     fun updateDueDateFromDelivery(deliveryId: Int, dueDate: Timestamp) //
     fun updateTagControlFromDelivery(deliveryId: Int, tagControl: String)
     fun getTeamsByDelivery(deliveryId: Int): List<Team>

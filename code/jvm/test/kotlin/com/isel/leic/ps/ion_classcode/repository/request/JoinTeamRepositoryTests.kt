@@ -10,7 +10,7 @@ class JoinTeamRepositoryTests {
     @Test
     fun `createJoinTeamRequest should create a new joinTeam request`() = testWithHandleAndRollback { handle ->
         val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
-        val request = JoinTeamInput(teamId = 1, creator = 3, assigmentId = 1)
+        val request = JoinTeamInput(teamId = 1, creator = 3, assignmentId = 1)
         joinTeamReq.createJoinTeamRequest(request = request)
     }
 

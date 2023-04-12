@@ -4,13 +4,13 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Uris
-import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
+import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.AssigmentServices
-import com.isel.leic.ps.ion_classcode.http.services.AssigmentServicesError
+import com.isel.leic.ps.ion_classcode.http.services.AssignmentServicesError
 import com.isel.leic.ps.ion_classcode.http.services.GithubServices
 import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
@@ -60,7 +60,7 @@ class AssigmentController(
                     }
                 }
                 if (user is Student) {
-                    when (val studentTeams = assigmentService.getAssigmentStudentTeams(assigmentId, user.id)) {
+                    when (val studentTeams = assigmentService.getAssignmentStudentTeams(assigmentId, user.id)) {
                         is Either.Left -> problem(studentTeams.value)
                         is Either.Right -> {
                             studentTeams.value.forEach {
@@ -92,15 +92,15 @@ class AssigmentController(
         user: User,
         @PathVariable("courseId") courseId: Int,
         @PathVariable("classroomId") classroomId: Int,
-        @RequestBody assigmentInfo: AssigmentInputModel,
+        @RequestBody assigmentInfo: AssignmentInputModel,
     ): ResponseEntity<*> {
-        return when (val assigment = assigmentService.createAssigment(assigmentInfo, user.id)) {
+        return when (val assigment = assigmentService.createAssignment(assigmentInfo, user.id)) {
             is Either.Left -> problem(assigment.value)
             is Either.Right -> siren(value = AssigmentCreatedOutputModel(assigment.value)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assigment.value.id), needAuthentication = true)
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
             }
         }
@@ -114,7 +114,7 @@ class AssigmentController(
         @PathVariable assigmentId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val delete = assigmentService.deleteAssigment(assigmentId)) {
+        return when (val delete = assigmentService.deleteAssignment(assigmentId)) {
             is Either.Left -> problem(delete.value)
             is Either.Right -> siren(value = delete.value) {
                 clazz("assigment-deleted")
@@ -125,14 +125,14 @@ class AssigmentController(
         }
     }
 
-    private fun problem(error: AssigmentServicesError): ResponseEntity<ErrorMessageModel> {
+    private fun problem(error: AssignmentServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
-            AssigmentServicesError.NotTeacher -> Problem.notTeacher
-            AssigmentServicesError.InvalidInput -> Problem.invalidInput
-            AssigmentServicesError.AssigmentNotFound -> Problem.notFound
-            AssigmentServicesError.AssigmentNotDeleted -> Problem.methodNotAllowed
-            AssigmentServicesError.ClassroomArchived -> Problem.invalidOperation
-            AssigmentServicesError.ClassroomNotFound -> Problem.notFound
+            AssignmentServicesError.NotTeacher -> Problem.notTeacher
+            AssignmentServicesError.InvalidInput -> Problem.invalidInput
+            AssignmentServicesError.AssignmentNotFound -> Problem.notFound
+            AssignmentServicesError.AssignmentNotDeleted -> Problem.methodNotAllowed
+            AssignmentServicesError.ClassroomArchived -> Problem.invalidOperation
+            AssignmentServicesError.ClassroomNotFound -> Problem.notFound
         }
     }
 

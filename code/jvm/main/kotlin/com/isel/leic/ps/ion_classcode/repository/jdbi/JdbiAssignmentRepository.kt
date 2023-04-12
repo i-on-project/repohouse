@@ -11,7 +11,7 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
     override fun createAssignment(assignment: AssignmentInput): Assignment {
         val id = handle.createUpdate(
             """
-               INSERT INTO assignment (title, description, max_elems_per_group, max_number_groups,classroom_id,release_date) 
+               INSERT INTO assignment (title, description, max_elems_per_group, max_number_groups,classroom_id, release_date) 
                VALUES (:title, :description, :max_elems_per_group, :numb_groups,:classroom_id, CURRENT_DATE)
                RETURNING id
                """,
