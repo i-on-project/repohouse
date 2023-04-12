@@ -6,7 +6,7 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
@@ -371,7 +371,7 @@ class CourseServiceTests {
 
         // the result should be an CourseArchivedModel
         if (course is Either.Right) {
-            assert(course.value is CourseArchivedModel.CourseArchived)
+            assert(course.value is CourseArchivedOutputModel.CourseArchived)
         } else {
             fail("Should not be Either.Left")
         }
@@ -387,7 +387,7 @@ class CourseServiceTests {
 
         // the result should be an CourseArchivedModel
         if (course is Either.Right) {
-            assert(course.value is CourseArchivedModel.CourseDeleted)
+            assert(course.value is CourseArchivedOutputModel.CourseDeleted)
         } else {
             fail("Should not be Either.Left")
         }

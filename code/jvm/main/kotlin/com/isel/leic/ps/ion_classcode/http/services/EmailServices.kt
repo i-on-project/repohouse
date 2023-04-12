@@ -11,12 +11,21 @@ import com.sendgrid.helpers.mail.objects.Email
 import org.springframework.stereotype.Component
 import java.io.IOException
 
+/**
+ * Alias for the response of the services
+ */
 typealias EmailResponse = Either<EmailServiceError, Response>
 
+/**
+ * Error codes for the services
+ */
 sealed class EmailServiceError {
     object SendEmailError : EmailServiceError()
 }
 
+/**
+ * Service to send emails
+ */
 @Component
 class EmailService {
     companion object {
@@ -29,6 +38,9 @@ class EmailService {
         const val BASE_URI = "https://api.sendgrid.com"
     }
 
+    /**
+     * Method to send an email with the otp to the user
+     */
     fun sendVerificationEmail(name: String, email: String, otp: Int): EmailResponse {
         val to = Email(email)
         val content = Content(

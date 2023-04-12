@@ -2,6 +2,9 @@ package com.isel.leic.ps.ion_classcode.domain
 
 import java.sql.Timestamp
 
+/**
+ * Tags Domain Interface
+ */
 data class Tags(
     val id: Int,
     val name: String,

@@ -1,7 +1,16 @@
 package com.isel.leic.ps.ion_classcode.repository.transaction
 
-
-import com.isel.leic.ps.ion_classcode.repository.*
+import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
+import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
+import com.isel.leic.ps.ion_classcode.repository.CooldownRepository
+import com.isel.leic.ps.ion_classcode.repository.CourseRepository
+import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
+import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
+import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
+import com.isel.leic.ps.ion_classcode.repository.RepoRepository
+import com.isel.leic.ps.ion_classcode.repository.TagRepository
+import com.isel.leic.ps.ion_classcode.repository.TeamRepository
+import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import com.isel.leic.ps.ion_classcode.repository.request.CompositeRepository
 import com.isel.leic.ps.ion_classcode.repository.request.CreateRepoRepository

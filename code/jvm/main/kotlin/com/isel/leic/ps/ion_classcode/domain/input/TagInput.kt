@@ -2,6 +2,9 @@ package com.isel.leic.ps.ion_classcode.domain.input
 
 import java.sql.Timestamp
 
+/**
+ * GitHub Tag Input Interface
+ */
 data class TagInput(
     val name: String,
     val isDelivered: Boolean,

@@ -6,7 +6,7 @@ import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
@@ -27,11 +27,20 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Course Controller
+ * All the write operations are only for Teachers
+ */
 @RestController
 class CourseController(
     private val courseServices: CourseServices,
 ) {
 
+    /**
+     * Create a course
+     * It will get from GitHub organizations from the Teacher's GitHub account
+     * If some of the organizations are already in the database, the Teacher is just added to the course
+     */
     @PostMapping(Uris.COURSES_PATH, produces = ["application/vnd.siren+json"])
     fun createCourse(
         user: User,
@@ -52,18 +61,21 @@ class CourseController(
         }
     }
 
+    /**
+     * Get all information about the course
+     */
     @GetMapping(Uris.COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun getCourse(
         user: User,
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.getCourseById(courseId,user.id)) {
+        return when (val course = courseServices.getCourseById(courseId, user.id)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teachers, course.value.isArchived, course.value.classrooms)) {
                 clazz("course")
                 link(rel = LinkRelation("self"), href = Uris.courseUri(course.value.id), needAuthentication = true)
                 course.value.classrooms.forEach {
-                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,it.id), needAuthentication = true)
+                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher) {
                     action(name = "create-classroom", method = HttpMethod.POST, href = Uris.createClassroomUri(course.value.id), type = "x-www-form-urlencoded", block = {
@@ -75,6 +87,11 @@ class CourseController(
         }
     }
 
+    /**
+     * Leave a course
+     * Only Student
+     * It will create a request to be the teacher to approve it
+     */
     @PutMapping(Uris.LEAVE_COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun leaveCourse(
         user: User,
@@ -97,6 +114,10 @@ class CourseController(
         }
     }
 
+    /**
+     * Archive a course
+     * It will archive the course and all the classrooms included in it
+     */
     @PutMapping(Uris.COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun archiveCourse(
         user: User,
@@ -106,8 +127,8 @@ class CourseController(
         return when (val archive = courseServices.archiveOrDeleteCourse(courseId)) {
             is Either.Left -> problem(CourseServicesError.CourseNotFound)
             is Either.Right ->
-                if (archive.value is CourseArchivedModel.CourseArchived) {
-                    when (val course = courseServices.getCourseById(courseId,user.id)) {
+                if (archive.value is CourseArchivedOutputModel.CourseArchived) {
+                    when (val course = courseServices.getCourseById(courseId, user.id)) {
                         is Either.Left -> problem(course.value)
                         is Either.Right -> siren(
                             value = CourseWithClassroomOutputModel(
@@ -128,7 +149,7 @@ class CourseController(
                             course.value.classrooms.forEach {
                                 link(
                                     rel = LinkRelation("classroom"),
-                                    href = Uris.classroomUri(courseId,it.id),
+                                    href = Uris.classroomUri(courseId, it.id),
                                     needAuthentication = true,
                                 )
                             }
@@ -159,6 +180,9 @@ class CourseController(
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: CourseServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             CourseServicesError.CourseNotFound -> Problem.courseNotFound

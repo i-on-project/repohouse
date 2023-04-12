@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.input
 
+/**
+ * Team Input Interface
+ */
 data class TeamInput(
     val name: String,
     val assignmentId: Int,

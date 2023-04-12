@@ -22,11 +22,18 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Delivery Controller
+ * All the write operations are done by the teacher and need to ensure the classroom is not archived
+ */
 @RestController
 class DeliveryController(
     private val deliveryServices: DeliveryServices,
 ) {
 
+    /**
+     * Get all information about a delivery
+     */
     @GetMapping(Uris.DELIVERY_PATH)
     fun getDeliveryInfo(
         user: User,
@@ -73,6 +80,9 @@ class DeliveryController(
         }
     }
 
+    /**
+     * Create a new delivery
+     */
     @PostMapping(Uris.CREATE_DELIVERY_PATH)
     fun createDelivery(
         user: User,
@@ -82,11 +92,11 @@ class DeliveryController(
         @RequestBody deliveryInfo: DeliveryInput,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val deliveryId = deliveryServices.createDelivery(deliveryInfo,user.id)){
+        return when (val deliveryId = deliveryServices.createDelivery(deliveryInfo, user.id)) {
             is Either.Left -> problem(deliveryId.value)
-            is Either.Right -> when(val delivery = deliveryServices.getDeliveryInfo(deliveryId.value)){
+            is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId.value)) {
                 is Either.Left -> problem(delivery.value)
-                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery,delivery.value.teamsDelivered,delivery.value.teamsNotDelivered)){
+                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId.value), rel = LinkRelation("self"), needAuthentication = true)
                     link(href = Uris.deliverysUri(courseId, classroomId, assigmentId), rel = LinkRelation("deliveries"), needAuthentication = true)
                     delivery.value.teamsNotDelivered.forEach {
@@ -121,6 +131,9 @@ class DeliveryController(
         }
     }
 
+    /**
+     * Delete a delivery
+     */
     @DeleteMapping(Uris.DELIVERY_PATH)
     fun deleteDelivery(
         user: User,
@@ -130,15 +143,18 @@ class DeliveryController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val delivery = deliveryServices.deleteDelivery(deliveryId,user.id)) {
+        return when (val delivery = deliveryServices.deleteDelivery(deliveryId, user.id)) {
             is Either.Left -> problem(delivery.value)
-            is Either.Right -> siren(DeliveryDeleteOutputModel(deliveryId,delivery.value)){
+            is Either.Right -> siren(DeliveryDeleteOutputModel(deliveryId, delivery.value)) {
                 clazz("delivery-deleted")
-                link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId,classroomId, assigmentId), needAuthentication = true)
+                link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, assigmentId), needAuthentication = true)
             }
         }
     }
 
+    /**
+     * Edit a delivery
+     */
     @PostMapping(Uris.EDIT_DELIVERY_PATH)
     fun editDelivery(
         user: User,
@@ -149,17 +165,20 @@ class DeliveryController(
         @RequestBody deliveryInfo: DeliveryInput,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val updateDelivery = deliveryServices.updateDelivery(deliveryId,deliveryInfo,user.id)){
+        return when (val updateDelivery = deliveryServices.updateDelivery(deliveryId, deliveryInfo, user.id)) {
             is Either.Left -> problem(updateDelivery.value)
-            is Either.Right -> when(val delivery = deliveryServices.getDeliveryInfo(deliveryId)){
+            is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
                 is Either.Left -> problem(delivery.value)
-                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery,delivery.value.teamsDelivered,delivery.value.teamsNotDelivered)){
+                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
                 }
             }
         }
     }
 
+    /**
+     * Sync a delivery with the GitHub truth
+     */
     @PostMapping(Uris.SYNC_DELIVERY_PATH)
     suspend fun syncDelivery(
         user: User,
@@ -169,17 +188,20 @@ class DeliveryController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when(val syncDelivery = deliveryServices.syncDelivery(deliveryId,user.id,courseId)){
+        return when (val syncDelivery = deliveryServices.syncDelivery(deliveryId, user.id, courseId)) {
             is Either.Left -> problem(syncDelivery.value)
-            is Either.Right -> when(val delivery = deliveryServices.getDeliveryInfo(deliveryId)){
+            is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
                 is Either.Left -> problem(delivery.value)
-                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery,delivery.value.teamsDelivered,delivery.value.teamsNotDelivered)){
+                is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
                 }
             }
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: DeliveryServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             DeliveryServicesError.DeliveryNotFound -> Problem.notFound

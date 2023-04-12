@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.model.github
 
+/**
+ * Represents a GitHub Team List.
+ */
 data class TeamList(
     val id: Int,
     val node_id: String,
@@ -16,6 +19,9 @@ data class TeamList(
     val parent: Parent
 )
 
+/**
+ * Represents a GitHub Team List Permissions.
+ */
 data class Permissions(
     val pull: Boolean,
     val triage: Boolean,

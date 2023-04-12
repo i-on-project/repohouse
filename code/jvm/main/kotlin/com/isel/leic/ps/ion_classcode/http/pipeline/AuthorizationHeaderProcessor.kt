@@ -5,6 +5,10 @@ import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
+/**
+ * Request Authorization Header Bearer Token Processor.
+ * @param userService services to be used to obtain request header data
+ */
 @Component
 class AuthorizationHeaderProcessor(
     private val userService: UserServices

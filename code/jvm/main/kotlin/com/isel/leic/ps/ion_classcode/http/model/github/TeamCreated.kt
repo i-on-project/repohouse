@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.http.model.github
 
+/**
+ * Represents a GitHub Team Created.
+ */
 data class TeamCreated(
     val id: Int,
     val node_id: String,

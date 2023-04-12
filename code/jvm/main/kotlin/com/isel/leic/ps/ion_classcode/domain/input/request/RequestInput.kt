@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.input.request
 
+/**
+ * Request Input Interface
+ */
 interface RequestInputInterface {
     val creator: Int
     val composite: Int?

@@ -3,17 +3,23 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
-import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentModel
+import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
-typealias AssigmentResponse = Either<AssignmentServicesError, AssignmentModel>
-typealias AssignmentCreatedResponse = Either<AssignmentServicesError, Assignment>
-typealias AssignmentDeletedResponse = Either<AssignmentServicesError, Boolean>
-typealias AssignmentStudentTeamResponse = Either<AssignmentServicesError, List<Team>>
+/**
+ * Alias for the response of the services
+ */
+typealias AssignmentResponse = Either<AssigmentServicesError, AssigmentModel>
+typealias AssignmentCreatedResponse = Either<AssigmentServicesError, Assigment>
+typealias AssignmentDeletedResponse = Either<AssigmentServicesError, Boolean>
+typealias AssignmentStudentTeamResponse = Either<AssigmentServicesError, List<Team>>
 
+/**
+ * Error codes for the services
+ */
 sealed class AssignmentServicesError {
     object NotTeacher : AssignmentServicesError()
     object InvalidInput : AssignmentServicesError()
@@ -23,8 +29,11 @@ sealed class AssignmentServicesError {
     object ClassroomNotFound : AssignmentServicesError()
 }
 
+/**
+ * Services for the assigment
+ */
 @Component
-class AssigmentServices(
+class AssignmentServices(
     val transactionManager: TransactionManager,
 ) {
 
@@ -54,6 +63,9 @@ class AssigmentServices(
         }
     }
 
+    /**
+     * Method that gets an assigment
+     */
     fun getAssigmentInfo(assignmentId: Int): AssigmentResponse {
         if (assignmentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
@@ -68,6 +80,10 @@ class AssigmentServices(
         }
     }
 
+    /**
+     * Method that deletes an assigment
+     * Checks if the classroom is not archived
+     */
     fun deleteAssignment(assignmentId: Int): AssignmentDeletedResponse {
         if (assignmentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
@@ -94,6 +110,9 @@ class AssigmentServices(
         }
     }
 
+    /**
+     * Method that gets the teams from a student of an assigment
+     */
     fun getAssignmentStudentTeams(assignmentId: Int, studentId: Int): AssignmentStudentTeamResponse {
         if (assignmentId <= 0 || studentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {

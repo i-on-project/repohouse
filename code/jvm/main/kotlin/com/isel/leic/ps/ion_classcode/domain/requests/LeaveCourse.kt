@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.requests
 
+/**
+ * Leave Course Request Interface
+ */
 data class LeaveCourse(
     override val id: Int,
     override val creator: Int,

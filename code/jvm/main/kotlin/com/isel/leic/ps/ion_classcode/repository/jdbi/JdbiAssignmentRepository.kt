@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
-import com.isel.leic.ps.ion_classcode.domain.Assignment
+import com.isel.leic.ps.ion_classcode.domain.Assigment
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import org.jdbi.v3.core.Handle
@@ -8,7 +8,7 @@ import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
 
 class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepository {
-    override fun createAssignment(assignment: AssignmentInput): Assignment {
+    override fun createAssignment(assignment: AssignmentInput): Assigment {
         val id = handle.createUpdate(
             """
                INSERT INTO assignment (title, description, max_elems_per_group, max_number_groups,classroom_id, release_date) 
@@ -24,28 +24,28 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Assignment(id, assignment.classroomId, assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
+        return Assigment(id, assignment.classroomId, assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
     }
 
-    override fun getAssignmentById(assignmentId: Int): Assignment? {
+    override fun getAssignmentById(assignmentId: Int): Assigment? {
         return handle.createQuery(
             """
                 SELECT * FROM assignment WHERE id = :assigmentId
             """,
         )
             .bind("assigmentId", assignmentId)
-            .mapTo<Assignment>()
+            .mapTo<Assigment>()
             .firstOrNull()
     }
 
-    override fun getAssignmentsByClassroom(classroomId: Int): List<Assignment> {
+    override fun getAssignmentsByClassroom(classroomId: Int): List<Assigment> {
         return handle.createQuery(
             """
                 SELECT * FROM assignment WHERE classroom_id = :classroomId
             """,
         )
             .bind("classroomId", classroomId)
-            .mapTo<Assignment>()
+            .mapTo<Assigment>()
             .list()
     }
 

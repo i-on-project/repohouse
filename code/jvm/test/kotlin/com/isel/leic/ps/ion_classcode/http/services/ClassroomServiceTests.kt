@@ -5,7 +5,7 @@ import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedModel
+import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
@@ -227,7 +227,7 @@ class ClassroomServiceTests {
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
         if (classroom is Either.Right) {
-            assert(classroom.value is ClassroomArchivedModel.ClassroomArchived)
+            assert(classroom.value is ClassroomArchivedOutputModel.ClassroomArchived)
         } else {
             fail("Should not be Either.Left")
         }
@@ -242,7 +242,7 @@ class ClassroomServiceTests {
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
         if (classroom is Either.Right) {
-            assert(classroom.value is ClassroomArchivedModel.ClassroomArchived)
+            assert(classroom.value is ClassroomArchivedOutputModel.ClassroomArchived)
         } else {
             fail("Should not be Either.Left")
         }
@@ -257,7 +257,7 @@ class ClassroomServiceTests {
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
         if (classroom is Either.Right) {
-            assert(classroom.value is ClassroomArchivedModel.ClassroomDeleted)
+            assert(classroom.value is ClassroomArchivedOutputModel.ClassroomDeleted)
         } else {
             fail("Should not be Either.Left")
         }

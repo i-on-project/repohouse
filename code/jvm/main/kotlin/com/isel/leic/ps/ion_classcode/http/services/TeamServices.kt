@@ -12,6 +12,9 @@ import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
+/**
+ * Alias for the response of the services
+ */
 typealias TeamResponse = Either<TeamServicesError, TeamModel>
 typealias TeamRequestsResponse = Either<TeamServicesError, TeamRequestsModel>
 typealias TeamCreateRequestResponse = Either<TeamServicesError, TeamModel>
@@ -20,6 +23,9 @@ typealias TeamJoinRequestResponse = Either<TeamServicesError, Int>
 typealias TeamUpdateRequestResponse = Either<TeamServicesError, Boolean>
 typealias TeamFeedbackResponse = Either<TeamServicesError, Int>
 
+/**
+ * Error codes for the services
+ */
 sealed class TeamServicesError {
     object RequestNotFound : TeamServicesError()
     object TeamNotFound : TeamServicesError()
@@ -30,11 +36,17 @@ sealed class TeamServicesError {
     object InvalidData : TeamServicesError()
 }
 
+/**
+ * Service to the team services
+ */
 @Component
 class TeamServices(
     val transactionManager: TransactionManager,
 ) {
 
+    /**
+     * Method to get all the information about a team
+     */
     fun getTeamInfo(teamId: Int): TeamResponse {
         if (teamId <= 0) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
@@ -50,6 +62,10 @@ class TeamServices(
         }
     }
 
+    /**
+     * Method to create a request to create a team
+     * Needs a teacher to approve the request
+     */
     fun createTeamRequest(createTeamInfo: CreateTeamInput, assigmentId: Int, classroomId: Int): TeamCreateRequestResponse {
         if (assigmentId <= 0 || classroomId <= 0 || createTeamInfo.isNotValid()) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
@@ -64,22 +80,24 @@ class TeamServices(
             } else {
                 // Join all requests in one composite request
                 val composite = it.compositeRepository.createCompositeRequest(
-                    CompositeInput(requests = listOf(teamId), creator = createTeamInfo.creator),
-                )
-                it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(assignmentId = assigmentId, teamId = teamId, composite = composite, creator = createTeamInfo.creator))
-                it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(teamId = teamId, composite = composite, creator = createTeamInfo.creator))
+                    CompositeInput(listOf(teamId), createTeamInfo.creator))
+                it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(assigmentId,teamId,composite, createTeamInfo.creator))
+                it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(teamId,composite, createTeamInfo.creator))
 
                 // Get all info about the team
-                val students = it.teamRepository.getStudentsFromTeam(teamId = teamId)
-                val repos = it.repoRepository.getReposByTeam(teamId = teamId)
-                val feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId = teamId)
-                Either.Right(TeamModel(team = team, students = students, repos = repos, feedbacks = feedbacks))
+                val students = it.teamRepository.getStudentsFromTeam(teamId)
+                val repos = it.repoRepository.getReposByTeam(teamId)
+                val feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId)
+                Either.Right(TeamModel(team, students, repos, feedbacks))
             }
         }
     }
 
+    /**
+     * Method to create a request to leave a team
+     * Needs a teacher to approve the request
+     */
     fun leaveTeamRequest(leaveInfo: LeaveTeamInput): TeamLeaveRequestResponse {
-        if(leaveInfo.isNotValid()) return Either.Left(TeamServicesError.InvalidData)
         return transactionManager.run {
             when (it.teamRepository.getTeamById(id = leaveInfo.teamId)) {
                 null -> Either.Left(value = TeamServicesError.TeamNotFound)
@@ -91,6 +109,10 @@ class TeamServices(
         }
     }
 
+    /**
+     * Method to create a request to join a team
+     * Needs a teacher to approve the request
+     */
     fun joinTeamRequest(joinInfo: JoinTeamInput): TeamJoinRequestResponse {
         if(joinInfo.isNotValid()) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
@@ -109,6 +131,9 @@ class TeamServices(
         }
     }
 
+    /**
+     * Method to get update the status of a request from a team
+     */
     fun updateTeamRequestStatus(requestId: Int, teamId: Int, classroomId: Int): TeamUpdateRequestResponse {
         if (requestId <= 0 || teamId <= 0 || classroomId <= 0) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
@@ -137,6 +162,9 @@ class TeamServices(
         }
     }
 
+    /**
+     * Method to post a feedback to a team
+     */
     fun postFeedback(feedbackInfo: FeedbackInput, classroomId: Int): TeamFeedbackResponse {
         if (feedbackInfo.isNotValid() || classroomId <= 0) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
@@ -153,6 +181,9 @@ class TeamServices(
         }
     }
 
+    /**
+     * Method to get all the requests of a team
+     */
     fun getTeamsRequests(teamId: Int): TeamRequestsResponse {
         if (teamId <= 0) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {

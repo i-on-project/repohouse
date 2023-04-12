@@ -2,7 +2,7 @@ package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedModel
+import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
@@ -12,13 +12,19 @@ import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 import java.io.File
 
+/**
+ * Alias for the response of the services
+ */
 typealias ClassroomResponse = Either<ClassroomServicesError, ClassroomModel>
-typealias ClassroomArchivedResponse = Either<ClassroomServicesError, ClassroomArchivedModel>
+typealias ClassroomArchivedResponse = Either<ClassroomServicesError, ClassroomArchivedOutputModel>
 typealias ClassroomCreateResponse = Either<ClassroomServicesError, Int>
 typealias ClassroomEnterResponse = Either<ClassroomServicesError, ClassroomModel>
 typealias ClassroomSyncResponse = Either<ClassroomServicesError, Boolean>
 typealias ClassroomLocalCopyResponse = Either<ClassroomServicesError, Boolean>
 
+/**
+ * Error codes for the services
+ */
 sealed class ClassroomServicesError {
     object ClassroomNotFound : ClassroomServicesError()
     object ClassroomArchived : ClassroomServicesError()
@@ -26,12 +32,18 @@ sealed class ClassroomServicesError {
     object InvalidInput : ClassroomServicesError()
 }
 
+/**
+ * Services for the classroom
+ */
 @Component
 class ClassroomServices(
     private val transactionManager: TransactionManager,
     private val deliveryServices: DeliveryServices,
 ) {
 
+    /**
+     * Method that gets a classroom
+     */
     fun getClassroom(classroomId: Int): ClassroomResponse {
         if (classroomId < 0) return Either.Left(value = ClassroomServicesError.InvalidInput)
         return transactionManager.run {
@@ -46,6 +58,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method that creates a classroom
+     */
     fun createClassroom(classroomInput: ClassroomInput): ClassroomCreateResponse {
         if (classroomInput.isNotValid()) return Either.Left(value = ClassroomServicesError.InvalidInput)
         return transactionManager.run {
@@ -56,26 +71,33 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method that archives or deletes a classroom
+     * If the classroom has no assignments, it is deleted
+     */
     fun archiveOrDeleteClassroom(classroomId: Int): ClassroomArchivedResponse {
         if (classroomId < 0) return Either.Left(value = ClassroomServicesError.InvalidInput)
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId = classroomId)) { // Safety check
                 null -> Either.Left(value = ClassroomServicesError.ClassroomNotFound)
                 else -> {
-                    if (classroom.isArchived) return@run Either.Right(value = ClassroomArchivedModel.ClassroomArchived)
+                    if (classroom.isArchived) return@run Either.Right(value = ClassroomArchivedOutputModel.ClassroomArchived)
                     val assignments = it.assignmentRepository.getAssignmentsByClassroom(classroomId = classroomId)
                     if (assignments.isEmpty()) {
                         it.classroomRepository.deleteClassroom(classroomId = classroomId)
-                        Either.Right(value = ClassroomArchivedModel.ClassroomDeleted)
+                        Either.Right(value = ClassroomArchivedOutputModel.ClassroomDeleted)
                     } else {
                         it.classroomRepository.archiveClassroom(classroomId = classroomId)
-                        Either.Right(value = ClassroomArchivedModel.ClassroomArchived)
+                        Either.Right(value = ClassroomArchivedOutputModel.ClassroomArchived)
                     }
                 }
             }
         }
     }
 
+    /**
+     * Method that edits a classroom
+     */
     fun editClassroom(classroomId: Int, classroomUpdateInput: ClassroomUpdateInputModel): ClassroomResponse {
         if (classroomId < 0 || classroomUpdateInput.isNotValid()) return Either.Left(value = ClassroomServicesError.InvalidInput)
         return transactionManager.run {
@@ -92,6 +114,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to enter a classroom with an invitation link
+     */
     fun enterClassroomWithInvite(inviteLink: String, studentId: Int): ClassroomEnterResponse {
         if (inviteLink.isBlank() || studentId < 0) return Either.Left(ClassroomServicesError.InvalidInput)
         return transactionManager.run {
@@ -110,6 +135,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to sync the classroom with the GitHub truth
+     */
     suspend fun syncClassroom(classroomId: Int, userId: Int, courseId: Int): ClassroomSyncResponse {
         val scopeMain = CoroutineScope(Job())
         val couroutines = mutableListOf<Job>()
@@ -130,6 +158,9 @@ class ClassroomServices(
         return Either.Right(true)
     }
 
+    /**
+     * Method to get the local copy of the classroom to path in the personal computer
+     */
     fun localCopy(classroomId: Int, path: String): ClassroomLocalCopyResponse {
         return transactionManager.run {
             val classroom = it.classroomRepository.getClassroomById(classroomId)
@@ -155,6 +186,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to generate a random invite link
+     */
     private fun generateRandomInviteLink(otherInviteLinks: List<String>): String {
         val chars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         val inviteLink = (10..30)
@@ -167,6 +201,9 @@ class ClassroomServices(
         }
     }
 
+    /**
+     * Method to delete a directory recursively
+     */
     private fun deleteDirectoryRecursion(file: File) {
         if (file.isDirectory) {
             file.listFiles()?.forEach { deleteDirectoryRecursion(it) }

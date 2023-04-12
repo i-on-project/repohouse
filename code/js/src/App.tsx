@@ -6,6 +6,9 @@ import { ShowCreditsFetch } from './Credits'
 import {AuthnContainer} from "./Auth";
 import {RequireAuth} from "./RequiredAuth";
 import {NavBarShow} from "./NavBar";
+import {ShowAuthTeacherFetch} from "./AuthTeacher";
+import {ShowAuthStudentFetch} from "./AuthStudent";
+import {ShowAuthCallbackFetch} from "./AuthCallback";
 
 const router = createBrowserRouter([
     {
@@ -19,6 +22,10 @@ const router = createBrowserRouter([
         {
             "path": "/credits",
             "element": <Credits/>
+        },
+        {
+            "path": "/auth/callback",
+            "element": <AuthCallback/>
         },
         {
             "path": "/auth/teacher",
@@ -71,7 +78,7 @@ function Credits() {
 function AuthTeacher() {
     return (
         <div>
-            <h1>Not done</h1>
+            <ShowAuthTeacherFetch authServices={authServices}/>
         </div>
     )
 }
@@ -79,7 +86,15 @@ function AuthTeacher() {
 function AuthStudent() {
     return (
         <div>
-            <h1>Not done</h1>
+            <ShowAuthStudentFetch authServices={authServices}/>
+        </div>
+    )
+}
+
+function AuthCallback() {
+    return (
+        <div>
+            <ShowAuthCallbackFetch authServices={authServices}/>
         </div>
     )
 }

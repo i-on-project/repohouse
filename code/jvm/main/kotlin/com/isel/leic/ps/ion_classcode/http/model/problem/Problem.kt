@@ -5,12 +5,20 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.net.URI
 
+/**
+ * Represents a Error Message Model.
+ */
 data class ErrorMessageModel(
     val type: URI,
     val title: String,
     val detail: String,
 ) : OutputModel
 
+/**
+ * Represents a Problem.
+ * This class contains all the possible problems that can occur in the application.
+ * Each problem is represented by a [ResponseEntity] with the corresponding [HttpStatus] and [ErrorMessageModel].
+ */
 class Problem {
 
     companion object {

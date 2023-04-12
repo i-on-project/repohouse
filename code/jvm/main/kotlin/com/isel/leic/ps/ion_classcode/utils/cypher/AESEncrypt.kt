@@ -5,6 +5,9 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * Class that encrypts a string using a simple AES algorithm.
+ */
 class AESEncrypt {
 
     companion object {

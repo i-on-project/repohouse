@@ -4,13 +4,13 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Uris
-import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
+import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.AssigmentServices
-import com.isel.leic.ps.ion_classcode.http.services.AssignmentServicesError
+import com.isel.leic.ps.ion_classcode.http.services.AssigmentServicesError
 import com.isel.leic.ps.ion_classcode.http.services.GithubServices
 import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
@@ -25,12 +25,19 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Assigment controller
+ * All the write operations are only for teachers and need to ensure that the classroom is not archived
+ */
 @RestController
 class AssigmentController(
     private val assigmentService: AssigmentServices,
     private val githubServices: GithubServices,
     private val userServices: TeacherServices
 ) {
+    /**
+     * Get all information about an assigment
+     */
     @GetMapping(Uris.ASSIGMENT_PATH)
     fun getAssigmentInfo(
         user: User,
@@ -60,7 +67,7 @@ class AssigmentController(
                     }
                 }
                 if (user is Student) {
-                    when (val studentTeams = assigmentService.getAssignmentStudentTeams(assigmentId, user.id)) {
+                    when (val studentTeams = assigmentService.getAssigmentStudentTeams(assigmentId, user.id)) {
                         is Either.Left -> problem(studentTeams.value)
                         is Either.Right -> {
                             studentTeams.value.forEach {
@@ -86,15 +93,18 @@ class AssigmentController(
             }
         }
     }
-
+    /**
+     * Get all information about an assigment
+     */
     @PostMapping(Uris.ASSIGMENTS_PATH)
     fun createAssignment(
         user: User,
         @PathVariable("courseId") courseId: Int,
         @PathVariable("classroomId") classroomId: Int,
-        @RequestBody assigmentInfo: AssignmentInputModel,
+        @RequestBody assigmentInfo: AssigmentInputModel,
     ): ResponseEntity<*> {
-        return when (val assigment = assigmentService.createAssignment(assigmentInfo, user.id)) {
+        if (user !is Teacher) return Problem.notTeacher
+        return when (val assigment = assigmentService.createAssigment(assigmentInfo, user.id)) {
             is Either.Left -> problem(assigment.value)
             is Either.Right -> siren(value = AssigmentCreatedOutputModel(assigment.value)) {
                 clazz("assigment")
@@ -106,6 +116,10 @@ class AssigmentController(
         }
     }
 
+    /**
+     * Delete an assigment need to not have deliveries
+     * Only Teacher
+     */
     @DeleteMapping(Uris.DELETE_ASSIGMENT_PATH)
     fun deleteAssigment(
         user: User,
@@ -114,17 +128,20 @@ class AssigmentController(
         @PathVariable assigmentId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val delete = assigmentService.deleteAssignment(assigmentId)) {
+        return when (val delete = assigmentService.deleteAssigment(assigmentId)) {
             is Either.Left -> problem(delete.value)
             is Either.Right -> siren(value = delete.value) {
                 clazz("assigment-deleted")
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
             }
         }
     }
 
+    /**
+     * Function to handle errors
+     */
     private fun problem(error: AssignmentServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             AssignmentServicesError.NotTeacher -> Problem.notTeacher
@@ -135,5 +152,4 @@ class AssigmentController(
             AssignmentServicesError.ClassroomNotFound -> Problem.notFound
         }
     }
-
 }

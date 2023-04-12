@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.input.request
 
+/**
+ * Leave Course Request Input Interface
+ */
 data class LeaveCourseInput(
     val courseId: Int,
     override val composite: Int? = null,

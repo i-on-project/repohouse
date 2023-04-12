@@ -7,7 +7,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomInputModel
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedModel
+import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -24,11 +24,18 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Classrooms Controller
+ * All the write operations are done by the teacher
+ */
 @RestController
 class ClassroomController(
     private val classroomServices: ClassroomServices
 ) {
 
+    /**
+     * Get all classroom information
+     */
     @GetMapping(Uris.CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun getClassroom(
         user: User,
@@ -44,16 +51,19 @@ class ClassroomController(
                     link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher && !classroom.value.isArchived) {
-                    link(rel = LinkRelation("local-copy"), href = Uris.localCopyUri(courseId, classroomId), needAuthentication = true)
+                    action(name = "local-copy", href = Uris.localCopyUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "create-assigment", href = Uris.createAssigmentUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                     action(name = "edit-classroom", href = Uris.editClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
-                    action(name = "sync-classroom", href = Uris.syncClassroomUri(courseId,classroomId), method = HttpMethod.POST, type = "application/json", block = {})
-                    action(name = "archive-classroom", href = Uris.archiveClassroomUri(courseId,classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(name = "sync-classroom", href = Uris.syncClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(name = "archive-classroom", href = Uris.archiveClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                 }
             }
         }
     }
 
+    /**
+     * Create a new classroom
+     */
     @PostMapping(Uris.CREATE_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun createClassroom(
         user: User,
@@ -67,12 +77,16 @@ class ClassroomController(
                 is Either.Left -> problem(classroom.value)
                 is Either.Right -> siren(value = ClassroomOutputModel(id = classroom.value.id, name = classroom.value.name, isArchived = classroom.value.isArchived, lastSync = classroom.value.lastSync, assignments = classroom.value.assignments, students = classroom.value.students)) {
                     clazz("classroom")
-                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId.value), needAuthentication = true)
+                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId.value), needAuthentication = true)
                 }
             }
         }
     }
 
+    /**
+     * Archive a classroom
+     * Possible if no assigments are created
+     */
     @PostMapping(Uris.ARCHIVE_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun archiveClassroom(
         user: User,
@@ -83,12 +97,12 @@ class ClassroomController(
         return when (val archive = classroomServices.archiveOrDeleteClassroom(classroomId)) {
             is Either.Left -> problem(archive.value)
             is Either.Right ->
-                if (archive.value is ClassroomArchivedModel.ClassroomArchived) {
+                if (archive.value is ClassroomArchivedOutputModel.ClassroomArchived) {
                     when (val classroom = classroomServices.getClassroom(classroomId)) {
                         is Either.Left -> problem(classroom.value)
                         is Either.Right -> siren(value = ClassroomOutputModel(id = classroom.value.id, name = classroom.value.name, isArchived = classroom.value.isArchived, lastSync = classroom.value.lastSync, assignments = classroom.value.assignments, students = classroom.value.students)) {
                             clazz("classroom")
-                            link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                            link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                             link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
                         }
                     }
@@ -101,6 +115,10 @@ class ClassroomController(
         }
     }
 
+    /**
+     * Edit a classroom
+     * Only Teacher
+     */
     @PostMapping(Uris.EDIT_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     fun editClassroom(
         user: User,
@@ -113,11 +131,14 @@ class ClassroomController(
             is Either.Left -> problem(classroom.value)
             is Either.Right -> siren(value = ClassroomOutputModel(id = classroom.value.id, name = classroom.value.name, isArchived = classroom.value.isArchived, lastSync = classroom.value.lastSync, assignments = classroom.value.assignments, students = classroom.value.students)) {
                 clazz("classroom")
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
             }
         }
     }
 
+    /**
+     * Enter a classroom with an invitation link
+     */
     @PostMapping(Uris.INVITE_LINK_PATH, produces = ["application/vnd.siren+json"])
     fun inviteLink(
         user: User,
@@ -125,16 +146,18 @@ class ClassroomController(
         @PathVariable inviteLink: String
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.unauthorized
-        return when (val enter = classroomServices.enterClassroomWithInvite(inviteLink,user.id)) {
+        return when (val enter = classroomServices.enterClassroomWithInvite(inviteLink, user.id)) {
             is Either.Left -> problem(enter.value)
             is Either.Right -> siren(value = ClassroomOutputModel(id = enter.value.id, name = enter.value.name, isArchived = enter.value.isArchived, lastSync = enter.value.lastSync, assignments = enter.value.assignments, students = enter.value.students)) {
                 clazz("classroom")
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,enter.value.id), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, enter.value.id), needAuthentication = true)
             }
         }
     }
 
-
+    /**
+     * Sync a classroom with the GitHub truth
+     */
     @PostMapping(Uris.SYNC_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
     suspend fun syncClassroom(
         user: User,
@@ -142,34 +165,41 @@ class ClassroomController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.unauthorized
-        return when (val sync = classroomServices.syncClassroom(classroomId,user.id,courseId)) {
+        return when (val sync = classroomServices.syncClassroom(classroomId, user.id, courseId)) {
             is Either.Left -> problem(sync.value)
-            is Either.Right ->  when(val classroom = classroomServices.getClassroom(classroomId)){
+            is Either.Right -> when (val classroom = classroomServices.getClassroom(classroomId)) {
                 is Either.Left -> problem(classroom.value)
                 is Either.Right -> siren(value = ClassroomOutputModel(id = classroom.value.id, name = classroom.value.name, isArchived = classroom.value.isArchived, lastSync = classroom.value.lastSync, assignments = classroom.value.assignments, students = classroom.value.students)) {
                     clazz("classroom")
-                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 }
             }
         }
     }
 
-    @GetMapping(Uris.LOCAL_COPY_PATH)
+    /**
+     * Create a local copy of a classroom to the personal computer
+     * Only Teacher
+     */
+    @PostMapping(Uris.LOCAL_COPY_PATH)
     fun localCopy(
         user: User,
         @PathVariable classroomId: Int,
         @PathVariable courseId: Int,
-    ):ResponseEntity<*>{
+    ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when(val localCopy = classroomServices.localCopy(classroomId,"C:\\Users\\ricar\\OneDrive\\Documentos")){
+        return when (val localCopy = classroomServices.localCopy(classroomId, "C:\\Users\\ricar\\OneDrive\\Documentos")) {
             is Either.Left -> problem(localCopy.value)
-            is Either.Right -> siren("oi"){
+            is Either.Right -> siren("oi") {
                 clazz("classroom")
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
             }
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: ClassroomServicesError): ResponseEntity<*> {
         return when (error) {
             ClassroomServicesError.ClassroomNotFound -> Problem.notFound

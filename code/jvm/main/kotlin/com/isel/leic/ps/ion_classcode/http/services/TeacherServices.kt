@@ -8,11 +8,17 @@ import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
+/**
+ * Alias for the response of the services
+ */
 typealias TeacherCoursesResponse = Either<TeacherServicesError, List<Course>>
 typealias TeacherPendingResponse = Either<TeacherServicesError, List<TeacherPending>>
 typealias TeachersApproveResponse = Either<TeacherServicesError, Boolean>
 typealias TeachersGetGithubTokenResponse = Either<TeacherServicesError, String>
 
+/**
+ * Error codes for the services
+ */
 sealed class TeacherServicesError {
     object CourseNotFound : TeacherServicesError()
     object TeacherNotFound : TeacherServicesError()
@@ -24,6 +30,9 @@ class TeacherServices(
     private val transactionManager: TransactionManager,
 ) {
 
+    /**
+     * Method to get all the courses of a teacher
+     */
     fun getCourses(teacherId: Int): TeacherCoursesResponse {
         if (teacherId < 0) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
@@ -32,6 +41,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to get all the teachers that need approval
+     */
     fun getTeachersNeedingApproval(): TeacherPendingResponse {
         return transactionManager.run {
             val requestsPending = it.applyRequestRepository.getApplyRequests().filter { request -> request.state == "Pending" }
@@ -48,6 +60,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to approve or reject a teacher
+     */
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
         if (teachers.isNotValid()) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {
@@ -61,6 +76,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to get the GitHub token of a teacher
+     */
     fun getTeacherGithubToken(teacherId: Int): TeachersGetGithubTokenResponse {
         if (teacherId < 0) return Either.Left(value = TeacherServicesError.InvalidData)
         return transactionManager.run {

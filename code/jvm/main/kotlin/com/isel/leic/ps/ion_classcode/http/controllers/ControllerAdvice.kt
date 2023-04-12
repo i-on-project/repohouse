@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.server.UnsupportedMediaTypeStatusException
 
+/**
+ * Controller Advice that handles exceptions thrown by the controllers.
+ */
 @ControllerAdvice
 class ExceptionControllerAdvice {
 

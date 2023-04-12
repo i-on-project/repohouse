@@ -11,8 +11,8 @@ import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.FeedbackOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestChangeStatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestCreatedOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.TeamServices
@@ -28,11 +28,18 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Team Controller
+ * All thw write operations are done by the teacher and need to ensure the classrooms are not archived
+ */
 @RestController
 class TeamController(
     private val teamService: TeamServices,
 ) {
 
+    /**
+     * Get all information about a team
+     */
     @GetMapping(Uris.TEAM_PATH)
     fun getTeamInfo(
         user: User,
@@ -61,6 +68,10 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a request for a student to join a team
+     * Needs then to be accepted by the teacher
+     */
     @PostMapping(Uris.JOIN_TEAM_PATH)
     fun joinTeam(
         user: User,
@@ -79,6 +90,10 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a request for a student to create a team
+     * Needs then to be accepted by the teacher
+     */
     @PostMapping(Uris.CREATE_TEAM_PATH)
     fun createTeam(
         user: User,
@@ -88,7 +103,7 @@ class TeamController(
         @RequestBody createTeamInfo: CreateTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val create = teamService.createTeamRequest(createTeamInfo,assigmentId,classroomId)) {
+        return when (val create = teamService.createTeamRequest(createTeamInfo, assigmentId, classroomId)) {
             is Either.Left -> problem(create.value)
             is Either.Right -> siren(TeamOutputModel(create.value.team, create.value.students, create.value.repos, create.value.feedbacks)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, create.value.team.id), rel = LinkRelation("team"), needAuthentication = true)
@@ -96,6 +111,9 @@ class TeamController(
         }
     }
 
+    /**
+     * List all the requests history for a team
+     */
     @GetMapping(Uris.TEAM_REQUESTS_PATH)
     fun teamRequests(
         user: User,
@@ -120,6 +138,9 @@ class TeamController(
         }
     }
 
+    /**
+     * Change the status of a request declined to pending again
+     */
     @PostMapping(Uris.TEAM_CHANGE_REQUEST_PATH)
     fun changeStatusRequest(
         user: User,
@@ -130,7 +151,7 @@ class TeamController(
         @PathVariable requestId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val change = teamService.updateTeamRequestStatus(requestId, teamId,classroomId)) {
+        return when (val change = teamService.updateTeamRequestStatus(requestId, teamId, classroomId)) {
             is Either.Left -> problem(change.value)
             is Either.Right -> siren(RequestChangeStatusOutputModel(requestId, change.value)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
@@ -139,6 +160,10 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a request for a student to leave a team
+     * Needs then to be accepted by the teacher
+     */
     @PostMapping(Uris.EXIT_TEAM_PATH)
     fun exitTeam(
         user: User,
@@ -157,6 +182,9 @@ class TeamController(
         }
     }
 
+    /**
+     * Create a feedback post for a team
+     */
     @PostMapping(Uris.POST_FEEDBACK_PATH)
     fun postFeedback(
         user: User,
@@ -167,7 +195,7 @@ class TeamController(
         @RequestBody feedbackInfo: FeedbackInput,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val feedback = teamService.postFeedback(feedbackInfo,classroomId)) {
+        return when (val feedback = teamService.postFeedback(feedbackInfo, classroomId)) {
             is Either.Left -> problem(feedback.value)
             is Either.Right -> siren(FeedbackOutputModel(feedback.value, true)) {
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
@@ -175,6 +203,9 @@ class TeamController(
         }
     }
 
+    /**
+     * Function to handle the errors
+     */
     private fun problem(error: TeamServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             is TeamServicesError.TeamNotFound -> Problem.notFound

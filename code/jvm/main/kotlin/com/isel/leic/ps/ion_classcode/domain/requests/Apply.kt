@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ion_classcode.domain.requests
 
+/**
+ * Apply Request Interface
+ */
 data class Apply(
     override val id: Int,
     override val creator: Int,
