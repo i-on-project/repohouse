@@ -1,6 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
-import com.isel.leic.ps.ion_classcode.domain.Assigment
+import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
@@ -28,7 +28,7 @@ class ClassroomServiceTests {
     companion object {
         val student = Student(id = 1, name = "Student 1", email = "student@email", githubUsername = "githubUsername", githubId = 123, isCreated = false, token = "token", schoolId = 123)
         val student2 = Student(id = 2, name = "Student 2", email = "student2@email", githubUsername = "githubUsername2", githubId = 1234, isCreated = false, token = "token1", schoolId = 1223)
-        val assignment = Assigment(id = 1, description = "Description", releaseDate = Timestamp.from(Instant.now()), classroomId = 1, maxElemsPerGroup = 3, maxNumberGroups = 3, title = "Title")
+        val assignment = Assignment(id = 1, description = "Description", releaseDate = Timestamp.from(Instant.now()), classroomId = 1, maxElemsPerGroup = 3, maxNumberGroups = 3, title = "Title")
     }
 
     @Autowired
