@@ -48,7 +48,7 @@ class JdbiJoinTeamRequestRepository(
             .list()
     }
 
-    override fun getJoinTeamRequestById(id: Int): JoinTeam {
+    override fun getJoinTeamRequestById(id: Int): JoinTeam? {
         return handle.createQuery(
             """
             SELECT j.id, r.creator, r.state, j.team_id, r.composite FROM jointeam as j JOIN request r on r.id = j.id
@@ -57,7 +57,7 @@ class JdbiJoinTeamRequestRepository(
         )
             .bind("id", id)
             .mapTo<JoinTeam>()
-            .first()
+            .firstOrNull()
     }
 
     override fun getJoinTeamRequestsByUser(userId: Int): List<JoinTeam> {

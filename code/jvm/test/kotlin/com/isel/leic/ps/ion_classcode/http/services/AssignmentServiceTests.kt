@@ -29,7 +29,7 @@ import java.time.Instant
 @SpringBootTest
 class AssignmentServiceTests {
     @Autowired
-    lateinit var assignmentServices: AssigmentServices
+    lateinit var assignmentServices: AssignmentServices
 
     @TestConfiguration
     class Config {
@@ -337,7 +337,7 @@ class AssignmentServiceTests {
         val assignmentId = -1
 
         // when: getting an error because the assignment id is invalid
-        val assignment = assignmentServices.getAssigmentInfo(assignmentId = assignmentId)
+        val assignment = assignmentServices.getAssignmentInfo(assignmentId = assignmentId)
 
         if (assignment is Either.Left) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
@@ -352,7 +352,7 @@ class AssignmentServiceTests {
         val assignmentId = 5
 
         // when: getting an error because the assignment id is not in database
-        val assignment = assignmentServices.getAssigmentInfo(assignmentId = assignmentId)
+        val assignment = assignmentServices.getAssignmentInfo(assignmentId = assignmentId)
 
         if (assignment is Either.Left) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
@@ -367,7 +367,7 @@ class AssignmentServiceTests {
         val assignmentId = 1
 
         // when: getting the assignment
-        val assignment = assignmentServices.getAssigmentInfo(assignmentId = assignmentId)
+        val assignment = assignmentServices.getAssignmentInfo(assignmentId = assignmentId)
 
         if (assignment is Either.Right) {
             assert(assignment.value.assignment.id == assignmentId)

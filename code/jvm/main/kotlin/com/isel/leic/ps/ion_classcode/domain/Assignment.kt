@@ -5,7 +5,7 @@ import java.sql.Timestamp
 /**
  * Assigment Domain Interface
  */
-data class Assigment(
+data class Assignment(
     val id: Int,
     val classroomId: Int,
     val maxElemsPerGroup: Int,

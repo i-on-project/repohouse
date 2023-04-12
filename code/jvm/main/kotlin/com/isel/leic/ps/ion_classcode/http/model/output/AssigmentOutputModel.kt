@@ -16,7 +16,7 @@ data class AssigmentOutputModel(
 /**
  * Represents a Assigment Created Output Model.
  */
-data class AssigmentCreatedOutputModel(
+data class AssignmentCreatedOutputModel(
     val assignment: Assignment,
 )
 
@@ -24,7 +24,7 @@ data class AssigmentCreatedOutputModel(
  * Represents a Assigment Model for inner functions.
  */
 data class AssignmentModel(
-    val assignment: Assigment,
+    val assignment: Assignment,
     val deliveries: List<Delivery>,
     val teams: List<Team>,
 )

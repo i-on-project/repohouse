@@ -4,13 +4,13 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Uris
-import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentCreatedOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.http.services.AssigmentServices
-import com.isel.leic.ps.ion_classcode.http.services.AssigmentServicesError
+import com.isel.leic.ps.ion_classcode.http.services.AssignmentServices
+import com.isel.leic.ps.ion_classcode.http.services.AssignmentServicesError
 import com.isel.leic.ps.ion_classcode.http.services.GithubServices
 import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
@@ -31,9 +31,9 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 class AssigmentController(
-    private val assigmentService: AssigmentServices,
+    private val assigmentService: AssignmentServices,
     private val githubServices: GithubServices,
-    private val userServices: TeacherServices
+    private val userServices: TeacherServices,
 ) {
     /**
      * Get all information about an assigment
@@ -43,48 +43,48 @@ class AssigmentController(
         user: User,
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
-        @PathVariable assigmentId: Int,
+        @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
-        return when (val assigment = assigmentService.getAssigmentInfo(assigmentId)) {
-            is Either.Left -> problem(assigment.value)
-            is Either.Right -> siren(value = AssigmentOutputModel(assigment.value.assignment, assigment.value.deliveries, assigment.value.teams)) {
+        return when (val assignment = assigmentService.getAssignmentInfo(assignmentId)) {
+            is Either.Left -> problem(assignment.value)
+            is Either.Right -> siren(value = AssigmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.teams)) {
                 clazz("assigment")
-                link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assigmentId), needAuthentication = true)
+                link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignmentId), needAuthentication = true)
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId,classroomId), needAuthentication = true)
+                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
-                assigment.value.deliveries.forEach {
-                    link(rel = LinkRelation("delivery"), href = Uris.deliveryUri(courseId, classroomId, assigmentId, it.id), needAuthentication = true)
+                assignment.value.deliveries.forEach {
+                    link(rel = LinkRelation("delivery"), href = Uris.deliveryUri(courseId, classroomId, assignmentId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher) {
-                    assigment.value.teams.forEach {
-                        link(rel = LinkRelation("team"), href = Uris.teamUri(courseId, classroomId, assigmentId, it.id), needAuthentication = true)
+                    assignment.value.teams.forEach {
+                        link(rel = LinkRelation("team"), href = Uris.teamUri(courseId, classroomId, assignmentId, it.id), needAuthentication = true)
                     }
-                    action("create-delivery", Uris.createDeliveryUri(courseId, classroomId, assigmentId), method = HttpMethod.POST, type = "application/json") {
-                        hiddenField("assigmentId", assigmentId.toString())
+                    action("create-delivery", Uris.createDeliveryUri(courseId, classroomId, assignmentId), method = HttpMethod.POST, type = "application/json") {
+                        hiddenField("assigmentId", assignmentId.toString())
                         textField("tag-control")
                         timestampField("due-date")
                     }
                 }
                 if (user is Student) {
-                    when (val studentTeams = assigmentService.getAssigmentStudentTeams(assigmentId, user.id)) {
+                    when (val studentTeams = assigmentService.getAssignmentStudentTeams(assignmentId, user.id)) {
                         is Either.Left -> problem(studentTeams.value)
                         is Either.Right -> {
                             studentTeams.value.forEach {
                                 action(
                                     "join-team",
-                                    Uris.joinTeamUri(courseId, classroomId, assigmentId,it.id),
+                                    Uris.joinTeamUri(courseId, classroomId, assignmentId, it.id),
                                     method = HttpMethod.POST,
-                                    type = "application/json"
+                                    type = "application/json",
                                 ) {
-                                    hiddenField("assigmentId", assigmentId.toString())
+                                    hiddenField("assigmentId", assignmentId.toString())
                                     numberField("teamId", it.id)
                                 }
                             }
 
-                            if (studentTeams.value.size < assigment.value.assignment.maxNumberGroups){
-                                action("create-team", Uris.createTeamUri(courseId, classroomId, assigmentId), method = HttpMethod.POST, type = "application/json") {
-                                    hiddenField("assigmentId", assigmentId.toString())
+                            if (studentTeams.value.size < assignment.value.assignment.maxNumberGroups) {
+                                action("create-team", Uris.createTeamUri(courseId, classroomId, assignmentId), method = HttpMethod.POST, type = "application/json") {
+                                    hiddenField("assigmentId", assignmentId.toString())
                                 }
                             }
                         }
@@ -93,6 +93,7 @@ class AssigmentController(
             }
         }
     }
+
     /**
      * Get all information about an assigment
      */
@@ -101,17 +102,17 @@ class AssigmentController(
         user: User,
         @PathVariable("courseId") courseId: Int,
         @PathVariable("classroomId") classroomId: Int,
-        @RequestBody assigmentInfo: AssigmentInputModel,
+        @RequestBody assignmentInfo: AssignmentInputModel,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val assigment = assigmentService.createAssigment(assigmentInfo, user.id)) {
-            is Either.Left -> problem(assigment.value)
-            is Either.Right -> siren(value = AssigmentCreatedOutputModel(assigment.value)) {
+        return when (val assignment = assigmentService.createAssignment(assignmentInfo, user.id)) {
+            is Either.Left -> problem(assignment.value)
+            is Either.Right -> siren(value = AssignmentCreatedOutputModel(assignment.value)) {
                 clazz("assigment")
-                link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assigment.value.id), needAuthentication = true)
+                link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignment.value.id), needAuthentication = true)
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
                 link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
-                link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
+                link(rel = LinkRelation("assignments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
             }
         }
     }
@@ -121,14 +122,14 @@ class AssigmentController(
      * Only Teacher
      */
     @DeleteMapping(Uris.DELETE_ASSIGMENT_PATH)
-    fun deleteAssigment(
+    fun deleteAssignment(
         user: User,
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
-        @PathVariable assigmentId: Int,
+        @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val delete = assigmentService.deleteAssigment(assigmentId)) {
+        return when (val delete = assigmentService.deleteAssignment(assignmentId)) {
             is Either.Left -> problem(delete.value)
             is Either.Right -> siren(value = delete.value) {
                 clazz("assigment-deleted")

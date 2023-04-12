@@ -3,8 +3,8 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
-import com.isel.leic.ps.ion_classcode.http.model.input.AssigmentInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentModel
+import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component
 /**
  * Alias for the response of the services
  */
-typealias AssignmentResponse = Either<AssigmentServicesError, AssigmentModel>
-typealias AssignmentCreatedResponse = Either<AssigmentServicesError, Assigment>
-typealias AssignmentDeletedResponse = Either<AssigmentServicesError, Boolean>
-typealias AssignmentStudentTeamResponse = Either<AssigmentServicesError, List<Team>>
+typealias AssignmentResponse = Either<AssignmentServicesError, AssignmentModel>
+typealias AssignmentCreatedResponse = Either<AssignmentServicesError, Assignment>
+typealias AssignmentDeletedResponse = Either<AssignmentServicesError, Boolean>
+typealias AssignmentStudentTeamResponse = Either<AssignmentServicesError, List<Team>>
 
 /**
  * Error codes for the services
@@ -66,7 +66,7 @@ class AssignmentServices(
     /**
      * Method that gets an assigment
      */
-    fun getAssigmentInfo(assignmentId: Int): AssigmentResponse {
+    fun getAssignmentInfo(assignmentId: Int): AssignmentResponse {
         if (assignmentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
             val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
