@@ -6,7 +6,13 @@ import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Feedback methods
+ */
 class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
+    /**
+     * Method to create a Feedback
+     */
     override fun createFeedback(feedback: FeedbackInput): Int {
         return handle.createUpdate(
             """
@@ -23,6 +29,9 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .first()
     }
 
+    /**
+     * Method to delete a Feedback
+     */
     override fun deleteFeedback(feedbackId: Int) {
         handle.createUpdate(
             """
@@ -34,6 +43,9 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .execute()
     }
 
+    /**
+     * Method to update a Feedback description
+     */
     override fun updateFeedbackDescription(feedbackId: Int, description: String) {
         handle.createUpdate(
             """
@@ -47,6 +59,10 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .execute()
     }
 
+
+    /**
+     * Method to update a Feedback label
+     */
     override fun updateFeedbackLabel(feedbackId: Int, label: String) {
         handle.createUpdate(
             """
@@ -60,6 +76,10 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .execute()
     }
 
+
+    /**
+     * Method to get a Feedback by is id
+     */
     override fun getFeedbackById(feedbackId: Int): Feedback? {
         return handle.createQuery(
             """
@@ -72,6 +92,10 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .firstOrNull()
     }
 
+
+    /**
+     * Method to get a Feedback by is team
+     */
     override fun getFeedbacksByTeam(teamId: Int): List<Feedback> {
         return handle.createQuery(
             """

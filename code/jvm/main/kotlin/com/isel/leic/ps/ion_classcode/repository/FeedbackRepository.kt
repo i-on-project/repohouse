@@ -3,6 +3,9 @@ package com.isel.leic.ps.ion_classcode.repository
 import com.isel.leic.ps.ion_classcode.domain.Feedback
 import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
 
+/**
+ * Repository functions for Feedback Repository
+ */
 interface FeedbackRepository {
     fun createFeedback(feedback: FeedbackInput): Int
     fun deleteFeedback(feedbackId: Int)

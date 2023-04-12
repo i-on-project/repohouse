@@ -6,6 +6,9 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
 
+/**
+ * Repository functions for Classroom Repository
+ */
 interface ClassroomRepository {
     fun createClassroom(classroom: ClassroomInput, inviteLink: String): Int
     fun updateClassroomName(classroomId: Int, classroomUpdate: ClassroomUpdateInputModel)

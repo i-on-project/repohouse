@@ -20,6 +20,10 @@ import com.isel.leic.ps.ion_classcode.repository.request.LeaveCourseRepository
 import com.isel.leic.ps.ion_classcode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 
+
+/**
+ * Transction interface holding all repositories
+ */
 interface Transaction {
     val assignmentRepository: AssignmentRepository
     val classroomRepository: ClassroomRepository

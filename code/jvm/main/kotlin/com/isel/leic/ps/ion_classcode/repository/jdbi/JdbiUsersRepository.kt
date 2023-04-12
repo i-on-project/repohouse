@@ -9,9 +9,15 @@ import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the User methods
+ */
 class JdbiUsersRepository(
     private val handle: Handle,
 ) : UsersRepository {
+    /**
+     * Method to verify if an email exists
+     */
     override fun checkIfEmailExists(email: String): Boolean {
         return handle.createQuery(
             """
@@ -24,6 +30,9 @@ class JdbiUsersRepository(
             .firstOrNull() != null
     }
 
+    /**
+     * Method to verify if a GitHub usernmae exists
+     */
     override fun checkIfGithubUsernameExists(githubUsername: String): Boolean {
         return handle.createQuery(
             """
@@ -36,6 +45,9 @@ class JdbiUsersRepository(
             .firstOrNull() != null
     }
 
+    /**
+     * Method to verify if a GitHub id exists
+     */
     override fun checkIfGithubIdExists(githubId: Long): Boolean {
         return handle.createQuery(
             """
@@ -48,6 +60,9 @@ class JdbiUsersRepository(
             .firstOrNull() != null
     }
 
+    /**
+     * Method to verify if a token exists
+     */
     override fun checkIfTokenExists(token: String): Boolean {
         return handle.createQuery(
             """
@@ -60,6 +75,9 @@ class JdbiUsersRepository(
             .firstOrNull() != null
     }
 
+    /**
+     * Method to verify if a GitHub token exists
+     */
     override fun checkIfGithubTokenExists(githubToken: String): Boolean {
         return handle.createQuery(
             """
@@ -72,6 +90,9 @@ class JdbiUsersRepository(
             .firstOrNull() != null
     }
 
+    /**
+     * Method to verify if a School id exists
+     */
     override fun checkIfSchoolIdExists(schoolId: Int): Boolean {
         return handle.createQuery(
             """
@@ -84,6 +105,9 @@ class JdbiUsersRepository(
             .firstOrNull() != null
     }
 
+    /**
+     * Method to create a student
+     */
     override fun createStudent(student: StudentInput): Student? {
         val id = handle.createUpdate(
             """
@@ -123,6 +147,9 @@ class JdbiUsersRepository(
         )
     }
 
+    /**
+     * Method to get all students
+     */
     override fun getAllStudents(): List<Student> {
         return handle.createQuery(
             """
@@ -134,6 +161,9 @@ class JdbiUsersRepository(
             .list()
     }
 
+    /**
+     * Method to get all teachers
+     */
     override fun getAllTeachers(): List<Teacher> {
         return handle.createQuery(
             """
@@ -145,10 +175,16 @@ class JdbiUsersRepository(
             .list()
     }
 
+    /**
+     * Method to get a user by id
+     */
     override fun getUserById(id: Int): User? {
         return helper(handle = handle, id = id)
     }
 
+    /**
+     * Method to get a user by email
+     */
     override fun getUserByEmail(email: String): User? {
         val id = handle.createQuery(
             """
@@ -162,6 +198,9 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
+    /**
+     * Method to get a user by is GitHub id
+     */
     override fun getUserByGithubId(githubId: Long): User? {
         val id = handle.createQuery(
             """
@@ -175,6 +214,9 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
+    /**
+     * Method to get a user by is token
+     */
     override fun getUserByToken(token: String): User? {
         val id = handle.createQuery(
             """
@@ -189,6 +231,9 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
+    /**
+     * Method to get a studen by is school id
+     */
     override fun getStudentSchoolId(id: Int): Int? {
         return handle.createQuery(
             """
@@ -201,6 +246,9 @@ class JdbiUsersRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to update a student school id
+     */
     override fun updateStudentSchoolId(userId: Int, schoolId: Int) {
         handle.createUpdate(
             """
@@ -213,6 +261,9 @@ class JdbiUsersRepository(
             .execute()
     }
 
+    /**
+     * Method to create a teacher
+     */
     override fun createTeacher(teacher: TeacherInput): Teacher? {
         val id = handle.createUpdate(
             """
@@ -242,6 +293,9 @@ class JdbiUsersRepository(
         return Teacher(name = teacher.name, email = teacher.email, id = id, githubUsername = teacher.githubUsername, githubId = teacher.githubId, isCreated = true, token = teacher.githubToken)
     }
 
+    /**
+     * Method to get a student
+     */
     override fun getStudent(studentId: Int): Student? {
         return handle.createQuery(
             """
@@ -254,6 +308,9 @@ class JdbiUsersRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get a teacher
+     */
     override fun getTeacher(teacherId: Int): Teacher? {
         return handle.createQuery(
             """
@@ -266,6 +323,9 @@ class JdbiUsersRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to update a user status
+     */
     override fun updateUserStatus(id: Int) {
         handle.createUpdate(
             """
@@ -278,6 +338,9 @@ class JdbiUsersRepository(
             .execute()
     }
 
+    /**
+     * Method to delete a student
+     */
     override fun deleteStudent(id: Int) {
         handle.createUpdate(
             """
@@ -298,6 +361,9 @@ class JdbiUsersRepository(
             .execute()
     }
 
+    /**
+     * Method to delete a teacher
+     */
     override fun deleteTeacher(id: Int) {
         handle.createUpdate(
             """
@@ -309,6 +375,9 @@ class JdbiUsersRepository(
             .execute()
     }
 
+    /**
+     * Method to get a teacher GitHub token
+     */
     override fun getTeacherGithubToken(id: Int): String? {
         return handle.createQuery(
             """
@@ -321,6 +390,11 @@ class JdbiUsersRepository(
             .firstOrNull()
     }
 }
+
+/**
+ * Method to help get a user type
+ * Can be a student or a teacher
+ */
 private fun helper(handle: Handle, id: Int): User? {
     return handle.createQuery(
         """

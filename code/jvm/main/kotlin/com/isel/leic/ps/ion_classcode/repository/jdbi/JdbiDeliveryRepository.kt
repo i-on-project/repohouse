@@ -8,7 +8,14 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
 
+/**
+ * Implementation of the Delivery methods
+ */
 class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
+
+    /**
+     * Method to create a Delivery
+     */
     override fun createDelivery(delivery: DeliveryInput): Int {
         return handle.createUpdate(
             """
@@ -25,6 +32,10 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .first()
     }
 
+
+    /**
+     * Method to delete a Delivery
+     */
     override fun deleteDelivery(deliveryId: Int) {
         handle.createUpdate(
             """
@@ -36,6 +47,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .execute()
     }
 
+    /**
+     * Method to get a Delivery by is id
+     */
     override fun getDeliveryById(deliveryId: Int): Delivery? {
         return handle.createQuery(
             """
@@ -48,6 +62,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .firstOrNull()
     }
 
+    /**
+     * Method to create all Deliveries by an assignment
+     */
     override fun getDeliveriesByAssignment(assignmentId: Int): List<Delivery> {
         return handle.createQuery(
             """
@@ -61,6 +78,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .list()
     }
 
+    /**
+     * Method to update a Delivery due date
+     */
     override fun updateDueDateFromDelivery(deliveryId: Int, dueDate: Timestamp) {
         handle.createUpdate(
             """
@@ -74,6 +94,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .execute()
     }
 
+    /**
+     * Method to update a Delivery tag control
+     */
     override fun updateTagControlFromDelivery(deliveryId: Int, tagControl: String) {
         handle.createUpdate(
             """
@@ -87,6 +110,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .execute()
     }
 
+    /**
+     * Method to get all Delivery teams
+     */
     override fun getTeamsByDelivery(deliveryId: Int): List<Team> {
         return handle.createQuery(
             """

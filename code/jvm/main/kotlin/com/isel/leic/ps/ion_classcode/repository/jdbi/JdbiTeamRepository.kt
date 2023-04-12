@@ -7,7 +7,13 @@ import com.isel.leic.ps.ion_classcode.repository.TeamRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Team methods
+ */
 class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
+    /**
+     * Method to create a Team
+     */
     override fun createTeam(team: TeamInput): Int {
         return handle.createUpdate(
             """
@@ -23,6 +29,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .first()
     }
 
+    /**
+     * Method to update a Team status
+     */
     override fun updateTeamStatus(id: Int, status: Boolean) {
         handle.createUpdate(
             """
@@ -35,6 +44,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .execute()
     }
 
+    /**
+     * Method to get a Team by is id
+     */
     override fun getTeamById(id: Int): Team? {
         return handle.createQuery(
             """
@@ -47,6 +59,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .firstOrNull()
     }
 
+    /**
+     * Method to get all students from a Team
+     */
     override fun getStudentsFromTeam(teamId: Int): List<Student> {
         return handle.createQuery(
             """
@@ -61,6 +76,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .list()
     }
 
+    /**
+     * Method to enter a Team
+     */
     override fun enterTeam(teamId: Int, studentId: Int) {
         handle.createUpdate(
             """
@@ -73,6 +91,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .execute()
     }
 
+    /**
+     * Method to leave a Team
+     */
     override fun leaveTeam(teamId: Int, studentId: Int) {
         handle.createUpdate(
             """
@@ -85,6 +106,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .execute()
     }
 
+    /**
+     * Method to delete a Team
+     */
     override fun deleteTeam(teamId: Int) {
         handle.createUpdate(
             """
@@ -96,6 +120,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .execute()
     }
 
+    /**
+     * Method to get all teams from an assignment
+     */
     override fun getTeamsFromAssignment(assignmentId: Int): List<Team> {
         return handle.createQuery(
             """
@@ -108,6 +135,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .list()
     }
 
+    /**
+     * Method to get all teams from a student
+     */
     override fun getTeamsFromStudent(studentId: Int): List<Team> {
         return handle.createQuery(
             """

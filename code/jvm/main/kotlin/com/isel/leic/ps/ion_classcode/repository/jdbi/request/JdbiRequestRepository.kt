@@ -6,9 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Request methods
+ */
 class JdbiRequestRepository(
     private val handle: Handle,
 ) : RequestRepository {
+
+    /**
+     * Method to create a Request
+     */
     override fun createRequest(request: RequestInput): Int {
         return handle.createUpdate(
             """
@@ -24,6 +31,9 @@ class JdbiRequestRepository(
             .first()
     }
 
+    /**
+     * Method to change a Request state
+     */
     override fun changeStateRequest(id: Int, state: String) {
         handle.createUpdate(
             """
@@ -37,6 +47,9 @@ class JdbiRequestRepository(
             .execute()
     }
 
+    /**
+     * Method to get all Request's
+     */
     override fun getRequests(): List<Request> {
         return handle.createQuery(
             """
@@ -47,6 +60,9 @@ class JdbiRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get a Request by is user
+     */
     override fun getRequestsByUser(userId: Int): List<Request> {
         return handle.createQuery(
             """
@@ -59,6 +75,9 @@ class JdbiRequestRepository(
             .list()
     }
 
+    /**
+     * Method to verify if Request is a Composite Request
+     */
     override fun checkIfIsComposite(id: Int): Boolean {
         return handle.createQuery(
             """
@@ -71,6 +90,9 @@ class JdbiRequestRepository(
             .firstOrNull() != null
     }
 
+    /**
+     * Method to get a Request by is id
+     */
     override fun getRequestById(id: Int): Request? {
         return handle.createQuery(
             """

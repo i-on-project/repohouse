@@ -6,10 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.ArchiveRepoRequestRepos
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Archive Repo Request methods
+ */
 class JdbiArchiveRepoRequestRepository(
     private val handle: Handle,
 ) : ArchiveRepoRequestRepository {
 
+    /**
+     * Method to create an Archive Repo Request
+     */
     override fun createArchiveRepoRequest(request: ArchiveRepoInput): Int {
         val requestId = handle.createUpdate(
             """
@@ -38,6 +44,9 @@ class JdbiArchiveRepoRequestRepository(
             .first()
     }
 
+    /**
+     * Method to get all Archive Repo Request's
+     */
     override fun getArchiveRepoRequests(): List<ArchiveRepo> {
         return handle.createQuery(
             """
@@ -48,6 +57,9 @@ class JdbiArchiveRepoRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get an Archive Repo Request by is id
+     */
     override fun getArchiveRepoRequestById(id: Int): ArchiveRepo? {
         return handle.createQuery(
             """
@@ -60,6 +72,9 @@ class JdbiArchiveRepoRequestRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Archive Repo Request's by a user
+     */
     override fun getArchiveRepoRequestsByUser(userId: Int): List<ArchiveRepo> {
         return handle.createQuery(
             """

@@ -6,10 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.JoinTeamRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Join Team Request methods
+ */
 class JdbiJoinTeamRequestRepository(
     private val handle: Handle,
 ) : JoinTeamRepository {
 
+    /**
+     * Method to create a Join Team Request
+     */
     override fun createJoinTeamRequest(request: JoinTeamInput): Int {
         val id = handle.createUpdate(
             """
@@ -38,6 +44,9 @@ class JdbiJoinTeamRequestRepository(
             .first()
     }
 
+    /**
+     * Method to get all Join Team Request's
+     */
     override fun getJoinTeamRequests(): List<JoinTeam> {
         return handle.createQuery(
             """
@@ -48,6 +57,9 @@ class JdbiJoinTeamRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get a Join Team Request by is id
+     */
     override fun getJoinTeamRequestById(id: Int): JoinTeam {
         return handle.createQuery(
             """
@@ -60,6 +72,9 @@ class JdbiJoinTeamRequestRepository(
             .first()
     }
 
+    /**
+     * Method to get all Create Team Request's by a user
+     */
     override fun getJoinTeamRequestsByUser(userId: Int): List<JoinTeam> {
         return handle.createQuery(
             """

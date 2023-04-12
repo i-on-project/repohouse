@@ -10,7 +10,14 @@ import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Course methods
+ */
 class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
+
+    /**
+     * Method to check if Course exists by is organization url
+     */
     override fun checkIfOrgUrlExists(orgUrl: String): Boolean {
         return handle.createQuery(
             """
@@ -23,6 +30,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .firstOrNull() != null
     }
 
+    /**
+     * Method to check if Course exists by the name
+     */
     override fun checkIfCourseNameExists(name: String): Boolean {
         return handle.createQuery(
             """
@@ -35,6 +45,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .firstOrNull() != null
     }
 
+    /**
+     * Method to create a Course
+     */
     override fun createCourse(course: CourseInput): Course {
         val id = handle.createUpdate(
             """
@@ -60,6 +73,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return Course(id, course.orgUrl, course.name, listOf(teacher))
     }
 
+    /**
+     * Method to delete a Course
+     */
     override fun deleteCourse(courseId: Int) {
         handle.createUpdate(
             """
@@ -71,6 +87,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .execute()
     }
 
+    /**
+     * Method to enter a Course
+     */
     override fun enterCourse(courseId: Int, studentId: Int): Course {
         handle.createUpdate(
             """
@@ -85,6 +104,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return getTheCourse(courseId = courseId)
     }
 
+    /**
+     * Method to leave a Course
+     */
     override fun leaveCourse(courseId: Int, studentId: Int): Course {
         handle.createUpdate(
             """
@@ -99,6 +121,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return getTheCourse(courseId = courseId)
     }
 
+    /**
+     * Method to archieve a Course
+     */
     override fun archiveCourse(courseId: Int) {
         handle.createUpdate(
             """
@@ -121,6 +146,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .execute()
     }
 
+    /**
+     * Method to add a teacher to a Course
+     */
     override fun addTeacherToCourse(teacherId: Int, courseId: Int): Course {
         handle.createUpdate(
             """
@@ -135,6 +163,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return getTheCourse(courseId = courseId)
     }
 
+    /**
+     * Method to get all teachers from a Course
+     */
     override fun getCourseTeachers(courseId: Int): List<Teacher> {
         val teachersIds = handle.createQuery(
             """
@@ -159,6 +190,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         }
     }
 
+    /**
+     * Method to get all classrooms from a Course
+     */
     override fun getCourseAllClassrooms(courseId: Int): List<Classroom> {
         return handle.createQuery(
             """
@@ -171,6 +205,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .list()
     }
 
+    /**
+     * Method to get all classrooms from a user in a Course
+     */
     override fun getCourseUserClassrooms(courseId: Int, userId: Int): List<Classroom> {
         return handle.createQuery(
             """
@@ -187,6 +224,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .list()
     }
 
+    /**
+     * Method to get all Courses by a user
+     */
     override fun getAllUserCourses(userId: Int): List<Course> {
         val dto = handle.createQuery(
             """
@@ -216,6 +256,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         }
     }
 
+    /**
+     * Method to get all students in a Course
+     */
     override fun getStudentInCourse(courseId: Int): List<Student> {
         return handle.createQuery(
             """
@@ -228,6 +271,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .list()
     }
 
+    /**
+     * Method to get a Course by is id
+     */
     override fun getCourse(courseId: Int): Course? {
         val dto = handle.createQuery(
             """
@@ -256,6 +302,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
     }
 
+    /**
+     * Method to get a Course by is organization url
+     */
     override fun getCourseByOrg(orgUrl: String): Course? {
         val dto = handle.createQuery(
             """
@@ -273,6 +322,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
     }
 
+    /**
+     * Method to get a Course by the name
+     */
     override fun getCourseByName(name: String): Course? {
         val dto = handle.createQuery(
             """
@@ -290,6 +342,9 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
     }
 
+    /**
+     * Method to check if a student is in a course
+     */
     override fun isStudentInCourse(studentId: Int, courseId: Int): Boolean =
         handle.createQuery(
             """
@@ -301,6 +356,10 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("courseId", courseId)
             .mapTo<Int>()
             .firstOrNull() != null
+
+    /**
+     * Method to get a Course by is id
+     */
     private fun getTheCourse(courseId: Int): Course {
         val dto = handle.createQuery(
             """

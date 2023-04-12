@@ -5,6 +5,9 @@ import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
 import java.sql.Timestamp
 
+/**
+ * Repository functions for Delivery Repository
+ */
 interface DeliveryRepository {
     fun createDelivery(delivery: DeliveryInput): Int //
     fun deleteDelivery(deliveryId: Int)

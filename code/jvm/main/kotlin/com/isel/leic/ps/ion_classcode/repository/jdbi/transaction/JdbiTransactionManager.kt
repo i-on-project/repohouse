@@ -5,6 +5,9 @@ import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Component
 
+/**
+ * Implementation of the Transaction Manager
+ */
 @Component
 class JdbiTransactionManager(
     private val jdbi: Jdbi

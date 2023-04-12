@@ -6,10 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.CreateRepoRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Create Repo Request methods
+ */
 class JdbiCreateRepoRequestRepository(
     private val handle: Handle,
 ) : CreateRepoRepository {
 
+    /**
+     * Method to create a Create Repo Request
+     */
     override fun createCreateRepoRequest(request: CreateRepoInput): Int {
         val id = handle.createUpdate(
             """
@@ -37,6 +43,9 @@ class JdbiCreateRepoRequestRepository(
             .first()
     }
 
+    /**
+     * Method to gel all a Create Repo Request's
+     */
     override fun getCreateRepoRequests(): List<CreateRepo> {
         return handle.createQuery(
             """
@@ -47,6 +56,9 @@ class JdbiCreateRepoRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get a Create Repo Request by is id
+     */
     override fun getCreateRepoRequestById(id: Int): CreateRepo? {
         return handle.createQuery(
             """
@@ -60,6 +72,9 @@ class JdbiCreateRepoRequestRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Create Repo Request's by a user
+     */
     override fun getCreateRepoRequestsByUser(userId: Int): List<CreateRepo> {
         return handle.createQuery(
             """

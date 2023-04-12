@@ -6,7 +6,13 @@ import com.isel.leic.ps.ion_classcode.repository.RepoRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Repo methods
+ */
 class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
+    /**
+     * Method to create a Repo
+     */
     override fun createRepo(repo: RepoInput): Int {
         return handle.createUpdate(
             """
@@ -23,6 +29,9 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .first()
     }
 
+    /**
+     * Method to delete a Repo
+     */
     override fun deleteRepo(repoId: Int) {
         handle.createUpdate(
             """
@@ -34,6 +43,9 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .execute()
     }
 
+    /**
+     * Method to update a Repo status
+     */
     override fun updateRepoStatus(repoId: Int, status: Boolean) {
         handle.createUpdate(
             """
@@ -47,6 +59,9 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .execute()
     }
 
+    /**
+     * Method to get a Repo by is id
+     */
     override fun getRepoById(repoId: Int): Repo? {
         return handle.createQuery(
             """
@@ -59,6 +74,9 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Repos from a team
+     */
     override fun getReposByTeam(teamId: Int): List<Repo> {
         return handle.createQuery(
             """

@@ -7,7 +7,13 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
 
+/**
+ * Implementation of the Assigment methods
+ */
 class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepository {
+    /**
+     * Method to create an Assigment
+     */
     override fun createAssignment(assignment: AssignmentInput): Assigment {
         val id = handle.createUpdate(
             """
@@ -27,6 +33,9 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
         return Assigment(id, assignment.classroomId, assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
     }
 
+    /**
+     * Method to get an Assigment by is id
+     */
     override fun getAssignmentById(assignmentId: Int): Assigment? {
         return handle.createQuery(
             """
@@ -38,6 +47,9 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
             .firstOrNull()
     }
 
+    /**
+     * Method to get an Assigment by a classroom
+     */
     override fun getAssignmentsByClassroom(classroomId: Int): List<Assigment> {
         return handle.createQuery(
             """
@@ -49,6 +61,9 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
             .list()
     }
 
+    /**
+     * Method to delete an Assigment
+     */
     override fun deleteAssignment(assignmentId: Int) {
         handle.createUpdate(
             """
@@ -57,6 +72,9 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
         ).bind("assigmentId", assignmentId).execute()
     }
 
+    /**
+     * Method to update an Assigment title
+     */
     override fun updateAssignmentTitle(assignmentId: Int, title: String) {
         handle.createUpdate(
             """
@@ -65,6 +83,9 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
         ).bind("assigmentId", assignmentId).bind("title", title).execute()
     }
 
+    /**
+     * Method to update an Assigment description
+     */
     override fun updateAssignmentDescription(assignmentId: Int, description: String) {
         handle.createUpdate(
             """
@@ -73,6 +94,9 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
         ).bind("assigmentId", assignmentId).bind("description", description).execute()
     }
 
+    /**
+     * Method to update an Assigment number of elements per group
+     */
     override fun updateAssignmentNumbElemsPerGroup(assignmentId: Int, numb: Int) {
         handle.createUpdate(
             """
@@ -81,6 +105,9 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
         ).bind("assigmentId", assignmentId).bind("numb", numb).execute()
     }
 
+    /**
+     * Method to update an Assigment number of groups
+     */
     override fun updateAssignmentNumbGroups(assignmentId: Int, numb: Int) {
         handle.createUpdate(
             """

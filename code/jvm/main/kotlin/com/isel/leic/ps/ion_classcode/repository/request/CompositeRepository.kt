@@ -3,6 +3,9 @@ package com.isel.leic.ps.ion_classcode.repository.request
 import com.isel.leic.ps.ion_classcode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Composite
 
+/**
+ * Repository functions for Composite Repository
+ */
 interface CompositeRepository {
     fun createCompositeRequest(request: CompositeInput): Int
     fun changeStateCompositeRequest(id: Int, state: String)

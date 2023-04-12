@@ -6,10 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.CreateTeamRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Create Team Request methods
+ */
 class JdbiCreateTeamRequestRepository(
     private val handle: Handle,
 ) : CreateTeamRepository {
 
+    /**
+     * Method to create a Create Team Request
+     */
     override fun createCreateTeamRequest(request: CreateTeamInput): Int {
         val id = handle.createUpdate(
             """
@@ -36,6 +42,9 @@ class JdbiCreateTeamRequestRepository(
             .first()
     }
 
+    /**
+     * Method to get all Create Team Request's
+     */
     override fun getCreateTeamRequests(): List<CreateTeam> {
         return handle.createQuery(
             """
@@ -46,6 +55,9 @@ class JdbiCreateTeamRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get a Create Team Request by is id
+     */
     override fun getCreateTeamRequestById(id: Int): CreateTeam? {
         return handle.createQuery(
             """
@@ -58,6 +70,9 @@ class JdbiCreateTeamRequestRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Create Team Request's by a user
+     */
     override fun getCreateTeamRequestsByUser(userId: Int): List<CreateTeam> {
         return handle.createQuery(
             """

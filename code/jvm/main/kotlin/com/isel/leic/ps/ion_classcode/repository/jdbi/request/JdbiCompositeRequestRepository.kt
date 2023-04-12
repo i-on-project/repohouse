@@ -7,10 +7,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.CompositeRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Composite Request methods
+ */
 class JdbiCompositeRequestRepository(
     private val handle: Handle,
 ) : CompositeRepository {
 
+    /**
+     * Method to create a Composite Request
+     */
     override fun createCompositeRequest(request: CompositeInput): Int {
         val requestId = handle.createUpdate(
             """
@@ -52,6 +58,9 @@ class JdbiCompositeRequestRepository(
         return compositeId
     }
 
+    /**
+     * Method to change a Composite Request state
+     */
     override fun changeStateCompositeRequest(id: Int, state: String) {
         handle.createUpdate(
             """
@@ -65,6 +74,9 @@ class JdbiCompositeRequestRepository(
             .execute()
     }
 
+    /**
+     * Method to get all a Composite Request's
+     */
     override fun getCompositeRequests(): List<Composite> {
         val compositeIds = handle.createQuery(
             """
@@ -91,6 +103,9 @@ class JdbiCompositeRequestRepository(
         }
     }
 
+    /**
+     * Method to get a Composite Request by is id
+     */
     override fun getCompositeRequestById(id: Int): Composite? {
         val compositeRequest = handle.createQuery(
             """
@@ -115,6 +130,9 @@ class JdbiCompositeRequestRepository(
         return Composite(id = id, creator = compositeRequest.creator, state = compositeRequest.state, requests = requests.map { it.id })
     }
 
+    /**
+     * Method to get all Composite Request's by a user
+     */
     override fun getCompositeRequestsByUser(userId: Int): List<Composite> {
         val compositeRequests = handle.createQuery(
             """

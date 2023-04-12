@@ -6,6 +6,9 @@ import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 
+/**
+ * Repository functions for User Repository
+ */
 interface UsersRepository {
     fun checkIfEmailExists(email: String): Boolean
     fun checkIfGithubUsernameExists(githubUsername: String): Boolean

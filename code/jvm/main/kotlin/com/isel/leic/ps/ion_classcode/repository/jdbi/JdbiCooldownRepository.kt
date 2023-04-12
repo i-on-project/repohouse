@@ -5,8 +5,14 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
 
+/**
+ * Implementation of the Cooldown methods
+ */
 class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
 
+    /**
+     * Method to create a Cooldown
+     */
     override fun createCooldownRequest(userId: Int, endTime: Timestamp): Int? {
         return handle.createUpdate(
             """
@@ -22,6 +28,9 @@ class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
             .firstOrNull()
     }
 
+    /**
+     * Method to get a Cooldown by is id
+     */
     override fun getCooldownRequest(userId: Int): Int? {
         val endDate = handle.createQuery(
             """
@@ -38,6 +47,9 @@ class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
         return (endDateInSeconds - currentTimeInSeconds).toInt()
     }
 
+    /**
+     * Method to delete a Cooldown
+     */
     override fun deleteCooldownRequest(userId: Int): Boolean {
         return handle.createUpdate(
             """

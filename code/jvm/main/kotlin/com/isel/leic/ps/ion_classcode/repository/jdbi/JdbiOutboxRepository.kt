@@ -9,7 +9,14 @@ import java.sql.Timestamp
 import java.time.Instant
 
 const val INTERVAL = "10 MINUTES"
+
+/**
+ * Implementation of the Outbox methods
+ */
 class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
+    /**
+     * Method to create an Outbox
+     */
     override fun createOutboxRequest(outbox: OutboxInput): Int? {
         return handle.createUpdate(
             """
@@ -28,6 +35,9 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Outbox's pending sent
+     */
     override fun getOutboxPendingRequests(): List<Outbox> {
         return handle.createQuery(
             """
@@ -39,6 +49,9 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .list()
     }
 
+    /**
+     * Method to get all Outbox's
+     */
     override fun getOutboxRequest(userId: Int): Outbox? {
         return handle.createQuery(
             """
@@ -51,6 +64,9 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .firstOrNull()
     }
 
+    /**
+     * Method to update a Outbox state
+     */
     override fun updateOutboxStateRequest(userId: Int): Boolean {
         return handle.createUpdate(
             """
@@ -63,6 +79,9 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .execute() == 1
     }
 
+    /**
+     * Method to delete an Outbox
+     */
     override fun deleteOutboxRequest(userId: Int): Boolean {
         return handle.createUpdate(
             """
@@ -74,6 +93,9 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .execute() == 1
     }
 
+    /**
+     * Method to create a query for add to timestamp
+     */
     private fun toTimestamp(): Timestamp {
         return handle.createQuery(
             """

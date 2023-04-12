@@ -6,10 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.LeaveCourseRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Leave Course Request methods
+ */
 class JdbiLeaveCourseRequestRepository(
     private val handle: Handle,
 ) : LeaveCourseRepository {
 
+    /**
+     * Method to create a Leave Course Request
+     */
     override fun createLeaveCourseRequest(request: LeaveCourseInput): Int {
         val id = handle.createUpdate(
             """
@@ -37,6 +43,9 @@ class JdbiLeaveCourseRequestRepository(
             .first()
     }
 
+    /**
+     * Method to get all Leave Course Request's
+     */
     override fun getLeaveCourseRequests(): List<LeaveCourse> {
         return handle.createQuery(
             """
@@ -47,6 +56,9 @@ class JdbiLeaveCourseRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get a Leave Course Request by is id
+     */
     override fun getLeaveCourseRequestById(id: Int): LeaveCourse? {
         return handle.createQuery(
             """
@@ -59,6 +71,9 @@ class JdbiLeaveCourseRequestRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Leave Course Request's by a user
+     */
     override fun getLeaveCourseRequestsByUser(userId: Int): List<LeaveCourse> {
         return handle.createQuery(
             """

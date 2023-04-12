@@ -3,6 +3,10 @@ package com.isel.leic.ps.ion_classcode.repository.request
 import com.isel.leic.ps.ion_classcode.domain.input.request.RequestInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Request
 
+
+/**
+ * Repository functions for Requests Repository
+ */
 interface RequestRepository {
     fun createRequest(request: RequestInput): Int
     fun changeStateRequest(id: Int, state: String)

@@ -6,10 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Apply Request methods
+ */
 class JdbiApplyRequestRepository(
     private val handle: Handle,
 ) : ApplyRequestRepository {
 
+    /**
+     * Method to create an Apply Request
+     */
     override fun createApplyRequest(request: ApplyInput): Int {
         val requestId = handle.createUpdate(
             """
@@ -38,6 +44,9 @@ class JdbiApplyRequestRepository(
             .first()
     }
 
+    /**
+     * Method to get all Apply Request's
+     */
     override fun getApplyRequests(): List<Apply> {
         return handle.createQuery(
             """
@@ -48,6 +57,9 @@ class JdbiApplyRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get an Apply Request by is id
+     */
     override fun getApplyRequestById(id: Int): Apply? {
         return handle.createQuery(
             """
@@ -60,6 +72,9 @@ class JdbiApplyRequestRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Apply Request's by a user
+     */
     override fun getApplyRequestsByUser(teacherId: Int): List<Apply> {
         return handle.createQuery(
             """

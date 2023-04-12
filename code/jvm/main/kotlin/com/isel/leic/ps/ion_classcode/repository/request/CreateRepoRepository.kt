@@ -3,6 +3,10 @@ package com.isel.leic.ps.ion_classcode.repository.request
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ion_classcode.domain.requests.CreateRepo
 
+
+/**
+ * Repository functions for Create Repo Repository
+ */
 interface CreateRepoRepository {
     fun createCreateRepoRequest(request: CreateRepoInput): Int
     fun getCreateRepoRequests(): List<CreateRepo>

@@ -6,10 +6,16 @@ import com.isel.leic.ps.ion_classcode.repository.request.LeaveTeamRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Leave Team Request methods
+ */
 class JdbiLeaveTeamRequestRepository(
     private val handle: Handle,
 ) : LeaveTeamRepository {
 
+    /**
+     * Method to create a Leave Team Request
+     */
     override fun createLeaveTeamRequest(request: LeaveTeamInput): Int {
         val id = handle.createUpdate(
             """
@@ -37,6 +43,9 @@ class JdbiLeaveTeamRequestRepository(
             .first()
     }
 
+    /**
+     * Method to get all Leave Team Request's
+     */
     override fun getLeaveTeamRequests(): List<LeaveTeam> {
         return handle.createQuery(
             """
@@ -47,6 +56,9 @@ class JdbiLeaveTeamRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get a Leave Team Request by is id
+     */
     override fun getLeaveTeamRequestById(id: Int): LeaveTeam? {
         return handle.createQuery(
             """
@@ -59,6 +71,9 @@ class JdbiLeaveTeamRequestRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Leave Team Request's by a user
+     */
     override fun getLeaveTeamRequestsByUser(userId: Int): List<LeaveTeam> {
         return handle.createQuery(
             """

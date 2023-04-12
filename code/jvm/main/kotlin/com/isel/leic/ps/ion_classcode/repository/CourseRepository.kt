@@ -6,6 +6,9 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 
+/**
+ * Repository functions for Course Repository
+ */
 interface CourseRepository {
     fun checkIfOrgUrlExists(orgUrl: String): Boolean
     fun checkIfCourseNameExists(name: String): Boolean

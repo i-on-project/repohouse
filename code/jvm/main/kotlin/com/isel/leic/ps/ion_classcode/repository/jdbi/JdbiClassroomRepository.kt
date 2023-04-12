@@ -9,7 +9,13 @@ import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Implementation of the Classroom methods
+ */
 class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository {
+    /**
+     * Method to create a Classroom
+     */
     override fun createClassroom(classroom: ClassroomInput, inviteLink: String): Int =
         handle.createUpdate(
             """
@@ -26,6 +32,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .mapTo<Int>()
             .first()
 
+    /**
+     * Method to update a Classroom name
+     */
     override fun updateClassroomName(classroomId: Int, classroomUpdate: ClassroomUpdateInputModel) {
         handle.createUpdate(
             """
@@ -39,6 +48,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .execute()
     }
 
+    /**
+     * Method to delete a Classroom
+     */
     override fun deleteClassroom(classroomId: Int) {
         handle.createUpdate(
             """
@@ -50,6 +62,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .execute()
     }
 
+    /**
+     * Method to get a Classroom by is id
+     */
     override fun getClassroomById(classroomId: Int): Classroom? {
         return handle.createQuery(
             """
@@ -62,6 +77,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .firstOrNull()
     }
 
+    /**
+     * Method to get all Assigments of a Classroom
+     */
     override fun getAssignmentsOfAClassroom(classroomId: Int): List<Assigment> {
         return handle.createQuery(
             """
@@ -74,6 +92,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .list()
     }
 
+    /**
+     * Method to achive a Classroom
+     */
     override fun archiveClassroom(classroomId: Int) {
         handle.createUpdate(
             """
@@ -86,6 +107,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .execute()
     }
 
+    /**
+     * Method to get a Classroom by a course and a student id
+     */
     override fun getStudentClassroomId(courseId: Int, studentId: Int): Int? {
         return handle.createQuery(
             """
@@ -101,6 +125,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .firstOrNull()
     }
 
+    /**
+     * Method to get a Classroom invite link
+     */
     override fun getClassroomInviteLink(classroomId: Int): String? {
         return handle.createQuery(
             """
@@ -113,6 +140,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .firstOrNull()
     }
 
+    /**
+     * Method to get a Classroom by is invite link
+     */
     override fun getClassroomByInviteLink(inviteLink: String): Classroom? {
         return handle.createQuery(
             """
@@ -124,6 +154,10 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .mapTo<Classroom>()
             .firstOrNull()
     }
+
+    /**
+     * Method to get all Classroom students
+     */
     override fun getStudentsByClassroom(classroomId: Int): List<Student> {
         return handle.createQuery(
             """
@@ -139,6 +173,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .list()
     }
 
+    /**
+     * Method to add a student to a Classroom
+     */
     override fun addStudentToClassroom(classroomId: Int, studentId: Int) {
         handle.createUpdate(
             """
@@ -151,6 +188,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .execute()
     }
 
+    /**
+     * Method to get all Classroom's invite links
+     */
     override fun getAllInviteLinks(): List<String> {
         return handle.createQuery(
             """
