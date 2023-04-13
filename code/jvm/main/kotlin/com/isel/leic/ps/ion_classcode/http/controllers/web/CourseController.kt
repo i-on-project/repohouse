@@ -10,6 +10,7 @@ import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputMode
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -41,7 +42,36 @@ class CourseController(
      * It will get from GitHub organizations from the Teacher's GitHub account
      * If some of the organizations are already in the database, the Teacher is just added to the course
      */
-    @PostMapping(Uris.COURSES_PATH, produces = ["application/vnd.siren+json"])
+    @GetMapping(Uris.CREATE_COURSE_PATH, produces = ["application/vnd.siren+json"])
+    fun getTeacherOrgs(
+        user: User,
+        @RequestBody courseInfo: CourseInputModel,
+    ): ResponseEntity<*> {
+        if (user !is Teacher) return Problem.unauthorized
+        return when (val course = courseServices.getTeacherCourses(user.id)) {
+            is Either.Left -> problem(course.value)
+            is Either.Right -> siren(GitHubOrgsOutputModel(course.value)){
+                clazz("course")
+                action(
+                    name = "createCourse",
+                    method = HttpMethod.POST,
+                    href = Uris.createCourseUri(),
+                    type = "application/json",
+                    block = {
+                        textField(name = "name")
+                        textField(name = "orgUrl")
+                        numberField(name = "id")
+                    })
+            }
+        }
+    }
+
+    /**
+     * Create a course
+     * It will get from GitHub organizations from the Teacher's GitHub account
+     * If some organizations are already in the database, the Teacher is just added to the course
+     */
+    @PostMapping(Uris.CREATE_COURSE_PATH, produces = ["application/vnd.siren+json"])
     fun createCourse(
         user: User,
         @RequestBody courseInfo: CourseInputModel,

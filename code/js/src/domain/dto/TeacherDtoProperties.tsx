@@ -1,7 +1,8 @@
 import {SirenEntity} from "../../siren/Siren";
-import {Teacher} from "../response-models/Teacher";
+import {Teacher, TeacherPending} from "../response-models/Teacher";
 
 export type TeacherDto = SirenEntity<TeacherDtoProperties>
+export type TeacherPendingApprovalDto = SirenEntity<TeacherPendingApprovalDtoProperties>
 
 export interface TeacherDtoProperties{
     name: string,
@@ -30,5 +31,17 @@ export class TeacherDtoProperties {
         this.githubId = githubId
         this.token = token
         this.isCreated = isCreated
+    }
+}
+
+export interface TeacherPendingApprovalDtoProperties{
+    teacher: TeacherPending[],
+}
+
+export class TeacherPendingApprovalDtoProperties {
+    constructor(
+        teacher: TeacherPending[],
+    ) {
+        this.teacher = teacher
     }
 }

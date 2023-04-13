@@ -29,6 +29,7 @@ object Uris {
     const val STUDENTS_PATH = "$API/students"
     const val STUDENT_PATH = "$STUDENTS_PATH/{id}"
     const val COURSES_PATH = "$API/courses"
+    const val CREATE_COURSE_PATH = "$COURSES_PATH/create"
     const val COURSE_PATH = "$COURSES_PATH/{courseId}"
     const val STUDENTS_COURSE_PATH = "$COURSE_PATH/students"
     const val ENTER_COURSE_PATH = "$COURSE_PATH/enter"
@@ -109,5 +110,6 @@ object Uris {
     fun postFeedbackUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(POST_FEEDBACK_PATH).expand(courseId, classroomId, assigmentId, teamId)
     fun localCopyUri(courseId: Int, classroomId: Int): URI = UriTemplate(LOCAL_COPY_PATH).expand(courseId, classroomId)
 
+    fun createCourseUri(): URI = URI(CREATE_COURSE_PATH)
     /** Mobile Uris **/
 }

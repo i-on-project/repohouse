@@ -5,12 +5,11 @@ export type MenuDto = SirenEntity<MenuDtoProperties>
 
 export interface MenuDtoProperties {
     name: string,
-    schoolNumber: number,
     email: string,
     courses: Course[]
 }
 
-export class MenuDtoProperties {
+export class MenuStudentDtoProperties implements MenuDtoProperties{
     constructor(
         name: string,
         schoolNumber: number,
@@ -22,4 +21,25 @@ export class MenuDtoProperties {
         this.email = email
         this.courses = courses
     }
+
+    schoolNumber: number;
+    courses: Course[];
+    email: string;
+    name: string;
+}
+
+export class MenuTeacherDtoProperties implements MenuDtoProperties{
+    constructor(
+        name: string,
+        email: string,
+        courses: Course[]
+    ) {
+        this.name = name
+        this.email = email
+        this.courses = courses
+    }
+
+    courses: Course[];
+    email: string;
+    name: string;
 }

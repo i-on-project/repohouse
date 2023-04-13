@@ -20,7 +20,6 @@ export function ShowAuthCallbackFetch({
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
 
-
     if (!content) {
         return (
             <Typography

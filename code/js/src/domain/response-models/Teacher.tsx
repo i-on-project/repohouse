@@ -1,4 +1,4 @@
-import {TeacherDto} from "../dto/TeacherDtoProperties";
+import {TeacherDto, TeacherPendingApprovalDto} from "../dto/TeacherDtoProperties";
 
 export interface Teacher {
     name: string,
@@ -23,5 +23,26 @@ export class Teacher {
         this.githubId = teacher.githubId
         this.token = teacher.token
         this.isCreated = teacher.isCreated
+    }
+}
+
+export interface TeacherPending {
+    name: string,
+    email: string,
+    id: number,
+    requestId: number
+}
+
+export interface TeacherPendingApproval {
+    teacher: TeacherPending[]
+}
+
+export class TeacherPendingApproval {
+    constructor(
+        dto: TeacherPendingApprovalDto
+    ) {
+        const teacher = dto.properties
+        if(teacher == null) throw new Error("TeacherDto properties is null")
+        this.teacher = teacher.teacher
     }
 }

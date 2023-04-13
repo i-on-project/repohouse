@@ -1,10 +1,14 @@
 import { NavigationRepository } from './NavigationRepository'
 import { SystemServices } from './services/SystemServices'
 import {AuthServices} from "./services/AuthServices";
+import {MenuServices} from "./services/MenuServices";
+import {CourseServices} from "./services/CourseServices";
 
 export const navigationRepository = new NavigationRepository()
 export const systemServices = new SystemServices()
 export const authServices = new AuthServices()
+export const menuServices = new MenuServices()
+export const courseServices = new CourseServices()
 
 export const HOME_KEY = "home"
 export const CREDITS_KEY = "credits"

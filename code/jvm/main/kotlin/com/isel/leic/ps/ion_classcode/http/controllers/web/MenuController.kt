@@ -62,7 +62,7 @@ class MenuController(
                 clazz("menu")
                 link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
                 link(rel = LinkRelation("credits"), href = Uris.creditsUri())
-                link(rel = LinkRelation("createCourse"), href = Uris.coursesUri(), needAuthentication = true)
+                link(rel = LinkRelation("createCourse"), href = Uris.createCourseUri(), needAuthentication = true)
                 link(rel = LinkRelation("teachersApproval"), href = Uris.teachersApprovalUri(), needAuthentication = true)
                 courses.value.forEach {
                     link(rel = LinkRelation("course"), href = Uris.courseUri(it.id), needAuthentication = true)

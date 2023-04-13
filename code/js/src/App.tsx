@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import {authServices, systemServices} from './Dependecies'
+import {createBrowserRouter, RouterProvider, useParams} from 'react-router-dom'
+import {authServices, courseServices, menuServices, systemServices} from './Dependecies'
 import { ShowHomeFetch } from './Home'
 import { ShowCreditsFetch } from './Credits'
 import {AuthnContainer} from "./Auth";
@@ -9,6 +9,10 @@ import {NavBarShow} from "./NavBar";
 import {ShowAuthTeacherFetch} from "./AuthTeacher";
 import {ShowAuthStudentFetch} from "./AuthStudent";
 import {ShowAuthCallbackFetch} from "./AuthCallback";
+import {Pending} from "@mui/icons-material";
+import {ShowMenuFetch} from "./Menu";
+import {ShowCourseCreateFetch, ShowCourseFetch} from "./Course";
+import {ShowPendingTeacherFetch} from "./ApproveTeachers";
 
 const router = createBrowserRouter([
     {
@@ -41,6 +45,28 @@ const router = createBrowserRouter([
                 <Menu/>
             </RequireAuth>
         },
+        {
+            "path": "/courses/:courseId",
+            "element": <RequireAuth>
+                <Course/>
+            </RequireAuth>
+        },
+        {
+            "path": "/courses/create",
+            "element": <RequireAuth>
+                <CourseCreate/>
+            </RequireAuth>
+        },
+        {
+            "path": "/pending-teachers",
+            "element": <RequireAuth>
+                <PendingTeacher/>
+            </RequireAuth>
+        },
+        {
+            "path": "*",
+            "element": <div>Not found</div>
+        }
     ]}
 ])
 
@@ -102,7 +128,32 @@ function AuthCallback() {
 function Menu() {
     return (
         <div>
-            <h1>Not done</h1>
+            <ShowMenuFetch menuServices={menuServices}/>
+        </div>
+    )
+}
+
+function Course() {
+    const {courseId} = useParams<{ courseId: string }>();
+    return (
+        <div>
+            <ShowCourseFetch courseServices={courseServices} courseId={Number(courseId)}/>
+        </div>
+    )
+}
+
+function CourseCreate() {
+    return (
+        <div>
+            <ShowCourseCreateFetch courseServices={courseServices}/>
+        </div>
+    )
+}
+
+function PendingTeacher() {
+    return (
+        <div>
+            <ShowPendingTeacherFetch menuServices={menuServices}/>
         </div>
     )
 }
