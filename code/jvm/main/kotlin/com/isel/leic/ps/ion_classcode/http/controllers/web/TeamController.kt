@@ -105,8 +105,8 @@ class TeamController(
         if (user !is Student) return Problem.notStudent
         return when (val create = teamService.createTeamRequest(createTeamInfo, assigmentId, classroomId)) {
             is Either.Left -> problem(create.value)
-            is Either.Right -> siren(TeamOutputModel(create.value.team, create.value.students, create.value.repos, create.value.feedbacks)) {
-                link(href = Uris.teamUri(courseId, classroomId, assigmentId, create.value.team.id), rel = LinkRelation("team"), needAuthentication = true)
+            is Either.Right -> siren(create.value) {
+                link(href = Uris.teamUri(courseId, classroomId, assigmentId, create.value), rel = LinkRelation("team"), needAuthentication = true)
             }
         }
     }

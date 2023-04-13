@@ -13,7 +13,9 @@ typealias CreateApplyRequestResult = Either<RequestServicesError, Int>
 /**
  * Error codes for the services
  */
-sealed class RequestServicesError
+sealed class RequestServicesError {
+    object InvalidData : RequestServicesError()
+}
 
 /**
  * Service to the request services
@@ -27,9 +29,12 @@ class RequestServices(
      * Method to create a new apply to teacher request
      */
     fun createApplyRequest(applyInput: ApplyInput): CreateApplyRequestResult {
+        if (applyInput.isNotValid()) {
+            return Either.Left(value = RequestServicesError.InvalidData)
+        }
         return transactionManager.run {
-            val request = it.applyRequestRepository.createApplyRequest(applyInput)
-            Either.Right(request)
+            val request = it.applyRequestRepository.createApplyRequest(request = applyInput)
+            Either.Right(value = request)
         }
     }
 }

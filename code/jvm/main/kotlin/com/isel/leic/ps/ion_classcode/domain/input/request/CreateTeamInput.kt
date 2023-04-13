@@ -5,7 +5,14 @@ package com.isel.leic.ps.ion_classcode.domain.input.request
  */
 data class CreateTeamInput(
     override val composite: Int? = null,
-    override val creator: Int
+    override val creator: Int,
 ) : RequestInputInterface {
-    fun isNotValid() = creator <= 0
+    fun isNotValid(): Boolean {
+        val cond = creator <= 0
+        return if (composite == null) {
+            cond
+        } else {
+            cond || composite <= 0
+        }
+    }
 }

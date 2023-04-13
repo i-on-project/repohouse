@@ -7,10 +7,13 @@ data class ApplyInput(
     override val composite: Int? = null,
     override val creator: Int,
 ) : RequestInputInterface {
-    init {
-        require(creator > 0) { "Creator id must be greater than 0" }
-        if (composite != null) {
-            require(composite > 0) { "Composite id must be greater than 0" }
+
+    fun isNotValid(): Boolean {
+        val cond = creator <= 0
+        return if (composite == null) {
+            cond
+        } else {
+            cond || composite <= 0
         }
     }
 }
