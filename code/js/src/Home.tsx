@@ -1,9 +1,9 @@
 import * as React from "react";
-import { useAsync } from "./siren/Fetch";
-import {useCallback, useState} from "react";
-import { ErrorMessageModel } from "./domain/response-models/Error";
-import { SirenEntity } from "./siren/Siren";
-import { SystemServices } from "./services/SystemServices";
+import {useCallback, useEffect, useState} from "react";
+import {useAsync} from "./siren/Fetch";
+import {ErrorMessageModel} from "./domain/response-models/Error";
+import {SirenEntity} from "./siren/Siren";
+import {SystemServices} from "./services/SystemServices";
 import {Typography} from "@mui/material";
 import {Button} from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
@@ -13,6 +13,7 @@ export function ShowHomeFetch({
 }: {
     systemServices: SystemServices;
 }) {
+
     const content = useAsync(async () => {
         return await systemServices.home();
     });

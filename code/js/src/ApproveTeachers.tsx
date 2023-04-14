@@ -10,7 +10,7 @@ import {MenuStudentDtoProperties, MenuTeacherDtoProperties} from "./domain/dto/M
 import {Link} from "react-router-dom";
 import {Button} from "react-bootstrap";
 
-export function ShowPendingTeacherFetch({
+export function ShowTeacherApprovalFetch({
                                   menuServices,
                               }: {
     menuServices: MenuServices;

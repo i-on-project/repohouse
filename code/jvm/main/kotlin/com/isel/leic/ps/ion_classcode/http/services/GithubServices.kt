@@ -6,9 +6,11 @@ import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.github.Owner
 import com.isel.leic.ps.ion_classcode.http.model.github.Permissions
+import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import okhttp3.Request
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
+import okhttp3.Response
 
 // TODO: Change the data classes to different files
 data class RepoOrg(
@@ -69,6 +71,17 @@ data class Author(
 class GithubServices(
     val okHttp: OkHttp,
 ) {
+
+    suspend fun getUserOrgs(token: String):List<GitHubOrgsModel>{
+        TODO()
+        val orgsRequest = Request.Builder().url("")
+            .addHeader("Authorization", "Bearer $token")
+            .addHeader("Accept", "application/json")
+            .build()
+
+        return okHttp.makeCallToList<GitHubOrgsModel>(orgsRequest)
+    }
+
     /**
      * Method to get the repositories from GitHub based on the organization and respective repository name
      */

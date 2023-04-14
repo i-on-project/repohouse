@@ -18,8 +18,10 @@ object Uris {
     const val HOME = "$API/home"
     const val CREDITS = "$API/credits"
     const val AUTH_PATH = "$API/auth"
-    const val AUTH_REGISTER_PATH = "$AUTH_PATH/register"
-    const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_PATH/verify"
+    const val AUTH_STATUS_PATH = "$AUTH_PATH/status"
+    const val AUTH_CREATE_PATH = "$AUTH_PATH/create"
+    const val AUTH_REGISTER_STUDENT_PATH = "$AUTH_PATH/register"
+    const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_STUDENT_PATH/verify"
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
     const val LOGOUT = "$AUTH_PATH/logout"
@@ -68,7 +70,7 @@ object Uris {
     fun homeUri(): URI = URI(HOME)
     fun creditsUri(): URI = URI(CREDITS)
     fun authUri(): URI = URI(AUTH_PATH)
-    fun authUriRegister(): URI = URI(AUTH_REGISTER_PATH)
+    fun authUriCreate(): URI = URI(AUTH_CREATE_PATH)
     fun authUriStudent(): URI = URI(AUTH_STUDENT_PATH)
     fun authUriTeacher(): URI = URI(AUTH_TEACHER_PATH)
     fun authUriRegisterVerification(): URI = URI(AUTH_REGISTER_VERIFICATION_PATH)
@@ -110,6 +112,8 @@ object Uris {
     fun postFeedbackUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): URI = UriTemplate(POST_FEEDBACK_PATH).expand(courseId, classroomId, assigmentId, teamId)
     fun localCopyUri(courseId: Int, classroomId: Int): URI = UriTemplate(LOCAL_COPY_PATH).expand(courseId, classroomId)
 
+    fun authUriRegisterStudent(): URI = URI(AUTH_REGISTER_STUDENT_PATH)
+    fun authStatusUri(): URI = URI(AUTH_STATUS_PATH)
     fun createCourseUri(): URI = URI(CREATE_COURSE_PATH)
     /** Mobile Uris **/
 }

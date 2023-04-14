@@ -1,5 +1,7 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
+import com.isel.leic.ps.ion_classcode.domain.PendingStudent
+import com.isel.leic.ps.ion_classcode.domain.PendingTeacher
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
@@ -106,6 +108,36 @@ class JdbiUsersRepository(
     }
 
     /**
+     * Method to create a pending student
+     */
+    override fun createPendingStudent(student: StudentInput): PendingStudent {
+        val id =  handle.createUpdate(
+            """
+            INSERT INTO pendingstudent (email, github_username, github_id, token, name,created_at)
+            VALUES (:email, :github_username, :github_id, :token, :name,now())
+            RETURNING id
+            """,
+        )
+            .bind("email", student.email)
+            .bind("github_username", student.githubUsername)
+            .bind("github_id", student.githubId)
+            .bind("token", student.token)
+            .bind("name", student.name)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
+
+        return PendingStudent(
+            id = id,
+            name = student.name,
+            email = student.email,
+            githubUsername = student.githubUsername,
+            githubId = student.githubId,
+            token = student.token
+        )
+    }
+
+    /**
      * Method to create a student
      */
     override fun createStudent(student: StudentInput): Student? {
@@ -144,6 +176,38 @@ class JdbiUsersRepository(
             token = student.token,
             schoolId = student.schoolId,
             isCreated = false,
+        )
+    }
+
+    /**
+     * Method to create a pending teacher
+     */
+    override fun createPendingTeacher(teacher: TeacherInput): PendingTeacher {
+        val id = handle.createUpdate(
+            """
+            INSERT INTO pendingteacher (email, github_username, github_id, token, name,github_token,created_at)
+            VALUES (:email, :github_username, :github_id, :token, :name,:github_token,now())
+            RETURNING id
+            """,
+        )
+            .bind("email", teacher.email)
+            .bind("github_username", teacher.githubUsername)
+            .bind("github_id", teacher.githubId)
+            .bind("token", teacher.token)
+            .bind("name", teacher.name)
+            .bind("github_token", teacher.githubToken)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .first()
+
+        return PendingTeacher(
+            id = id,
+            name = teacher.name,
+            email = teacher.email,
+            githubUsername = teacher.githubUsername,
+            githubId = teacher.githubId,
+            token = teacher.token,
+            githubToken = teacher.githubToken
         )
     }
 
@@ -212,6 +276,28 @@ class JdbiUsersRepository(
             .mapTo<Int>()
             .firstOrNull() ?: return null
         return helper(handle = handle, id = id)
+    }
+
+    override fun getPendingUserByGithubId(githubId: Long): User? {
+        return handle.createQuery(
+            """
+            SELECT  id,name,email,github_username,is_created,github_id,token,github_token FROM pendingteacher
+            WHERE github_id = :github_id 
+            Order By created_at DESC limit 1
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo<PendingTeacher>()
+            .firstOrNull() ?:
+        handle.createQuery(
+            """
+            SELECT id,name,email,github_username,is_created,github_id,token FROM pendingstudent
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo<PendingStudent>()
+            .firstOrNull()
     }
 
     /**
@@ -388,6 +474,25 @@ class JdbiUsersRepository(
             .bind("id", id)
             .mapTo<String>()
             .firstOrNull()
+    }
+
+    /**
+     * Method to delete all pending users that are older than 1 day
+     */
+    override fun deletePendingUsers() {
+        handle.createUpdate(
+            """
+            DELETE FROM pendingstudent
+            where  created_at < now() - interval '1 day'
+            """,
+        ).execute()
+
+        handle.createUpdate(
+            """
+            DELETE FROM pendingteacher
+            where  created_at < now() - interval '1 day'
+            """,
+        ).execute()
     }
 }
 

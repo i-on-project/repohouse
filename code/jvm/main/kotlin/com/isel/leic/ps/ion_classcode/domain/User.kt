@@ -28,6 +28,19 @@ data class Student(
 ) : User()
 
 /**
+ * Pending Student Domain Interface
+ */
+data class PendingStudent(
+    override val name: String,
+    override val email: String,
+    override val id: Int,
+    override val githubUsername: String,
+    override val githubId: Long,
+    override val isCreated: Boolean = false,
+    override val token: String
+) : User()
+
+/**
  * Teacher Domain Interface
  */
 data class Teacher(
@@ -38,4 +51,18 @@ data class Teacher(
     override val githubId: Long,
     override val token: String,
     override val isCreated: Boolean,
+) : User()
+
+/**
+ * Pending Teacher Domain Interface
+ */
+data class PendingTeacher(
+    override val name: String,
+    override val email: String,
+    override val id: Int,
+    override val githubUsername: String,
+    override val githubId: Long,
+    override val token: String,
+    override val isCreated: Boolean = false,
+    val githubToken: String
 ) : User()

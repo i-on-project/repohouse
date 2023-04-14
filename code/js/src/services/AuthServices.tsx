@@ -1,8 +1,9 @@
 import * as Hypermedia from "../Dependecies"
-import {fetchGet} from "../siren/Fetch";
+import {fetchGet, fetchPost} from "../siren/Fetch";
 import {SirenEntity} from "../siren/Siren";
 import {StatusDtoProperties} from "../domain/dto/StatusDtoProperties";
-import {AuthRedirectDto, AuthRedirectDtoProperties} from "../domain/dto/AuthRedirectDtoProperties";
+import {AuthRedirectDtoProperties} from "../domain/dto/AuthRedirectDtoProperties";
+import {PendingUserDtoProperties} from "../domain/dto/PendingUserDtoProperties";
 
 
 export class AuthServices {
@@ -11,28 +12,64 @@ export class AuthServices {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_TEACHER_KEY, Hypermedia.systemServices.home)
         const response = await fetchGet<AuthRedirectDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
-            Hypermedia.navigationRepository.addLinks([Hypermedia.HOME_KEY, Hypermedia.AUTH_CALLBACK_KEY], response.links)
+            //TODO
         }
         return response
     }
 
     authStudent = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_STUDENT_KEY, Hypermedia.systemServices.home)
+        console.log(link.href)
         const response = await fetchGet<AuthRedirectDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
-            console.log("Returned from authStudent: " + response.properties.url)
-            Hypermedia.navigationRepository.addLinks([Hypermedia.AUTH_CALLBACK_KEY], response.links)
+            //TODO
         }
         return response
     }
 
-    authCallback = async () => {
-        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_CALLBACK_KEY,Hypermedia.authServices.authStudent)
-        const link = 'api/auth/callback' + window.location.search
-        console.log("authCallback: " + link)
-        const response = await fetchGet<StatusDtoProperties>(link)
+    createTeacher = async () => {
+        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.CREATE_KEY, Hypermedia.systemServices.home)
+        const response = await fetchGet<PendingUserDtoProperties>("/api/auth/create")
         if (response instanceof SirenEntity) {
-            Hypermedia.navigationRepository.addLinks([Hypermedia.HOME_KEY, Hypermedia.MENU_KEY], response.links)
+            //TODO
+        }
+        return response
+    }
+
+    createTeacherPost = async () => {
+        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.CREATE_KEY, Hypermedia.systemServices.home)
+        const response = await fetchPost<StatusDtoProperties>("/api/auth/create")
+        if (response instanceof SirenEntity) {
+            //TODO
+        }
+        return response
+    }
+
+    createStudentPost = async (schoolId:number) => {
+        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.REGISTER_KEY, Hypermedia.systemServices.home)
+        const body = { schoolId: schoolId }
+        const response = await fetchPost<StatusDtoProperties>("/api/auth/register")
+        if (response instanceof SirenEntity) {
+            //TODO
+        }
+        return response
+    }
+
+    verify = async (otp: number) => {
+        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.VERIFY_KEY, Hypermedia.systemServices.home)
+        const body = { otp: otp }
+        const response = await fetchPost<StatusDtoProperties>("/api/auth/register/verify", body)
+        if (response instanceof SirenEntity) {
+            //TODO
+        }
+        return response
+    }
+
+    status = async () => {
+        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.STATUS_KEY,Hypermedia.systemServices.home)
+        const response = await fetchGet<StatusDtoProperties>("/api/auth/status")
+        if (response instanceof SirenEntity) {
+            //TODO
         }
         return response
     }

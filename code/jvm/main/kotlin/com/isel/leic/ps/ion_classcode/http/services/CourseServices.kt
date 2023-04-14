@@ -42,6 +42,7 @@ sealed class CourseServicesError {
 @Component
 class CourseServices(
     private val transactionManager: TransactionManager,
+    private val githubServices: GithubServices
 ) {
 
     /**
@@ -124,12 +125,12 @@ class CourseServices(
 
 
     fun getTeacherCourses(userId: Int) : CoursesOrgsResponse {
-        return transactionManager.run {
+        return TODO()
+        transactionManager.run {
             val githubToken = it.usersRepository.getTeacherGithubToken(userId)
-            if (githubToken == null) // return@run Either.Left(value = CourseServicesError.UserNotFound)
-            val coursesOrg = TODO("Request To github to get orgs")
+            // if (githubToken == null) return@run Either.Left(value = CourseServicesError.UserNotFound)
+            //val coursesOrg = githubServices.getUserOrgs(githubToken)
             //TODO: Filter the ones not already in the database
-            TODO()
         }
     }
 }

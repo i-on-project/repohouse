@@ -11,13 +11,36 @@ CREATE TABLE Users(
     name text not null
 );
 
+CREATE TABLE PendingTeacher(
+      id serial primary key,
+      email text check (email like '%@%') not null,
+      is_created boolean not null default false,
+      github_username text not null,
+      github_id bigint not null,
+      token text not null,
+      name text not null,
+      github_token text not null,
+      created_at date
+);
+
+CREATE TABLE PendingStudent(
+       id serial primary key,
+       email text check (email like '%@%') not null,
+       is_created boolean not null default false,
+       github_username text not null,
+       github_id bigint not null,
+       token text not null,
+       name text not null,
+       created_at date
+);
+
 CREATE TABLE Teacher(
     id int primary key,
     github_token text unique not null,
     foreign key(id) references users(id)
 );
 
-CREATE TABLE User(
+CREATE TABLE Student(
     id int primary key,
     school_id int unique default null,
     foreign key(id) references users(id)
@@ -34,7 +57,7 @@ CREATE TABLE Student_Course(
     student int,
     course int,
     primary key (student, course),
-    foreign key (student) references User(id),
+    foreign key (student) references Student(id),
     foreign key (course) references Course(id)
 );
 
@@ -145,7 +168,7 @@ CREATE TABLE Student_Team(
     student int,
     team int,
     primary key (student, team),
-    foreign key (student) references User(id),
+    foreign key (student) references Student(id),
     foreign key (team) references Team(id)
 );
 

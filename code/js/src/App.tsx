@@ -8,11 +8,12 @@ import {RequireAuth} from "./RequiredAuth";
 import {NavBarShow} from "./NavBar";
 import {ShowAuthTeacherFetch} from "./AuthTeacher";
 import {ShowAuthStudentFetch} from "./AuthStudent";
-import {ShowAuthCallbackFetch} from "./AuthCallback";
-import {Pending} from "@mui/icons-material";
 import {ShowMenuFetch} from "./Menu";
 import {ShowCourseCreateFetch, ShowCourseFetch} from "./Course";
-import {ShowPendingTeacherFetch} from "./ApproveTeachers";
+import {ShowTeacherApprovalFetch} from "./ApproveTeachers";
+import {ShowCreateCallbackFetch, ShowCreateFetch, ShowCreateTeacherFetchPost} from "./Create";
+import {ShowStatusCallbackFetch, ShowStatusFetch} from "./Status";
+import {ShowVerifyFetch} from "./Verify";
 
 const router = createBrowserRouter([
     {
@@ -22,51 +23,63 @@ const router = createBrowserRouter([
             {
             "path": "/",
             "element": <Home/>
-        },
-        {
-            "path": "/credits",
-            "element": <Credits/>
-        },
-        {
-            "path": "/auth/callback",
-            "element": <AuthCallback/>
-        },
-        {
-            "path": "/auth/teacher",
-            "element": <AuthTeacher/>
-        },
-        {
-            "path": "/auth/student",
-            "element": <AuthStudent/>
-        },
-        {
-            "path": "/menu",
-            "element": <RequireAuth>
-                <Menu/>
-            </RequireAuth>
-        },
-        {
-            "path": "/courses/:courseId",
-            "element": <RequireAuth>
-                <Course/>
-            </RequireAuth>
-        },
-        {
-            "path": "/courses/create",
-            "element": <RequireAuth>
-                <CourseCreate/>
-            </RequireAuth>
-        },
-        {
-            "path": "/pending-teachers",
-            "element": <RequireAuth>
-                <PendingTeacher/>
-            </RequireAuth>
-        },
-        {
-            "path": "*",
-            "element": <div>Not found</div>
-        }
+            },
+            {
+                "path": "/credits",
+                "element": <Credits/>
+            },
+            {
+                "path": "/auth/create",
+                "element": <Create/>
+            },
+            {
+                "path": "/auth/create/callback",
+                "element": <CreateCallback/>
+            },
+            {
+                "path": "/auth/verify",
+                "element": <Verify/>
+            },
+            {
+                "path": "/auth/status",
+                "element": <Status/>
+            },
+            {
+                "path": "/auth/status/callback",
+                "element": <StatusCallback/>
+            },
+            {
+                "path": "/auth/teacher",
+                "element": <AuthTeacher/>
+            },
+            {
+                "path": "/auth/student",
+                "element": <AuthStudent/>
+            },
+            {
+                "path": "/menu",
+                "element": <RequireAuth>
+                    <Menu/>
+                </RequireAuth>
+            },
+            {
+                "path": "/courses/:courseId",
+                "element": <RequireAuth>
+                    <Course/>
+                </RequireAuth>
+            },
+            {
+                "path": "/courses/create",
+                "element": <RequireAuth>
+                    <CourseCreate/>
+                </RequireAuth>
+            },
+            {
+                "path": "/pending-teachers",
+                "element": <RequireAuth>
+                    <TeacherApproval/>
+                </RequireAuth>
+            }
     ]}
 ])
 
@@ -116,11 +129,42 @@ function AuthStudent() {
         </div>
     )
 }
-
-function AuthCallback() {
+function Create() {
     return (
         <div>
-            <ShowAuthCallbackFetch authServices={authServices}/>
+            <ShowCreateFetch authServices={authServices}/>
+        </div>
+    )
+}
+
+function CreateCallback() {
+    return (
+        <div>
+            <ShowCreateCallbackFetch/>
+        </div>
+    )
+}
+
+function StatusCallback() {
+    return (
+        <div>
+            <ShowStatusCallbackFetch/>
+        </div>
+    )
+}
+
+function Status() {
+    return (
+        <div>
+            <ShowStatusFetch authServices={authServices}/>
+        </div>
+    )
+}
+
+function Verify() {
+    return (
+        <div>
+            <ShowVerifyFetch authServices={authServices}/>
         </div>
     )
 }
@@ -150,10 +194,10 @@ function CourseCreate() {
     )
 }
 
-function PendingTeacher() {
+function TeacherApproval() {
     return (
         <div>
-            <ShowPendingTeacherFetch menuServices={menuServices}/>
+            <ShowTeacherApprovalFetch menuServices={menuServices}/>
         </div>
     )
 }

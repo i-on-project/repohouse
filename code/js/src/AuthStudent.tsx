@@ -1,11 +1,9 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import {Typography} from "@mui/material";
-import {Button} from "react-bootstrap";
-import {useNavigate} from "react-router-dom";
 import {AuthServices} from "./services/AuthServices";
 
 export function ShowAuthStudentFetch({
@@ -17,6 +15,27 @@ export function ShowAuthStudentFetch({
         return await authServices.authStudent();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
+    const [windowRef, setWindowRef] = useState<Window>(null);
+    const [isOpen, setOpen] = useState<Boolean>(false);
+
+    useEffect(() => {
+        if (content instanceof SirenEntity && !isOpen) {
+            const authWindow = window.open(content.properties.url, '')
+            setWindowRef(authWindow)
+            setOpen(true)
+        }
+    }, [content, windowRef, setWindowRef, isOpen, setOpen])
+
+    useEffect(() => {
+        window.addEventListener('message', function(e) {
+            console.log(e)
+            if(e.origin !== 'http://localhost:3000')
+                return;
+            if (e.data.type === "Auth") {
+                window.location = e.data.data
+            }
+        }, false);
+    }, [windowRef])
 
 
     if (!content) {
@@ -41,9 +60,6 @@ export function ShowAuthStudentFetch({
                 justifyContent: "space-evenly",
             }}
         >
-            {content instanceof SirenEntity ? (
-                window.location.href = content.properties.url
-            ) : null}
         </div>
     );
 }

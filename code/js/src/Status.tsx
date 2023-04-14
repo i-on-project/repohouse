@@ -5,14 +5,15 @@ import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import { SystemServices } from "./services/SystemServices";
 import { Typography } from "@mui/material";
+import {AuthServices} from "./services/AuthServices";
 
-export function ShowCreditsFetch({
-                                  systemServices,
+export function ShowStatusFetch({
+                                  authServices,
                               }: {
-    systemServices: SystemServices;
+    authServices: AuthServices;
 }) {
     const content = useAsync(async () => {
-        return await systemServices.credits();
+        return await authServices.status();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
 
@@ -43,7 +44,7 @@ export function ShowCreditsFetch({
                     <Typography
                         variant="h2"
                     >
-                        {"Credits"}
+                        {"Status"}
                     </Typography>
                     <Typography
                         variant="h5"
@@ -51,35 +52,22 @@ export function ShowCreditsFetch({
                         {"Teacher"}
                         <ul>
                             <li>
-                                {content.properties.teacher.name}
+                                {content.properties.statusInfo}
                             </li>
                             <li>
-                                {content.properties.teacher.email}
+                                {content.properties.message}
                             </li>
-                        </ul>
-                    </Typography>
-                    <Typography
-                        variant="h5"
-                    >
-                        {"Students"}
-                        <ul>
-                            {content.properties.students.map((student) => (
-                                <li key={student.schoolNumber}>
-                                    {student.name}
-                                    <ul>
-                                        <li>
-                                            {student.email}
-                                        </li>
-                                        <li>
-                                            {"School_Id: " + student.schoolNumber}
-                                        </li>
-                                    </ul>
-                                </li>
-                            ))}
                         </ul>
                     </Typography>
                 </>
             ) : null}
         </div>
     );
+}
+
+
+export function ShowStatusCallbackFetch() {
+    window.opener.postMessage({type:"Auth", data:'http://localhost:3000/auth/status'},'http://localhost:3000/')
+    window.close()
+    return (<> </>)
 }

@@ -15,7 +15,6 @@ export class Menu {
         const menu = dto.properties
         if(menu == null) throw new Error("MenuDto properties is null")
         this.name = menu.name
-        this.schoolNumber = menu.schoolNumber
         this.email = menu.email
         this.courses = menu.courses
     }

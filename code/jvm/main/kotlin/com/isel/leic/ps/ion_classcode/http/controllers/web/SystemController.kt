@@ -10,6 +10,7 @@ import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -47,14 +48,4 @@ class SystemController {
         }
     }
 
-    /**
-     * Fallback from api to redirect to home
-     */
-    @GetMapping("*")
-    fun getFallback(): ResponseEntity<Any> {
-        return ResponseEntity
-            .status(Status.REDIRECT)
-            .header(HttpHeaders.LOCATION, Uris.HOME)
-            .build()
-    }
 }
