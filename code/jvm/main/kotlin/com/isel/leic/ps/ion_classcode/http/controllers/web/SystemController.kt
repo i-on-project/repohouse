@@ -3,8 +3,9 @@ package com.isel.leic.ps.ion_classcode.http.controllers.web
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.CreditsOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.HomeOutputModel
+import com.isel.leic.ps.ion_classcode.infra.JsonHome
 import com.isel.leic.ps.ion_classcode.http.model.output.OutputModel
+import com.isel.leic.ps.ion_classcode.infra.jsonHome
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
@@ -24,15 +25,16 @@ class SystemController {
     /**
      * Home page
      */
-    @GetMapping(Uris.HOME, produces = ["application/vnd.siren+json"])
-    fun home(): ResponseEntity<SirenModel<OutputModel>> {
-        return siren(value = HomeOutputModel()) {
-            link(rel = LinkRelation("self"), href = Uris.homeUri())
-            link(rel = LinkRelation("credits"), href = Uris.creditsUri())
-            link(rel = LinkRelation("authTeacher"), href = Uris.authUriTeacher())
-            link(rel = LinkRelation("authStudent"), href = Uris.authUriStudent())
-            link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
-            action(name = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
+    @GetMapping(Uris.HOME, produces = ["application/home+json"])
+    fun home(): ResponseEntity<JsonHome> {
+        return jsonHome {
+            resource(Uris.HOME, listOf(HttpMethod.GET))
+            resource(Uris.CREDITS, listOf(HttpMethod.GET))
+            resource(Uris.AUTH_STUDENT_PATH, listOf(HttpMethod.GET))
+            resource(Uris.AUTH_TEACHER_PATH, listOf(HttpMethod.GET))
+            resource(Uris.LOGOUT, listOf(HttpMethod.POST))
+            resource(Uris.MENU_PATH, listOf(HttpMethod.GET))
+            // TODO(ADD ALL RESOURCES)
         }
     }
 

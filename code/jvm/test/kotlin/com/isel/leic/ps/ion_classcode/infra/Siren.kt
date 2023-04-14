@@ -53,7 +53,7 @@ class SirenTests {
         }
 
         // and: serializing it to JSON
-        val jsonString = mapper.writeValueAsString(sirenModel)
+        val jsonString = mapper.writeValueAsString(sirenModel.body)
 
         // then: the serialization is the expected one
         val expected = """

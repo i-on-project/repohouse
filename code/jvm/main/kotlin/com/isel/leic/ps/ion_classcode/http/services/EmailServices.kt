@@ -21,6 +21,7 @@ typealias EmailResponse = Either<EmailServiceError, Response>
  */
 sealed class EmailServiceError {
     object SendEmailError : EmailServiceError()
+    object InvalidInput : EmailServiceError()
 }
 
 /**
@@ -42,6 +43,9 @@ class EmailService {
      * Method to send an email with the otp to the user
      */
     fun sendVerificationEmail(name: String, email: String, otp: Int): EmailResponse {
+        if (name.isEmpty() || email.isEmpty() || otp < 0) {
+            return Either.Left(EmailServiceError.InvalidInput)
+        }
         val to = Email(email)
         val content = Content(
             CONTENT_TYPE,

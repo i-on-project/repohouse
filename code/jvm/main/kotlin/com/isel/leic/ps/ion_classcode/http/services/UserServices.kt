@@ -8,6 +8,7 @@ import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ion_classcode.tokenHash.TokenHash
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -47,6 +48,7 @@ sealed class UserServicesError {
 @Component
 class UserServices(
     private val transactionManager: TransactionManager,
+    private val tokenHash: TokenHash
 ) {
     /**
      * Method to check the token from a user
@@ -126,7 +128,16 @@ class UserServices(
     fun createPendingTeacher(teacher: TeacherInput): PendingTeacherCreationResult {
         if (teacher.isNotValid()) return Either.Left(value = UserServicesError.InvalidData)
         return transactionManager.run {
-            val teacherRes = it.usersRepository.createPendingTeacher(teacher = teacher)
+            val hash = tokenHash.getTokenHash(teacher.token)
+            val githubTokenHash = tokenHash.getTokenHash(teacher.githubToken)
+            val teacherRes = it.usersRepository.createPendingTeacher(teacher = TeacherInput(
+                name = teacher.name,
+                email = teacher.email,
+                githubUsername = teacher.githubUsername,
+                githubId = teacher.githubId,
+                token = hash,
+                githubToken = githubTokenHash)
+            )
             Either.Right(value = teacherRes)
         }
     }
@@ -135,44 +146,44 @@ class UserServices(
      * Method to create a user as a student
      */
     fun createStudent(githubId: Long,schoolId:Int): StudentCreationResult {
-       return transactionManager.run {
-           val student = it.usersRepository.getPendingUserByGithubId(githubId = githubId)
-           if (student == null) {
-               Either.Left(value = UserServicesError.UserNotFound)
-           } else if (student is PendingStudent) {
-               if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = student.githubUsername)) {
-                   return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
-               }
-               if (it.usersRepository.checkIfEmailExists(email = student.email)) {
-                   return@run Either.Left(value = UserServicesError.EmailInUse)
-               }
-               if (it.usersRepository.checkIfGithubIdExists(githubId = student.githubId)) {
-                   return@run Either.Left(value = UserServicesError.GithubIdInUse)
-               }
-               if (it.usersRepository.checkIfTokenExists(token = student.token)) {
-                   return@run Either.Left(value = UserServicesError.TokenInUse)
-               }
-               if (it.usersRepository.checkIfSchoolIdExists(schoolId = schoolId)) {
-                   return@run Either.Left(value = UserServicesError.SchoolIdInUse)
-               }
-               val studentRes = it.usersRepository.createStudent(student =
-               StudentInput(
-                     name = student.name,
-                     email = student.email,
-                     githubUsername = student.githubUsername,
-                     githubId = student.githubId,
-                     token = student.token,
-                     schoolId = schoolId
-               ))
-               if (studentRes == null) {
-                   Either.Left(value = UserServicesError.ErrorCreatingUser)
-               } else {
-                   Either.Right(value = studentRes)
-               }
-           } else {
-               Either.Left(value = UserServicesError.UserNotFound)
-           }
-       }
+        return transactionManager.run {
+            val student = it.usersRepository.getPendingUserByGithubId(githubId = githubId)
+            if (student == null) {
+                Either.Left(value = UserServicesError.UserNotFound)
+            } else if (student is PendingStudent) {
+                if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = student.githubUsername)) {
+                    return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
+                }
+                if (it.usersRepository.checkIfEmailExists(email = student.email)) {
+                    return@run Either.Left(value = UserServicesError.EmailInUse)
+                }
+                if (it.usersRepository.checkIfGithubIdExists(githubId = student.githubId)) {
+                    return@run Either.Left(value = UserServicesError.GithubIdInUse)
+                }
+                if (it.usersRepository.checkIfTokenExists(token = student.token)) {
+                    return@run Either.Left(value = UserServicesError.TokenInUse)
+                }
+                if (it.usersRepository.checkIfSchoolIdExists(schoolId = schoolId)) {
+                    return@run Either.Left(value = UserServicesError.SchoolIdInUse)
+                }
+                val studentRes = it.usersRepository.createStudent(student =
+                StudentInput(
+                    name = student.name,
+                    email = student.email,
+                    githubUsername = student.githubUsername,
+                    githubId = student.githubId,
+                    token = student.token,
+                    schoolId = schoolId
+                ))
+                if (studentRes == null) {
+                    Either.Left(value = UserServicesError.ErrorCreatingUser)
+                } else {
+                    Either.Right(value = studentRes)
+                }
+            } else {
+                Either.Left(value = UserServicesError.UserNotFound)
+            }
+        }
     }
 
     /**
@@ -182,7 +193,14 @@ class UserServices(
         if (student.name.isEmpty() || student.email.isEmpty()) return Either.Left(UserServicesError.InvalidData)
         if (student.isNotValid()) return Either.Left(value = UserServicesError.InvalidData)
         return transactionManager.run {
-            val studentRes = it.usersRepository.createPendingStudent(student = student)
+            val hash = tokenHash.getTokenHash(student.token)
+            val studentRes = it.usersRepository.createPendingStudent(student = StudentInput(
+                name = student.name,
+                email = student.email,
+                githubUsername = student.githubUsername,
+                githubId = student.githubId,
+                token = hash,
+                schoolId = student.schoolId))
             Either.Right(value = studentRes)
         }
     }

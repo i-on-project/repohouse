@@ -181,7 +181,7 @@ class Problem {
             ErrorMessageModel(
                 URI("$BASE_URL/unauthenticated"),
                 "Unauthenticated.",
-                "The resource you are trying to access is forbidden because of your user status.",
+                "The resource you are trying to access is forbidden because of your authentication status.",
             ),
         )
 

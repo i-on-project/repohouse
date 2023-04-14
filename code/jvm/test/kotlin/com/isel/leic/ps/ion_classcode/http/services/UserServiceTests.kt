@@ -32,7 +32,7 @@ class UserServiceTests {
                 val mockedTransaction = mock<Transaction> {
                     val mockedUsersRepository = mock<UsersRepository> {
                         on {
-                            createStudent(student = StudentInput(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
+                            createStudent(student = StudentInput(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "qh9vcITUAw4J9VQqoi55R6gc7ClmolHadIz7UBrObdw=", githubId = 124345))
                         } doReturn Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 3, schoolId = null)
 
                         on {
@@ -41,7 +41,7 @@ class UserServiceTests {
 
                         on {
                             createTeacher(
-                                teacher = TeacherInput(name = "test142", email = "test@alunos.isel.pt", githubUsername = "test1239", githubToken = "token5", githubId = 123415, token = "token5"),
+                                teacher = TeacherInput(name = "test142", email = "test@alunos.isel.pt", githubUsername = "test1239", githubToken = "qh9vcITUAw4J9VQqoi55R6gc7ClmolHadIz7UBrObdw=", githubId = 123415, token = "qh9vcITUAw4J9VQqoi55R6gc7ClmolHadIz7UBrObdw="),
                             )
                         } doReturn Teacher(name = "test142", id = 2, email = "test@alunos.isel.pt", githubUsername = "test1239", githubId = 123415, token = "token5", isCreated = false)
 
@@ -61,7 +61,7 @@ class UserServiceTests {
                             getUserByGithubId(githubId = 1234)
                         } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 1234, token = "token1", id = 2, email = "test1@alunos.isel.pt")
                         on {
-                            getUserByToken(token = "bearer")
+                            getUserByToken(token = "JFStYcKswE8KIPq_fyvJbyjRnENAUv3v27UbRv5TT4k=")
                         } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 1234, token = "token1", id = 2, email = "test1@alunos.isel.pt")
 
                         on {
@@ -73,7 +73,7 @@ class UserServiceTests {
                         } doReturn true
 
                         on {
-                            checkIfGithubTokenExists(githubToken = "token")
+                            checkIfGithubTokenExists(githubToken = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=")
                         } doReturn true
 
                         on {
@@ -81,7 +81,7 @@ class UserServiceTests {
                         } doReturn true
 
                         on {
-                            checkIfTokenExists(token = "token")
+                            checkIfTokenExists(token = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=")
                         } doReturn true
 
                         on {
@@ -793,10 +793,10 @@ class UserServiceTests {
         val bearerToken = ""
 
         // when: getting an error because of an invalid github id
-        val user = userServices.checkAuthentication(bearerToken = bearerToken)
+        val user = userServices.checkAuthentication(token = bearerToken)
 
         if (user is Either.Left) {
-            assert(user.value is UserServicesError.InvalidBearerToken)
+            assert(user.value is UserServicesError.InvalidToken)
         } else {
             fail("Should not be Either.Right")
         }
@@ -808,7 +808,7 @@ class UserServiceTests {
         val bearerToken = "notInDatabase"
 
         // when: getting a null because the bearer token is not in the database
-        val user = userServices.checkAuthentication(bearerToken = bearerToken)
+        val user = userServices.checkAuthentication(token = bearerToken)
 
         // the result should be an error
         if (user is Either.Left) {
@@ -825,7 +825,7 @@ class UserServiceTests {
         val bearerToken = "bearer"
 
         // when: getting a user
-        val user = userServices.checkAuthentication(bearerToken = bearerToken)
+        val user = userServices.checkAuthentication(token = bearerToken)
 
         // the result should be a user
         if (user is Either.Right) {

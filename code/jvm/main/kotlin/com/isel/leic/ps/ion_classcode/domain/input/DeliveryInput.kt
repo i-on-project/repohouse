@@ -7,11 +7,8 @@ import java.sql.Timestamp
  */
 data class DeliveryInput(
     val dueDate: Timestamp,
-    val assigmentId: Int,
+    val assignmentId: Int,
     val tagControl: String,
 ) {
-    init {
-        require(assigmentId > 0) { "Assigment id must be greater than 0" }
-        require(tagControl.isNotEmpty()) { "Tag control must not be empty" }
-    }
+    fun isNotValid() = assignmentId <= 0 || tagControl.isEmpty()
 }
