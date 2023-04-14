@@ -18,3 +18,16 @@
 ## 30 Março - Ricardo
 - Outbox pattern
 - Schedule para o envio de emails
+
+## 31 Março - 9 Abril - João
+- Testes ao repositório
+- Resolução de bugs presente no repositório
+- Criação dum ficheiro de insert para testes. Para o uso correto deverá garantir-se que corre logo a seguir a criação das tabelas, devido ao serials
+
+## Reunião com o professor - 4 Abril
+- 
+
+## 10 Abril - ? Abril - João
+- Aprender como usar o mockito para testes
+- Testes ao services
+

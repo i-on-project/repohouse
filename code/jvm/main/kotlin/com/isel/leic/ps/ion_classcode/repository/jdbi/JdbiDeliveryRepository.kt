@@ -24,7 +24,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
                 RETURNING id
                 """,
         )
-            .bind("assigmentId", delivery.assigmentId)
+            .bind("assigmentId", delivery.assignmentId)
             .bind("dueDate", delivery.dueDate)
             .bind("tagControl", delivery.tagControl)
             .executeAndReturnGeneratedKeys()

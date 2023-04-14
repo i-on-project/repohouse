@@ -22,6 +22,7 @@ sealed class OutboxServicesError {
     object OtpDifferent : OutboxServicesError()
     object EmailNotSent : OutboxServicesError()
     object ErrorCreatingRequest : OutboxServicesError()
+    object InvalidInput : OutboxServicesError()
     class CooldownNotExpired(val cooldown: Int) : OutboxServicesError()
 }
 
@@ -40,17 +41,18 @@ class OutboxServices(
      * Method to create a new outbox request
      */
     fun createUserVerification(userId: Int): OutboxResponse {
+        if (userId <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
         val otp = createRandomOtp()
         return transactionManager.run {
-            val cooldown = it.cooldownRepository.getCooldownRequest(userId)
+            val cooldown = it.cooldownRepository.getCooldownRequest(userId = userId)
             if (cooldown != null) {
-                Either.Left(OutboxServicesError.CooldownNotExpired(cooldown))
+                return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
             }
-            val outbox = it.outboxRepository.createOutboxRequest(OutboxInput(userId, otp))
+            val outbox = it.outboxRepository.createOutboxRequest(outbox = OutboxInput(userId = userId, otp = otp))
             if (outbox == null) {
-                Either.Left(OutboxServicesError.ErrorCreatingRequest)
+                Either.Left(value = OutboxServicesError.ErrorCreatingRequest)
             } else {
-                Either.Right(Unit)
+                Either.Right(value = Unit)
             }
         }
     }
@@ -59,23 +61,20 @@ class OutboxServices(
      * Method to check the otp
      */
     fun checkOtp(userId: Int, otp: Int): OutboxResponse {
+        if (userId <= 0 || otp <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
         return transactionManager.run {
-            val outbox = it.outboxRepository.getOutboxRequest(userId)
-            if (outbox == null) {
-                Either.Left(OutboxServicesError.OtpNotFound)
+            val outbox = it.outboxRepository.getOutboxRequest(userId = userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
+            if (outbox.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
+                it.outboxRepository.deleteOutboxRequest(userId = outbox.userId)
+                return@run Either.Left(value = OutboxServicesError.OtpExpired)
+            }
+            if (outbox.otp == otp) {
+                it.usersRepository.updateUserStatus(id = userId)
+                Either.Right(value = Unit)
             } else {
-                if (outbox.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
-                    it.outboxRepository.deleteOutboxRequest(outbox.userId)
-                    Either.Left(OutboxServicesError.OtpExpired)
-                }
-                if (outbox.otp == otp) {
-                    it.usersRepository.updateUserStatus(userId)
-                    Either.Right(Unit)
-                } else {
-                    it.outboxRepository.deleteOutboxRequest(outbox.userId)
-                    it.cooldownRepository.createCooldownRequest(userId, addTime())
-                    Either.Left(OutboxServicesError.OtpDifferent)
-                }
+                it.outboxRepository.deleteOutboxRequest(userId = outbox.userId)
+                it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
+                Either.Left(value = OutboxServicesError.OtpDifferent)
             }
         }
     }
@@ -87,9 +86,9 @@ class OutboxServices(
     fun sendEmails() {
         transactionManager.run {
             it.outboxRepository.getOutboxPendingRequests().forEach { outbox ->
-                it.usersRepository.getUserById(outbox.userId)?.let { user ->
-                    if (emailService.sendVerificationEmail(user.name, user.email, outbox.otp) is Either.Right) {
-                        it.outboxRepository.updateOutboxStateRequest(outbox.userId)
+                it.usersRepository.getUserById(id = outbox.userId)?.let { user ->
+                    if (emailService.sendVerificationEmail(name = user.name, email = user.email, otp = outbox.otp) is Either.Right) {
+                        it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId)
                     }
                 }
             }

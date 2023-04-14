@@ -15,7 +15,7 @@ class DeliveryRepositoryTests {
     fun `can create delivery`() = testWithHandleAndRollback { handle ->
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
         val assignmentId = 1
-        deliveryRepository.createDelivery(delivery = DeliveryInput(assigmentId = assignmentId, dueDate = Timestamp.from(Instant.now()), tagControl = "tag"))
+        deliveryRepository.createDelivery(delivery = DeliveryInput(assignmentId = assignmentId, dueDate = Timestamp.from(Instant.now()), tagControl = "tag"))
     }
 
     @Test

@@ -51,7 +51,7 @@ class ClassroomServiceTests {
                         on { archiveClassroom(classroomId = 1) } doAnswer {}
                         on { updateClassroomName(classroomId = 1, classroomUpdate = ClassroomUpdateInputModel(name = "newName")) } doAnswer {}
                         on {
-                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteLink = "inviteLink2")
+                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteLink = "Mockito.anyString()")
                         } doReturn 2
                         on {
                             getClassroomByInviteLink(inviteLink = "inviteLink2")

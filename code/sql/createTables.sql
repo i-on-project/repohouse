@@ -17,7 +17,7 @@ CREATE TABLE Teacher(
     foreign key(id) references users(id)
 );
 
-CREATE TABLE User(
+CREATE TABLE Student(
     id int primary key,
     school_id int unique default null,
     foreign key(id) references users(id)
@@ -34,7 +34,7 @@ CREATE TABLE Student_Course(
     student int,
     course int,
     primary key (student, course),
-    foreign key (student) references User(id),
+    foreign key (student) references Student(id),
     foreign key (course) references Course(id)
 );
 
@@ -145,7 +145,7 @@ CREATE TABLE Student_Team(
     student int,
     team int,
     primary key (student, team),
-    foreign key (student) references User(id),
+    foreign key (student) references Student(id),
     foreign key (team) references Team(id)
 );
 

@@ -43,7 +43,7 @@ sealed class UserServicesError {
 @Component
 class UserServices(
     private val transactionManager: TransactionManager,
-    private val tokenHash: TokenHash
+    private val tokenHash: TokenHash,
 ) {
     /**
      * Method to check the token from a user
@@ -101,13 +101,13 @@ class UserServices(
             }
             val teacherRes = it.usersRepository.createTeacher(
                 teacher = TeacherInput(
-                    teacher.email,
-                    teacher.githubUsername,
-                    teacher.githubId,
-                    hash,
-                    teacher.name,
-                    githubTokenHash
-                )
+                    email = teacher.email,
+                    githubUsername = teacher.githubUsername,
+                    githubId = teacher.githubId,
+                    token = hash,
+                    name = teacher.name,
+                    githubToken = githubTokenHash,
+                ),
             )
             if (teacherRes == null) {
                 Either.Left(value = UserServicesError.ErrorCreatingUser)
@@ -122,7 +122,7 @@ class UserServices(
      */
     fun createStudent(student: StudentInput): StudentCreationResult {
         if (student.isNotValid()) return Either.Left(value = UserServicesError.InvalidData)
-        val hash = tokenHash.getTokenHash(student.token)
+        val hash = tokenHash.getTokenHash(token = student.token)
         return transactionManager.run {
             if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = student.githubUsername)) {
                 return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
@@ -141,13 +141,13 @@ class UserServices(
             }
             val studentRes = it.usersRepository.createStudent(
                 student = StudentInput(
-                    student.name,
-                    student.email,
-                    student.githubUsername,
-                    student.schoolId,
-                    hash,
-                    student.githubId
-                )
+                    name = student.name,
+                    email = student.email,
+                    githubUsername = student.githubUsername,
+                    schoolId = student.schoolId,
+                    token = hash,
+                    githubId = student.githubId,
+                ),
             )
             if (studentRes == null) {
                 Either.Left(value = UserServicesError.ErrorCreatingUser)

@@ -3,11 +3,9 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
-import com.isel.leic.ps.ion_classcode.http.model.github.Organization
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
-import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsOutputModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
@@ -20,6 +18,7 @@ typealias CourseCreatedResponse = Either<CourseServicesError, Course>
 typealias CourseArchivedResponse = Either<CourseServicesError, CourseArchivedOutputModel>
 typealias LeaveCourseResponse = Either<CourseServicesError, Course>
 typealias CoursesOrgsResponse = Either<CourseServicesError, List<GitHubOrgsModel>>
+
 /**
  * Error codes for the services
  */
@@ -122,14 +121,14 @@ class CourseServices(
         }
     }
 
-
-    fun getTeacherCourses(userId: Int) : CoursesOrgsResponse {
-        return transactionManager.run {
-            val githubToken = it.usersRepository.getTeacherGithubToken(userId)
-            if (githubToken == null) // return@run Either.Left(value = CourseServicesError.UserNotFound)
-            val coursesOrg = TODO("Request To github to get orgs")
-            //TODO: Filter the ones not already in the database
-            TODO()
-        }
+    fun getTeacherCourses(userId: Int): CoursesOrgsResponse {
+        TODO()
+//        return transactionManager.run {
+//            val githubToken = it.usersRepository.getTeacherGithubToken(userId)
+//            if (githubToken == null) // return@run Either.Left(value = CourseServicesError.UserNotFound)
+//            val coursesOrg = TODO("Request To github to get orgs")
+//            //TODO: Filter the ones not already in the database
+//            TODO()
+//        }
     }
 }

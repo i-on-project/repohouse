@@ -40,31 +40,27 @@ sealed class DeliveryServicesError {
 @Component
 class DeliveryServices(
     val transactionManager: TransactionManager,
-    val githubServices: GithubServices
+    val githubServices: GithubServices,
 ) {
     /**
      * Method that creates a delivery
      */
     fun createDelivery(deliveryInfo: DeliveryInput, userId: Int): DeliveryCreatedResponse {
-        if (
-            deliveryInfo.assigmentId > 0 &&
-            deliveryInfo.tagControl.isNotBlank()
-        ) {
-            return Either.Left(DeliveryServicesError.InvalidInput)
+        if (deliveryInfo.isNotValid() || userId <= 0) {
+            return Either.Left(value = DeliveryServicesError.InvalidInput)
         }
         return transactionManager.run {
-            val isArchived = checkIfArchived(deliveryInfo.assigmentId)
+            val isArchived = checkIfArchived(assignmentId = deliveryInfo.assignmentId)
             if (isArchived is Either.Left) return@run isArchived
-            if (isArchived is Either.Right && isArchived.value) return@run Either.Left(DeliveryServicesError.ClassroomArchived)
-            if (it.usersRepository.getTeacher(userId) == null) Either.Left(DeliveryServicesError.NotTeacher)
+            if (it.usersRepository.getTeacher(teacherId = userId) == null) return@run Either.Left(value = DeliveryServicesError.NotTeacher)
             val deliveryId = it.deliveryRepository.createDelivery(
-                DeliveryInput(
-                    deliveryInfo.dueDate,
-                    deliveryInfo.assigmentId,
-                    deliveryInfo.tagControl,
+                delivery = DeliveryInput(
+                    dueDate = deliveryInfo.dueDate,
+                    assignmentId = deliveryInfo.assignmentId,
+                    tagControl = deliveryInfo.tagControl,
                 ),
             )
-            Either.Right(deliveryId)
+            Either.Right(value = deliveryId)
         }
     }
 
@@ -72,22 +68,20 @@ class DeliveryServices(
      * Method to get a delivery
      */
     fun getDeliveryInfo(deliveryId: Int): DeliveryResponse {
+        if (deliveryId <= 0) return Either.Left(value = DeliveryServicesError.InvalidInput)
         return transactionManager.run {
-            val delivery = it.deliveryRepository.getDeliveryById(deliveryId)
-            if (delivery == null) {
-                Either.Left(DeliveryServicesError.DeliveryNotFound)
-            } else {
-                val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
-                val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
-                val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
-                Either.Right(
-                    DeliveryModel(
-                        delivery = delivery,
-                        teamsDelivered = teamsDelivered,
-                        teams.filter { team -> team.id !in teamsDeliveredIds },
-                    ),
-                )
-            }
+            val delivery = it.deliveryRepository.getDeliveryById(deliveryId = deliveryId)
+                ?: return@run Either.Left(value = DeliveryServicesError.DeliveryNotFound)
+            val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
+            val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
+            val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
+            Either.Right(
+                value = DeliveryModel(
+                    delivery = delivery,
+                    teamsDelivered = teamsDelivered,
+                    teamsNotDelivered = teams.filter { team -> team.id !in teamsDeliveredIds },
+                ),
+            )
         }
     }
 
@@ -96,19 +90,16 @@ class DeliveryServices(
      * Only if the delivery has no teams
      */
     fun deleteDelivery(deliveryId: Int, userId: Int): DeliveryDeletedResponse {
+        if (deliveryId <= 0 || userId <= 0) return Either.Left(value = DeliveryServicesError.InvalidInput)
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(userId) == null) Either.Left(DeliveryServicesError.NotTeacher)
-            val delivery = it.deliveryRepository.getDeliveryById(deliveryId)
-            if (delivery == null) {
-                Either.Left(DeliveryServicesError.DeliveryNotFound)
-            } else {
-                val isArchived = checkIfArchived(delivery.assignmentId)
-                if (isArchived is Either.Left) return@run isArchived
-                if (isArchived is Either.Right && isArchived.value) return@run Either.Left(DeliveryServicesError.ClassroomArchived)
-                if (it.deliveryRepository.getTeamsByDelivery(deliveryId).isNotEmpty()) Either.Left(DeliveryServicesError.DeliveryWithTeams)
-                it.deliveryRepository.deleteDelivery(deliveryId)
-                Either.Right(true)
-            }
+            if (it.usersRepository.getTeacher(teacherId = userId) == null) return@run Either.Left(value = DeliveryServicesError.NotTeacher)
+            val delivery = it.deliveryRepository.getDeliveryById(deliveryId = deliveryId) ?: return@run Either.Left(value = DeliveryServicesError.DeliveryNotFound)
+            val isArchived = checkIfArchived(assignmentId = delivery.assignmentId)
+            if (isArchived is Either.Left) return@run isArchived
+            val x = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId).isNotEmpty()
+            if (it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId).isNotEmpty()) Either.Left(value = DeliveryServicesError.DeliveryWithTeams)
+            it.deliveryRepository.deleteDelivery(deliveryId = deliveryId)
+            Either.Right(true)
         }
     }
 
@@ -116,29 +107,21 @@ class DeliveryServices(
      * Method to update a delivery
      */
     fun updateDelivery(deliveryId: Int, deliveryInfo: DeliveryInput, userId: Int): DeliveryUpdateResponse {
-        if (
-            deliveryInfo.assigmentId > 0 &&
-            deliveryInfo.tagControl.isNotBlank()
-        ) {
-            return Either.Left(DeliveryServicesError.InvalidInput)
+        if (deliveryId <= 0 || userId <= 0 || deliveryInfo.isNotValid()) {
+            return Either.Left(value = DeliveryServicesError.InvalidInput)
         }
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(userId) == null) Either.Left(DeliveryServicesError.NotTeacher)
-            val delivery = it.deliveryRepository.getDeliveryById(deliveryId)
-            if (delivery == null) {
-                Either.Left(DeliveryServicesError.DeliveryNotFound)
-            } else {
-                val isArchived = checkIfArchived(delivery.assignmentId)
-                if (isArchived is Either.Left) return@run isArchived
-                if (isArchived is Either.Right && isArchived.value) return@run Either.Left(DeliveryServicesError.ClassroomArchived)
-                if (delivery.tagControl != deliveryInfo.tagControl) {
-                    it.deliveryRepository.updateTagControlFromDelivery(deliveryId, deliveryInfo.tagControl)
-                }
-                if (delivery.dueDate != deliveryInfo.dueDate) {
-                    it.deliveryRepository.updateDueDateFromDelivery(deliveryId, deliveryInfo.dueDate)
-                }
-                Either.Right(true)
+            if (it.usersRepository.getTeacher(teacherId = userId) == null) return@run Either.Left(value = DeliveryServicesError.NotTeacher)
+            val delivery = it.deliveryRepository.getDeliveryById(deliveryId = deliveryId) ?: return@run Either.Left(value = DeliveryServicesError.DeliveryNotFound)
+            val isArchived = checkIfArchived(assignmentId = delivery.assignmentId)
+            if (isArchived is Either.Left) return@run isArchived
+            if (delivery.tagControl != deliveryInfo.tagControl) {
+                it.deliveryRepository.updateTagControlFromDelivery(deliveryId = deliveryId, tagControl = deliveryInfo.tagControl)
             }
+            if (delivery.dueDate != deliveryInfo.dueDate) {
+                it.deliveryRepository.updateDueDateFromDelivery(deliveryId = deliveryId, dueDate = deliveryInfo.dueDate)
+            }
+            Either.Right(value = true)
         }
     }
 
@@ -146,6 +129,7 @@ class DeliveryServices(
      * Method to sync a delivery with the GitHub truth
      */
     suspend fun syncDelivery(deliveryId: Int, userId: Int, courseId: Int): DeliverySyncResponse {
+        if (deliveryId <= 0 || userId <= 0 || courseId <= 0) return Either.Left(value = DeliveryServicesError.InvalidInput)
         val scopeMain = CoroutineScope(Job())
         val couroutines = mutableListOf<Job>()
 
@@ -209,7 +193,7 @@ class DeliveryServices(
 
         // TODO: Update last sync date
 
-        return Either.Right(true)
+        return Either.Right(value = true)
     }
 
     /**
@@ -218,12 +202,15 @@ class DeliveryServices(
     private fun checkIfArchived(assignmentId: Int): Either<DeliveryServicesError, Boolean> {
         val assignment = transactionManager.run {
             it.assignmentRepository.getAssignmentById(assignmentId)
-        } ?: return Either.Left(DeliveryServicesError.AssignmentNotFound)
+        } ?: return Either.Left(value = DeliveryServicesError.AssignmentNotFound)
 
         val classroom = transactionManager.run {
             it.classroomRepository.getClassroomById(assignment.classroomId)
-        } ?: return Either.Left(DeliveryServicesError.ClassroomNotFound)
-
-        return Either.Right(classroom.isArchived)
+        } ?: return Either.Left(value = DeliveryServicesError.ClassroomNotFound)
+        return if (classroom.isArchived) {
+            Either.Left(value = DeliveryServicesError.ClassroomArchived)
+        } else {
+            Either.Right(true)
+        }
     }
 }
