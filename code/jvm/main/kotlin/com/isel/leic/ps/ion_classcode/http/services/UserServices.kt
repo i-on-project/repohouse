@@ -6,6 +6,7 @@ import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ion_classcode.tokenHash.TokenHash
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
 
@@ -27,7 +28,7 @@ sealed class UserServicesError {
     object InvalidGithubId : UserServicesError()
     object InvalidData : UserServicesError()
     object ErrorCreatingUser : UserServicesError()
-    object InvalidBearerToken : UserServicesError()
+    object InvalidToken : UserServicesError()
     object GithubUserNameInUse : UserServicesError()
     object EmailInUse : UserServicesError()
     object GithubIdInUse : UserServicesError()
@@ -42,14 +43,16 @@ sealed class UserServicesError {
 @Component
 class UserServices(
     private val transactionManager: TransactionManager,
+    private val tokenHash: TokenHash
 ) {
     /**
      * Method to check the token from a user
      */
-    fun checkAuthentication(bearerToken: String): UserAuthenticationResult {
-        if (bearerToken.isEmpty()) return Either.Left(value = UserServicesError.InvalidBearerToken)
+    fun checkAuthentication(token: String): UserAuthenticationResult {
+        if (token.isEmpty()) return Either.Left(value = UserServicesError.InvalidToken)
+        val hash = tokenHash.getTokenHash(token)
         return transactionManager.run {
-            val user = it.usersRepository.getUserByToken(token = bearerToken)
+            val user = it.usersRepository.getUserByToken(token = hash)
             if (user == null) {
                 Either.Left(value = UserServicesError.UserNotAuthenticated)
             } else {
@@ -78,6 +81,8 @@ class UserServices(
      */
     fun createTeacher(teacher: TeacherInput): TeacherCreationResult {
         if (teacher.isNotValid()) return Either.Left(value = UserServicesError.InvalidData)
+        val hash = tokenHash.getTokenHash(teacher.token)
+        val githubTokenHash = tokenHash.getTokenHash(teacher.githubToken)
         return transactionManager.run {
             if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = teacher.githubUsername)) {
                 return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
@@ -88,13 +93,22 @@ class UserServices(
             if (it.usersRepository.checkIfGithubIdExists(githubId = teacher.githubId)) {
                 return@run Either.Left(value = UserServicesError.GithubIdInUse)
             }
-            if (it.usersRepository.checkIfTokenExists(token = teacher.token)) {
+            if (it.usersRepository.checkIfTokenExists(token = hash)) {
                 return@run Either.Left(value = UserServicesError.TokenInUse)
             }
-            if (it.usersRepository.checkIfGithubTokenExists(githubToken = teacher.githubToken)) {
+            if (it.usersRepository.checkIfGithubTokenExists(githubToken = githubTokenHash)) {
                 return@run Either.Left(value = UserServicesError.GithubTokenInUse)
             }
-            val teacherRes = it.usersRepository.createTeacher(teacher = teacher)
+            val teacherRes = it.usersRepository.createTeacher(
+                teacher = TeacherInput(
+                    teacher.email,
+                    teacher.githubUsername,
+                    teacher.githubId,
+                    hash,
+                    teacher.name,
+                    githubTokenHash
+                )
+            )
             if (teacherRes == null) {
                 Either.Left(value = UserServicesError.ErrorCreatingUser)
             } else {
@@ -107,10 +121,9 @@ class UserServices(
      * Method to create a user as student
      */
     fun createStudent(student: StudentInput): StudentCreationResult {
-        if (student.name.isEmpty() || student.email.isEmpty()) return Either.Left(UserServicesError.InvalidData)
         if (student.isNotValid()) return Either.Left(value = UserServicesError.InvalidData)
+        val hash = tokenHash.getTokenHash(student.token)
         return transactionManager.run {
-            val studentRes = it.usersRepository.createStudent(student = student)
             if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = student.githubUsername)) {
                 return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
             }
@@ -120,12 +133,22 @@ class UserServices(
             if (it.usersRepository.checkIfGithubIdExists(githubId = student.githubId)) {
                 return@run Either.Left(value = UserServicesError.GithubIdInUse)
             }
-            if (it.usersRepository.checkIfTokenExists(token = student.token)) {
+            if (it.usersRepository.checkIfTokenExists(token = hash)) {
                 return@run Either.Left(value = UserServicesError.TokenInUse)
             }
             if (student.schoolId != null && it.usersRepository.checkIfSchoolIdExists(schoolId = student.schoolId)) {
                 return@run Either.Left(value = UserServicesError.SchoolIdInUse)
             }
+            val studentRes = it.usersRepository.createStudent(
+                student = StudentInput(
+                    student.name,
+                    student.email,
+                    student.githubUsername,
+                    student.schoolId,
+                    hash,
+                    student.githubId
+                )
+            )
             if (studentRes == null) {
                 Either.Left(value = UserServicesError.ErrorCreatingUser)
             } else {
