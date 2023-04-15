@@ -1,17 +1,13 @@
 package com.isel.leic.ps.ion_classcode.http.controllers.web
 
-import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.CreditsOutputModel
-import com.isel.leic.ps.ion_classcode.infra.JsonHome
+import com.isel.leic.ps.ion_classcode.http.model.output.HomeOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.OutputModel
-import com.isel.leic.ps.ion_classcode.infra.jsonHome
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -25,16 +21,26 @@ class SystemController {
     /**
      * Home page
      */
-    @GetMapping(Uris.HOME, produces = ["application/home+json"])
-    fun home(): ResponseEntity<JsonHome> {
-        return jsonHome {
-            resource(Uris.HOME, listOf(HttpMethod.GET))
-            resource(Uris.CREDITS, listOf(HttpMethod.GET))
-            resource(Uris.AUTH_STUDENT_PATH, listOf(HttpMethod.GET))
-            resource(Uris.AUTH_TEACHER_PATH, listOf(HttpMethod.GET))
-            resource(Uris.LOGOUT, listOf(HttpMethod.POST))
-            resource(Uris.MENU_PATH, listOf(HttpMethod.GET))
-            // TODO(ADD ALL RESOURCES)
+    @GetMapping(Uris.HOME, produces = ["application/vnd.siren+json"])
+    fun home(): ResponseEntity<SirenModel<HomeOutputModel>> {
+        return siren(value = HomeOutputModel()) {
+            link(rel = LinkRelation("home"), href = Uris.HOME)
+            link(rel = LinkRelation("credits"), href = Uris.CREDITS)
+            link(rel = LinkRelation("menu"), href = Uris.MENU_PATH, needAuthentication = true)
+            link(rel = LinkRelation("authTeacher"), href = Uris.AUTH_TEACHER_PATH)
+            link(rel = LinkRelation("authStudent"), href = Uris.AUTH_STUDENT_PATH)
+            link(rel = LinkRelation("registerInfo"), href = Uris.AUTH_REGISTER_PATH)
+            action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
+                numberField("schoolId")
+            })
+            action(title = "registerTeacher", href = Uris.AUTH_REGISTER_TEACHER_PATH, method = HttpMethod.POST, type = "application/json", block = {})
+            action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})
+            action(title = "teachersApproval", href = Uris.TEACHERS_APPROVAL_PATH, method = HttpMethod.POST, type = "application/json", block = {
+                rangeField("approved")
+                rangeField("rejected")
+            })
+            link(rel = LinkRelation("teachersApproval"), href = Uris.TEACHERS_APPROVAL_PATH)
+
         }
     }
 

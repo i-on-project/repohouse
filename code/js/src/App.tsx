@@ -11,7 +11,7 @@ import {ShowAuthStudentFetch} from "./AuthStudent";
 import {ShowMenuFetch} from "./Menu";
 import {ShowCourseCreateFetch, ShowCourseFetch} from "./Course";
 import {ShowTeacherApprovalFetch} from "./ApproveTeachers";
-import {ShowCreateCallbackFetch, ShowCreateFetch, ShowCreateTeacherFetchPost} from "./Create";
+import {ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentFetch, ShowCreateStudentFetchPost, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost} from "./Create";
 import {ShowStatusCallbackFetch, ShowStatusFetch} from "./Status";
 import {ShowVerifyFetch} from "./Verify";
 
@@ -29,12 +29,28 @@ const router = createBrowserRouter([
                 "element": <Credits/>
             },
             {
-                "path": "/auth/create",
-                "element": <Create/>
+                "path": "/auth/create/student",
+                "element": <CreateStudent/>
             },
             {
-                "path": "/auth/create/callback",
-                "element": <CreateCallback/>
+                "path": "/auth/create/teacher",
+                "element": <CreateTeacher/>
+            },
+            {
+                "path": "/auth/register/student",
+                "element": <RegisterStudent/>
+            },
+            {
+                "path": "/auth/register/teacher",
+                "element": <RegisterTeacher/>
+            },
+            {
+                "path": "/auth/create/callback/student",
+                "element": <CreateCallbackStudent/>
+            },
+            {
+                "path": "/auth/create/callback/teacher",
+                "element": <CreateCallbackTeacher/>
             },
             {
                 "path": "/auth/verify",
@@ -129,18 +145,51 @@ function AuthStudent() {
         </div>
     )
 }
-function Create() {
+
+function CreateStudent() {
     return (
         <div>
-            <ShowCreateFetch authServices={authServices}/>
+            <ShowCreateStudentFetch authServices={authServices}/>
         </div>
     )
 }
 
-function CreateCallback() {
+function CreateTeacher() {
     return (
         <div>
-            <ShowCreateCallbackFetch/>
+            <ShowCreateTeacherFetch authServices={authServices}/>
+        </div>
+    )
+}
+
+function CreateCallbackStudent() {
+    return (
+        <div>
+            <ShowCreateCallbackStudent/>
+        </div>
+    )
+}
+
+function CreateCallbackTeacher() {
+    return (
+        <div>
+            <ShowCreateCallbackTeacher/>
+        </div>
+    )
+}
+
+function RegisterStudent() {
+    return (
+        <div>
+            <ShowCreateStudentFetchPost authServices={authServices}/>
+        </div>
+    )
+}
+
+function RegisterTeacher() {
+    return (
+        <div>
+            <ShowCreateTeacherFetchPost authServices={authServices}/>
         </div>
     )
 }

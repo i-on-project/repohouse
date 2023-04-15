@@ -5,32 +5,25 @@ import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import {TextField, Typography} from "@mui/material";
 import {Button} from "react-bootstrap";
-import {Navigate, useNavigate} from "react-router-dom";
+import {Navigate, useLocation, useNavigate} from "react-router-dom";
 import {AuthServices} from "./services/AuthServices";
 import {Label} from "@mui/icons-material";
 
 
-export function ShowCreateFetch({
-  authServices
+export function ShowCreateTeacherFetch({
+    authServices
 }: {
     authServices: AuthServices;
 }) {
     const content = useAsync(async () => {
-        return await authServices.createTeacher();
+        return await authServices.getRegisterInfo();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
     const navigate = useNavigate();
-    const [schoolId, setSchoolId] = useState<number>(null);
-    const cookie:string = document.cookie  //TODO: undefined
-
+    
     const handleConfirmClick = useCallback((event:any) => {
         event.preventDefault()
-        console.log(cookie)
-        if (cookie === "student") {
-            ShowCreateStudentFetchPost({authServices, schoolId})
-        } else if (cookie === "teacher") {
-            ShowCreateTeacherFetchPost({authServices})
-        }
+        navigate("/auth/register/teacher")
     }, [navigate])
 
     const handleDeclineClick = useCallback ((event:any) => {
@@ -77,12 +70,6 @@ export function ShowCreateFetch({
                     >
                         {content.properties.GitHubUsername}
                     </Typography>
-                    {cookie === "student" ? (
-                        <Label>
-                            {"SchoolId"}
-                            <TextField required type={"number"} onChange={(event) => setSchoolId(Number(event.target.value))}/>
-                        </Label>
-                    ) : null}
                     <Button onClick={handleConfirmClick}> {"Confirm"} </Button>
                     <Button onClick={handleDeclineClick}> {"Decline"} </Button>
                 </>
@@ -91,6 +78,80 @@ export function ShowCreateFetch({
     );
 }
 
+export function ShowCreateStudentFetch({
+    authServices
+}: {
+    authServices: AuthServices;
+}) {
+    const content = useAsync(async () => {
+        return await authServices.getRegisterInfo();
+    });
+    const [error, setError] = useState<ErrorMessageModel>(null);
+    const navigate = useNavigate();
+    const [schoolId, setSchoolId] = useState<number>(null);
+
+    const handleConfirmClick = useCallback((event:any) => {
+        event.preventDefault()
+        navigate("/auth/register/student", {state: {schoolId: schoolId} })
+    }, [navigate])
+
+    const handleDeclineClick = useCallback ((event:any) => {
+        event.preventDefault()
+        navigate("/")
+    }, [navigate])
+
+    if (!content) {
+        return (
+            <Typography
+                variant="h6"
+                gutterBottom
+            >
+                ...loading...
+            </Typography>
+        );
+    }
+
+    if (content instanceof ErrorMessageModel && !error) {
+        setError(content);
+    }
+
+    return (
+        <div
+            style={{
+                alignItems: "center",
+                justifyContent: "space-evenly",
+            }}
+        >
+            {content instanceof SirenEntity ? (
+                <>
+                    <Typography
+                        variant="h2"
+                    >
+                        {content.properties.name}
+                    </Typography>
+                    <Typography
+                        variant="h5"
+                    >
+                        {content.properties.email}
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                    >
+                        {content.properties.GitHubUsername}
+                    </Typography>
+                    {
+                        <Label>
+                            {"SchoolId"}
+                            <TextField required type={"number"} onChange={(event) => setSchoolId(Number(event.target.value))}/>
+                        </Label>
+                    }
+                    <Button onClick={handleConfirmClick}> {"Confirm"} </Button>
+                    <Button onClick={handleDeclineClick}> {"Decline"} </Button>
+                </>
+            ) : null}
+        </div>
+    );
+}
 
 export function ShowCreateTeacherFetchPost({
     authServices,
@@ -122,14 +183,13 @@ export function ShowCreateTeacherFetchPost({
 
 
 export function ShowCreateStudentFetchPost({
-                                               authServices,
-                                               schoolId
-                                           }: {
+    authServices,
+}: {
     authServices: AuthServices;
-    schoolId: number;
 }) {
+    const location = useLocation()
     const content = useAsync(async () => {
-        return await authServices.createStudentPost(schoolId);
+        return await authServices.createStudentPost(location.state.schoolId);
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
 
@@ -151,8 +211,14 @@ export function ShowCreateStudentFetchPost({
     return <Navigate to={"/auth/status"}/>
 }
 
-export function ShowCreateCallbackFetch(){
-    window.opener.postMessage({type:"Auth", data:'http://localhost:3000/auth/create'},'http://localhost:3000/')
+export function ShowCreateCallbackStudent() {
+    window.opener.postMessage({type:"Auth", data:'/auth/create/student'},'http://localhost:3000/')
+    window.close()
+    return (<> </>)
+}
+
+export function ShowCreateCallbackTeacher() {
+    window.opener.postMessage({type:"Auth", data:'/auth/create/teacher'},'http://localhost:3000/')
     window.close()
     return (<> </>)
 }

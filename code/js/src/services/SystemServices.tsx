@@ -8,12 +8,12 @@ import {CreditsDtoProperties} from "../domain/dto/CreditsDtoProperties";
 export class SystemServices {
 
     home = async () => {
+        console.log("Fetching home")
         const response = await fetchGet<HomeDtoProperties>("api/home")
+        console.log("response")
         if (response instanceof SirenEntity) {
-            console.log("Returned from home: " + response.properties.title)
-
-            Hypermedia.navigationRepository.addLinks([Hypermedia.CREDITS_KEY, Hypermedia.MENU_KEY,Hypermedia.AUTH_TEACHER_KEY, Hypermedia.AUTH_STUDENT_KEY], response.links)
-            Hypermedia.navigationRepository.addActions([Hypermedia.LOGOUT_KEY], response.actions)
+            Hypermedia.navigationRepository.addLinks([Hypermedia.CREDITS_KEY, Hypermedia.MENU_KEY,Hypermedia.AUTH_TEACHER_KEY, Hypermedia.AUTH_STUDENT_KEY, Hypermedia.AUTH_REGISTER_INFO], response.links)
+            Hypermedia.navigationRepository.addActions([Hypermedia.LOGOUT_KEY, Hypermedia.AUTH_REGISTER_STUDENT, Hypermedia.AUTH_REGISTER_TEACHER], response.actions)
         }
         return response
     }

@@ -53,7 +53,7 @@ class CourseController(
             is Either.Right -> siren(GitHubOrgsOutputModel(course.value)){
                 clazz("course")
                 action(
-                    name = "createCourse",
+                    title = "createCourse",
                     method = HttpMethod.POST,
                     href = Uris.createCourseUri(),
                     type = "application/json",
@@ -85,8 +85,8 @@ class CourseController(
                 link(rel = LinkRelation("course"), href = Uris.courseUri(course.value.id), needAuthentication = true)
                 link(rel = LinkRelation("courses"), href = Uris.coursesUri(), needAuthentication = true)
                 link(rel = LinkRelation("students"), href = Uris.courseStudentsUri(course.value.id), needAuthentication = true)
-                action(name = "Enter Course", method = HttpMethod.PUT, href = Uris.enterCourse(course.value.id), type = "application/json", block = {})
-                action(name = "Leave Course", method = HttpMethod.PUT, href = Uris.leaveCourse(course.value.id), type = "application/json", block = {})
+                action(title = "Enter Course", method = HttpMethod.PUT, href = Uris.enterCourse(course.value.id), type = "application/json", block = {})
+                action(title = "Leave Course", method = HttpMethod.PUT, href = Uris.leaveCourse(course.value.id), type = "application/json", block = {})
             }
         }
     }
@@ -108,10 +108,10 @@ class CourseController(
                     link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher) {
-                    action(name = "create-classroom", method = HttpMethod.POST, href = Uris.createClassroomUri(course.value.id), type = "x-www-form-urlencoded", block = {
+                    action(title = "create-classroom", method = HttpMethod.POST, href = Uris.createClassroomUri(course.value.id), type = "x-www-form-urlencoded", block = {
                         textField(name = "name")
                     })
-                    action(name = "Delete Course", method = HttpMethod.DELETE, href = Uris.courseUri(course.value.id), type = "application/json", block = {})
+                    action(title = "Delete Course", method = HttpMethod.DELETE, href = Uris.courseUri(course.value.id), type = "application/json", block = {})
                 }
             }
         }
@@ -184,7 +184,7 @@ class CourseController(
                                 )
                             }
                             action(
-                                name = "create-classroom",
+                                title = "create-classroom",
                                 method = HttpMethod.POST,
                                 href = Uris.createClassroomUri(course.value.id),
                                 type = "x-www-form-urlencoded",
@@ -193,7 +193,7 @@ class CourseController(
                                 },
                             )
                             action(
-                                name = "Delete Course",
+                                title = "Delete Course",
                                 method = HttpMethod.DELETE,
                                 href = Uris.courseUri(course.value.id),
                                 type = "application/json",

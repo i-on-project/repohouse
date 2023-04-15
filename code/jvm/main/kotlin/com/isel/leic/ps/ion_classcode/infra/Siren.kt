@@ -32,7 +32,7 @@ data class EntityModel<T>(
 )
 
 data class ActionModel(
-    val name: String,
+    val title: String,
     val href: String,
     val method: String,
     val type: String,
@@ -57,11 +57,11 @@ class SirenBuilderScope<T>(
         classes.add(value)
     }
 
-    fun link(href: URI, rel: LinkRelation, needAuthentication: Boolean = false) {
+    fun link(href: String, rel: LinkRelation, needAuthentication: Boolean = false) {
         links.add(
             LinkModel(
                 rel = listOf(rel.value),
-                href = href.toASCIIString(),
+                href = href,
                 needAuthentication = needAuthentication,
             ),
         )
@@ -73,8 +73,8 @@ class SirenBuilderScope<T>(
         entities.add(scope.build())
     }
 
-    fun action(name: String, href: URI, method: HttpMethod, type: String, block: ActionBuilderScope.() -> Unit) {
-        val scope = ActionBuilderScope(name = name, href = href, method = method, type = type)
+    fun action(title: String, href: String, method: HttpMethod, type: String, block: ActionBuilderScope.() -> Unit) {
+        val scope = ActionBuilderScope(name = title, hrefTemplate = href, method = method, type = type)
         scope.block()
         actions.add(scope.build())
     }
@@ -113,7 +113,7 @@ class EntityBuilderScope<T>(
 
 class ActionBuilderScope(
     private val name: String,
-    private val href: URI,
+    private val hrefTemplate: String,
     private val method: HttpMethod,
     private val type: String,
 ) {
@@ -131,11 +131,15 @@ class ActionBuilderScope(
         fields.add(FieldModel(name, "number", value))
     }
 
+    fun rangeField(name: String, value: Any? = null) {
+        fields.add(FieldModel(name, "range", value))
+    }
+
     fun hiddenField(name: String, value: Any? = null) {
         fields.add(FieldModel(name, "hidden", value))
     }
 
-    fun build() = ActionModel(name, href.toASCIIString(), method.name(), type, fields)
+    fun build() = ActionModel(name, hrefTemplate, method.name(), type, fields)
 }
 
 fun <T> siren(value: T, block: SirenBuilderScope<T>.() -> Unit): ResponseEntity<SirenModel<T>> {

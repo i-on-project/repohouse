@@ -33,7 +33,9 @@ export async function fetchPost<T>(url: string, body:object =null) {
 }
 
 async function myFetch<T>(url: string, options: object) {
+    console.log("before fecth")
     const res = await fetch(url, options)
+    console.log(res)
     const resp = await res.json()
     return handleResponse<T>(resp, res.ok)
 }
@@ -57,7 +59,7 @@ export function useAsync<T>(callback: () => Promise<SirenEntity<T> | ErrorMessag
     return content
 }
 
-function handleResponse<T>(response: any,isOk:boolean): SirenEntity<T>| ErrorMessageModel {
+function handleResponse<T>(response: any, isOk:boolean): SirenEntity<T> | ErrorMessageModel {
     if (isOk) {
         return new SirenEntity<T>(response.cls, response.properties, response.actions, response.links)
     } else {

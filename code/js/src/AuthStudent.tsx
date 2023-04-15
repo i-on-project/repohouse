@@ -1,14 +1,15 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import {useCallback, useEffect, useState} from "react";
+import { useEffect, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
+import { useNavigate } from "react-router-dom";
 
 export function ShowAuthStudentFetch({
-                                  authServices,
-                              }: {
+    authServices,
+}: {
     authServices: AuthServices;
 }) {
     const content = useAsync(async () => {
@@ -17,6 +18,7 @@ export function ShowAuthStudentFetch({
     const [error, setError] = useState<ErrorMessageModel>(null);
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
@@ -32,7 +34,7 @@ export function ShowAuthStudentFetch({
             if(e.origin !== 'http://localhost:3000')
                 return;
             if (e.data.type === "Auth") {
-                window.location = e.data.data
+                navigate(e.data.data)
             }
         }, false);
     }, [windowRef])

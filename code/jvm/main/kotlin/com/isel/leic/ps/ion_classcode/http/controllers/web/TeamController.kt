@@ -55,10 +55,10 @@ class TeamController(
                 link(href = Uris.teamRequestsUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("requestsHistory"), needAuthentication = true)
                 link(href = Uris.assigmentUri(courseId, classroomId, assigmentId), rel = LinkRelation("assigment"), needAuthentication = true)
                 if (user is Student) {
-                    action(name = "exitTeam", href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), method = HttpMethod.PUT, type = "application/json", block = {})
+                    action(title = "exitTeam", href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), method = HttpMethod.PUT, type = "application/json", block = {})
                 }
                 if (user is Teacher) {
-                    action(name = "postFeedback", href = Uris.postFeedbackUri(courseId, classroomId, assigmentId, teamId), method = HttpMethod.POST, type = "application/json") {
+                    action(title = "postFeedback", href = Uris.postFeedbackUri(courseId, classroomId, assigmentId, teamId), method = HttpMethod.POST, type = "application/json") {
                         hiddenField(name = "teamId", teamId)
                         textField(name = "description")
                         textField(name = "label")
@@ -128,10 +128,10 @@ class TeamController(
                 link(href = Uris.teamUri(courseId, classroomId, assigmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
                 if (user is Teacher) {
                     requests.value.joinTeam.forEach {
-                        if (it.state == "Rejected") action(name = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
+                        if (it.state == "Rejected") action(title = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
                     }
                     requests.value.leaveTeam.forEach {
-                        if (it.state == "Rejected") action(name = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
+                        if (it.state == "Rejected") action(title = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assigmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
                     }
                 }
             }

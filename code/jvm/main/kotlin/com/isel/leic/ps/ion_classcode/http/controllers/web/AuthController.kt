@@ -168,7 +168,7 @@ class AuthController(
                                     ResponseEntity
                                         .status(Status.REDIRECT)
                                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback")
+                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
                                         .body(EMPTY_REQUEST)
                                 }
 
@@ -191,7 +191,7 @@ class AuthController(
                                     ResponseEntity
                                         .status(Status.REDIRECT)
                                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback")
+                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
                                         .body(EMPTY_REQUEST)
                                 }
 
@@ -204,45 +204,21 @@ class AuthController(
         }
     }
 
-    @GetMapping(Uris.AUTH_CREATE_PATH)
+    @GetMapping(Uris.AUTH_REGISTER_PATH)
     fun getRegisterInfo(
-        @CookieValue position: String,
         @CookieValue userGithubId: String
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val userInfo = userServices.getPendingUserByGithubId(githubId)) {
             is Either.Right -> {
-                siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {
-                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                    if (position == "Student") {
-                        action(
-                            "create",
-                            href = Uris.authUriRegisterStudent(),
-                            method = HttpMethod.POST,
-                            type = "application/json"
-                        ) {
-                            numberField("schoolId")
-                        }
-                    }else{
-                        action(
-                            "create",
-                            href = Uris.authUriCreate(),
-                            method = HttpMethod.POST,
-                            type = "application/json",
-                            block = {}
-                        )
-                    }
-
-                }
+                siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {}
             }
             is Either.Left -> problemUser(userInfo.value)
         }
     }
 
-
-    @PostMapping(Uris.AUTH_CREATE_PATH)
-    fun postRegister(
+    @PostMapping(Uris.AUTH_REGISTER_TEACHER_PATH)
+    fun createTeacher(
         @CookieValue userGithubId: String,
         @CookieValue position: String
     ): ResponseEntity<*> {
@@ -260,12 +236,11 @@ class AuthController(
         }
     }
 
-
     /**
      * Register a student with a school id.
      */
     @PostMapping(Uris.AUTH_REGISTER_STUDENT_PATH)
-    fun authRegisterStudent(
+    fun createStudent(
         @CookieValue userGithubId: String,
         @CookieValue position: String,
         @RequestBody input: SchoolIdInputModel,
@@ -323,36 +298,13 @@ class AuthController(
                                 "Needing approval",
                                 "Wait for approval from other teachers"
                             )
-                        ) {
-                            link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                            link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                        }
-
+                        ) {}
                         else -> siren(
                             StatusOutputModel(
                                 "Needing action.",
                                 "Verify your email to proceed with the verification or register using your school id."
                             )
-                        ) {
-                            link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                            link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                            action(
-                                "register",
-                                href = Uris.authUriCreate(),
-                                method = HttpMethod.POST,
-                                type = "application/json"
-                            ) {
-                                numberField("schoolId")
-                            }
-                            action(
-                                "verify",
-                                href = Uris.authUriRegisterVerification(),
-                                method = HttpMethod.POST,
-                                type = "application/json"
-                            ) {
-                                numberField("otp")
-                            }
-                        }
+                        ) {}
                     }
                 }
             }

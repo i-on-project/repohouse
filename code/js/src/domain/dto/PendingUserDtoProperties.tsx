@@ -1,5 +1,4 @@
 import {SirenEntity} from "../../siren/Siren";
-import {Teacher, TeacherPending} from "../response-models/Teacher";
 
 export type PendingUserDto = SirenEntity<PendingUserDtoProperties>
 

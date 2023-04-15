@@ -30,14 +30,15 @@ export class NavigationRepository implements NavigationRepository {
     }
 
     async ensureLink(key: string, fetchLink: () => any): Promise<SirenLink> {
+        console.log(this.linkStorage)
         if (this.getLink(key) == null) {
-            console.log("Fetching link: " + key)
             await fetchLink()
         }
         return this.getLink(key)
     }
 
     async ensureAction(key: string, fetchAction:() => any): Promise<SirenAction> {
+        console.log(this.actionStorage)
         if (this.getAction(key) == null) {
             await fetchAction()
         }

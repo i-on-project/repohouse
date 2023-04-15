@@ -3,7 +3,7 @@ import {fetchGet, fetchPost} from "../siren/Fetch";
 import {SirenEntity} from "../siren/Siren";
 import {StatusDtoProperties} from "../domain/dto/StatusDtoProperties";
 import {AuthRedirectDtoProperties} from "../domain/dto/AuthRedirectDtoProperties";
-import {PendingUserDtoProperties} from "../domain/dto/PendingUserDtoProperties";
+import { PendingUserDtoProperties } from "../domain/dto/PendingUserDtoProperties";
 
 
 export class AuthServices {
@@ -19,7 +19,6 @@ export class AuthServices {
 
     authStudent = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_STUDENT_KEY, Hypermedia.systemServices.home)
-        console.log(link.href)
         const response = await fetchGet<AuthRedirectDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
             //TODO
@@ -27,9 +26,9 @@ export class AuthServices {
         return response
     }
 
-    createTeacher = async () => {
-        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.CREATE_KEY, Hypermedia.systemServices.home)
-        const response = await fetchGet<PendingUserDtoProperties>("/api/auth/create")
+    getRegisterInfo = async () => {
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_REGISTER_INFO, Hypermedia.systemServices.home)
+        const response = await fetchGet<PendingUserDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
             //TODO
         }
@@ -37,8 +36,8 @@ export class AuthServices {
     }
 
     createTeacherPost = async () => {
-        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.CREATE_KEY, Hypermedia.systemServices.home)
-        const response = await fetchPost<StatusDtoProperties>("/api/auth/create")
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.AUTH_REGISTER_TEACHER, Hypermedia.systemServices.home)
+        const response = await fetchPost<StatusDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
             //TODO
         }
@@ -46,9 +45,9 @@ export class AuthServices {
     }
 
     createStudentPost = async (schoolId:number) => {
-        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.REGISTER_KEY, Hypermedia.systemServices.home)
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.AUTH_REGISTER_STUDENT, Hypermedia.systemServices.home)
         const body = { schoolId: schoolId }
-        const response = await fetchPost<StatusDtoProperties>("/api/auth/register")
+        const response = await fetchPost<StatusDtoProperties>(link.href, body)
         if (response instanceof SirenEntity) {
             //TODO
         }

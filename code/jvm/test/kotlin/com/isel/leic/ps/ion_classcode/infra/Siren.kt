@@ -35,7 +35,7 @@ class SirenTests {
             ),
         ) {
             clazz(value = "team")
-            link(href = URI("https://example.com/teams/1"), rel = self)
+            link(href = URI("https://example.com/teams/1").toASCIIString(), rel = self)
             entity(UserModel(name = "user1"), rel = user) {
                 link(URI("https://example.com/users/1"), rel = self)
             }
@@ -43,8 +43,8 @@ class SirenTests {
                 link(URI("https://example.com/users/2"), rel = self)
             }
             action(
-                name = "remove user",
-                URI("https://example.com/teams/1/remove/1"),
+                title = "remove user",
+                URI("https://example.com/teams/1/remove/1").toASCIIString(),
                 method = HttpMethod.POST,
                 type = "application/json",
             ) {

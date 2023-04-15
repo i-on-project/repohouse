@@ -51,11 +51,11 @@ class ClassroomController(
                     link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher && !classroom.value.isArchived) {
-                    action(name = "local-copy", href = Uris.localCopyUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
-                    action(name = "create-assigment", href = Uris.createAssigmentUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
-                    action(name = "edit-classroom", href = Uris.editClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
-                    action(name = "sync-classroom", href = Uris.syncClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
-                    action(name = "archive-classroom", href = Uris.archiveClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(title = "local-copy", href = Uris.localCopyUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(title = "create-assigment", href = Uris.createAssigmentUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(title = "edit-classroom", href = Uris.editClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(title = "sync-classroom", href = Uris.syncClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
+                    action(title = "archive-classroom", href = Uris.archiveClassroomUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})
                 }
             }
         }

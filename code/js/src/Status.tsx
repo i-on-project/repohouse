@@ -1,15 +1,14 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
-import { SystemServices } from "./services/SystemServices";
 import { Typography } from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 
 export function ShowStatusFetch({
-                                  authServices,
-                              }: {
+    authServices,
+}: {
     authServices: AuthServices;
 }) {
     const content = useAsync(async () => {
@@ -49,7 +48,6 @@ export function ShowStatusFetch({
                     <Typography
                         variant="h5"
                     >
-                        {"Teacher"}
                         <ul>
                             <li>
                                 {content.properties.statusInfo}

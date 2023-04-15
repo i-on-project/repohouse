@@ -67,7 +67,7 @@ class MenuController(
                 courses.value.forEach {
                     link(rel = LinkRelation("course"), href = Uris.courseUri(it.id), needAuthentication = true)
                 }
-                action(name = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
+                action(title = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
             }
             is Either.Left -> problemTeacher(courses.value)
         }
@@ -89,7 +89,7 @@ class MenuController(
                 courses.value.forEach {
                     link(rel = LinkRelation("course"), href = Uris.courseUri(it.id), needAuthentication = true)
                 }
-                action(name = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
+                action(title = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
             }
             is Either.Left -> problemStudent(courses.value)
         }
@@ -110,7 +110,7 @@ class MenuController(
                 link(rel = LinkRelation("credits"), href = Uris.creditsUri())
                 teachers.value.forEach {
                     action(
-                        name = "approveTeacher",
+                        title = "approveTeacher",
                         href = Uris.teachersApprovalUri(),
                         method = HttpMethod.POST,
                         type = "application/x-www-form-urlencoded",
@@ -119,7 +119,7 @@ class MenuController(
                         },
                     )
                 }
-                action(name = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
+                action(title = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
             }
 
             is Either.Left -> problemTeacher(teachers.value)

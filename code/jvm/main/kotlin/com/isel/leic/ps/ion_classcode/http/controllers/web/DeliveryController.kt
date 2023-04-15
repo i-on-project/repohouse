@@ -55,7 +55,7 @@ class DeliveryController(
                 }
                 if (user is Teacher) {
                     action(
-                        name = "edit-delivery",
+                        title = "edit-delivery",
                         href = Uris.editDeliveryUri(courseId, classroomId, assigmentId, deliveryId),
                         method = HttpMethod.POST,
                         type = "application/json",
@@ -64,13 +64,13 @@ class DeliveryController(
                         textField(name = "tagControl", delivery.value.delivery.tagControl)
                     }
                     action(
-                        name = "delete-delivery",
+                        title = "delete-delivery",
                         href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId),
                         method = HttpMethod.DELETE,
                         type = "application/json",
                     ) {}
                     action(
-                        name = "sync-delivery",
+                        title = "sync-delivery",
                         href = Uris.syncDeliveryUri(courseId, classroomId, assigmentId, deliveryId),
                         method = HttpMethod.POST,
                         type = "application/json",
@@ -106,7 +106,7 @@ class DeliveryController(
                         link(href = Uris.teamUri(courseId, classroomId, assigmentId, it.id), rel = LinkRelation("team"), needAuthentication = true)
                     }
                     action(
-                        name = "edit-delivery",
+                        title = "edit-delivery",
                         href = Uris.editDeliveryUri(courseId, classroomId, assigmentId, deliveryId.value),
                         method = HttpMethod.POST,
                         type = "application/json",
@@ -115,13 +115,13 @@ class DeliveryController(
                         textField(name = "tagControl", delivery.value.delivery.tagControl)
                     }
                     action(
-                        name = "delete-delivery",
+                        title = "delete-delivery",
                         href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId.value),
                         method = HttpMethod.DELETE,
                         type = "application/json",
                     ) {}
                     action(
-                        name = "sync-delivery",
+                        title = "sync-delivery",
                         href = Uris.syncDeliveryUri(courseId, classroomId, assigmentId, deliveryId.value),
                         method = HttpMethod.POST,
                         type = "application/json",

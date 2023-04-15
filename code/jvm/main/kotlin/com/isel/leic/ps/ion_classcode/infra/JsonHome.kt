@@ -19,12 +19,13 @@ data class APILinks(
 )
 
 data class Resource(
+    val tag: String,
     val hrefTemplate: String,
     val hints: Hints,
 )
 
 data class Hints(
-    val allow: List<HttpMethod>,
+    val allow: List<String>,
     val format: String = "application/json"
 )
 
@@ -33,8 +34,8 @@ class JsonHomeBuilderScope {
     private val api = API(links = APILinks())
     private val resources = mutableListOf<Resource>()
 
-    fun resource(hrefTemplate: String, methods: List<HttpMethod>) {
-        resources.add(Resource(hrefTemplate, Hints(allow = methods)))
+    fun resource(hrefTemplate: String, tag: String, methods: List<HttpMethod>) {
+        resources.add(Resource(hrefTemplate, tag, Hints(allow = methods.map { it.name() })))
     }
 
     fun build(): JsonHome = JsonHome(api, resources)
