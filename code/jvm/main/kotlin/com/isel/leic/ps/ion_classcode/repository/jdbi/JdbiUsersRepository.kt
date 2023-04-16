@@ -111,7 +111,7 @@ class JdbiUsersRepository(
      * Method to create a pending student
      */
     override fun createPendingStudent(student: StudentInput): PendingStudent {
-        val id =  handle.createUpdate(
+        val id = handle.createUpdate(
             """
             INSERT INTO pendingstudent (email, github_username, github_id, token, name,created_at)
             VALUES (:email, :github_username, :github_id, :token, :name,now())
@@ -133,7 +133,7 @@ class JdbiUsersRepository(
             email = student.email,
             githubUsername = student.githubUsername,
             githubId = student.githubId,
-            token = student.token
+            token = student.token,
         )
     }
 
@@ -207,7 +207,7 @@ class JdbiUsersRepository(
             githubUsername = teacher.githubUsername,
             githubId = teacher.githubId,
             token = teacher.token,
-            githubToken = teacher.githubToken
+            githubToken = teacher.githubToken,
         )
     }
 
@@ -288,16 +288,16 @@ class JdbiUsersRepository(
         )
             .bind("github_id", githubId)
             .mapTo<PendingTeacher>()
-            .firstOrNull() ?:
-        handle.createQuery(
-            """
+            .firstOrNull()
+            ?: handle.createQuery(
+                """
             SELECT id,name,email,github_username,is_created,github_id,token FROM pendingstudent
             WHERE github_id = :github_id
             """,
-        )
-            .bind("github_id", githubId)
-            .mapTo<PendingStudent>()
-            .firstOrNull()
+            )
+                .bind("github_id", githubId)
+                .mapTo<PendingStudent>()
+                .firstOrNull()
     }
 
     /**

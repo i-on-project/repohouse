@@ -59,6 +59,27 @@ class UsersRepositoryTests {
     }
 
     @Test
+    fun `can create a pending student`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        userRepo.createStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
+    }
+
+    @Test
+    fun `can get a pending user`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val pendingUser = userRepo.getPendingUserByGithubId(githubId = 2222)
+        assert(pendingUser != null && pendingUser.email == "test2@alunos.isel.pt")
+    }
+
+    @Test
+    fun `delete pending users`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        userRepo.deletePendingUsers()
+        val pendingUser = userRepo.getPendingUserByGithubId(githubId = 2227)
+        assert(pendingUser == null)
+    }
+
+    @Test
     fun `can create a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         userRepo.createStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
@@ -72,6 +93,12 @@ class UsersRepositoryTests {
         userRepo.updateStudentSchoolId(userId = userId, schoolId = schoolId)
         val id = userRepo.getStudentSchoolId(id = userId)
         assert(id == schoolId)
+    }
+
+    @Test
+    fun `can create a pending teacher`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        userRepo.createPendingTeacher(teacher = TeacherInput(name = "test142", email = "test5@alunos.isel.pt", githubUsername = "test1239", githubToken = "token5", githubId = 123415, token = "token5"))
     }
 
     @Test

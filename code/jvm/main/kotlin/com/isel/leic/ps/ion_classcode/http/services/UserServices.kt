@@ -48,7 +48,7 @@ sealed class UserServicesError {
 @Component
 class UserServices(
     private val transactionManager: TransactionManager,
-    private val tokenHash: TokenHash
+    private val tokenHash: TokenHash,
 ) {
     /**
      * Method to check the token from a user
@@ -88,7 +88,7 @@ class UserServices(
             val teacher = it.usersRepository.getPendingUserByGithubId(githubId = githubId)
             if (teacher == null) {
                 Either.Left(value = UserServicesError.UserNotFound)
-            } else if (teacher is PendingTeacher){
+            } else if (teacher is PendingTeacher) {
                 if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = teacher.githubUsername)) {
                     return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
                 }
@@ -101,24 +101,24 @@ class UserServices(
                 if (it.usersRepository.checkIfTokenExists(token = teacher.token)) {
                     return@run Either.Left(value = UserServicesError.TokenInUse)
                 }
-                val teacherRes = it.usersRepository.createTeacher(teacher = TeacherInput(
-                    name = teacher.name,
-                    email = teacher.email,
-                    githubUsername = teacher.githubUsername,
-                    githubId = teacher.githubId,
-                    token = teacher.token,
-                    githubToken = teacher.githubToken
-                )
+                val teacherRes = it.usersRepository.createTeacher(
+                    teacher = TeacherInput(
+                        name = teacher.name,
+                        email = teacher.email,
+                        githubUsername = teacher.githubUsername,
+                        githubId = teacher.githubId,
+                        token = teacher.token,
+                        githubToken = teacher.githubToken,
+                    ),
                 )
                 if (teacherRes == null) {
                     Either.Left(value = UserServicesError.ErrorCreatingUser)
                 } else {
                     Either.Right(value = teacherRes)
                 }
-            }else{
+            } else {
                 Either.Left(value = UserServicesError.UserNotFound)
             }
-
         }
     }
 
@@ -130,13 +130,15 @@ class UserServices(
         return transactionManager.run {
             val hash = tokenHash.getTokenHash(teacher.token)
             val githubTokenHash = tokenHash.getTokenHash(teacher.githubToken)
-            val teacherRes = it.usersRepository.createPendingTeacher(teacher = TeacherInput(
-                name = teacher.name,
-                email = teacher.email,
-                githubUsername = teacher.githubUsername,
-                githubId = teacher.githubId,
-                token = hash,
-                githubToken = githubTokenHash)
+            val teacherRes = it.usersRepository.createPendingTeacher(
+                teacher = TeacherInput(
+                    name = teacher.name,
+                    email = teacher.email,
+                    githubUsername = teacher.githubUsername,
+                    githubId = teacher.githubId,
+                    token = hash,
+                    githubToken = githubTokenHash,
+                ),
             )
             Either.Right(value = teacherRes)
         }
@@ -145,43 +147,40 @@ class UserServices(
     /**
      * Method to create a user as a student
      */
-    fun createStudent(githubId: Long,schoolId:Int): StudentCreationResult {
+    fun createStudent(githubId: Long, schoolId: Int): StudentCreationResult {
+        if (schoolId <= 0 || githubId <= 0) return Either.Left(value = UserServicesError.InvalidData)
         return transactionManager.run {
-            val student = it.usersRepository.getPendingUserByGithubId(githubId = githubId)
-            if (student == null) {
-                Either.Left(value = UserServicesError.UserNotFound)
-            } else if (student is PendingStudent) {
-                if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = student.githubUsername)) {
-                    return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
-                }
-                if (it.usersRepository.checkIfEmailExists(email = student.email)) {
-                    return@run Either.Left(value = UserServicesError.EmailInUse)
-                }
-                if (it.usersRepository.checkIfGithubIdExists(githubId = student.githubId)) {
-                    return@run Either.Left(value = UserServicesError.GithubIdInUse)
-                }
-                if (it.usersRepository.checkIfTokenExists(token = student.token)) {
-                    return@run Either.Left(value = UserServicesError.TokenInUse)
-                }
-                if (it.usersRepository.checkIfSchoolIdExists(schoolId = schoolId)) {
-                    return@run Either.Left(value = UserServicesError.SchoolIdInUse)
-                }
-                val studentRes = it.usersRepository.createStudent(student =
+            val student = it.usersRepository.getPendingUserByGithubId(githubId = githubId) ?: return@run Either.Left(value = UserServicesError.UserNotFound)
+            if (it.usersRepository.checkIfGithubUsernameExists(githubUsername = student.githubUsername)) {
+                return@run Either.Left(value = UserServicesError.GithubUserNameInUse)
+            }
+            if (it.usersRepository.checkIfEmailExists(email = student.email)) {
+                return@run Either.Left(value = UserServicesError.EmailInUse)
+            }
+            if (it.usersRepository.checkIfGithubIdExists(githubId = student.githubId)) {
+                return@run Either.Left(value = UserServicesError.GithubIdInUse)
+            }
+            if (it.usersRepository.checkIfTokenExists(token = student.token)) {
+                return@run Either.Left(value = UserServicesError.TokenInUse)
+            }
+            if (it.usersRepository.checkIfSchoolIdExists(schoolId = schoolId)) {
+                return@run Either.Left(value = UserServicesError.SchoolIdInUse)
+            }
+            val studentRes = it.usersRepository.createStudent(
+                student =
                 StudentInput(
                     name = student.name,
                     email = student.email,
                     githubUsername = student.githubUsername,
                     githubId = student.githubId,
                     token = student.token,
-                    schoolId = schoolId
-                ))
-                if (studentRes == null) {
-                    Either.Left(value = UserServicesError.ErrorCreatingUser)
-                } else {
-                    Either.Right(value = studentRes)
-                }
+                    schoolId = schoolId,
+                ),
+            )
+            if (studentRes == null) {
+                Either.Left(value = UserServicesError.ErrorCreatingUser)
             } else {
-                Either.Left(value = UserServicesError.UserNotFound)
+                Either.Right(value = studentRes)
             }
         }
     }
@@ -194,13 +193,16 @@ class UserServices(
         if (student.isNotValid()) return Either.Left(value = UserServicesError.InvalidData)
         return transactionManager.run {
             val hash = tokenHash.getTokenHash(student.token)
-            val studentRes = it.usersRepository.createPendingStudent(student = StudentInput(
-                name = student.name,
-                email = student.email,
-                githubUsername = student.githubUsername,
-                githubId = student.githubId,
-                token = hash,
-                schoolId = student.schoolId))
+            val studentRes = it.usersRepository.createPendingStudent(
+                student = StudentInput(
+                    name = student.name,
+                    email = student.email,
+                    githubUsername = student.githubUsername,
+                    githubId = student.githubId,
+                    token = hash,
+                    schoolId = student.schoolId,
+                ),
+            )
             Either.Right(value = studentRes)
         }
     }
@@ -220,7 +222,6 @@ class UserServices(
         }
     }
 
-
     /**
      * Method to get a pending user by GitHub id
      */
@@ -236,13 +237,12 @@ class UserServices(
         }
     }
 
-
     /**
      * Method to delete pending users from the database after each day at 12:00 pm
      */
 
     @Scheduled(cron = "0 0 0 * * *")
-    fun deletePendingUsers(){
+    fun deletePendingUsers() {
         return transactionManager.run {
             it.usersRepository.deletePendingUsers()
         }

@@ -37,6 +37,15 @@ VALUES (5, 1236);
 INSERT INTO student (id, school_id)
 VALUES (8, 1237);
 
+INSERT INTO pendingstudent(email, is_created, github_username, github_id, token, name, created_at)
+VALUES ('test2@alunos.isel.pt', false, 'test1235', 2222, 'token10', 'student10', CURRENT_TIMESTAMP);
+
+
+INSERT INTO pendingteacher(email, is_created, github_username, github_id, token, name, github_token,created_at)
+VALUES ('test3@alunos.isel.pt', false, 'test1239', 2226, 'token14', 'student15', 'githubToken', CURRENT_TIMESTAMP);
+INSERT INTO pendingteacher(email, is_created, github_username, github_id, token, name, github_token,created_at)
+VALUES ('test4@alunos.isel.pt', false, 'test1240', 2227, 'token15', 'student16', 'githubToken1', '2023-01-01 00:00:00');
+
 
 INSERT INTO course (org_url, name)
 VALUES ('https://daw.isel.pt', 'DAW');
