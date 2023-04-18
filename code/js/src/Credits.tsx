@@ -5,6 +5,7 @@ import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import { SystemServices } from "./services/SystemServices";
 import { Typography } from "@mui/material";
+import {ErrorAlert} from "./ErrorAlert";
 
 export function ShowCreditsFetch({
                                   systemServices,
@@ -80,6 +81,7 @@ export function ShowCreditsFetch({
                     </Typography>
                 </>
             ) : null}
+            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
     );
 }

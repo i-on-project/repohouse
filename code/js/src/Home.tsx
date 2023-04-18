@@ -7,6 +7,7 @@ import {SystemServices} from "./services/SystemServices";
 import {Typography} from "@mui/material";
 import {Button} from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
+import {ErrorAlert} from "./ErrorAlert";
 
 export function ShowHomeFetch({
   systemServices,
@@ -71,6 +72,7 @@ export function ShowHomeFetch({
                     <Button onClick={handleAuthStudentClick}> {"Student"} </Button>
                 </>
             ) : null}
+            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
     );
 }

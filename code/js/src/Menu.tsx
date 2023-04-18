@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import { useState } from "react";
+import {useCallback, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import { SystemServices } from "./services/SystemServices";
@@ -8,12 +8,24 @@ import {List, ListItem, Typography} from "@mui/material";
 import {MenuServices} from "./services/MenuServices";
 import {MenuStudentDtoProperties, MenuTeacherDtoProperties} from "./domain/dto/MenuDtoProperties";
 import {Link} from "react-router-dom";
+import {ErrorAlert} from "./ErrorAlert";
+import {useSetLogin} from "./Auth";
 
 export function ShowMenuFetch({
                                   menuServices,
                               }: {
     menuServices: MenuServices;
 }) {
+    const setLogin = useSetLogin();
+
+    useCallback(() => {
+        if (window.opener) {
+            setLogin(true) // TODO: fix this
+            window.opener.postMessage({type:"Auth", data:'/menu'},'http://localhost:3000/')
+            window.close()
+        }
+    }, [setLogin, window.opener])
+
     const content = useAsync(async () => {
         return await menuServices.menu();
     });
@@ -69,6 +81,7 @@ export function ShowMenuFetch({
                     ) : null}
                 </>
             ) : null}
+            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
     );
 }

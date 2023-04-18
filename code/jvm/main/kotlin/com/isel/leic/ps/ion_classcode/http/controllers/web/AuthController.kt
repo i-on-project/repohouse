@@ -127,77 +127,74 @@ class AuthController(
                     ResponseEntity
                         .status(Status.REDIRECT)
                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
+                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu")
                         .body(EMPTY_REQUEST)
                 } else {
-                    val cookie = generateGithubIdCookie(userGithubInfo.id)
-                    ResponseEntity
-                        .status(Status.REDIRECT)
-                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback")
-                        .body(EMPTY_REQUEST)
-                }
-            }
-            is Either.Left -> {
-                when(userServices.getUserByGithubId(userGithubInfo.id)) {
-                    is Either.Right -> {
+                    if (position == "Teacher") {
                         val cookie = generateGithubIdCookie(userGithubInfo.id)
                         ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/status/callback")
+                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/status")
+                            .body(EMPTY_REQUEST)
+                    } else {
+                        val cookie = generateGithubIdCookie(userGithubInfo.id)
+                        ResponseEntity
+                            .status(Status.REDIRECT)
+                            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/verify")
                             .body(EMPTY_REQUEST)
                     }
-                    is Either.Left -> {
-                        val userEmail = fetchUserEmails(accessToken.access_token).first { it.primary }
-                        if (position == "Teacher") {
-                            when (
-                                val user = userServices.createPendingTeacher(
-                                    TeacherInput(
-                                        userEmail.email,
-                                        userGithubInfo.login,
-                                        userGithubInfo.id,
-                                        generateRandomToken(),
-                                        userGithubInfo.name,
-                                        accessToken.access_token,
-                                    ),
-                                )
-                            ) {
-                                is Either.Right -> {
-                                    val cookie = generateGithubIdCookie(userGithubInfo.id)
-                                    ResponseEntity
-                                        .status(Status.REDIRECT)
-                                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
-                                        .body(EMPTY_REQUEST)
-                                }
-
-                                is Either.Left -> problemUser(user.value)
-                            }
-                        } else {
-                            when (
-                                val user = userServices.createPendingStudent(
-                                    StudentInput(
-                                        email = userEmail.email,
-                                        githubUsername = userGithubInfo.login,
-                                        githubId = userGithubInfo.id,
-                                        token = generateRandomToken(),
-                                        name = userGithubInfo.name,
-                                    ),
-                                )
-                            ) {
-                                is Either.Right -> {
-                                    val cookie = generateGithubIdCookie(userGithubInfo.id)
-                                    ResponseEntity
-                                        .status(Status.REDIRECT)
-                                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
-                                        .body(EMPTY_REQUEST)
-                                }
-
-                                is Either.Left -> problemUser(user.value)
-                            }
+                }
+            }
+            is Either.Left -> {
+                val userEmail = fetchUserEmails(accessToken.access_token).first { it.primary }
+                if (position == "Teacher") {
+                    when (
+                        val user = userServices.createPendingTeacher(
+                            TeacherInput(
+                                userEmail.email,
+                                userGithubInfo.login,
+                                userGithubInfo.id,
+                                generateRandomToken(),
+                                userGithubInfo.name,
+                                accessToken.access_token,
+                            ),
+                        )
+                    ) {
+                        is Either.Right -> {
+                            val cookie = generateGithubIdCookie(userGithubInfo.id)
+                            ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
+                                .body(EMPTY_REQUEST)
                         }
+
+                        is Either.Left -> problemUser(user.value)
+                    }
+                } else {
+                    when (
+                        val user = userServices.createPendingStudent(
+                            StudentInput(
+                                email = userEmail.email,
+                                githubUsername = userGithubInfo.login,
+                                githubId = userGithubInfo.id,
+                                token = generateRandomToken(),
+                                name = userGithubInfo.name,
+                            ),
+                        )
+                    ) {
+                        is Either.Right -> {
+                            val cookie = generateGithubIdCookie(userGithubInfo.id)
+                            ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
+                                .body(EMPTY_REQUEST)
+                        }
+
+                        is Either.Left -> problemUser(user.value)
                     }
                 }
             }
@@ -289,7 +286,7 @@ class AuthController(
                     ResponseEntity
                         .status(Status.REDIRECT)
                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, Uris.MENU_PATH)
+                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu")
                         .body(EMPTY_REQUEST)
                 }else {
                     when (position) {
@@ -369,7 +366,7 @@ class AuthController(
         response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
         return ResponseEntity
             .status(Status.REDIRECT)
-            .header(HttpHeaders.LOCATION, Uris.HOME)
+            .header(HttpHeaders.LOCATION, "http://localhost:3000")
             .build()
     }
 
@@ -494,12 +491,13 @@ class AuthController(
     private fun problemOtp(error: OutboxServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             OutboxServicesError.OtpExpired -> Problem.gone
-            OutboxServicesError.OtpDifferent -> Problem.badRequest
+            OutboxServicesError.OtpDifferent -> Problem.invalidInput
             OutboxServicesError.OtpNotFound -> Problem.notFound
             OutboxServicesError.UserNotFound -> Problem.notFound
             OutboxServicesError.EmailNotSent -> Problem.internalError
             OutboxServicesError.ErrorCreatingRequest -> Problem.internalError
-            else -> Problem.forbidden
+            OutboxServicesError.InvalidInput -> Problem.invalidInput
+            else -> Problem.cooldown((error as OutboxServicesError.CooldownNotExpired).cooldown)
         }
     }
 }

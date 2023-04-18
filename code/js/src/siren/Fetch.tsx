@@ -33,9 +33,7 @@ export async function fetchPost<T>(url: string, body:object =null) {
 }
 
 async function myFetch<T>(url: string, options: object) {
-    console.log("before fecth")
     const res = await fetch(url, options)
-    console.log(res)
     const resp = await res.json()
     return handleResponse<T>(resp, res.ok)
 }

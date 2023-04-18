@@ -7,7 +7,7 @@ import {TextField, Typography} from "@mui/material";
 import {Button} from "react-bootstrap";
 import {Navigate, useLocation, useNavigate} from "react-router-dom";
 import {AuthServices} from "./services/AuthServices";
-import {Label} from "@mui/icons-material";
+import {ErrorAlert} from "./ErrorAlert";
 
 
 export function ShowCreateTeacherFetch({
@@ -93,7 +93,7 @@ export function ShowCreateStudentFetch({
     const handleConfirmClick = useCallback((event:any) => {
         event.preventDefault()
         navigate("/auth/register/student", {state: {schoolId: schoolId} })
-    }, [navigate])
+    }, [navigate,schoolId])
 
     const handleDeclineClick = useCallback ((event:any) => {
         event.preventDefault()
@@ -139,16 +139,12 @@ export function ShowCreateStudentFetch({
                     >
                         {content.properties.GitHubUsername}
                     </Typography>
-                    {
-                        <Label>
-                            {"SchoolId"}
-                            <TextField required type={"number"} onChange={(event) => setSchoolId(Number(event.target.value))}/>
-                        </Label>
-                    }
+                    <TextField label={"SchoolId"} required type={"number"} onChange={(event) => setSchoolId(Number(event.target.value))}/>
                     <Button onClick={handleConfirmClick}> {"Confirm"} </Button>
                     <Button onClick={handleDeclineClick}> {"Decline"} </Button>
                 </>
             ) : null}
+            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
     );
 }
@@ -208,7 +204,7 @@ export function ShowCreateStudentFetchPost({
         setError(content);
     }
 
-    return <Navigate to={"/auth/status"}/>
+    return <Navigate to={"/auth/verify"}/>
 }
 
 export function ShowCreateCallbackStudent() {

@@ -5,6 +5,7 @@ import { useLoggedIn } from './Auth'
 
 export function RequireAuth({ children }: { children: React.ReactNode }): React.ReactElement {
     const currentUser = useLoggedIn()
+    console.log("RequireAuth - " + currentUser)
     const location = useLocation()
     if (currentUser) {
         return <>{children}</>

@@ -20,3 +20,9 @@ export class PendingUserDtoProperties {
     }
 }
 
+export class OTPBody {
+    otp: number
+    constructor(otp: number) {
+        this.otp = otp
+    }
+}

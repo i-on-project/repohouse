@@ -6,6 +6,7 @@ import { SirenEntity } from "./siren/Siren";
 import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 import { useNavigate } from "react-router-dom";
+import {ErrorAlert} from "./ErrorAlert";
 
 export function ShowAuthStudentFetch({
     authServices,
@@ -30,7 +31,6 @@ export function ShowAuthStudentFetch({
 
     useEffect(() => {
         window.addEventListener('message', function(e) {
-            console.log(e)
             if(e.origin !== 'http://localhost:3000')
                 return;
             if (e.data.type === "Auth") {
@@ -62,6 +62,7 @@ export function ShowAuthStudentFetch({
                 justifyContent: "space-evenly",
             }}
         >
+            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
     );
 }

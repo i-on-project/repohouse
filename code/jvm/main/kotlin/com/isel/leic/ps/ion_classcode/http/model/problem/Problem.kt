@@ -211,5 +211,14 @@ class Problem {
                 "The resource you are trying to access is forbidden.",
             ),
         )
+
+        fun cooldown(time:Int) = response(
+            HttpStatus.REQUEST_TIMEOUT,
+            ErrorMessageModel(
+                URI("$BASE_URL/too-many-requests"),
+                "In Cooldown.",
+                "You have to wait $time seconds for another request.",
+            ),
+        )
     }
 }

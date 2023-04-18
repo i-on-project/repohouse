@@ -74,9 +74,9 @@ const router = createBrowserRouter([
             },
             {
                 "path": "/menu",
-                "element": <RequireAuth>
+                "element": //<RequireAuth> TODO: Unable this line to enable authentication
                     <Menu/>
-                </RequireAuth>
+                   // </RequireAuth>
             },
             {
                 "path": "/courses/:courseId",
@@ -213,7 +213,7 @@ function Status() {
 function Verify() {
     return (
         <div>
-            <ShowVerifyFetch authServices={authServices}/>
+            <ShowVerifyFetch authServices={authServices} error={null}/>
         </div>
     )
 }

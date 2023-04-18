@@ -5,12 +5,18 @@ import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import { Typography } from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
+import {ErrorAlert} from "./ErrorAlert";
 
 export function ShowStatusFetch({
     authServices,
 }: {
     authServices: AuthServices;
 }) {
+    if (window.opener) {
+        window.opener.postMessage({type:"Auth", data:'/auth/status'},'http://localhost:3000/')
+        window.close()
+    }
+
     const content = useAsync(async () => {
         return await authServices.status();
     });
@@ -27,9 +33,11 @@ export function ShowStatusFetch({
         );
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
+    if (content instanceof ErrorMessageModel) {
         setError(content);
     }
+
+
 
     return (
         <div
@@ -59,6 +67,7 @@ export function ShowStatusFetch({
                     </Typography>
                 </>
             ) : null}
+            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
     );
 }

@@ -26,7 +26,7 @@ sealed class OutboxServicesError {
     class CooldownNotExpired(val cooldown: Int) : OutboxServicesError()
 }
 
-private const val COOLDOWN_TIME = 500000 // 5 minutes cooldown
+private const val COOLDOWN_TIME = 5000 // 5 minutes cooldown
 
 /**
  * Service to the outbox services
@@ -63,6 +63,10 @@ class OutboxServices(
     fun checkOtp(userId: Int, otp: Int): OutboxResponse {
         if (userId <= 0 || otp <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
         return transactionManager.run {
+            val cooldown = it.cooldownRepository.getCooldownRequest(userId = userId)
+            if (cooldown != null) {
+                return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
+            }
             val outbox = it.outboxRepository.getOutboxRequest(userId = userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
             if (outbox.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
                 it.outboxRepository.deleteOutboxRequest(userId = outbox.userId)
@@ -72,7 +76,7 @@ class OutboxServices(
                 it.usersRepository.updateUserStatus(id = userId)
                 Either.Right(value = Unit)
             } else {
-                it.outboxRepository.deleteOutboxRequest(userId = outbox.userId)
+                //it.outboxRepository.deleteOutboxRequest(userId = outbox.userId) TODO: CHECK THIS
                 it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
                 Either.Left(value = OutboxServicesError.OtpDifferent)
             }

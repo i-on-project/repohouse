@@ -54,10 +54,9 @@ export class AuthServices {
         return response
     }
 
-    verify = async (otp: number) => {
+    verify = async (otp: { otp: number}) => {
         //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.VERIFY_KEY, Hypermedia.systemServices.home)
-        const body = { otp: otp }
-        const response = await fetchPost<StatusDtoProperties>("/api/auth/register/verify", body)
+        const response = await fetchPost<StatusDtoProperties>("/api/auth/register/student/verify", otp)
         if (response instanceof SirenEntity) {
             //TODO
         }
