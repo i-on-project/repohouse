@@ -1,30 +1,22 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import { SystemServices } from "./services/SystemServices";
 import {List, ListItem, Typography} from "@mui/material";
 import {MenuServices} from "./services/MenuServices";
 import {MenuStudentDtoProperties, MenuTeacherDtoProperties} from "./domain/dto/MenuDtoProperties";
-import {Link} from "react-router-dom";
+import {Link, Navigate} from "react-router-dom";
 import {ErrorAlert} from "./ErrorAlert";
-import {useSetLogin} from "./Auth";
+import {useLoggedIn, useSetLogin} from "./Auth";
+import {OTPBody} from "./domain/dto/PendingUserDtoProperties";
 
 export function ShowMenuFetch({
                                   menuServices,
                               }: {
     menuServices: MenuServices;
 }) {
-    const setLogin = useSetLogin();
-
-    useCallback(() => {
-        if (window.opener) {
-            setLogin(true) // TODO: fix this
-            window.opener.postMessage({type:"Auth", data:'/menu'},'http://localhost:3000/')
-            window.close()
-        }
-    }, [setLogin, window.opener])
 
     const content = useAsync(async () => {
         return await menuServices.menu();
@@ -70,6 +62,14 @@ export function ShowMenuFetch({
                         {content.properties.courses.map( course => (
                             <ListItem>
                                 <Link to={"/courses/" + course.id}>{course.name}</Link>
+                                <List>
+                                    Teachers:
+                                    {course.teacher.map( teacher => (
+                                        <ListItem>
+                                            {teacher.name}
+                                        </ListItem>
+                                    ))}
+                                </List>
                             </ListItem>
                         ))}
                     </List>
@@ -82,6 +82,25 @@ export function ShowMenuFetch({
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => { setError(null) }}/>
+            // TODO: add logout button
+            // TODO: If teacher, add create course button
         </div>
     );
+}
+
+export function ShowMenuCallbackFetch(){
+    const setLogin = useSetLogin()
+    const loggedIn = useLoggedIn()
+
+    console.log("Logged - " + loggedIn)
+
+    useEffect(() => {
+        setLogin(true)
+    },[])
+
+    if (loggedIn){
+        window.opener.postMessage({type:"Auth", data:'/menu'},'http://localhost:3000/')
+        window.close()
+        return (<></>)
+    }
 }

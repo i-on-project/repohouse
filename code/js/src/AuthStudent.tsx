@@ -7,6 +7,7 @@ import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 import { useNavigate } from "react-router-dom";
 import {ErrorAlert} from "./ErrorAlert";
+import {useLoggedIn, useSetLogin} from "./Auth";
 
 export function ShowAuthStudentFetch({
     authServices,
@@ -37,7 +38,7 @@ export function ShowAuthStudentFetch({
                 navigate(e.data.data)
             }
         }, false);
-    }, [windowRef])
+    }, [windowRef,useLoggedIn,useSetLogin])
 
 
     if (!content) {

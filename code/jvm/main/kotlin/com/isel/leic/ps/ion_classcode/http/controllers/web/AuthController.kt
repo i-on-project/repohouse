@@ -127,7 +127,7 @@ class AuthController(
                     ResponseEntity
                         .status(Status.REDIRECT)
                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu")
+                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback")
                         .body(EMPTY_REQUEST)
                 } else {
                     if (position == "Teacher") {
@@ -286,7 +286,7 @@ class AuthController(
                     ResponseEntity
                         .status(Status.REDIRECT)
                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu")
+                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback")
                         .body(EMPTY_REQUEST)
                 }else {
                     when (position) {

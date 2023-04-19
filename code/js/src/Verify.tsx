@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useAsync } from "./siren/Fetch";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import {TextField, Typography} from "@mui/material";
 import {Button} from "react-bootstrap";
@@ -18,24 +17,34 @@ export function ShowVerifyFetch({
     authServices: AuthServices;
     error: ErrorMessageModel;
 }) {
+
     if (window.opener) {
         window.opener.postMessage({type:"Auth", data:'/auth/verify'},'http://localhost:3000/')
         window.close()
     }
-    const [create, setCreate] = useState<boolean>(false);
+
     const [otp, setOtp] = useState<number>(null);
     const [serror, setError] = useState<ErrorMessageModel>(error);
+    const setLogin = useSetLogin();
+    const [redirect,setRedirect] = useState(false)
 
-    const handleSubmit = useCallback((event:any) => {
+    const handleSubmit = useCallback(async (event: any) => {
         event.preventDefault()
         if (otp != null && otp > 0) {
-            setCreate(true)
+            const otpBody = new OTPBody(otp)
+            const res = await authServices.verify(otpBody);
+            if (res instanceof ErrorMessageModel) {
+                setError(res)
+            }
+            if (res instanceof SirenEntity) {
+                setLogin(true)
+                setRedirect(true)
+            }
         }
-    },[setCreate,otp])
+    },[otp,setError,setLogin,setRedirect])
 
-    if (create) {
-        const otpBody = new OTPBody(otp)
-        return <ShowVerifyFetchPost authServices={authServices} otp={otpBody}/>
+    if (redirect){
+        return <Navigate to={"/menu"} replace={true}/>
     }
 
     return (
@@ -56,37 +65,4 @@ export function ShowVerifyFetch({
             <ErrorAlert error={serror} onClose={() => { setError(null) }}/>
         </div>
     );
-}
-
-export function ShowVerifyFetchPost({
-                                   authServices,
-                                   otp
-                               }: {
-    authServices: AuthServices;
-    otp: OTPBody;
-}) {
-    const content = useAsync(async () => {
-        return await authServices.verify(otp);
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-    const setLogin = useSetLogin();
-
-    if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
-    }
-
-    if (content instanceof ErrorMessageModel) {
-       return <ShowVerifyFetch authServices={authServices} error={content}/>
-    }
-
-
-    setLogin(true) //TODO fix this
-    return <Navigate to={"/menu"} replace={true}/>
 }

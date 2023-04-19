@@ -60,13 +60,14 @@ export function ShowCourseFetch({
                     <List>
                         {content.properties.classrooms.map( classroom => (
                             <ListItem>
+                                //TODO: If archived,make it grey
                                 <Link to={"/courses/:id/classrooms/" + classroom.id}>
                                     {classroom.name}
                                 </Link>
                             </ListItem>
                         ))}
                     </List>
-                    // TODO: Check if user is teacher and add button to create classroom if not archived
+                    // TODO: If teacher add button to create classroom if course not archived
                 </>
             ) : null}
         </div>
@@ -96,6 +97,7 @@ export function ShowCourseCreateFetch({
         event.preventDefault()
         const course = courseBody
         if (!course) return
+        //TODO : Change this
         ShowCourseCreatePost({courseServices, course})
     },[courseBody])
 

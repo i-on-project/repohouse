@@ -8,7 +8,7 @@ import {RequireAuth} from "./RequiredAuth";
 import {NavBarShow} from "./NavBar";
 import {ShowAuthTeacherFetch} from "./AuthTeacher";
 import {ShowAuthStudentFetch} from "./AuthStudent";
-import {ShowMenuFetch} from "./Menu";
+import {ShowMenuCallbackFetch, ShowMenuFetch} from "./Menu";
 import {ShowCourseCreateFetch, ShowCourseFetch} from "./Course";
 import {ShowTeacherApprovalFetch} from "./ApproveTeachers";
 import {ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentFetch, ShowCreateStudentFetchPost, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost} from "./Create";
@@ -74,9 +74,13 @@ const router = createBrowserRouter([
             },
             {
                 "path": "/menu",
-                "element": //<RequireAuth> TODO: Unable this line to enable authentication
+                "element": <RequireAuth>
                     <Menu/>
-                   // </RequireAuth>
+                    </RequireAuth>
+            },
+            {
+                "path": "/menu/callback",
+                "element": <MenuCallback/>
             },
             {
                 "path": "/courses/:courseId",
@@ -222,6 +226,14 @@ function Menu() {
     return (
         <div>
             <ShowMenuFetch menuServices={menuServices}/>
+        </div>
+    )
+}
+
+function MenuCallback(){
+    return (
+        <div>
+            <ShowMenuCallbackFetch/>
         </div>
     )
 }

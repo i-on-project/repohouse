@@ -7,6 +7,7 @@ import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {useNavigate} from "react-router-dom";
+import {useSetLogin} from "./Auth";
 
 export function ShowAuthTeacherFetch({
                                          authServices,
@@ -22,6 +23,7 @@ export function ShowAuthTeacherFetch({
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
     const navigate = useNavigate()
+    const setLogin = useSetLogin()
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
@@ -37,7 +39,6 @@ export function ShowAuthTeacherFetch({
             if(e.origin !== 'http://localhost:3000')
                 return;
             if (e.data.type === "Auth") {
-                console.log("Data - " + e.data.data)
                 navigate(e.data.data)
             }
         }, false);
