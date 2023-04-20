@@ -8,6 +8,7 @@ import {Typography} from "@mui/material";
 import {Button} from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
 import {ErrorAlert} from "./ErrorAlert";
+import { useLoggedIn } from "./Auth";
 
 export function ShowHomeFetch({
   systemServices,
@@ -16,10 +17,11 @@ export function ShowHomeFetch({
 }) {
 
     const content = useAsync(async () => {
-        return await systemServices.home();
+        return await systemServices.home()
     });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-    const navigate = useNavigate();
+    const [error, setError] = useState<ErrorMessageModel>(null)
+    const navigate = useNavigate()
+    const loggedIn = useLoggedIn()
 
     const handleAuthTeacherClick = useCallback(() => {
         navigate("/auth/teacher")
@@ -68,8 +70,13 @@ export function ShowHomeFetch({
                     >
                         {"est: "+ content.properties.est}
                     </Typography>
-                    <Button onClick={handleAuthTeacherClick}> {"Teacher"} </Button>
-                    <Button onClick={handleAuthStudentClick}> {"Student"} </Button>
+                    {!loggedIn &&
+                        <>
+                        <Button onClick={handleAuthTeacherClick}> {"Teacher"} </Button> 
+                        <Button onClick={handleAuthStudentClick}> {"Student"} </Button>
+                        </>
+                    }
+                    
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => { setError(null) }}/>

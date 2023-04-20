@@ -7,7 +7,7 @@ import {Navigate} from "react-router-dom";
 import {AuthServices} from "./services/AuthServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {OTPBody} from "./domain/dto/PendingUserDtoProperties";
-import {useSetLogin} from "./Auth";
+import {AuthState, useSetLogin} from "./Auth";
 import {SirenEntity} from "./siren/Siren";
 
 export function ShowVerifyFetch({
@@ -37,7 +37,7 @@ export function ShowVerifyFetch({
                 setError(res)
             }
             if (res instanceof SirenEntity) {
-                setLogin(true)
+                setLogin(AuthState.Student) //TODO check this
                 setRedirect(true)
             }
         }

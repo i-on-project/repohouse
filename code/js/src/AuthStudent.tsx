@@ -21,6 +21,7 @@ export function ShowAuthStudentFetch({
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
     const navigate = useNavigate()
+    const setLogin = useSetLogin()
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
@@ -34,9 +35,10 @@ export function ShowAuthStudentFetch({
         window.addEventListener('message', function(e) {
             if(e.origin !== 'http://localhost:3000')
                 return;
-            if (e.data.type === "Auth") {
-                navigate(e.data.data)
+            if (e.data.type === "Menu") {
+                setLogin(e.data.state)
             }
+            navigate(e.data.data)
         }, false);
     }, [windowRef,useLoggedIn,useSetLogin])
 

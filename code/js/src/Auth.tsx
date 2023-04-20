@@ -5,23 +5,33 @@ import {
     useContext,
 } from 'react'
 
+export enum AuthState {
+    None,
+    Student,
+    Teacher
+}
+
+export function toState(state: string): AuthState {
+    if (state === "student") return AuthState.Student
+    if (state === "teacher") return AuthState.Teacher
+}
 
 type ContextType = {
-    loggedin: boolean,
+    loggedin: AuthState | undefined,
     userId: number,
-    setLogin: (v: boolean) => void,
+    setLogin: (v: AuthState) => void,
     setUserId: (v: number) => void
 }
 
 const LoggedInContext = createContext<ContextType>({
-    loggedin: false,
+    loggedin: undefined,
     userId: 0,
     setLogin: () => {},
     setUserId: () => {}
 })
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
-    const [loggedin, setLoggedin] = useState(false)
+    const [loggedin, setLoggedin] = useState(undefined)
     const [userId, setUserId] = useState(0)
 
     return (

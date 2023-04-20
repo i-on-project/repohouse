@@ -7,27 +7,24 @@ import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {useNavigate} from "react-router-dom";
-import {useSetLogin} from "./Auth";
+import { useSetLogin } from "./Auth";
 
 export function ShowAuthTeacherFetch({
-                                         authServices,
-                                     }: {
+    authServices,
+}: {
     authServices: AuthServices;
 }) {
-    console.log("ShowAuthTeacherFetch")
     const content = useAsync(async () => {
-        console.log("ShowAuthTeacherFetch - useAsync")
         return await authServices.authTeacher();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
-    const navigate = useNavigate()
     const setLogin = useSetLogin()
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
-            console.log("Url - " + content)
             const authWindow = window.open(content.properties.url, '')
             setWindowRef(authWindow)
             setOpen(true)
@@ -38,9 +35,10 @@ export function ShowAuthTeacherFetch({
         window.addEventListener('message', function(e) {
             if(e.origin !== 'http://localhost:3000')
                 return;
-            if (e.data.type === "Auth") {
-                navigate(e.data.data)
+            if (e.data.type === "Menu") {
+               setLogin(e.data.state)
             }
+            navigate(e.data.data)
         }, false);
     }, [windowRef])
 
