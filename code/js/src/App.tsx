@@ -14,6 +14,7 @@ import {ShowTeacherApprovalFetch} from "./ApproveTeachers";
 import {ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentFetch, ShowCreateStudentFetchPost, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost} from "./Create";
 import {ShowStatusCallbackFetch, ShowStatusFetch} from "./Status";
 import {ShowVerifyFetch} from "./Verify";
+import { HandleAuthFail, HandleAuthFailCallback } from './AuthFail'
 
 const router = createBrowserRouter([
     {
@@ -73,13 +74,21 @@ const router = createBrowserRouter([
                 "element": <AuthStudent/>
             },
             {
+                "path": "/auth/fail",
+                "element": <AuthFail/>
+            },
+            {
+                "path": "/auth/fail/callback",
+                "element": <AuthFailCallback/>
+            },
+            {
                 "path": "/menu",
                 "element": <RequireAuth>
                     <Menu/>
                 </RequireAuth>
             },
             {
-                "path": "/menu/callback",
+                "path": "/menu/callback/:user",
                 "element": <MenuCallback/>
             },
             {
@@ -218,6 +227,22 @@ function Verify() {
     return (
         <div>
             <ShowVerifyFetch authServices={authServices} error={null}/>
+        </div>
+    )
+}
+
+function AuthFail() {
+    return (
+        <div>
+             <HandleAuthFail/>
+        </div>
+    )
+}
+
+function AuthFailCallback() {
+    return (
+        <div>
+             <HandleAuthFailCallback/>
         </div>
     )
 }

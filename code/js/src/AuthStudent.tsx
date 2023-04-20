@@ -20,7 +20,6 @@ export function ShowAuthStudentFetch({
     const [error, setError] = useState<ErrorMessageModel>(null);
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
-    const [redirect, setRedirect] = useState<string>(null);
     const navigate = useNavigate()
     const setLogin = useSetLogin()
 
@@ -36,19 +35,13 @@ export function ShowAuthStudentFetch({
         window.addEventListener('message', function(e) {
             if(e.origin !== 'http://localhost:3000')
                 return;
-            if (e.data.type === "Auth") {
-                setRedirect(e.data.data)
-            }else if (e.data.type === "Menu") {
-                setLogin(true)
-                setRedirect(e.data.data)
+            if (e.data.type === "Menu") {
+                setLogin(e.data.state)
             }
+            navigate(e.data.data)
         }, false);
-    }, [windowRef,setLogin])
+    }, [windowRef,useLoggedIn,useSetLogin])
 
-
-    if (redirect) {
-        navigate(redirect)
-    }
 
     if (!content) {
         return (

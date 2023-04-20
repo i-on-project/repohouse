@@ -7,23 +7,21 @@ import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {useNavigate} from "react-router-dom";
-import {useSetLogin} from "./Auth";
+import { useSetLogin } from "./Auth";
 
 export function ShowAuthTeacherFetch({
-                                         authServices,
-                                     }: {
+    authServices,
+}: {
     authServices: AuthServices;
 }) {
     const content = useAsync(async () => {
-        console.log("ShowAuthTeacherFetch - useAsync")
         return await authServices.authTeacher();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
-    const [redirect, setRedirect] = useState<string>(null);
-    const navigate = useNavigate()
     const setLogin = useSetLogin()
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
@@ -37,19 +35,12 @@ export function ShowAuthTeacherFetch({
         window.addEventListener('message', function(e) {
             if(e.origin !== 'http://localhost:3000')
                 return;
-            if (e.data.type === "Auth") {
-                setRedirect(e.data.data)
-            }else if (e.data.type === "Menu") {
-                setLogin(true)
-                setRedirect(e.data.data)
+            if (e.data.type === "Menu") {
+               setLogin(e.data.state)
             }
+            navigate(e.data.data)
         }, false);
-    }, [windowRef,setLogin])
-
-
-    if (redirect) {
-        navigate(redirect)
-    }
+    }, [windowRef])
 
     if (!content) {
         return (

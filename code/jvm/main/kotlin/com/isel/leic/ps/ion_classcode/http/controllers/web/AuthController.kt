@@ -1,5 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.controllers.web
 
+import com.isel.leic.ps.ion_classcode.domain.Student
+import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInputModel
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
@@ -123,12 +125,34 @@ class AuthController(
         return when (val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
             is Either.Right -> {
                 if (userInfo.value.isCreated) {
-                    val cookie = generateSessionCookie(userInfo.value.token)
-                    ResponseEntity
-                        .status(Status.REDIRECT)
-                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback")
-                        .body(EMPTY_REQUEST)
+                    when {
+                        userInfo.value is Student && position == "Student" -> {
+                            val cookie = generateSessionCookie(userInfo.value.token)
+                            ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/student")
+                                .body(EMPTY_REQUEST)
+                        }
+                        userInfo.value is Teacher && position == "Teacher" -> {
+                            val cookie = generateSessionCookie(userInfo.value.token)
+                            ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/teacher")
+                                .body(EMPTY_REQUEST)
+                        }
+                        else -> {
+                            val authorizationCookie = deleteSessionCookie()
+                            val githubIdCookie = deleteGithubIdCookie()
+                            response.setHeader(HttpHeaders.SET_COOKIE, authorizationCookie.toString())
+                            response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
+                            return ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/fail/callback")
+                                .body(EMPTY_REQUEST)
+                        }
+                    }
                 } else {
                     if (position == "Teacher") {
                         val cookie = generateGithubIdCookie(userGithubInfo.id)
@@ -348,20 +372,8 @@ class AuthController(
     fun logout(
         response: HttpServletResponse,
     ): ResponseEntity<Any> {
-        val authorizationCookie = ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, "")
-            .httpOnly(true)
-            .sameSite("Strict")
-            .secure(true)
-            .maxAge(0)
-            .path("/api")
-            .build()
-        val githubIdCookie = ResponseCookie.from("userGithubId", "")
-            .httpOnly(true)
-            .sameSite("Strict")
-            .secure(true)
-            .maxAge(0)
-            .path("/api")
-            .build()
+        val authorizationCookie = deleteSessionCookie()
+        val githubIdCookie = deleteGithubIdCookie()
         response.setHeader(HttpHeaders.SET_COOKIE, authorizationCookie.toString())
         response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
         return ResponseEntity
@@ -397,6 +409,19 @@ class AuthController(
     }
 
     /**
+     * Delete a session cookie.
+     */
+    private fun deleteSessionCookie(): ResponseCookie {
+        return ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, "")
+            .httpOnly(true)
+            .sameSite("Strict")
+            .secure(true)
+            .maxAge(0)
+            .path("/api")
+            .build()
+    }
+
+    /**
      * Create a user position cookie.
      */
     private fun generateUserPosition(position: String): ResponseCookie {
@@ -419,6 +444,19 @@ class AuthController(
             .httpOnly(true)
             .secure(true)
             .sameSite("None")
+            .build()
+    }
+
+    /**
+     * Delete a user GitHub id cookie.
+     */
+    private fun deleteGithubIdCookie(): ResponseCookie {
+        return ResponseCookie.from("userGithubId", "")
+            .httpOnly(true)
+            .sameSite("Strict")
+            .secure(true)
+            .maxAge(0)
+            .path("/api")
             .build()
     }
 

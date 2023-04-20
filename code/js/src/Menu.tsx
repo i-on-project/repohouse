@@ -1,20 +1,18 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import {useCallback, useEffect, useState} from "react";
+import {useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
-import { SystemServices } from "./services/SystemServices";
 import {List, ListItem, Typography} from "@mui/material";
 import {MenuServices} from "./services/MenuServices";
-import {MenuStudentDtoProperties, MenuTeacherDtoProperties} from "./domain/dto/MenuDtoProperties";
-import {Link, Navigate} from "react-router-dom";
+import {MenuTeacherDtoProperties} from "./domain/dto/MenuDtoProperties";
+import {Link, useParams} from "react-router-dom";
 import {ErrorAlert} from "./ErrorAlert";
-import {useLoggedIn, useSetLogin} from "./Auth";
-import {OTPBody} from "./domain/dto/PendingUserDtoProperties";
+import {toState} from "./Auth";
 
 export function ShowMenuFetch({
-                                  menuServices,
-                              }: {
+    menuServices,
+}: {
     menuServices: MenuServices;
 }) {
 
@@ -82,13 +80,22 @@ export function ShowMenuFetch({
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => { setError(null) }}/>
+            // TODO: add logout button
             // TODO: If teacher, add create course button
         </div>
     );
 }
 
-export function ShowMenuCallbackFetch(){
-    window.opener.postMessage({type:"Menu", data:'/menu'},'http://localhost:3000/')
-    window.close()
-    return (<></>)
+export function ShowMenuCallbackFetch() {
+    const params = useParams()
+    const state = toState(params.user)
+    if (state !== undefined) {
+        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, 'http://localhost:3000/')
+        window.close()
+        return (<></>)
+    }
+   
+    return <>
+        It seems that your server redirect URL is not setup correctly!
+    </>
 }

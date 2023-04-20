@@ -11,13 +11,11 @@ export function NavBarShow({ authServices }: { authServices: AuthServices }) {
     const loggedin = useLoggedIn()
     const setLoggedin = useSetLogin()
 
-
     const handleLogout = useCallback(async() => {
         await authServices.logout()
-        setLoggedin(false)
+        setLoggedin(undefined)
         navigate("/")
     }, [navigate, setLoggedin])
-
 
     return (
         <>
