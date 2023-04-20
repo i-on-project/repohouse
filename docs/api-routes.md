@@ -4,71 +4,107 @@
 
 All web API routes are prefixed with `/api/web`.
 
-#### Common
-- GET `./home` - Get the home page
-- POST `./login` - Post to login
-- POST `./logout` - Post to logout
-- POST `./register` - Get to register
-- GET `./credits` - Get the credits page
-- GET `./courses` - Get the courses page
-- GET `./courses/:id/classrooms` - Get the classrooms page from a course
-- GET `./courses/:id/classrooms/:id` - Get the classroom page from a course
-- GET `./courses/:id/classrooms/:id/teams/:id` - Get the team page from a classroom
-- GET `./courses/:id/classrooms/:id/teams/:id/feedbacks` - Get the feedbacks page from a team
-- GET `./courses/:id/classrooms/:id/assigments` - Get the assigments page from a classroom
-- GET `./courses/:id/classrooms/:id/assigments/:id` - Get the assigment page from a classroom
-- GET `./courses/:id/classrooms/:id/assigments/:id/deliveries/:id` - Get the delivery page from an assigment
+<br/>
 
+#### System Controller
+| Route              | Description           |
+|--------------------|-----------------------|
+| GET ```/home```    | Get the home page.    |
+| GET ```/credits``` | Get the credits page. |
 
-#### Teacher
+<br/><br/>
 
-- GET `./login/teacher/approval` - Get the teacher approval status page
-- POST `./courses/submit` - Submit a new course
-- DELETE `./courses/:id` - Delete a course
-- POST `./courses/:id/classrooms/submit` - Submit a new classroom
-- DELETE `./courses/:id/classrooms/:id` - Delete a classroom
-- POST `./courses/:id/classrooms/:id/assigments/submit` - Submit a new assigment
-- DELETE `./courses/:id/classrooms/:id/assigments/:id` - Delete a assigment
-- GET `./courses/:id/classrooms/:id/teams` - Get the teams page from a classroom
-- DELETE `./courses/:id/classrooms/:id/teams/:id` - Delete a team
-- POST `./courses/:id/classrooms/:id/teams/:id/feedbacks/submit` - Submit a new feedback
-- DELETE `./courses/:id/classrooms/:id/teams/:id/feedbacks/:id` - Delete a feedback
-- POST `./courses/:id/classrooms/:id/assigments/:id/deliveries/submit` - Submit a new delivery
-- DELETE `./courses/:id/classrooms/:id/assigments/:id/deliveries/:id` - Delete a delivery
-- POST `./courses/:id/classrooms/:id/sync` - Sync a classroom
-- POST `./courses/:id/classrooms/:id/teams/:id/sync` - Sync a team
+#### Auth Controller
+| Route                                      | Description                                                                |
+|--------------------------------------------|----------------------------------------------------------------------------|
+| GET ```/auth/teacher```                    | Start GitHub OAuth process as Teacher.                                     |
+| GET ```/auth/student```                    | Start GitHub OAuth process as Student.                                     | 
+| GET ```/auth/callback```                   | Callback for GitHub OAuth process.                                         |
+| GET ```/auth/register```                   | Get info of the user in progress of registration.                          |
+| POST ```/auth/register/teacher```          | Register a new user as a teacher, pending verification by another teacher. |
+| POST ```/auth/register/student```          | Register a new user as a student, pending verification from email.         |
+| GET ```/auth/status```                     | Get the status of the current pending user.                                |
+| POST ```/auth/register/student/verify```   | Verify a pending student using the sent OTP.                               |
+| POST ```/auth/logout```                    | Logout the current user.                                                   |
 
+<br/><br/>
 
-#### User
+#### Menu Controller
 
-- GET `./login/student/approval` - Get the student approval status page
-- POST `./courses/:id/classrooms/:id/teams/create` - Create a new team
-- POST `./courses/:id/classrooms/:id/teams/leave` - Leave a team
-- POST `./courses/:id/classrooms/:id/teams/enter` - Enter a team
-- POST `./courses/:id/enter` - Enter a course
-- POST `./courses/:id/leave` - Leave a course
-- POST `./courses/:id/classrooms/:id/enter` - Enter a classroom
-- POST `./courses/:id/classrooms/:id/leave` - Leave a classroom
+| Route                 | Description                               |
+|-----------------------|-------------------------------------------|
+| GET ```/menu```       | Get the menu for the current user.        |
+| GET ```/teachers```   | Get the teacher needding approval page. * |
+| POST ```/teachers```  | Approve a set of teachers. *              |
 
-### Mobile API Routes
+<br/><br/>
 
-All mobile API routes are prefixed with `/api/mobile`.
+#### Course Controller
 
+| Route                        | Description                                            |
+|------------------------------|--------------------------------------------------------|
+| GET ```/courses/:id```       | Get the course page for the course with the given id.  |
+| GET ```/courses/create```    | Get all teacher GitHub organizations. *                |
+| POST ```/courses/create```   | Create a new course, based on a Github Organization. * |
+| PUT ```/courses/:id/leave``` | Leave a course. **                                     |
+| PUT ```/courses/:id```       | Archive a course. *                                    |
 
-- GET `./home` - Get the home page
-- POST `./login` - Post to login
-- POST `./logout` - Post to logout
-- GET `./credits` - Get the credits page
-- GET `./teachers` - Get all teachers needing approval
-- POST `./teachers/approve` - Approve a list of teachers
-- GET `./courses` - Get all courses
-- GET `./courses/:id/classrooms` - Get all classrooms from a course
-- GET `./courses/:id/classrooms/:id` - Get all requests from a classroom
-- GET `./courses/:id/classrooms/:id/teams` - Get all teams requests from a classroom
-- POST `./courses/:id/classrooms/approve` - Approve a list of actions from a classroom
-- POST `./courses/:id/classrooms/:id/teams/approve` - Approve a list of teams requests from a classroom
-- POST `./courses/:id/classrooms/:id/sync` - Sync a classroom
-- POST `./courses/:id/classrooms/:id/teams/:id/sync` - Sync a team
+<br/><br/>
+
+#### Classroom Controller
+
+| Route                                               | Description                                                 |
+|-----------------------------------------------------|-------------------------------------------------------------|
+| GET ```/courses/:id/classrooms/:id```               | Get the classroom page for the classroom with the given id. |
+| POST ```/courses/:id/classrooms/create```           | Create a classroom. *                                       |
+| PUT ```/courses/:id/classrooms/:id/archive```       | Archive a classroom. *                                      |
+| POST ```/courses/:id/classrooms/:id/edit```         | Edit a classroom. *                                         |
+| POST ```/courses/:id/enter-classroom/:inviteLink``` | Invite link to a student enter in a classroom. **           |
+| POST ```/courses/:id/classrooms/:id/sync```         | Sync a classroom with GitHub. *                             |
+| POST ```/courses/:id/classrooms/:id/copy```         | Create a local copy of classroom content. *                 |
+
+<br/><br/>
+
+#### Assignment Controller
+
+| Route                                                           | Description                                                                 |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+| GET ```/courses/:id/classrooms/:id/assignments/:id```           | Get the assignment page for the assignment with the given id.               |
+| POST ```/courses/:id/classrooms/:id/assignments/create```       | Create a new assignment. *                                                  |
+| DELETE ```/courses/:id/classrooms/:id/assignments/:id/delete``` | Delete an assignment. *                                                     |
+
+<br/><br/>
+
+#### Delivery Controller
+
+| Route                                                                          | Description                                               |
+|--------------------------------------------------------------------------------|-----------------------------------------------------------|
+| GET ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id```           | Get the delivery page for the delivery with the given id. |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/create```       | Create a new delivery. *                                  |
+| DELETE ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/delete``` | Delete a delivery. *                                      |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/edit```     | Edit a delivery. *                                        |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/sync```     | Sync a delivery with the Github repositories. *           |
+
+<br/><br/>
+
+#### Team Controller 
+
+| Route                                                                    | Description                                           |
+|--------------------------------------------------------------------------|-------------------------------------------------------|
+ | GET ```/courses/:id/classrooms/:id/assignments/:id/team```               | Get the team page for the delivery with the given id. |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/create```       | Create a new team. **                                 |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/join```         | Join a team. **                                       |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/exit```         | Leave a team. **                                      |
+| GET ```/courses/:id/classrooms/:id/assignments/:id/team/requests```      | Get all requests history from a team.                 |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/requests/:id``` | Change a request status to 'pending' state. *         |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/feedback```     | Post a feedback in a team. *                          |
+
+<br/><br/>
+
+``` 
+ * = Only for teachers.    
+ ** = Only for students.
+ ```
 
 
 

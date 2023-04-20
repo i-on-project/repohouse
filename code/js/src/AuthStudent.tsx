@@ -20,7 +20,9 @@ export function ShowAuthStudentFetch({
     const [error, setError] = useState<ErrorMessageModel>(null);
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
+    const [redirect, setRedirect] = useState<string>(null);
     const navigate = useNavigate()
+    const setLogin = useSetLogin()
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
@@ -35,11 +37,18 @@ export function ShowAuthStudentFetch({
             if(e.origin !== 'http://localhost:3000')
                 return;
             if (e.data.type === "Auth") {
-                navigate(e.data.data)
+                setRedirect(e.data.data)
+            }else if (e.data.type === "Menu") {
+                setLogin(true)
+                setRedirect(e.data.data)
             }
         }, false);
-    }, [windowRef,useLoggedIn,useSetLogin])
+    }, [windowRef,setLogin])
 
+
+    if (redirect) {
+        navigate(redirect)
+    }
 
     if (!content) {
         return (

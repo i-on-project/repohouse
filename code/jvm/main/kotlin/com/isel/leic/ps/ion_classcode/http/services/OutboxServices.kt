@@ -26,7 +26,7 @@ sealed class OutboxServicesError {
     class CooldownNotExpired(val cooldown: Int) : OutboxServicesError()
 }
 
-private const val COOLDOWN_TIME = 5000 // 5 minutes cooldown
+private const val COOLDOWN_TIME = 500000 // 5 minutes cooldown
 
 /**
  * Service to the outbox services

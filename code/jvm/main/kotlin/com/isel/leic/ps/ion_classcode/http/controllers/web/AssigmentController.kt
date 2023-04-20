@@ -31,9 +31,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 class AssigmentController(
-    private val assigmentService: AssignmentServices,
-    private val githubServices: GithubServices,
-    private val userServices: TeacherServices,
+    private val assigmentService: AssignmentServices
 ) {
     /**
      * Get all information about an assigment

@@ -82,25 +82,13 @@ export function ShowMenuFetch({
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => { setError(null) }}/>
-            // TODO: add logout button
             // TODO: If teacher, add create course button
         </div>
     );
 }
 
 export function ShowMenuCallbackFetch(){
-    const setLogin = useSetLogin()
-    const loggedIn = useLoggedIn()
-
-    console.log("Logged - " + loggedIn)
-
-    useEffect(() => {
-        setLogin(true)
-    },[])
-
-    if (loggedIn){
-        window.opener.postMessage({type:"Auth", data:'/menu'},'http://localhost:3000/')
-        window.close()
-        return (<></>)
-    }
+    window.opener.postMessage({type:"Menu", data:'/menu'},'http://localhost:3000/')
+    window.close()
+    return (<></>)
 }

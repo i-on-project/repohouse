@@ -38,7 +38,7 @@ Restrições
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Users``.
 - github_token - não pode ser vazio ou null. Valor único.
 
-``User`` - especialização de ``Users``
+``Student`` - especialização de ``Users``
 > Entidade que representa um aluno do sistema.
 - id - identificador do utilizador.
 - school_id - identificador da escola do aluno.
@@ -47,6 +47,52 @@ Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Users``.
 - school_id - valor numérico inteiro não negativo. Valor único.
+
+``PendingStudent`` 
+> Entidade que representa um aluno que ainda não se registou no sistema.
+- id - identificador do utilizador.
+- school_id - identificador da escola do aluno.
+- email - email do utilizador
+- github_username - username do utilizador no github
+- github_id - username do utilizador no github
+- token - token de autenticação do utilizador
+- is_created - flag que indica se o utilizador já foi criado
+- created_at - data de criação do utilizador
+
+Restrições
+
+- id - valor numérico inteiro não negativo. Chave primária.
+- school_id - valor numérico inteiro não negativo. 
+- email - não pode ser vazio ou null. Deve ser um email válido.
+- github_username - não pode ser vazio ou null.
+- github_id - não pode ser vazio ou null.
+- token - não pode ser vazio ou null. Valor único.
+- is_created - não pode ser null.
+- created_at - não pode ser null. formato de data.
+
+``PendingTeacher``
+> Entidade que representa um docente que ainda não se registou no sistema.
+- id - identificador do utilizador.
+- email - email do utilizador
+- github_username - username do utilizador no github
+- github_id - username do utilizador no github
+- token - token de autenticação do utilizador
+- is_created - flag que indica se o utilizador já foi criado
+- created_at - data de criação do utilizador
+- github_token - token de autenticação do docente no github.
+
+Restrições
+
+- id - valor numérico inteiro não negativo. Chave primária.
+- email - não pode ser vazio ou null. Deve ser um email válido.
+- github_username - não pode ser vazio ou null.
+- github_id - não pode ser vazio ou null.
+- token - não pode ser vazio ou null. Valor único.
+- is_created - não pode ser null.
+- created_at - não pode ser null. formato de data.
+- github_token - não pode ser vazio ou null. 
+
+``School``
 
 ``Course``
 > Entidade que representa uma disciplina/cadeira do sistema.
@@ -229,7 +275,7 @@ Restrições
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
-- repo_id -  não pode ser null. valor numérico inteiro não negativo.
+- repo_id - não pode ser null. valor numérico inteiro não negativo.
 
 ``LeaveCourse`` - especialização de ``Request``
 > Entidade que representa um pedido de saída de uma disciplina/cadeira.
@@ -239,7 +285,7 @@ Restrições
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
-- course_id -  não pode ser null. valor numérico inteiro não negativo.
+- course_id - não pode ser null. valor numérico inteiro não negativo.
 
 ``CreateTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de criação de uma turma.
@@ -249,7 +295,7 @@ Restrições
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
-- team_id -  não pode ser null. valor numérico inteiro não negativo.
+- team_id - não pode ser null. valor numérico inteiro não negativo.
 
 ``JoinTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de adesão a uma turma.
@@ -259,7 +305,7 @@ Restrições
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
-- team_id -  não pode ser null. valor numérico inteiro não negativo.
+- team_id - não pode ser null. valor numérico inteiro não negativo.
 
 ``LeaveTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de saída de uma turma.
@@ -269,7 +315,7 @@ Restrições
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
-- team_id -  não pode ser null. valor numérico inteiro não negativo.
+- team_id - não pode ser null. valor numérico inteiro não negativo.
 
 ``Apply`` - especialização de ``Request``
 > Entidade que representa um pedido de aplicação como docente no sistema.

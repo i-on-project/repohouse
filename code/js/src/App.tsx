@@ -76,7 +76,7 @@ const router = createBrowserRouter([
                 "path": "/menu",
                 "element": <RequireAuth>
                     <Menu/>
-                    </RequireAuth>
+                </RequireAuth>
             },
             {
                 "path": "/menu/callback",

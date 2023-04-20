@@ -14,7 +14,6 @@ export function ShowAuthTeacherFetch({
                                      }: {
     authServices: AuthServices;
 }) {
-    console.log("ShowAuthTeacherFetch")
     const content = useAsync(async () => {
         console.log("ShowAuthTeacherFetch - useAsync")
         return await authServices.authTeacher();
@@ -22,12 +21,12 @@ export function ShowAuthTeacherFetch({
     const [error, setError] = useState<ErrorMessageModel>(null);
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
+    const [redirect, setRedirect] = useState<string>(null);
     const navigate = useNavigate()
     const setLogin = useSetLogin()
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
-            console.log("Url - " + content)
             const authWindow = window.open(content.properties.url, '')
             setWindowRef(authWindow)
             setOpen(true)
@@ -39,10 +38,18 @@ export function ShowAuthTeacherFetch({
             if(e.origin !== 'http://localhost:3000')
                 return;
             if (e.data.type === "Auth") {
-                navigate(e.data.data)
+                setRedirect(e.data.data)
+            }else if (e.data.type === "Menu") {
+                setLogin(true)
+                setRedirect(e.data.data)
             }
         }, false);
-    }, [windowRef])
+    }, [windowRef,setLogin])
+
+
+    if (redirect) {
+        navigate(redirect)
+    }
 
     if (!content) {
         return (
