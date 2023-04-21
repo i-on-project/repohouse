@@ -1,5 +1,5 @@
 import {SirenEntity} from "../../siren/Siren";
-import {AssigmentDomain} from "../Assigment";
+import {AssignmentDomain} from "../Assignment";
 import {TeamDomain} from "../Team";
 import {DeliveryDomain} from "../Delivery";
 

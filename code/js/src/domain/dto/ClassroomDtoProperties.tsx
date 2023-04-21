@@ -1,6 +1,6 @@
 import {SirenEntity} from "../../siren/Siren";
 import {Teacher} from "../response-models/Teacher";
-import {AssigmentDomain} from "../Assigment";
+import {AssignmentDomain} from "../Assignment";
 import {Student} from "../User";
 
 export type ClassroomDto = SirenEntity<ClassroomDtoProperties>
@@ -10,7 +10,7 @@ export interface ClassroomDtoProperties{
     name: String,
     isArchived: Boolean,
     lastSync: Date,
-    assigments: AssigmentDomain[],
+    assigments: AssignmentDomain[],
     students: Student[],
 }
 
@@ -20,7 +20,7 @@ export class ClassroomDtoProperties {
         name: String,
         isArchived: Boolean,
         lastSync: Date,
-        assigments: AssigmentDomain[],
+        assigments: AssignmentDomain[],
         students: Student[],
     ) {
         this.id = id
@@ -29,5 +29,17 @@ export class ClassroomDtoProperties {
         this.lastSync = lastSync
         this.assigments = assigments
         this.students = students
+    }
+}
+
+export interface ClassroomBody {
+    name: String,
+}
+
+export class ClassroomBody {
+    constructor(
+        name: String
+    ) {
+        this.name = name
     }
 }

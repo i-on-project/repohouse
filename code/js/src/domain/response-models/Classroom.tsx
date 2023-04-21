@@ -1,4 +1,4 @@
-import {AssigmentDomain} from "../Assigment";
+import {AssignmentDomain} from "../Assignment";
 import {Student} from "../User";
 import {ClassroomDto} from "../dto/ClassroomDtoProperties";
 
@@ -7,7 +7,7 @@ export interface Classroom {
     name: String,
     isArchived: Boolean,
     lastSync: Date,
-    assigments: AssigmentDomain[],
+    assigments: AssignmentDomain[],
     students: Student[],
 }
 

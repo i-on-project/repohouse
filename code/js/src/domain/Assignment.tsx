@@ -1,4 +1,4 @@
-export interface AssigmentDomain {
+export interface AssignmentDomain {
     id: number,
     classroomId: number,
     maxElemsPerGroup: number,
@@ -8,7 +8,7 @@ export interface AssigmentDomain {
     title: string,
 }
 
-export class AssigmentDomain {
+export class AssignmentDomain {
     constructor(
         id: number,
         classroomId: number,

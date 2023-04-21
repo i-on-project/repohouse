@@ -32,6 +32,16 @@ export async function fetchPost<T>(url: string, body:object =null) {
     return myFetch<T>(url, options)
 }
 
+export async function fetchDelete<T>(url: string) {
+    const options = {
+        method:"DELETE",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    return myFetch<T>(url, options)
+}
+
 async function myFetch<T>(url: string, options: object) {
     const res = await fetch(url, options)
     const resp = await res.json()

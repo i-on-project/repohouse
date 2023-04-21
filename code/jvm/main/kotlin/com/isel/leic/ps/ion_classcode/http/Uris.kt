@@ -46,7 +46,7 @@ object Uris {
     const val EDIT_CLASSROOM_PATH = "$CLASSROOM_PATH/edit"
     const val INVITE_LINK_PATH = "$COURSE_PATH/enter-classroom/{inviteLink}"
     const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assignments"
-    const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assigmentId}"
+    const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assignmentId}"
     const val CREATE_ASSIGMENT_PATH = "$ASSIGMENTS_PATH/create"
     const val DELIVERYS_PATH = "$ASSIGMENT_PATH/deliveries"
     const val DELIVERY_PATH = "$DELIVERYS_PATH/{deliveryId}"

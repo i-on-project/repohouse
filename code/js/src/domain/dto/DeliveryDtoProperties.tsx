@@ -21,3 +21,33 @@ export class DeliveryDtoProperties {
         this.teamsNotDelivered = teamsNotDelivered
     }
 }
+
+export interface DeliveryDeletedDtoProperties{
+    deleted: boolean
+}
+
+export class DeliveryDeletedDtoProperties {
+    constructor(
+        deleted: boolean
+    ) {
+        this.deleted = deleted
+    }
+}
+
+export interface DeliveryBody{
+    assignmentId: number,
+    dueDate: string,
+    tagControl: string,
+}
+
+export class DeliveryBody {
+    constructor(
+        tagControl: string,
+        dueDate: string,
+        assignmentId: number,
+    ) {
+        this.assignmentId = assignmentId
+        this.dueDate = dueDate
+        this.tagControl = tagControl
+    }
+}

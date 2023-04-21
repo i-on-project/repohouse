@@ -3,12 +3,19 @@ import { SystemServices } from './services/SystemServices'
 import {AuthServices} from "./services/AuthServices";
 import {MenuServices} from "./services/MenuServices";
 import {CourseServices} from "./services/CourseServices";
+import {Class} from "@mui/icons-material";
+import {ClassroomServices} from "./services/ClassroomServices";
+import {AssignmentServices} from "./services/AssignmentServices";
+import {DeliveryServices} from "./services/DeliveryServices";
 
 export const navigationRepository = new NavigationRepository()
 export const systemServices = new SystemServices()
 export const authServices = new AuthServices()
 export const menuServices = new MenuServices()
 export const courseServices = new CourseServices()
+export const classroomServices = new ClassroomServices()
+export const assignmentServices = new AssignmentServices()
+export const deliveryServices = new DeliveryServices()
 
 export const HOME_KEY = "home"
 export const CREDITS_KEY = "credits"

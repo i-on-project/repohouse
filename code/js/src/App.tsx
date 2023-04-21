@@ -1,6 +1,13 @@
 import * as React from 'react'
-import {createBrowserRouter, RouterProvider, useParams} from 'react-router-dom'
-import {authServices, courseServices, menuServices, systemServices} from './Dependecies'
+import {createBrowserRouter, RouterProvider, useLocation, useParams} from 'react-router-dom'
+import {
+    assignmentServices,
+    authServices,
+    classroomServices,
+    courseServices, deliveryServices,
+    menuServices,
+    systemServices
+} from './Dependecies'
 import { ShowHomeFetch } from './Home'
 import { ShowCreditsFetch } from './Credits'
 import {AuthnContainer} from "./Auth";
@@ -15,97 +22,157 @@ import {ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentF
 import {ShowStatusCallbackFetch, ShowStatusFetch} from "./Status";
 import {ShowVerifyFetch} from "./Verify";
 import { HandleAuthFail, HandleAuthFailCallback } from './AuthFail'
+import {ShowClassroomFetch,ShowCreateClassroom} from "./Classroom";
+import {ShowAssignmentFetch, ShowCreateAssignment} from './Assignment'
+import {ShowCreateDelivery, ShowDeliveryFetch, ShowEditDelivery} from "./Delivery";
 
 const router = createBrowserRouter([
     {
-        "path": "/",
-        "element": <NavBar/>,
-        "children": [
+        path: "/",
+        element: <NavBar/>,
+        children: [
             {
-            "path": "/",
-            "element": <Home/>
+                path: "/", 
+                element: <Home/>
             },
             {
-                "path": "/credits",
-                "element": <Credits/>
+                path: "/credits",
+                element: <Credits/>
             },
             {
-                "path": "/auth/create/student",
-                "element": <CreateStudent/>
+                path: "/auth/create/student",
+                element: <CreateStudent/>
             },
             {
-                "path": "/auth/create/teacher",
-                "element": <CreateTeacher/>
+                path: "/auth/create/teacher",
+                element: <CreateTeacher/>
             },
             {
-                "path": "/auth/register/student",
-                "element": <RegisterStudent/>
+                path: "/auth/register/student",
+                element: <RegisterStudent/>
             },
             {
-                "path": "/auth/register/teacher",
-                "element": <RegisterTeacher/>
+                path: "/auth/register/teacher",
+                element: <RegisterTeacher/>
             },
             {
-                "path": "/auth/create/callback/student",
-                "element": <CreateCallbackStudent/>
+                path: "/auth/create/callback/student",
+                element: <CreateCallbackStudent/>
             },
             {
-                "path": "/auth/create/callback/teacher",
-                "element": <CreateCallbackTeacher/>
+                path: "/auth/create/callback/teacher",
+                element: <CreateCallbackTeacher/>
             },
             {
-                "path": "/auth/verify",
-                "element": <Verify/>
+                path: "/auth/verify",
+                element: <Verify/>
             },
             {
-                "path": "/auth/status",
-                "element": <Status/>
+                path: "/auth/status",
+                element: <Status/>
             },
             {
-                "path": "/auth/status/callback",
-                "element": <StatusCallback/>
+                path: "/auth/status/callback",
+                element: <StatusCallback/>
             },
             {
-                "path": "/auth/teacher",
-                "element": <AuthTeacher/>
+                path: "/auth/teacher",
+                element: <AuthTeacher/>
             },
             {
-                "path": "/auth/student",
-                "element": <AuthStudent/>
+                path: "/auth/student",
+                element: <AuthStudent/>
             },
             {
-                "path": "/auth/fail",
-                "element": <AuthFail/>
+                path: "/auth/fail",
+                element: <AuthFail/>
             },
             {
-                "path": "/auth/fail/callback",
-                "element": <AuthFailCallback/>
+                path: "/auth/fail/callback",
+                element: <AuthFailCallback/>
             },
             {
-                "path": "/menu",
-                "element": <RequireAuth>
+                path: "/menu",
+                element: <RequireAuth>
                     <Menu/>
                 </RequireAuth>
             },
             {
-                "path": "/menu/callback/:user",
-                "element": <MenuCallback/>
+                path: "/menu/callback/:user",
+                element: <MenuCallback/>
             },
             {
-                "path": "/courses/:courseId",
-                "element": <RequireAuth>
+                path: "/courses/:courseId",
+                element: <RequireAuth>
                     <Course/>
-                </RequireAuth>
+                </RequireAuth>,
+                children: [
+                    {
+                        path: "classrooms/:classroomId",
+                        element: <RequireAuth>
+                            <Classroom/>
+                        </RequireAuth>,
+                        children: [
+                            {
+                                path: "assignments/:assignmentId",
+                                element: <RequireAuth>
+                                    <Assignment/>
+                                </RequireAuth>,
+                                children: [
+                                    {
+                                        path: "deliveries/:deliveryId",
+                                        element: <RequireAuth>
+                                            <Delivery/>
+                                        </RequireAuth>,
+                                        children: [
+                                            {
+                                                path: "teams/:teamId",
+                                                element: <RequireAuth>
+                                                    <Team/>
+                                                </RequireAuth>
+                                            },
+                                            {
+                                                path: "edit",
+                                                element: <RequireAuth>
+                                                    <DeliveryEdit/>
+                                                </RequireAuth>
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        path: "deliveries/create",
+                                        element: <RequireAuth>
+                                            <DeliveryCreate/>
+                                        </RequireAuth>
+                                    }
+
+                                ]
+                            },
+                            {
+                                path: "assignments/create",
+                                element: <RequireAuth>
+                                    <AssignmentCreate/>
+                                </RequireAuth>
+                            }
+                        ]
+                    },
+                    {
+                        path: "classrooms/create",
+                        element: <RequireAuth>
+                            <ClassroomCreate/>
+                        </RequireAuth>
+                    }
+                ]
             },
             {
-                "path": "/courses/create",
-                "element": <RequireAuth>
+                path: "/courses/create",
+                element: <RequireAuth>
                     <CourseCreate/>
                 </RequireAuth>
             },
             {
-                "path": "/pending-teachers",
-                "element": <RequireAuth>
+                path: "/pending-teachers",
+                element: <RequireAuth>
                     <TeacherApproval/>
                 </RequireAuth>
             }
@@ -276,6 +343,80 @@ function CourseCreate() {
     return (
         <div>
             <ShowCourseCreateFetch courseServices={courseServices}/>
+        </div>
+    )
+}
+
+function Classroom() {
+    const {courseId, classroomId} = useParams<{ courseId: string, classroomId: string }>();
+    return (
+        <div>
+            <ShowClassroomFetch classroomServices={classroomServices} classroomId={Number(classroomId)}
+                                courseId={Number(courseId)}/>
+        </div>
+    )
+}
+
+function ClassroomCreate() {
+    const {courseId} = useParams<{ courseId: string }>();
+    return (
+        <div>
+            <ShowCreateClassroom classroomServices={classroomServices} courseId={Number(courseId)}/>
+        </div>
+    )
+}
+
+function Assignment() {
+    const {courseId, classroomId, assignmentId} = useParams<{ courseId: string, classroomId: string, assignmentId: string }>();
+    return (
+        <div>
+            <ShowAssignmentFetch assignmentServices={assignmentServices} />
+        </div>
+    )
+}
+
+function AssignmentCreate() {
+    const {courseId, classroomId} = useParams<{ courseId: string, classroomId: string }>();
+    return (
+        <div>
+            <ShowCreateAssignment assignmentServices={assignmentServices} classroomId={Number(classroomId)} error={null}/>
+        </div>
+    )
+}
+
+function Delivery() {
+    const {courseId, classroomId, assignmentId, deliveryId} = useParams<{ courseId: string, classroomId: string, assignmentId: string, deliveryId: string }>();
+    return (
+        <div>
+            <ShowDeliveryFetch deliveryServices={deliveryServices} />
+        </div>
+    )
+}
+
+function DeliveryCreate() {
+    const {courseId, classroomId, assignmentId} = useParams<{ courseId: string, classroomId: string, assignmentId: string }>();
+    return (
+        <div>
+            <ShowCreateDelivery deliveryServices={deliveryServices} assignmentId={Number(assignmentId)} error={null}/>
+        </div>
+    )
+}
+
+function DeliveryEdit() {
+    const {courseId, classroomId, assignmentId, deliveryId} = useParams<{ courseId: string, classroomId: string, assignmentId: string, deliveryId: string }>();
+    const delivery = useLocation().state.delivery
+    return (
+        <div>
+            <ShowEditDelivery deliveryServices={deliveryServices} delivery={delivery} error={null}/>
+        </div>
+    )
+}
+
+function Team() {
+    const {courseId, classroomId, teamId} = useParams<{ courseId: string, classroomId: string, teamId: string }>();
+    return (
+        <div>
+            TODO
         </div>
     )
 }

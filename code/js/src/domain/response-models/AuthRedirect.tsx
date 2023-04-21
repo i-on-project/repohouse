@@ -1,7 +1,7 @@
-import {AssigmentDomain} from "../Assigment";
+import {AssignmentDomain} from "../Assignment";
 import {DeliveryDomain} from "../Delivery";
 import {TeamDomain} from "../Team";
-import {AssigmentDto} from "../dto/AssigmentDtoProperties";
+import {AssignmentDto} from "../dto/AssignmentDtoProperties";
 import {AuthRedirectDto} from "../dto/AuthRedirectDtoProperties";
 
 
