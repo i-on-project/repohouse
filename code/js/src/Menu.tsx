@@ -5,10 +5,9 @@ import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
 import {List, ListItem, Typography} from "@mui/material";
 import {MenuServices} from "./services/MenuServices";
-import {MenuTeacherDtoProperties} from "./domain/dto/MenuDtoProperties";
 import {Link, useParams} from "react-router-dom";
 import {ErrorAlert} from "./ErrorAlert";
-import {toState} from "./Auth";
+import {AuthState, toState, useLoggedIn} from "./Auth";
 
 export function ShowMenuFetch({
     menuServices,
@@ -17,9 +16,10 @@ export function ShowMenuFetch({
 }) {
 
     const content = useAsync(async () => {
-        return await menuServices.menu();
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
+        return await menuServices.menu()
+    })
+    const [error, setError] = useState<ErrorMessageModel>(null)
+    const loggedIn = useLoggedIn()
 
     if (!content) {
         return (
@@ -33,7 +33,7 @@ export function ShowMenuFetch({
     }
 
     if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+        setError(content)
     }
 
     return (
@@ -71,19 +71,17 @@ export function ShowMenuFetch({
                             </ListItem>
                         ))}
                     </List>
-                    {content.properties instanceof MenuTeacherDtoProperties ? (
+                    { loggedIn === AuthState.Teacher ? (
                         <>
-                            <Link to={"/courses/create"}>{"Create Course"}</Link>
-                            <Link to={"/pending-teachers"}>{"Pending Teachers"}</Link>
+                            <Link to={"/teacher/orgs"}> Create Course </Link>
+                            <Link to={"/pending-teachers"}> Pending Teachers </Link>
                         </>
                     ) : null}
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => { setError(null) }}/>
-            // TODO: add logout button
-            // TODO: If teacher, add create course button
         </div>
-    );
+    )
 }
 
 export function ShowMenuCallbackFetch() {

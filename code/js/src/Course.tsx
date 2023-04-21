@@ -1,18 +1,18 @@
-import * as React from "react";
-import { useAsync } from "./siren/Fetch";
-import {useCallback, useState} from "react";
-import { ErrorMessageModel } from "./domain/response-models/Error";
-import { SirenEntity } from "./siren/Siren";
-import {List, ListItem, Select, Typography} from "@mui/material";
-import {CourseServices} from "./services/CourseServices";
-import {Form, Link, Navigate} from "react-router-dom";
-import {CourseBody} from "./domain/dto/CourseDtoProperties";
-import {Label} from "@mui/icons-material";
-import {Button, Image} from "react-bootstrap";
+import * as React from "react"
+import { useAsync } from "./siren/Fetch"
+import {useCallback, useState} from "react"
+import { ErrorMessageModel } from "./domain/response-models/Error"
+import { SirenEntity } from "./siren/Siren"
+import {List, ListItem, Typography, Card, CardActionArea, CardContent} from "@mui/material"
+import {CourseServices} from "./services/CourseServices"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import {CourseBody} from "./domain/dto/CourseDtoProperties"
+import {Image} from "react-bootstrap"
+import { GitHubOrg } from "./domain/response-models/GitHubOrgs"
 
 export function ShowCourseFetch({
-                                  courseServices,courseId
-                              }: {
+    courseServices, courseId
+}: {
     courseServices: CourseServices;
     courseId: number;
 }) {
@@ -75,31 +75,20 @@ export function ShowCourseFetch({
 }
 
 export function ShowCourseCreateFetch({
-                                          courseServices
-                                      }: {
+    courseServices
+}: {
     courseServices: CourseServices
 }) {
 
     const content = useAsync(async () => {
-        return await courseServices.getTeacherOrgs();
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-    const [courseBody, setCourseBody] = useState<CourseBody | null>(null)
-
-    const handleChange = useCallback((event:any) => {
-        if (content instanceof SirenEntity) {
-            const org = content.properties.orgs.find(org => org.url === event.target.value)
-            setCourseBody(new CourseBody(org.login, org.url))
-        }
-    },[courseBody])
-
-    const handleSubmit = useCallback((event:any) => {
-        event.preventDefault()
-        const course = courseBody
-        if (!course) return
-        //TODO : Change this
-        ShowCourseCreatePost({courseServices, course})
-    },[courseBody])
+        return await courseServices.getTeacherOrgs()
+    })
+    const navigate = useNavigate()
+    const [error, setError] = useState<ErrorMessageModel>(null)
+    
+    const handleSubmit = useCallback((org: GitHubOrg) => {
+        navigate("/courses/create", {state: {body: new CourseBody(org.login, org.url)} })
+    }, [])
 
     if (!content) {
         return (
@@ -113,7 +102,7 @@ export function ShowCourseCreateFetch({
     }
 
     if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+        setError(content)
     }
 
     return (
@@ -130,33 +119,24 @@ export function ShowCourseCreateFetch({
                     >
                         {"Create Course"}
                     </Typography>
-                    <Form>
-                        <Label>
-                            Organization:
-                            <select onChange={handleChange}>
-                                {content.properties.orgs.map(org => (
-                                    <option value={org.url}>
-                                        {org.login}
-                                        <Image>
-                                            src={org.avatar_url}
-                                        </Image>
-                                    </option>
-                                ))}
-                            </select>
-                        </Label>
-                        <Button onClick={handleSubmit}>
-                            {"Submit"}
-                        </Button>
-                    </Form>
+                    <Typography
+                        variant="h4"
+                    >
+                        {"Select an Organization:"}
+                    </Typography>
+                    {content.properties.orgs.map(org => <OrgsDetailsBox org={org} onClick={handleSubmit}/>)}
                 </>
             ) : null}
         </div>
-    );
+    )
 }
 
-export function ShowCourseCreatePost({ courseServices, course }: { courseServices: CourseServices, course: CourseBody }) {
+export function ShowCourseCreatePost({ courseServices }: { courseServices: CourseServices }) {
+    const location = useLocation()
+    const [error, setError] = useState<ErrorMessageModel>(null)
     const content = useAsync(async () => {
-        return await courseServices.createCourse(course) })
+        return await courseServices.createCourse(location.state.body) 
+    })
 
     if (!content) {
         return (
@@ -164,9 +144,32 @@ export function ShowCourseCreatePost({ courseServices, course }: { courseService
         )
     }
 
-    if (content instanceof ErrorMessageModel) {
-        // TODO
+    if (content instanceof ErrorMessageModel && !error) {
+        setError(content)
     }
 
-    return <Navigate to={"/courses"}/>
+    return <>Posted</>
+}
+
+
+function OrgsDetailsBox({ org, onClick } : { org: GitHubOrg, onClick: (org: GitHubOrg) => void }) {
+    return (
+        <>
+            <Card variant="outlined">
+                <CardActionArea onClick={(event: any) => {
+                    event.preventDefault()
+                    onClick(org)
+                }}>
+                    <CardContent>
+                        <Typography variant="body2">
+                            <Image src={org.avatar_url} style={{maxWidth:"15%", maxHeight:"15%"}}/>
+                            <br/>
+                            {org.login}
+                        </Typography>
+                    </CardContent>
+                </CardActionArea>
+                <a href={"https://github.com/" + org.login} target="_blank" rel="noopener noreferrer">Open on Github</a>
+            </Card>
+        </>
+    )
 }

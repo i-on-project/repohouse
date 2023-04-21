@@ -38,4 +38,5 @@ interface UsersRepository {
     fun deleteTeacher(id: Int)
     fun getTeacherGithubToken(id: Int): String?
     fun deletePendingUsers()
+    fun updateTeacherGithubToken(id: Int, token: String)
 }

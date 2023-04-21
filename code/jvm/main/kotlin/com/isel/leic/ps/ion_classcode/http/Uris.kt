@@ -10,9 +10,6 @@ object Uris {
 
     private const val API = "/api"
 
-    private const val WEB = "$API/web"
-    private const val MOBILE = "$API/mobile"
-
     /** Common Uris **/
 
     const val HOME = "$API/home"
@@ -28,12 +25,13 @@ object Uris {
     const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_STUDENT_PATH/verify"
     const val LOGOUT = "$AUTH_PATH/logout"
     const val MENU_PATH = "$API/menu"
+    const val ORGS_PATH = "$API/orgs"
+    const val COURSES_PATH = "$API/courses"
+    const val COURSE_PATH = "$COURSES_PATH/{courseId}"
+
     const val TEACHERS_APPROVAL_PATH = "$API/teachers"
     const val STUDENTS_PATH = "$API/students"
     const val STUDENT_PATH = "$STUDENTS_PATH/{id}"
-    const val COURSES_PATH = "$API/courses"
-    const val CREATE_COURSE_PATH = "$COURSES_PATH/create"
-    const val COURSE_PATH = "$COURSES_PATH/{courseId}"
     const val STUDENTS_COURSE_PATH = "$COURSE_PATH/students"
     const val ENTER_COURSE_PATH = "$COURSE_PATH/enter"
     const val LEAVE_COURSE_PATH = "$COURSE_PATH/leave"
@@ -114,6 +112,5 @@ object Uris {
 
     fun authUriRegisterStudent(): String = URI(AUTH_REGISTER_STUDENT_PATH).toASCIIString()
     fun authStatusUri(): String = URI(AUTH_STATUS_PATH).toASCIIString()
-    fun createCourseUri(): String = URI(CREATE_COURSE_PATH).toASCIIString()
     /** Mobile Uris **/
 }

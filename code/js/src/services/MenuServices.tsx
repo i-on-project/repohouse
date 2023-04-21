@@ -18,7 +18,7 @@ export class MenuServices {
     }
 
     getTeachersPendingApproval = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.TEACHERS_APPROVAL_KEY, this.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.TEACHERS_APPROVAL_KEY, Hypermedia.systemServices.home)
         const response = await fetchGet<TeacherPendingApprovalDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
             // TODO
@@ -27,7 +27,7 @@ export class MenuServices {
     }
 
     approveTeacher = async (approved:number[],rejected:number[]) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.TEACHERS_APPROVAL_KEY, this.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.TEACHERS_APPROVAL_KEY, Hypermedia.systemServices.home)
         const body = {
             approved: approved,
             rejected: rejected

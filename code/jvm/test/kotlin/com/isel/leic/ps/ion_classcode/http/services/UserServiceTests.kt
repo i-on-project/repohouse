@@ -837,10 +837,10 @@ class UserServiceTests {
         val bearerToken = ""
 
         // when: getting an error because of an invalid github id
-        val user = userServices.checkAuthentication(bearerToken = bearerToken)
+        val user = userServices.checkAuthentication(token = bearerToken)
 
         if (user is Either.Left) {
-            assert(user.value is UserServicesError.InvalidBearerToken)
+            assert(user.value is UserServicesError.InvalidToken)
         } else {
             fail("Should not be Either.Right")
         }
@@ -852,7 +852,7 @@ class UserServiceTests {
         val bearerToken = "notInDatabase"
 
         // when: getting a null because the bearer token is not in the database
-        val user = userServices.checkAuthentication(bearerToken = bearerToken)
+        val user = userServices.checkAuthentication(token = bearerToken)
 
         // the result should be an error
         if (user is Either.Left) {
@@ -869,7 +869,7 @@ class UserServiceTests {
         val bearerToken = "bearer"
 
         // when: getting a user
-        val user = userServices.checkAuthentication(bearerToken = bearerToken)
+        val user = userServices.checkAuthentication(token = bearerToken)
 
         // the result should be a user
         if (user is Either.Right) {

@@ -16,7 +16,7 @@ import {NavBarShow} from "./NavBar";
 import {ShowAuthTeacherFetch} from "./AuthTeacher";
 import {ShowAuthStudentFetch} from "./AuthStudent";
 import {ShowMenuCallbackFetch, ShowMenuFetch} from "./Menu";
-import {ShowCourseCreateFetch, ShowCourseFetch} from "./Course";
+import {ShowCourseCreateFetch, ShowCourseCreatePost, ShowCourseFetch} from "./Course";
 import {ShowTeacherApprovalFetch} from "./ApproveTeachers";
 import {ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentFetch, ShowCreateStudentFetchPost, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost} from "./Create";
 import {ShowStatusCallbackFetch, ShowStatusFetch} from "./Status";
@@ -165,9 +165,15 @@ const router = createBrowserRouter([
                 ]
             },
             {
+                path: "/teacher/orgs",
+                element: <RequireAuth>
+                    <CourseCreateFetch/>
+                </RequireAuth>
+            },
+            {
                 path: "/courses/create",
                 element: <RequireAuth>
-                    <CourseCreate/>
+                    <CourseCreatePost/>
                 </RequireAuth>
             },
             {
@@ -339,10 +345,18 @@ function Course() {
     )
 }
 
-function CourseCreate() {
+function CourseCreateFetch() {
     return (
         <div>
             <ShowCourseCreateFetch courseServices={courseServices}/>
+        </div>
+    )
+}
+
+function CourseCreatePost() {
+    return (
+        <div>
+            <ShowCourseCreatePost courseServices={courseServices}/>
         </div>
     )
 }
