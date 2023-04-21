@@ -10,8 +10,8 @@ export class SystemServices {
     home = async () => {
         const response = await fetchGet<HomeDtoProperties>("api/home")
         if (response instanceof SirenEntity) {
-            Hypermedia.navigationRepository.addLinks([Hypermedia.CREDITS_KEY, Hypermedia.MENU_KEY,Hypermedia.AUTH_TEACHER_KEY, Hypermedia.AUTH_STUDENT_KEY, Hypermedia.AUTH_REGISTER_INFO], response.links)
-            Hypermedia.navigationRepository.addActions([Hypermedia.LOGOUT_KEY, Hypermedia.AUTH_REGISTER_STUDENT, Hypermedia.AUTH_REGISTER_TEACHER], response.actions)
+            Hypermedia.navigationRepository.addLinks([Hypermedia.CREDITS_KEY, Hypermedia.MENU_KEY,Hypermedia.AUTH_TEACHER_KEY, Hypermedia.AUTH_STUDENT_KEY, Hypermedia.AUTH_REGISTER_INFO, Hypermedia.ORGS_KEY, Hypermedia.COURSE_KEY], response.links)
+            Hypermedia.navigationRepository.addActions([Hypermedia.LOGOUT_KEY, Hypermedia.AUTH_REGISTER_STUDENT, Hypermedia.AUTH_REGISTER_TEACHER, Hypermedia.CREATE_COURSE_KEY], response.actions)
         }
         return response
     }

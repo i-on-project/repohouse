@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useState} from "react";
 import {useAsync} from "./siren/Fetch";
 import {ErrorMessageModel} from "./domain/response-models/Error";
 import {SirenEntity} from "./siren/Siren";

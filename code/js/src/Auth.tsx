@@ -18,24 +18,19 @@ export function toState(state: string): AuthState {
 
 type ContextType = {
     loggedin: AuthState | undefined,
-    userId: number,
     setLogin: (v: AuthState) => void,
-    setUserId: (v: number) => void
 }
 
 const LoggedInContext = createContext<ContextType>({
     loggedin: undefined,
-    userId: 0,
     setLogin: () => {},
-    setUserId: () => {}
 })
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
     const [loggedin, setLoggedin] = useState(undefined)
-    const [userId, setUserId] = useState(0)
 
     return (
-        <LoggedInContext.Provider value={{loggedin: loggedin, userId:userId,setLogin: setLoggedin, setUserId:setUserId}}>
+        <LoggedInContext.Provider value={{loggedin: loggedin,setLogin: setLoggedin}}>
             {children}
         </LoggedInContext.Provider>
     )
@@ -47,12 +42,4 @@ export function useLoggedIn() {
 
 export function useSetLogin() {
     return useContext(LoggedInContext).setLogin
-}
-
-export function useUserId() {
-    return useContext(LoggedInContext).userId
-}
-
-export function useSetUserId() {
-    return useContext(LoggedInContext).setUserId
 }

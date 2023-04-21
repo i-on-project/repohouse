@@ -85,10 +85,10 @@ export function ShowCreateStudentFetch({
 }) {
     const content = useAsync(async () => {
         return await authServices.getRegisterInfo();
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-    const navigate = useNavigate();
-    const [schoolId, setSchoolId] = useState<number>(null);
+    })
+    const [error, setError] = useState<ErrorMessageModel>(null)
+    const navigate = useNavigate()
+    const [schoolId, setSchoolId] = useState<number>(null)
 
     const handleConfirmClick = useCallback((event:any) => {
         event.preventDefault()
@@ -186,8 +186,8 @@ export function ShowCreateStudentFetchPost({
     const location = useLocation()
     const content = useAsync(async () => {
         return await authServices.createStudentPost(location.state.schoolId);
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
+    })
+    const [error, setError] = useState<ErrorMessageModel>(null)
 
     if (!content) {
         return (
@@ -201,7 +201,7 @@ export function ShowCreateStudentFetchPost({
     }
 
     if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+        setError(content)
     }
 
     return <Navigate to={"/auth/verify"}/>

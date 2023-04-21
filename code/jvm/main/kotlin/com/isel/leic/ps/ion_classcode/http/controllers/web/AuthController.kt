@@ -135,12 +135,17 @@ class AuthController(
                                 .body(EMPTY_REQUEST)
                         }
                         userInfo.value is Teacher && position == "Teacher" -> {
-                            val cookie = generateSessionCookie(userInfo.value.token)
-                            ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/teacher")
-                                .body(EMPTY_REQUEST)
+                            when (val update = userServices.updateTeacherGithubToken(userInfo.value.id, accessToken.access_token)) {
+                                is Either.Left -> problemUser(update.value)
+                                is Either.Right -> {
+                                    val cookie = generateSessionCookie(userInfo.value.token)
+                                    ResponseEntity
+                                        .status(Status.REDIRECT)
+                                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/teacher")
+                                        .body(EMPTY_REQUEST)
+                                }
+                            }
                         }
                         else -> {
                             val authorizationCookie = deleteSessionCookie()
@@ -513,7 +518,7 @@ class AuthController(
             UserServicesError.UserNotAuthenticated -> Problem.unauthenticated
             UserServicesError.ErrorCreatingUser -> Problem.internalError
             UserServicesError.InvalidGithubId -> Problem.internalError
-            UserServicesError.InvalidBearerToken -> Problem.unauthenticated
+            UserServicesError.InvalidToken -> Problem.unauthenticated
             UserServicesError.GithubIdInUse -> Problem.internalError
             UserServicesError.TokenInUse -> Problem.internalError
             UserServicesError.EmailInUse -> Problem.internalError

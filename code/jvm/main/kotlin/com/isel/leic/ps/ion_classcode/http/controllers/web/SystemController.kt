@@ -35,12 +35,18 @@ class SystemController {
             })
             action(title = "registerTeacher", href = Uris.AUTH_REGISTER_TEACHER_PATH, method = HttpMethod.POST, type = "application/json", block = {})
             action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})
+            link(rel = LinkRelation("orgs"), href = Uris.ORGS_PATH)
+            action(title = "createCourse", href = Uris.COURSES_PATH, method = HttpMethod.POST, type = "application/json", block = {
+                textField("orgUrl")
+                textField("name")
+                numberField("teacherId")
+            })
+            link(rel = LinkRelation("course"), href = Uris.COURSE_PATH)
             action(title = "teachersApproval", href = Uris.TEACHERS_APPROVAL_PATH, method = HttpMethod.POST, type = "application/json", block = {
                 rangeField("approved")
                 rangeField("rejected")
             })
             link(rel = LinkRelation("teachersApproval"), href = Uris.TEACHERS_APPROVAL_PATH)
-
         }
     }
 

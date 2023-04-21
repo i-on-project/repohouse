@@ -5,9 +5,9 @@ import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import org.springframework.stereotype.Component
 
 /**
@@ -17,7 +17,7 @@ typealias CourseResponse = Either<CourseServicesError, CourseWithClassrooms>
 typealias CourseCreatedResponse = Either<CourseServicesError, Course>
 typealias CourseArchivedResponse = Either<CourseServicesError, CourseArchivedOutputModel>
 typealias LeaveCourseResponse = Either<CourseServicesError, Course>
-typealias CoursesOrgsResponse = Either<CourseServicesError, List<GitHubOrgsModel>>
+typealias UserGithubTokenResponse = Either<CourseServicesError, String>
 
 /**
  * Error codes for the services
@@ -41,7 +41,6 @@ sealed class CourseServicesError {
 @Component
 class CourseServices(
     private val transactionManager: TransactionManager,
-    private val githubServices: GithubServices
 ) {
 
     /**
@@ -64,20 +63,20 @@ class CourseServices(
     /**
      * Method that creates a course
      */
-    fun createCourse(courseInfo: CourseInputModel): CourseCreatedResponse {
+    fun createCourse(courseInfo: CourseInputModel, teacherId: Int): CourseCreatedResponse {
         if (courseInfo.isNotValid()) return Either.Left(value = CourseServicesError.InvalidInput)
         return transactionManager.run {
             if (it.courseRepository.checkIfCourseNameExists(name = courseInfo.name)) {
                 return@run Either.Left(value = CourseServicesError.CourseNameAlreadyExists)
             }
-            if (it.usersRepository.getTeacher(teacherId = courseInfo.teacherId) == null) {
+            if (it.usersRepository.getTeacher(teacherId = teacherId) == null) {
                 return@run Either.Left(value = CourseServicesError.NotTeacher)
             }
             val courseByOrg = it.courseRepository.getCourseByOrg(orgUrl = courseInfo.orgUrl)
             if (courseByOrg != null) {
-                return@run Either.Right(value = it.courseRepository.addTeacherToCourse(teacherId = courseInfo.teacherId, courseId = courseByOrg.id))
+                return@run Either.Right(value = it.courseRepository.addTeacherToCourse(teacherId = teacherId, courseId = courseByOrg.id))
             }
-            val id = it.courseRepository.createCourse(course = CourseInput(orgUrl = courseInfo.orgUrl, name = courseInfo.name, teacherId = courseInfo.teacherId)).id
+            val id = it.courseRepository.createCourse(course = CourseInput(orgUrl = courseInfo.orgUrl, name = courseInfo.name, teacherId = teacherId)).id
             val course = it.courseRepository.getCourse(courseId = id)
             if (course == null) {
                 Either.Left(value = CourseServicesError.CourseNotFound)
@@ -123,13 +122,11 @@ class CourseServices(
     }
 
 
-    fun getTeacherCourses(userId: Int) : CoursesOrgsResponse {
-        TODO()
-        transactionManager.run {
+    fun getTeacherGithubToken(userId: Int) : UserGithubTokenResponse {
+       return transactionManager.run {
             val githubToken = it.usersRepository.getTeacherGithubToken(userId)
-            // if (githubToken == null) return@run Either.Left(value = CourseServicesError.UserNotFound)
-            //val coursesOrg = githubServices.getUserOrgs(githubToken)
-            //TODO: Filter the ones not already in the database
+            if (githubToken == null) Either.Left(value = CourseServicesError.UserNotFound)
+            else Either.Right(AESDecrypt.decrypt(githubToken))
         }
     }
 }

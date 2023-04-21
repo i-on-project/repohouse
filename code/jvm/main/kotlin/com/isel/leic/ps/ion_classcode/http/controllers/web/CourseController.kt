@@ -3,13 +3,18 @@ package com.isel.leic.ps.ion_classcode.http.controllers.web
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
+import com.isel.leic.ps.ion_classcode.http.GITHUB_API_BASE_URL
+import com.isel.leic.ps.ion_classcode.http.GITHUB_USER_ORGS
+import com.isel.leic.ps.ion_classcode.http.OkHttp
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
+import com.isel.leic.ps.ion_classcode.http.makeCallToList
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
@@ -19,6 +24,7 @@ import com.isel.leic.ps.ion_classcode.http.services.CourseServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
+import okhttp3.Request
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -34,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 class CourseController(
+    private val okHttp: OkHttp,
     private val courseServices: CourseServices,
 ) {
 
@@ -42,26 +49,28 @@ class CourseController(
      * It will get from GitHub organizations from the Teacher's GitHub account
      * If some of the organizations are already in the database, the Teacher is just added to the course
      */
-    @GetMapping(Uris.CREATE_COURSE_PATH, produces = ["application/vnd.siren+json"])
-    fun getTeacherOrgs(
-        user: User,
-        @RequestBody courseInfo: CourseInputModel,
+    @GetMapping(Uris.ORGS_PATH, produces = ["application/vnd.siren+json"])
+    suspend fun getTeacherOrgs(
+        user: User
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.unauthorized
-        return when (val course = courseServices.getTeacherCourses(user.id)) {
-            is Either.Left -> problem(course.value)
-            is Either.Right -> siren(GitHubOrgsOutputModel(course.value)){
-                clazz("course")
-                action(
-                    title = "createCourse",
-                    method = HttpMethod.POST,
-                    href = Uris.createCourseUri(),
-                    type = "application/json",
-                    block = {
-                        textField(name = "name")
-                        textField(name = "orgUrl")
-                        numberField(name = "id")
-                    })
+        return when (val token = courseServices.getTeacherGithubToken(user.id)) {
+            is Either.Left -> problem(token.value)
+            is Either.Right -> {
+                val orgs = fetchTeacherOrgs(token.value)
+                siren(GitHubOrgsOutputModel(orgs)) {
+                    clazz("course")
+                    action(
+                        title = "createCourse",
+                        method = HttpMethod.POST,
+                        href = Uris.COURSE_PATH,
+                        type = "application/json",
+                        block = {
+                            textField(name = "name")
+                            textField(name = "orgUrl")
+                            numberField(name = "id")
+                        })
+                }
             }
         }
     }
@@ -71,13 +80,13 @@ class CourseController(
      * It will get from GitHub organizations from the Teacher's GitHub account
      * If some organizations are already in the database, the Teacher is just added to the course
      */
-    @PostMapping(Uris.CREATE_COURSE_PATH, produces = ["application/vnd.siren+json"])
+    @PostMapping(Uris.COURSES_PATH, produces = ["application/vnd.siren+json"])
     fun createCourse(
         user: User,
         @RequestBody courseInfo: CourseInputModel,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.unauthorized
-        return when (val course = courseServices.createCourse(courseInfo)) {
+        return when (val course = courseServices.createCourse(courseInfo, user.id)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseCreatedOutputModel(course.value)) {
                 clazz("course")
@@ -208,6 +217,18 @@ class CourseController(
                     }
                 }
         }
+    }
+
+    /**
+     * Method to fetch the teacher orgs from GitHub.
+     */
+    private suspend fun fetchTeacherOrgs(githubToken: String): List<GitHubOrgsModel> {
+        val request = Request.Builder().url("$GITHUB_API_BASE_URL$GITHUB_USER_ORGS")
+            .addHeader("Authorization", "Bearer $githubToken")
+            .addHeader("Accept", "application/vnd.github+json")
+            .build()
+
+        return okHttp.makeCallToList(request)
     }
 
     /**

@@ -10,6 +10,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.tokenHash.TokenHash
 import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
@@ -23,6 +24,7 @@ typealias TeacherCreationResult = Either<UserServicesError, Teacher>
 typealias StudentCreationResult = Either<UserServicesError, Student>
 typealias PendingStudentCreationResult = Either<UserServicesError, PendingStudent>
 typealias PendingTeacherCreationResult = Either<UserServicesError, PendingTeacher>
+typealias UpdateTeacherGithubTokenResult = Either<UserServicesError, Unit>
 
 /**
  * Error codes for the services
@@ -33,7 +35,7 @@ sealed class UserServicesError {
     object InvalidGithubId : UserServicesError()
     object InvalidData : UserServicesError()
     object ErrorCreatingUser : UserServicesError()
-    object InvalidBearerToken : UserServicesError()
+    object InvalidToken : UserServicesError()
     object GithubUserNameInUse : UserServicesError()
     object EmailInUse : UserServicesError()
     object GithubIdInUse : UserServicesError()
@@ -53,10 +55,10 @@ class UserServices(
     /**
      * Method to check the token from a user
      */
-    fun checkAuthentication(bearerToken: String): UserAuthenticationResult {
-        if (bearerToken.isEmpty()) return Either.Left(value = UserServicesError.InvalidBearerToken)
+    fun checkAuthentication(token: String): UserAuthenticationResult {
+        if (token.isEmpty()) return Either.Left(value = UserServicesError.InvalidToken)
         return transactionManager.run {
-            val user = it.usersRepository.getUserByToken(token = bearerToken)
+            val user = it.usersRepository.getUserByToken(token = token)
             if (user == null) {
                 Either.Left(value = UserServicesError.UserNotAuthenticated)
             } else {
@@ -69,11 +71,11 @@ class UserServices(
      * Method to get a user by id
      */
     fun getUserById(userId: Int): UserByIdResult {
-        if (userId <= 0) return Either.Left(value = UserServicesError.InvalidData)
+        if (userId <= 0) return Either.Left(value = UserServicesError.UserNotAuthenticated)
         return transactionManager.run {
             val user = it.usersRepository.getUserById(id = userId)
             if (user == null) {
-                Either.Left(value = UserServicesError.UserNotFound)
+                Either.Left(value = UserServicesError.UserNotAuthenticated)
             } else {
                 Either.Right(value = user)
             }
@@ -129,7 +131,7 @@ class UserServices(
         if (teacher.isNotValid()) return Either.Left(value = UserServicesError.InvalidData)
         return transactionManager.run {
             val hash = tokenHash.getTokenHash(teacher.token)
-            val githubTokenHash = tokenHash.getTokenHash(teacher.githubToken)
+            val githubToken = AESEncrypt.encrypt(teacher.githubToken)
             val teacherRes = it.usersRepository.createPendingTeacher(
                 teacher = TeacherInput(
                     name = teacher.name,
@@ -137,7 +139,7 @@ class UserServices(
                     githubUsername = teacher.githubUsername,
                     githubId = teacher.githubId,
                     token = hash,
-                    githubToken = githubTokenHash,
+                    githubToken = githubToken,
                 ),
             )
             Either.Right(value = teacherRes)
@@ -245,6 +247,16 @@ class UserServices(
     fun deletePendingUsers() {
         return transactionManager.run {
             it.usersRepository.deletePendingUsers()
+        }
+    }
+
+    fun updateTeacherGithubToken(teacherId: Int, token: String): UpdateTeacherGithubTokenResult {
+        if (teacherId <= 0) return Either.Left(UserServicesError.UserNotAuthenticated)
+        val githubTokenHash = AESEncrypt.encrypt(token)
+        return transactionManager.run {
+            val user = it.usersRepository.getTeacher(teacherId)
+            if (user == null) Either.Left(UserServicesError.UserNotAuthenticated)
+            Either.Right(it.usersRepository.updateTeacherGithubToken(teacherId, githubTokenHash))
         }
     }
 }

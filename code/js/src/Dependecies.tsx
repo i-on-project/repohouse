@@ -3,7 +3,6 @@ import { SystemServices } from './services/SystemServices'
 import {AuthServices} from "./services/AuthServices";
 import {MenuServices} from "./services/MenuServices";
 import {CourseServices} from "./services/CourseServices";
-import {Class} from "@mui/icons-material";
 import {ClassroomServices} from "./services/ClassroomServices";
 import {AssignmentServices} from "./services/AssignmentServices";
 import {DeliveryServices} from "./services/DeliveryServices";
@@ -28,7 +27,8 @@ export const AUTH_REGISTER_INFO = "registerInfo"
 export const AUTH_REGISTER_STUDENT = "registerStudent"
 export const AUTH_REGISTER_TEACHER = "registerTeacher"
 export const LOGOUT_KEY = "logout"
-
-export const TEACHERS_APPROVAL_KEY = "teachersApproval"
+export const ORGS_KEY = "orgs"
 export const CREATE_COURSE_KEY = "createCourse"
 export const COURSE_KEY = "course"
+
+export const TEACHERS_APPROVAL_KEY = "teachersApproval"
