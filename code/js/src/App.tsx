@@ -6,7 +6,7 @@ import {
     classroomServices,
     courseServices, deliveryServices,
     menuServices,
-    systemServices
+    systemServices, teamServices
 } from './Dependecies'
 import { ShowHomeFetch } from './Home'
 import { ShowCreditsFetch } from './Credits'
@@ -25,6 +25,7 @@ import { HandleAuthFail, HandleAuthFailCallback } from './AuthFail'
 import {ShowClassroomFetch,ShowCreateClassroom} from "./Classroom";
 import {ShowAssignmentFetch, ShowCreateAssignment} from './Assignment'
 import {ShowCreateDelivery, ShowDeliveryFetch, ShowEditDelivery} from "./Delivery";
+import {ShowTeamFetch, ShowTeamRequestsFetch} from "./Team";
 
 const router = createBrowserRouter([
     {
@@ -129,7 +130,15 @@ const router = createBrowserRouter([
                                                 path: "teams/:teamId",
                                                 element: <RequireAuth>
                                                     <Team/>
-                                                </RequireAuth>
+                                                </RequireAuth>,
+                                                children: [
+                                                    {
+                                                        path: "requests",
+                                                        element: <RequireAuth>
+                                                            <TeamRequests/>
+                                                        </RequireAuth>
+                                                    }
+                                                ]
                                             },
                                             {
                                                 path: "edit",
@@ -416,7 +425,16 @@ function Team() {
     const {courseId, classroomId, teamId} = useParams<{ courseId: string, classroomId: string, teamId: string }>();
     return (
         <div>
-            TODO
+            <ShowTeamFetch teamServices={teamServices}/>
+        </div>
+    )
+}
+
+function TeamRequests() {
+    const {courseId, classroomId, teamId} = useParams<{ courseId: string, classroomId: string, teamId: string }>();
+    return (
+        <div>
+            <ShowTeamRequestsFetch teamServices={teamServices}/>
         </div>
     )
 }

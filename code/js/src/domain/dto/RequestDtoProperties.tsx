@@ -69,3 +69,24 @@ export class RequestChangeStatusDtoProperties {
         this.changed = changed
     }
 }
+
+export interface RequestBody{
+    creator: number,
+    composite: number | null ,
+}
+
+export class LeaveTeamBody implements RequestBody{
+    constructor(
+        teamId: number,
+        creator: number,
+        composite: number | null = null,
+    ) {
+        this.teamId = teamId
+        this.creator = creator
+        this.composite = composite
+    }
+
+    composite: number | null;
+    creator: number;
+    teamId: number;
+}

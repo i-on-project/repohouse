@@ -7,6 +7,7 @@ import {Class} from "@mui/icons-material";
 import {ClassroomServices} from "./services/ClassroomServices";
 import {AssignmentServices} from "./services/AssignmentServices";
 import {DeliveryServices} from "./services/DeliveryServices";
+import {TeamServices} from "./services/TeamServices";
 
 export const navigationRepository = new NavigationRepository()
 export const systemServices = new SystemServices()
@@ -16,6 +17,7 @@ export const courseServices = new CourseServices()
 export const classroomServices = new ClassroomServices()
 export const assignmentServices = new AssignmentServices()
 export const deliveryServices = new DeliveryServices()
+export const teamServices = new TeamServices()
 
 export const HOME_KEY = "home"
 export const CREDITS_KEY = "credits"

@@ -26,3 +26,21 @@ export class TeamDtoProperties {
         this.feedbacks = feedbacks
     }
 }
+
+export interface FeedbackBody {
+    label: string,
+    description: string,
+    teamId: number,
+}
+
+export class FeedbackBody {
+    constructor(
+        label: string,
+        description: string,
+        teamId: number,
+    ) {
+        this.label = label
+        this.description = description
+        this.teamId = teamId
+    }
+}
