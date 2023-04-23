@@ -48,7 +48,7 @@ export function ShowDeliveryFetch({
         if (result instanceof SirenEntity) {
             // TODO: refresh/update content of the delivery page
         }
-    }, [deliveryServices]);
+    }, [setError]);
 
     const handleDeleteDelivery = useCallback(async () => {
         const result = await deliveryServices.deleteDelivery();
