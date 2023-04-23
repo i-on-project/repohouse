@@ -55,8 +55,8 @@ export class AuthServices {
     }
 
     verify = async (otp: { otp: number}) => {
-        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.VERIFY_KEY, Hypermedia.systemServices.home)
-        const response = await fetchPost<StatusDtoProperties>("/api/auth/register/student/verify", otp)
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.AUTH_VERIFY_STUDENT_KEY, Hypermedia.systemServices.home)
+        const response = await fetchPost<StatusDtoProperties>(link.href, otp)
         if (response instanceof SirenEntity) {
             //TODO
         }
@@ -64,8 +64,8 @@ export class AuthServices {
     }
 
     status = async () => {
-        //const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.STATUS_KEY,Hypermedia.systemServices.home)
-        const response = await fetchGet<StatusDtoProperties>("/api/auth/status")
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_STATUS_KEY,Hypermedia.systemServices.home)
+        const response = await fetchGet<StatusDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
             //TODO
         }
@@ -73,6 +73,11 @@ export class AuthServices {
     }
 
     async logout() {
-        // TODO: Implement
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.LOGOUT_KEY,Hypermedia.systemServices.home)
+        const response = await fetchPost(link.href)
+        if (response instanceof SirenEntity) {
+            //TODO
+        }
+        return response
     }
 }

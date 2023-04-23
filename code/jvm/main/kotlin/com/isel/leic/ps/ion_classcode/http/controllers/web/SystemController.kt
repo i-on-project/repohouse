@@ -34,6 +34,10 @@ class SystemController {
                 numberField("schoolId")
             })
             action(title = "registerTeacher", href = Uris.AUTH_REGISTER_TEACHER_PATH, method = HttpMethod.POST, type = "application/json", block = {})
+            link(rel = LinkRelation("status"), href = Uris.AUTH_STATUS_PATH)
+            action(title = "verify", href = Uris.AUTH_REGISTER_VERIFICATION_PATH, method = HttpMethod.POST, type = "application/json", block = {
+                numberField("otp")
+            })
             action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})
             link(rel = LinkRelation("orgs"), href = Uris.ORGS_PATH)
             action(title = "createCourse", href = Uris.COURSES_PATH, method = HttpMethod.POST, type = "application/json", block = {

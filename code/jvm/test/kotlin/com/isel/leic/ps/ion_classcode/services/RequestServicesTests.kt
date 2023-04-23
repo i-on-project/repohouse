@@ -1,6 +1,8 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
+import com.isel.leic.ps.ion_classcode.http.services.RequestServices
+import com.isel.leic.ps.ion_classcode.http.services.RequestServicesError
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager

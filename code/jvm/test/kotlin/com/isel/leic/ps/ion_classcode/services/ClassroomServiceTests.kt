@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
@@ -6,6 +6,8 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
+import com.isel.leic.ps.ion_classcode.http.services.ClassroomServices
+import com.isel.leic.ps.ion_classcode.http.services.ClassroomServicesError
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction

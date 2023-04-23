@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.PendingStudent
 import com.isel.leic.ps.ion_classcode.domain.PendingTeacher
@@ -6,6 +6,8 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
+import com.isel.leic.ps.ion_classcode.http.services.UserServices
+import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager

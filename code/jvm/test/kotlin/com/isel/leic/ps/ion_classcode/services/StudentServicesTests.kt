@@ -1,6 +1,8 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
+import com.isel.leic.ps.ion_classcode.http.services.StudentServices
+import com.isel.leic.ps.ion_classcode.http.services.StudentServicesError
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction

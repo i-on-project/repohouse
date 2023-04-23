@@ -1,8 +1,10 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Outbox
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
+import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
+import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.repository.CooldownRepository
 import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository

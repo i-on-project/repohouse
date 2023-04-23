@@ -38,6 +38,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     // for JDBI
     implementation("org.jdbi:jdbi3-core:3.37.1")

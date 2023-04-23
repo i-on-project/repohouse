@@ -47,7 +47,7 @@ class CourseController(
     /**
      * Create a course
      * It will get from GitHub organizations from the Teacher's GitHub account
-     * If some of the organizations are already in the database, the Teacher is just added to the course
+     * If some organizations are already in the database, the Teacher is just added to the course
      */
     @GetMapping(Uris.ORGS_PATH, produces = ["application/vnd.siren+json"])
     suspend fun getTeacherOrgs(
@@ -246,6 +246,8 @@ class CourseController(
             CourseServicesError.InvalidInput -> Problem.invalidInput
             CourseServicesError.CourseArchived -> Problem.invalidOperation
             CourseServicesError.CourseNameAlreadyExists -> Problem.conflict
+            CourseServicesError.CourseUrlAlreadyExists -> Problem.conflict
+            CourseServicesError.InternalError -> Problem.internalError
         }
     }
 }

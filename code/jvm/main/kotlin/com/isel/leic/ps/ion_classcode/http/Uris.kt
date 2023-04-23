@@ -8,7 +8,7 @@ import java.net.URI
  */
 object Uris {
 
-    private const val API = "/api"
+    const val API = "/api"
 
     /** Common Uris **/
 
@@ -18,10 +18,10 @@ object Uris {
     const val AUTH_STUDENT_PATH = "$AUTH_PATH/student"
     const val AUTH_TEACHER_PATH = "$AUTH_PATH/teacher"
     const val CALLBACK_PATH = "$AUTH_PATH/callback"
-    const val AUTH_STATUS_PATH = "$AUTH_PATH/status"
     const val AUTH_REGISTER_PATH = "$AUTH_PATH/register"
     const val AUTH_REGISTER_STUDENT_PATH = "$AUTH_REGISTER_PATH/student"
     const val AUTH_REGISTER_TEACHER_PATH = "$AUTH_REGISTER_PATH/teacher"
+    const val AUTH_STATUS_PATH = "$AUTH_PATH/status"
     const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_STUDENT_PATH/verify"
     const val LOGOUT = "$AUTH_PATH/logout"
     const val MENU_PATH = "$API/menu"

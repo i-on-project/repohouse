@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
@@ -11,6 +11,8 @@ import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Request
+import com.isel.leic.ps.ion_classcode.http.services.TeamServices
+import com.isel.leic.ps.ion_classcode.http.services.TeamServicesError
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
@@ -753,8 +755,6 @@ class TeamServicesTests {
 
     @Test
     fun `updateTeamRequestStatus should update the status`() {
-        // given: an invalid request id
-        val requestId = 1
 
         // when: getting the flag was updated
         val team = teamServices.updateTeamRequestStatus(

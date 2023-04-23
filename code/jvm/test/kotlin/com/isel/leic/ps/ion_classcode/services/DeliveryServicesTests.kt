@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
@@ -6,6 +6,8 @@ import com.isel.leic.ps.ion_classcode.domain.Delivery
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
+import com.isel.leic.ps.ion_classcode.http.services.DeliveryServices
+import com.isel.leic.ps.ion_classcode.http.services.DeliveryServicesError
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository

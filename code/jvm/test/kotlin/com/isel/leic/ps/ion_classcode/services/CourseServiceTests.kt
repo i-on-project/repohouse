@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
@@ -7,6 +7,8 @@ import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
+import com.isel.leic.ps.ion_classcode.http.services.CourseServices
+import com.isel.leic.ps.ion_classcode.http.services.CourseServicesError
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
@@ -49,16 +51,27 @@ class CourseServiceTests {
                     val mockedCourseRepository = mock<CourseRepository> {
                         on {
                             createCourse(course = CourseInput(orgUrl = "orgUrl3", name = "courseName3", teacherId = 1))
-                        } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf<Teacher>(teacher), isArchived = false)
-                        on { getCourse(courseId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf<Teacher>(teacher), isArchived = false)
-                        on { getCourse(courseId = 2) } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf<Teacher>(teacher), isArchived = true)
-                        on { getCourse(courseId = 3) } doReturn Course(id = 3, orgUrl = "orgUrl2", name = "courseName2", teachers = listOf<Teacher>(teacher), isArchived = false)
+                        } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf<Teacher>(
+                            teacher
+                        ), isArchived = false)
+                        on { getCourse(courseId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf<Teacher>(
+                            teacher
+                        ), isArchived = false)
+                        on { getCourse(courseId = 2) } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf<Teacher>(
+                            teacher
+                        ), isArchived = true)
+                        on { getCourse(courseId = 3) } doReturn Course(id = 3, orgUrl = "orgUrl2", name = "courseName2", teachers = listOf<Teacher>(
+                            teacher
+                        ), isArchived = false)
                         on { getCourseUserClassrooms(courseId = 1, userId = 2) } doReturn listOf<Classroom>(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteLink = "inviteLink"))
                         on { getStudentInCourse(courseId = 1) } doReturn listOf<Student>(student)
-                        on { getCourseByOrg(orgUrl = "orgUrl") } doReturn Course(id = 2, orgUrl = "orgUrl", name = "courseName", teachers = listOf<Teacher>(teacher), isArchived = false)
+                        on { getCourseByOrg(orgUrl = "orgUrl") } doReturn Course(id = 2, orgUrl = "orgUrl", name = "courseName", teachers = listOf<Teacher>(
+                            teacher
+                        ), isArchived = false)
                         on {
                             addTeacherToCourse(teacherId = 1, courseId = 2)
-                        } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf<Teacher>(teacher, Teacher(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, token = "token1", isCreated = false)), isArchived = false)
+                        } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf<Teacher>(
+                            teacher, Teacher(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, token = "token1", isCreated = false)), isArchived = false)
                         on { checkIfCourseNameExists(name = "courseName") } doReturn true
 
                         on {
@@ -70,7 +83,9 @@ class CourseServiceTests {
                         on { archiveCourse(courseId = 2) } doAnswer { }
                         on { deleteCourse(courseId = 2) } doAnswer { }
                         on { isStudentInCourse(studentId = 1, courseId = 1) } doReturn true
-                        on { leaveCourse(courseId = 1, studentId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf<Teacher>(teacher), isArchived = false)
+                        on { leaveCourse(courseId = 1, studentId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf<Teacher>(
+                            teacher
+                        ), isArchived = false)
                     }
 
                     on { usersRepository } doReturn mockedUsersRepository
@@ -173,8 +188,8 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = orgUrl,
                 name = "courseName3",
-                teacherId = 1,
             ),
+            teacherId = 1
         )
 
         // the result should be an error
@@ -195,8 +210,8 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl2",
                 name = name,
-                teacherId = 1,
             ),
+            teacherId = 1
         )
 
         // the result should be an error
@@ -209,16 +224,13 @@ class CourseServiceTests {
 
     @Test
     fun `createCourse should be InvalidInput because the teacher id is invalid`() {
-        // given: an invalid teacher id
-        val teacherId = -1
-
         // when: creating a course should give an error because of an invalid teacher id
         val course = courseService.createCourse(
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl2",
                 name = "name2",
-                teacherId = teacherId,
             ),
+            teacherId = -1
         )
 
         // the result should be an error
@@ -239,8 +251,8 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl2",
                 name = name,
-                teacherId = 1,
             ),
+            teacherId = 1
         )
 
         // the result should be an error
@@ -253,16 +265,13 @@ class CourseServiceTests {
 
     @Test
     fun `createCourse should be NotTeacher because the teacher id don't exists in database`() {
-        // given: a valid teacher id
-        val teacherId = 4
-
         // when: creating a course should give an error because the teacher id don't exists in database
         val course = courseService.createCourse(
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl3",
                 name = "name",
-                teacherId = teacherId,
             ),
+            teacherId = 4
         )
 
         // the result should be an error
@@ -280,8 +289,8 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl",
                 name = "name",
-                teacherId = 1,
             ),
+            teacherId = 1
         )
 
         // the result should be an error
@@ -299,8 +308,8 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl3",
                 name = "courseName3",
-                teacherId = 1,
             ),
+            teacherId = 1
         )
 
         // the result should be an error

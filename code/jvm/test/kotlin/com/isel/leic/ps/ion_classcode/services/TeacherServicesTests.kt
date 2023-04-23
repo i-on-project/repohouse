@@ -1,10 +1,12 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.requests.Apply
 import com.isel.leic.ps.ion_classcode.http.model.input.TeachersPendingInputModel
+import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
+import com.isel.leic.ps.ion_classcode.http.services.TeacherServicesError
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository

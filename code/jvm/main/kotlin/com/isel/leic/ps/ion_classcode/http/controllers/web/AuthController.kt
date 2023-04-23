@@ -57,6 +57,8 @@ const val GITHUB_STUDENT_SCOPE = "repo user:email"
 const val STUDENT_COOKIE_NAME = "Student"
 const val TEACHER_COOKIE_NAME = "Teacher"
 const val STATE_COOKIE_NAME = "userState"
+const val POSITION_COOKIE_NAME = "position"
+const val GITHUB_ID_COOKIE_NAME = "userGithubId"
 const val STATE_COOKIE_PATH = Uris.CALLBACK_PATH
 const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
@@ -376,15 +378,12 @@ class AuthController(
     @PostMapping(Uris.LOGOUT)
     fun logout(
         response: HttpServletResponse,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<*> {
         val authorizationCookie = deleteSessionCookie()
         val githubIdCookie = deleteGithubIdCookie()
         response.setHeader(HttpHeaders.SET_COOKIE, authorizationCookie.toString())
         response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
-        return ResponseEntity
-            .status(Status.REDIRECT)
-            .header(HttpHeaders.LOCATION, "http://localhost:3000")
-            .build()
+        return siren(null) {}
     }
 
     private fun generateUserState(): OAuthState {
@@ -430,7 +429,7 @@ class AuthController(
      * Create a user position cookie.
      */
     private fun generateUserPosition(position: String): ResponseCookie {
-        return ResponseCookie.from("position", position)
+        return ResponseCookie.from(POSITION_COOKIE_NAME, position)
             .path("/api")
             .maxAge(HALF_HOUR)
             .httpOnly(true)
@@ -443,7 +442,7 @@ class AuthController(
      * Create a user GitHub id cookie.
      */
     private fun generateGithubIdCookie(gitHubId:Long): ResponseCookie {
-        return ResponseCookie.from("userGithubId", AESEncrypt.encrypt(gitHubId.toString()))
+        return ResponseCookie.from(GITHUB_ID_COOKIE_NAME, AESEncrypt.encrypt(gitHubId.toString()))
             .path("/api")
             .maxAge(HALF_HOUR)
             .httpOnly(true)
@@ -456,7 +455,7 @@ class AuthController(
      * Delete a user GitHub id cookie.
      */
     private fun deleteGithubIdCookie(): ResponseCookie {
-        return ResponseCookie.from("userGithubId", "")
+        return ResponseCookie.from(GITHUB_ID_COOKIE_NAME, "")
             .httpOnly(true)
             .sameSite("Strict")
             .secure(true)
