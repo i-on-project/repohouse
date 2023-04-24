@@ -385,7 +385,7 @@ function Assignment() {
     const {courseId, classroomId, assignmentId} = useParams<{ courseId: string, classroomId: string, assignmentId: string }>();
     return (
         <div>
-            <ShowAssignmentFetch assignmentServices={assignmentServices} />
+            <ShowAssignmentFetch assignmentServices={assignmentServices} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)}/>
         </div>
     )
 }

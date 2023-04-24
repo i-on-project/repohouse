@@ -6,17 +6,15 @@ import {
     AssignmentDeletedDtoProperties,
     AssignmentDtoProperties
 } from "../domain/dto/AssignmentDtoProperties";
+import {parse} from "uri-template";
 
 
 export class AssignmentServices {
 
-    assignment = async () => {
+    assignment = async (courseId,classroomId,assignmentId) => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.ASSIGNMENT_KEY, Hypermedia.systemServices.home)
-        const response = await fetchGet<AssignmentDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId})
+        return await fetchGet<AssignmentDtoProperties>(href)
     }
 
     createAssignment = async (body: AssignmentBody) => {

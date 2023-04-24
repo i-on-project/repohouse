@@ -18,7 +18,7 @@ export function ShowCourseFetch({
     courseId: number;
 }) {
     const content = useAsync(async () => {
-        return await courseServices.course();
+        return await courseServices.course({courseId: courseId});
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
     const navigate = useNavigate();
@@ -74,11 +74,15 @@ export function ShowCourseFetch({
                     <a href={content.properties.orgUrl} target={"_blank"}>GitHub Page</a>
                     <List>
                         {content.properties.classrooms.map( classroom => (
-                            <ListItem key={classroom.id}>
-                                <Link to={"/courses/"+ courseId + "/classrooms/" + classroom.id}>
-                                    {classroom.name}
-                                </Link>
-                            </ListItem>
+                            <>
+                                {console.log(classroom)}
+                                <ListItem key={classroom.id}>
+
+                                    <Link to={"/courses/"+ courseId + "/classrooms/" + classroom.id}>
+                                        {classroom.name}
+                                    </Link>
+                                </ListItem>
+                            </>
                         ))}
                     </List>
                     { user == AuthState.Teacher  && !content.properties.isArchived ? (

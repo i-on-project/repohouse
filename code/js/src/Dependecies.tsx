@@ -35,3 +35,26 @@ export const COURSE_KEY = "course"
 export const TEACHERS_APPROVAL_KEY = "teachersApproval"
 export const CLASSROOM_KEY = "classroom"
 export const ASSIGNMENT_KEY = "assignment"
+
+
+export const systemLinkKeys = [
+    HOME_KEY,
+    MENU_KEY,
+    CREDITS_KEY,
+    AUTH_TEACHER_KEY,
+    AUTH_STUDENT_KEY,
+    AUTH_REGISTER_INFO,
+    AUTH_STATUS_KEY,
+    ORGS_KEY,
+    COURSE_KEY,
+    CLASSROOM_KEY,
+    ASSIGNMENT_KEY
+]
+
+export const systemActionKeys = [
+    LOGOUT_KEY,
+    AUTH_REGISTER_STUDENT,
+    AUTH_REGISTER_TEACHER,
+    AUTH_VERIFY_STUDENT_KEY,
+    CREATE_COURSE_KEY
+]

@@ -113,15 +113,6 @@ class CourseController(
             is Either.Right -> siren(value = CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teachers, course.value.isArchived, course.value.classrooms)) {
                 clazz("course")
                 link(rel = LinkRelation("self"), href = Uris.courseUri(course.value.id), needAuthentication = true)
-                course.value.classrooms.forEach {
-                    link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, it.id), needAuthentication = true)
-                }
-                if (user is Teacher) {
-                    action(title = "create-classroom", method = HttpMethod.POST, href = Uris.createClassroomUri(course.value.id), type = "x-www-form-urlencoded", block = {
-                        textField(name = "name")
-                    })
-                    action(title = "Delete Course", method = HttpMethod.DELETE, href = Uris.courseUri(course.value.id), type = "application/json", block = {})
-                }
             }
         }
     }

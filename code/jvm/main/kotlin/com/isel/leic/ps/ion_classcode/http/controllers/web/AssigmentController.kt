@@ -59,19 +59,8 @@ class AssigmentController(
             is Either.Right -> siren(value = StudentAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.team)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignmentId), needAuthentication = true)
-                link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
-                link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
-                assignment.value.deliveries.forEach {
-                    link(rel = LinkRelation("delivery"), href = Uris.deliveryUri(courseId, classroomId, assignmentId, it.id), needAuthentication = true)
-                }
-                if (assignment.value.team != null){
-                    link(
-                        rel = LinkRelation("team"),
-                        href = Uris.teamUri(courseId, classroomId, assignmentId, assignment.value.team.id),
-                        needAuthentication = true
-                    )
-                }else {
+                // TODO: Check under this line
+                if (assignment.value.team == null){
                     when (val studentTeams = assigmentService.getAssignmentStudentTeams(assignmentId, user.id)) {
                         is Either.Left -> problem(studentTeams.value)
                         is Either.Right -> {

@@ -3,18 +3,15 @@ import { SirenEntity } from "../siren/Siren"
 import * as Hypermedia from "../Dependecies"
 import {CourseBody, CourseDtoProperties, CourseWithClassroomsDtoProperties} from "../domain/dto/CourseDtoProperties";
 import {GitHubOrgsDtoProperties} from "../domain/dto/GitHubOrgsDtoProperties";
+import {parse} from "uri-template";
 
 
 export class CourseServices {
 
-    course = async () => {
+    course = async (courseId) => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        const response = await fetchGet<CourseWithClassroomsDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            Hypermedia.navigationRepository.addLinks([Hypermedia.CLASSROOM_KEY], response.links)
-            // TODO actions
-        }
-        return response
+        const href = parse(link.href).expand(courseId)
+        return await fetchGet<CourseWithClassroomsDtoProperties>(href)
     }
 
     getTeacherOrgs = async () => {

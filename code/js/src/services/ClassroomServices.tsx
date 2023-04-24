@@ -5,18 +5,15 @@ import {MenuDtoProperties} from "../domain/dto/MenuDtoProperties";
 import {CourseBody, CourseDtoProperties, CourseWithClassroomsDtoProperties} from "../domain/dto/CourseDtoProperties";
 import {GitHubOrgsDtoProperties} from "../domain/dto/GitHubOrgsDtoProperties";
 import {ClassroomBody, ClassroomDtoProperties} from "../domain/dto/ClassroomDtoProperties";
+import {parse} from "uri-template";
 
 
 export class ClassroomServices {
 
-    classroom = async () => {
+    classroom = async (courseId,classroomId) => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.CLASSROOM_KEY, Hypermedia.systemServices.home)
-        const response = await fetchGet<ClassroomDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            Hypermedia.navigationRepository.addLinks([Hypermedia.ASSIGNMENT_KEY], response.links)
-            // TODO actions
-        }
-        return response
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId})
+        return await fetchGet<ClassroomDtoProperties>(href.toString())
     }
 
     createClassroom = async (body:ClassroomBody) => {

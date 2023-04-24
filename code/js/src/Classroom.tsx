@@ -19,7 +19,7 @@ export function ShowClassroomFetch({
     classroomId: number;
 }) {
     const content = useAsync(async () => {
-        return await classroomServices.classroom();
+        return await classroomServices.classroom(courseId,classroomId);
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
     const user = useLoggedIn()
@@ -73,7 +73,16 @@ export function ShowClassroomFetch({
                         variant="h6"
                         gutterBottom
                     >
-                        {"Last Sync Time: " + content.properties.lastSync}
+                        {"Last Sync Time: " + new Date(content.properties.lastSync).toLocaleString(
+                            "en-GB",
+                            {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                month: "long",
+                                day: "2-digit",
+                                year: "numeric",
+                            }
+                        )}
                     </Typography>
                     <List>
                         {content.properties.assignments.map( assigment => (

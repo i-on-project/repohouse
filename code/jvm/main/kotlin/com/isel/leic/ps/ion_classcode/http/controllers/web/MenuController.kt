@@ -60,14 +60,6 @@ class MenuController(
         return when (val courses = teacherServices.getCourses(user.id)) {
             is Either.Right -> siren(value = MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
                 clazz("menu")
-                link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
-                link(rel = LinkRelation("credits"), href = Uris.creditsUri())
-                link(rel = LinkRelation("createCourse"), href = Uris.COURSES_PATH, needAuthentication = true)
-                link(rel = LinkRelation("teachersApproval"), href = Uris.teachersApprovalUri(), needAuthentication = true)
-                courses.value.forEach {
-                    link(rel = LinkRelation("course"), href = Uris.courseUri(it.id), needAuthentication = true)
-                }
-                action(title = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
             }
             is Either.Left -> problemTeacher(courses.value)
         }
@@ -85,11 +77,6 @@ class MenuController(
         return when (val courses = studentServices.getCourses(user.id)) {
             is Either.Right -> siren(value = MenuStudentOutputModel(user.name, (studentSchoolId as Either.Right).value, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
                 link(rel = LinkRelation("self"), href = Uris.menuUri(), needAuthentication = true)
-                link(rel = LinkRelation("credits"), href = Uris.creditsUri())
-                courses.value.forEach {
-                    link(rel = LinkRelation("course"), href = Uris.courseUri(it.id), needAuthentication = true)
-                }
-                action(title = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
             }
             is Either.Left -> problemStudent(courses.value)
         }

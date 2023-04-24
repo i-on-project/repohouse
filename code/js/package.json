@@ -26,7 +26,8 @@
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.10.0",
     "siren-js": "^0.2.4",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "uri-template": "^2.0.0"
   },
   "scripts": {
     "start": "webpack serve"

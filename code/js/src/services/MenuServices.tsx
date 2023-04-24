@@ -9,12 +9,7 @@ export class MenuServices {
 
     menu = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.MENU_KEY, Hypermedia.systemServices.home)
-        const response = await fetchGet<MenuDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            Hypermedia.navigationRepository.addLinks([Hypermedia.CREDITS_KEY, Hypermedia.TEACHERS_APPROVAL_KEY,Hypermedia.CREATE_COURSE_KEY,Hypermedia.COURSE_KEY], response.links)
-            Hypermedia.navigationRepository.addActions([Hypermedia.LOGOUT_KEY], response.actions)
-        }
-        return response
+        return await fetchGet<MenuDtoProperties>(link.href)
     }
 
     getTeachersPendingApproval = async () => {

@@ -17,9 +17,14 @@ import {
 
 export function ShowAssignmentFetch({
                                   assignmentServices,
-
+                                    courseId,
+                                    classroomId,
+                                    assignmentId
                               }: {
     assignmentServices: AssignmentServices;
+    courseId: number;
+    classroomId: number;
+    assignmentId: number
 
 }) {
     const user = useLoggedIn()
@@ -27,9 +32,9 @@ export function ShowAssignmentFetch({
     function renderAssignment() {
         switch (user) {
             case AuthState.Student:
-                return <ShowStudentAssignmentFetch assignmentServices={assignmentServices}/>
+                return <ShowStudentAssignmentFetch assignmentServices={assignmentServices} courseId={courseId} classroomId={classroomId} assignmentId={assignmentId}/>;
             case AuthState.Teacher:
-                return <ShowTeacherAssignmentFetch assignmentServices={assignmentServices}/>
+                return <ShowTeacherAssignmentFetch assignmentServices={assignmentServices} courseId={courseId} classroomId={classroomId} assignmentId={assignmentId}/>
             default:
                 return <ErrorAlert error={new ErrorMessageModel(401, "Unauthorized", "You are not logged in","")} onClose={() => {}}/>
         }
@@ -43,13 +48,16 @@ export function ShowAssignmentFetch({
 }
 
 function ShowStudentAssignmentFetch({
-    assignmentServices,
-}: {
+                                        assignmentServices,courseId,classroomId,assignmentId
+                                    }: {
     assignmentServices: AssignmentServices;
+    courseId: number;
+    classroomId: number;
+    assignmentId: number;
 }) {
 
     const content = useAsync(async () => {
-        return await assignmentServices.assignment() as SirenEntity<StudentAssignmentDtoProperties >
+        return await assignmentServices.assignment(courseId,classroomId,assignmentId) as SirenEntity<StudentAssignmentDtoProperties >
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
 
@@ -99,7 +107,14 @@ function ShowStudentAssignmentFetch({
                                 <Typography
                                     variant="h6"
                                 >
-                                    {delivery.tagControl + " -  " + delivery.dueDate}
+                                    {delivery.tagControl + " -  " + new Date(delivery.dueDate).toLocaleString(
+                                        "en-GB",
+                                        {
+                                            month: "long",
+                                            day: "2-digit",
+                                            year: "numeric",
+                                        }
+                                    )}
                                 </Typography>
                             </CardContent>
                             <CardActions>
@@ -148,12 +163,15 @@ function ShowStudentAssignmentFetch({
 }
 
 function ShowTeacherAssignmentFetch({
-    assignmentServices,
+    assignmentServices,courseId,classroomId,assignmentId
 }: {
     assignmentServices: AssignmentServices;
+    courseId: number;
+    classroomId: number;
+    assignmentId: number;
 }) {
     const content = useAsync(async () => {
-        return await assignmentServices.assignment() as SirenEntity<TeacherAssignmentDtoProperties>
+        return await assignmentServices.assignment(courseId,classroomId,assignmentId) as SirenEntity<TeacherAssignmentDtoProperties>
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
 
@@ -345,6 +363,5 @@ function ShowCreateAssignmentPost({ assignmentServices, assignment }: { assignme
 
     if (content instanceof SirenEntity) {
         //TODO: redirect to the new assignment
-        return <ShowAssignmentFetch assignmentServices={assignmentServices}/>
     }
 }

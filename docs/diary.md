@@ -31,3 +31,7 @@
 - Aprender como usar o mockito para testes
 - Testes ao services
 
+## 24 Abril - Ricardo & André
+- Decisao dos templates todos no home
+- Nenhum siren retorna links e actions sem ser o home
+- O react trata dos expand
