@@ -1,10 +1,13 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
+import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentModel
+import com.isel.leic.ps.ion_classcode.http.model.output.StudentAssignmentModel
+import com.isel.leic.ps.ion_classcode.http.model.output.TeacherAssignmentModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
 import org.springframework.stereotype.Component
@@ -64,9 +67,9 @@ class AssignmentServices(
     }
 
     /**
-     * Method that gets an assigment
+     * Method that gets an assigment for a teacher
      */
-    fun getAssignmentInfo(assignmentId: Int): AssignmentResponse {
+    fun getTeacherAssignmentInfo(assignmentId: Int): AssignmentResponse {
         if (assignmentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
             val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
@@ -75,10 +78,31 @@ class AssignmentServices(
             } else {
                 val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assignmentId = assignmentId)
                 val teams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
-                Either.Right(value = AssignmentModel(assignment = assignment, deliveries = deliveries, teams = teams))
+                Either.Right(value = TeacherAssignmentModel(assignment = assignment, deliveries = deliveries, teams = teams))
             }
         }
     }
+
+    /**
+     * Method that gets an assigment for a student
+     */
+    fun getStudentAssignmentInfo(assignmentId: Int,studentId: Int): AssignmentResponse {
+        if (assignmentId <= 0) return Either.Left(value = AssignmentServicesError.InvalidInput)
+        return transactionManager.run {
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
+            if (assignment == null) {
+                Either.Left(value = AssignmentServicesError.AssignmentNotFound)
+            } else {
+                val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assignmentId = assignmentId)
+                val team = it.teamRepository.getTeamsFromStudent(studentId = studentId).find { team ->
+                    team.assignment == assignmentId
+                }
+                Either.Right(value = StudentAssignmentModel(assignment = assignment, deliveries = deliveries, team = team))
+            }
+        }
+    }
+
+
 
     /**
      * Method that deletes an assigment

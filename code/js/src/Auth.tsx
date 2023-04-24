@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
     useState,
     createContext,
-    useContext,
+    useContext, useEffect,
 } from 'react'
 
 export enum AuthState {
@@ -17,12 +17,12 @@ export function toState(state: string): AuthState {
 }
 
 type ContextType = {
-    loggedin: AuthState | undefined,
+    loggedin: AuthState,
     setLogin: (v: AuthState) => void,
 }
 
 const LoggedInContext = createContext<ContextType>({
-    loggedin: undefined,
+    loggedin: AuthState.None,
     setLogin: () => {},
 })
 
@@ -43,3 +43,5 @@ export function useLoggedIn() {
 export function useSetLogin() {
     return useContext(LoggedInContext).setLogin
 }
+
+

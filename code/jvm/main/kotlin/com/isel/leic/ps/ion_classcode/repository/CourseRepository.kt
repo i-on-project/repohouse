@@ -22,6 +22,7 @@ interface CourseRepository {
     fun getCourseAllClassrooms(courseId: Int): List<Classroom>
     fun getCourseUserClassrooms(courseId: Int, userId: Int): List<Classroom>
     fun getAllUserCourses(userId: Int): List<Course>
+    fun getAllStudentCourses(studentId: Int):List<Course>
     fun getStudentInCourse(courseId: Int): List<Student>
     fun getCourse(courseId: Int): Course?
     fun getCourseByOrg(orgUrl: String): Course?

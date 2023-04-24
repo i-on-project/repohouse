@@ -1,13 +1,13 @@
 import * as React from "react";
-import { useAsync } from "./siren/Fetch";
 import {useEffect, useState} from "react";
-import { ErrorMessageModel } from "./domain/response-models/Error";
-import { SirenEntity } from "./siren/Siren";
+import {useAsync} from "./siren/Fetch";
+import {ErrorMessageModel} from "./domain/response-models/Error";
+import {SirenEntity} from "./siren/Siren";
 import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {useNavigate} from "react-router-dom";
-import { useSetLogin } from "./Auth";
+import {AuthState, useSetLogin} from "./Auth";
 
 export function ShowAuthTeacherFetch({
     authServices,
@@ -36,7 +36,7 @@ export function ShowAuthTeacherFetch({
             if(e.origin !== 'http://localhost:3000')
                 return;
             if (e.data.type === "Menu") {
-               setLogin(e.data.state)
+               setLogin(AuthState.Teacher)
             }
             navigate(e.data.data)
         }, false);

@@ -1,7 +1,4 @@
 import {SirenEntity} from "../../siren/Siren";
-import {AssignmentDomain} from "../Assignment";
-import {TeamDomain} from "../Team";
-import {DeliveryDomain} from "../Delivery";
 
 export type AuthRedirectDto = SirenEntity<AuthRedirectDtoProperties>
 

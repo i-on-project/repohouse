@@ -256,6 +256,35 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         }
     }
 
+    override fun getAllStudentCourses(studentId: Int):List<Course>{
+        val dto = handle.createQuery(
+            """
+            SELECT id, org_url, name, (
+                SELECT array(SELECT teacher FROM teacher_course WHERE course = Course.id) as teachers
+                ), is_archived FROM student_course JOIN course ON course.id = student_course.course
+                WHERE student_course.student = :student_id
+            """,
+        )
+            .bind("student_id", studentId)
+            .mapTo<CourseDTO>()
+            .list()
+        return dto.map { courseTemp ->
+            val teachers = courseTemp.teachers.map { teacherId ->
+                handle.createQuery(
+                    """
+                    SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+                    JOIN users on teacher.id = users.id
+                    WHERE teacher.id = :teacher_id
+                    """,
+                )
+                    .bind("teacher_id", teacherId)
+                    .mapTo<Teacher>()
+                    .first()
+            }
+            Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, isArchived = courseTemp.isArchived)
+        }
+    }
+
     /**
      * Method to get all students in a Course
      */

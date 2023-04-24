@@ -9,7 +9,11 @@ import {Button, Card} from "react-bootstrap";
 import {AssignmentServices} from "./services/AssignmentServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {AuthState, useLoggedIn} from "./Auth";
-import {AssignmentBody} from "./domain/dto/AssignmentDtoProperties";
+import {
+    AssignmentBody,
+    StudentAssignmentDtoProperties,
+    TeacherAssignmentDtoProperties
+} from "./domain/dto/AssignmentDtoProperties";
 
 export function ShowAssignmentFetch({
                                   assignmentServices,
@@ -18,11 +22,36 @@ export function ShowAssignmentFetch({
     assignmentServices: AssignmentServices;
 
 }) {
+    const user = useLoggedIn()
+
+    function renderAssignment() {
+        switch (user) {
+            case AuthState.Student:
+                return <ShowStudentAssignmentFetch assignmentServices={assignmentServices}/>
+            case AuthState.Teacher:
+                return <ShowTeacherAssignmentFetch assignmentServices={assignmentServices}/>
+            default:
+                return <ErrorAlert error={new ErrorMessageModel(401, "Unauthorized", "You are not logged in","")} onClose={() => {}}/>
+        }
+    }
+
+    return (
+        <div>
+            { renderAssignment() }
+        </div>
+    )
+}
+
+function ShowStudentAssignmentFetch({
+    assignmentServices,
+}: {
+    assignmentServices: AssignmentServices;
+}) {
+
     const content = useAsync(async () => {
-        return await assignmentServices.assignment();
+        return await assignmentServices.assignment() as SirenEntity<StudentAssignmentDtoProperties >
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
-    const user = useLoggedIn()
 
     if (!content) {
         return (
@@ -35,19 +64,10 @@ export function ShowAssignmentFetch({
         );
     }
 
-    const handleDeleteAssigment = useCallback(async () => {
-        const result = await assignmentServices.deleteAssignment();
-        if (result instanceof ErrorMessageModel) {
-            setError(result);
-        }
-        if (result instanceof SirenEntity) {
-            // TODO : navigate to the classroom page if deleted
-        }
-    }, [assignmentServices, setError]);
-
     if (content instanceof ErrorMessageModel && !error) {
         setError(content);
     }
+
 
     return (
         <div
@@ -58,71 +78,176 @@ export function ShowAssignmentFetch({
         >
             {content instanceof SirenEntity ? (
                 <>
-                { user == AuthState.Student ? (
-                    <>
-
-                    </>
-                ):(
-                    <>
-                       <Typography
-                             variant="h2"
-                       >
-                           {content.properties.assigment.title}
-                        </Typography>
-                        <Typography
-                            variant="h4"
-                        >
-                            {content.properties.assigment.description}
-                        </Typography>
-                        {content.properties.deliveries.map((delivery,index) => (
-                            <Card>
-                                <CardContent>
-                                    <Typography
-                                        variant="h6"
+                    <Typography
+                        variant="h2"
+                    >
+                        {content.properties.assignment.title}
+                    </Typography>
+                    <Typography
+                        variant="h4"
+                    >
+                        {content.properties.assignment.description}
+                    </Typography>
+                    {content.properties.deliveries.map((delivery, index) => (
+                        <Card>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                >
+                                    {"Delivery #" + index}
+                                </Typography>
+                                <Typography
+                                    variant="h6"
+                                >
+                                    {delivery.tagControl + " -  " + delivery.dueDate}
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Link to={"/assignments/" + content.properties.assignment.id + "/deliveries/" + delivery.id}>
+                                    More Info
+                                </Link>
+                            </CardActions>
+                        </Card>
+                    ))}
+                    {content.properties.team ? (
+                        <Card>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
                                     >
-                                        {"Delivery #" + index }
-                                    </Typography>
-                                    <Typography
-                                        variant="h6"
-                                    >
-                                        {delivery.tagControl + " -  " + delivery.dueDate}
-                                    </Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Link to={"/assignments/" + content.properties.assigment.id + "/deliveries/" + delivery.id}>
-                                        More Info
-                                    </Link>
-                                </CardActions>
-                            </Card>
-                        ))}
-                        {content.properties.teams.map((team,index) => (
-                            <Card>
-                                <CardContent>
-                                    <Typography
-                                        variant="h6"
-                                    >
-                                        {team.name}
-                                    </Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Link to={"/teams/" + team.id}>
-                                        More Info
-                                    </Link>
-                                </CardActions>
-                            </Card>
-                        ))}
-                        <Link to={"/assignments/" + content.properties.assigment.id + "/deliveries/create"}>Create Delivery</Link>
-                        {content.properties.deliveries.length == 0 ? (
-                            <Button onClick={handleDeleteAssigment}>Delete Assigment</Button>
-                        ) : null}
-
-                    </>
-                )}
+                                    {content.properties.team.name}
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Link to={"/teams/" + content.properties.team.id}>
+                                    More Info
+                                </Link>
+                            </CardActions>
+                        </Card>
+                    ) : (
+                        <Card>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                >
+                                    {"No team assigned - Please Join or Create one"}
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Link to={"/TODO"}>
+                                    More Info
+                                </Link>
+                            </CardActions>
+                        </Card>
+                    )}
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => setError(null)}/>
         </div>
-    );
+    )
+}
+
+function ShowTeacherAssignmentFetch({
+    assignmentServices,
+}: {
+    assignmentServices: AssignmentServices;
+}) {
+    const content = useAsync(async () => {
+        return await assignmentServices.assignment() as SirenEntity<TeacherAssignmentDtoProperties>
+    });
+    const [error, setError] = useState<ErrorMessageModel>(null);
+
+    const handleDeleteAssigment = useCallback(async () => {
+        const response = await assignmentServices.deleteAssignment()
+        if (response instanceof ErrorMessageModel) {
+            setError(response)
+        }
+    }, [setError])
+
+
+    if (!content) {
+        return (
+            <Typography
+                variant="h6"
+                gutterBottom
+            >
+                ...loading...
+            </Typography>
+        );
+    }
+
+    if (content instanceof ErrorMessageModel && !error) {
+        setError(content);
+    }
+
+
+
+    return (
+        <div
+            style={{
+                alignItems: "center",
+                justifyContent: "space-evenly",
+            }}
+        >
+            {content instanceof SirenEntity ?(
+                <>
+                    <Typography
+                        variant="h2"
+                    >
+                        {content.properties.assignment.title}
+                    </Typography>
+                    <Typography
+                        variant="h4"
+                    >
+                        {content.properties.assignment.description}
+                    </Typography>
+                    {content.properties.deliveries.map((delivery,index) => (
+                        <Card>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                >
+                                    {"Delivery #" + index }
+                                </Typography>
+                                <Typography
+                                    variant="h6"
+                                >
+                                    {delivery.tagControl + " -  " + delivery.dueDate}
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Link to={"/assignments/" + content.properties.assignment.id + "/deliveries/" + delivery.id}>
+                                    More Info
+                                </Link>
+                            </CardActions>
+                        </Card>
+                    ))}
+                    {content.properties.teams.map((team,index) => (
+                        <Card>
+                            <CardContent>
+                                <Typography
+                                    variant="h6"
+                                >
+                                    {team.name}
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Link to={"/teams/" + team.id}>
+                                    More Info
+                                </Link>
+                            </CardActions>
+                        </Card>
+                    ))}
+                    <Link to={"/assignments/" + content.properties.assignment.id + "/deliveries/create"}>Create Delivery</Link>
+                    {content.properties.deliveries.length == 0 ? (
+                        <Button onClick={handleDeleteAssigment}>Delete Assigment</Button>
+                    ) : null}
+
+                </>
+            ) : null}
+            <ErrorAlert error={error} onClose={() => setError(null)}/>
+        </div>
+    )
 }
 
 export function ShowCreateAssignment({ assignmentServices,classroomId, error }: { assignmentServices: AssignmentServices,classroomId:number, error: ErrorMessageModel | null }) {

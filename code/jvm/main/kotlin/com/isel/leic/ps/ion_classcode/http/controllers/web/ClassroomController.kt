@@ -49,7 +49,7 @@ class ClassroomController(
                 clazz("classroom")
                 link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
                 classroom.value.assignments.forEach {
-                    link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, it.id), needAuthentication = true)
+                    link(rel = LinkRelation("assignment"), href = Uris.assigmentUri(courseId, classroomId, it.id), needAuthentication = true)
                 }
                 if (user is Teacher && !classroom.value.isArchived) {
                     action(title = "local-copy", href = Uris.localCopyUri(courseId, classroomId), method = HttpMethod.POST, type = "application/json", block = {})

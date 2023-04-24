@@ -161,10 +161,11 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
     override fun getStudentsByClassroom(classroomId: Int): List<Student> {
         return handle.createQuery(
             """
-            SELECT distinct u.name, email, u.id, github_username, github_id, u.is_created, token from classroom
+            SELECT distinct u.name, email, u.id, github_username, github_id, u.is_created, token, student.school_id from classroom
             JOIN assignment on classroom.id = assignment.classroom_id
             JOIN team on team.assignment = assignment.id JOIN student_team on student_team.team = team.id
             JOIN users as u on u.id = student_team.student
+            JOIN student on u.id = student.id 
             WHERE classroom.id = :classroom_id
             """,
         )

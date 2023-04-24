@@ -7,8 +7,9 @@ import {List, ListItem, Typography, Card, CardActionArea, CardContent} from "@mu
 import {CourseServices} from "./services/CourseServices"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import {CourseBody} from "./domain/dto/CourseDtoProperties"
-import {Image} from "react-bootstrap"
+import {Button, Image} from "react-bootstrap"
 import { GitHubOrg } from "./domain/response-models/GitHubOrgs"
+import {AuthState, useLoggedIn} from "./Auth";
 
 export function ShowCourseFetch({
     courseServices, courseId
@@ -17,9 +18,11 @@ export function ShowCourseFetch({
     courseId: number;
 }) {
     const content = useAsync(async () => {
-        return await courseServices.course(courseId);
+        return await courseServices.course();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
+    const navigate = useNavigate();
+    const user = useLoggedIn()
 
     if (!content) {
         return (
@@ -30,6 +33,16 @@ export function ShowCourseFetch({
                 ...loading...
             </Typography>
         );
+    }
+
+    const handleArchiveButton = async () => {
+        const result = await courseServices.archiveCourse(courseId);
+        if (result instanceof ErrorMessageModel) {
+            setError(result);
+        }
+        if (result instanceof SirenEntity) {
+            navigate("/menu")
+        }
     }
 
     if (content instanceof ErrorMessageModel && !error) {
@@ -50,24 +63,27 @@ export function ShowCourseFetch({
                     >
                         {content.properties.name}
                     </Typography>
-                    <Typography
-                        variant="h6"
-                        gutterBottom
-                    >
-                        {"Teacher: " + content.properties.teacher}
-                    </Typography>
+                    <List>
+                        {"Teachers"}
+                        {content.properties.teacher.map( teacher => (
+                            <ListItem key={teacher.id}>
+                                {teacher.name}
+                            </ListItem>
+                        ))}
+                    </List>
                     <a href={content.properties.orgUrl} target={"_blank"}>GitHub Page</a>
                     <List>
                         {content.properties.classrooms.map( classroom => (
-                            <ListItem>
-                                //TODO: If archived,make it grey
-                                <Link to={"/courses/:id/classrooms/" + classroom.id}>
+                            <ListItem key={classroom.id}>
+                                <Link to={"/courses/"+ courseId + "/classrooms/" + classroom.id}>
                                     {classroom.name}
                                 </Link>
                             </ListItem>
                         ))}
                     </List>
-                    // TODO: If teacher add button to create classroom if course not archived
+                    { user == AuthState.Teacher  && !content.properties.isArchived ? (
+                        <Button onClick={handleArchiveButton}>Archive</Button>
+                    ) : null}
                 </>
             ) : null}
         </div>

@@ -7,7 +7,7 @@ export interface Classroom {
     name: String,
     isArchived: Boolean,
     lastSync: Date,
-    assigments: AssignmentDomain[],
+    assignments: AssignmentDomain[],
     students: Student[],
 }
 
@@ -21,7 +21,7 @@ export class Classroom {
         this.name = classroom.name
         this.isArchived = classroom.isArchived
         this.lastSync = classroom.lastSync
-        this.assigments = classroom.assigments
+        this.assignments = classroom.assignments
         this.students = classroom.students
     }
 }

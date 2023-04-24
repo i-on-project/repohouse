@@ -51,6 +51,8 @@ class SystemController {
                 rangeField("rejected")
             })
             link(rel = LinkRelation("teachersApproval"), href = Uris.TEACHERS_APPROVAL_PATH)
+            link(rel = LinkRelation("classroom"), href = Uris.CLASSROOM_PATH)
+            link(rel = LinkRelation("assignment"), href = Uris.ASSIGMENT_PATH)
         }
     }
 

@@ -4,9 +4,11 @@ import {
     assignmentServices,
     authServices,
     classroomServices,
-    courseServices, deliveryServices,
+    courseServices,
+    deliveryServices,
     menuServices,
-    systemServices, teamServices
+    systemServices,
+    teamServices
 } from './Dependecies'
 import { ShowHomeFetch } from './Home'
 import { ShowCreditsFetch } from './Credits'
@@ -107,71 +109,60 @@ const router = createBrowserRouter([
                 element: <RequireAuth>
                     <Course/>
                 </RequireAuth>,
-                children: [
-                    {
-                        path: "classrooms/:classroomId",
-                        element: <RequireAuth>
-                            <Classroom/>
-                        </RequireAuth>,
-                        children: [
-                            {
-                                path: "assignments/:assignmentId",
-                                element: <RequireAuth>
-                                    <Assignment/>
-                                </RequireAuth>,
-                                children: [
-                                    {
-                                        path: "deliveries/:deliveryId",
-                                        element: <RequireAuth>
-                                            <Delivery/>
-                                        </RequireAuth>,
-                                        children: [
-                                            {
-                                                path: "teams/:teamId",
-                                                element: <RequireAuth>
-                                                    <Team/>
-                                                </RequireAuth>,
-                                                children: [
-                                                    {
-                                                        path: "requests",
-                                                        element: <RequireAuth>
-                                                            <TeamRequests/>
-                                                        </RequireAuth>
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                path: "edit",
-                                                element: <RequireAuth>
-                                                    <DeliveryEdit/>
-                                                </RequireAuth>
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        path: "deliveries/create",
-                                        element: <RequireAuth>
-                                            <DeliveryCreate/>
-                                        </RequireAuth>
-                                    }
-
-                                ]
-                            },
-                            {
-                                path: "assignments/create",
-                                element: <RequireAuth>
-                                    <AssignmentCreate/>
-                                </RequireAuth>
-                            }
-                        ]
-                    },
-                    {
-                        path: "classrooms/create",
-                        element: <RequireAuth>
-                            <ClassroomCreate/>
-                        </RequireAuth>
-                    }
-                ]
+            },
+            {
+                path: "/courses/:courseId/classrooms/:classroomId",
+                element: <RequireAuth>
+                    <Classroom/>
+                </RequireAuth>
+            },
+            {
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId",
+                element: <RequireAuth>
+                    <Assignment/>
+                </RequireAuth>
+            },
+            {
+                path: "deliveries/:deliveryId",
+                element: <RequireAuth>
+                    <Delivery/>
+                </RequireAuth>
+            },
+            {
+                path: "teams/:teamId",
+                element: <RequireAuth>
+                    <Team/>
+                </RequireAuth>
+            },
+            {
+                path: "requests",
+                element: <RequireAuth>
+                    <TeamRequests/>
+                </RequireAuth>
+            },
+            {
+                path: "edit",
+                element: <RequireAuth>
+                    <DeliveryEdit/>
+                </RequireAuth>
+            },
+            {
+                path: "deliveries/create",
+                element: <RequireAuth>
+                    <DeliveryCreate/>
+                </RequireAuth>
+            },
+            {
+                path: "assignments/create",
+                element: <RequireAuth>
+                    <AssignmentCreate/>
+                </RequireAuth>
+            },
+            {
+                path: "classrooms/create",
+                element: <RequireAuth>
+                    <ClassroomCreate/>
+                </RequireAuth>
             },
             {
                 path: "/teacher/orgs",
@@ -372,6 +363,7 @@ function CourseCreatePost() {
 
 function Classroom() {
     const {courseId, classroomId} = useParams<{ courseId: string, classroomId: string }>();
+    console.log("courseId: " + courseId)
     return (
         <div>
             <ShowClassroomFetch classroomServices={classroomServices} classroomId={Number(classroomId)}

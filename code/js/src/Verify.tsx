@@ -37,7 +37,7 @@ export function ShowVerifyFetch({
                 setError(res)
             }
             if (res instanceof SirenEntity) {
-                setLogin(AuthState.Student) //TODO check this
+                setLogin(AuthState.Student)
                 setRedirect(true)
             }
         }

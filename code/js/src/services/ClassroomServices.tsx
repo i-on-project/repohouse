@@ -9,12 +9,12 @@ import {ClassroomBody, ClassroomDtoProperties} from "../domain/dto/ClassroomDtoP
 
 export class ClassroomServices {
 
-    classroom = async (courseId,classroomId) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
-        // TODO: Change this
+    classroom = async () => {
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.CLASSROOM_KEY, Hypermedia.systemServices.home)
         const response = await fetchGet<ClassroomDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
-            // TODO
+            Hypermedia.navigationRepository.addLinks([Hypermedia.ASSIGNMENT_KEY], response.links)
+            // TODO actions
         }
         return response
     }

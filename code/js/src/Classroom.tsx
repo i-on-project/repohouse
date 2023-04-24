@@ -19,7 +19,7 @@ export function ShowClassroomFetch({
     classroomId: number;
 }) {
     const content = useAsync(async () => {
-        return await classroomServices.classroom(courseId,classroomId);
+        return await classroomServices.classroom();
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
     const user = useLoggedIn()
@@ -54,6 +54,7 @@ export function ShowClassroomFetch({
         setError(content);
     }
 
+
     return (
         <div
             style={{
@@ -75,9 +76,9 @@ export function ShowClassroomFetch({
                         {"Last Sync Time: " + content.properties.lastSync}
                     </Typography>
                     <List>
-                        {content.properties.assigments.map( assigment => (
-                            <ListItem>
-                                <Link to={"/courses/" + courseId  + "/classrooms/ "+ classroomId  + "/assigments/" + assigment.id}>
+                        {content.properties.assignments.map( assigment => (
+                            <ListItem key={assigment.id}>
+                                <Link to={"/courses/" + courseId  + "/classrooms/" + assigment.classroomId  + "/assignments/" + assigment.id}>
                                     {assigment.title + " - " + assigment.description}
                                 </Link>
                             </ListItem>
@@ -85,7 +86,7 @@ export function ShowClassroomFetch({
                     </List>
                     <List>
                         {content.properties.students.map( student => (
-                            <ListItem>
+                            <ListItem key={student.id}>
                                 {student.name + " - " + student.schoolId}
                             </ListItem>
                         ))}

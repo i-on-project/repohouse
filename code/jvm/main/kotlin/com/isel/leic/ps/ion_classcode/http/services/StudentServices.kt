@@ -35,7 +35,7 @@ class StudentServices(
     fun getCourses(studentId: Int): StudentCoursesResponse {
         if (studentId <= 0) return Either.Left(value = StudentServicesError.InvalidInput)
         return transactionManager.run {
-            val courses = it.courseRepository.getAllUserCourses(userId = studentId)
+            val courses = it.courseRepository.getAllStudentCourses(studentId = studentId)
             Either.Right(value = courses)
         }
     }

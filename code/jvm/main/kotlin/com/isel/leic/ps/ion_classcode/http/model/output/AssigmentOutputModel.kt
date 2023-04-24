@@ -7,11 +7,23 @@ import com.isel.leic.ps.ion_classcode.domain.Team
 /**
  * Represents a Assigment Output Model.
  */
-data class AssigmentOutputModel(
-    val assignment: Assignment,
-    val deliveries: List<Delivery>,
-    val teams: List<Team>,
-)
+interface AssigmentOutputModel {
+    val assignment: Assignment
+    val deliveries: List<Delivery>
+}
+
+data class TeacherAssignmentOutputModel(
+    override val assignment: Assignment,
+    override val deliveries: List<Delivery>,
+    val teams: List<Team>
+) : AssigmentOutputModel
+
+
+data class StudentAssignmentOutputModel(
+    override val assignment: Assignment,
+    override val deliveries: List<Delivery>,
+    val team: Team?
+) : AssigmentOutputModel
 
 /**
  * Represents a Assigment Created Output Model.
@@ -23,8 +35,25 @@ data class AssignmentCreatedOutputModel(
 /**
  * Represents a Assigment Model for inner functions.
  */
-data class AssignmentModel(
-    val assignment: Assignment,
-    val deliveries: List<Delivery>,
+interface AssignmentModel {
+    val assignment: Assignment
+    val deliveries: List<Delivery>
+}
+
+/**
+ * Represents an Assigment Model for the teacher.
+ */
+data class TeacherAssignmentModel(
+    override val assignment: Assignment,
+    override val deliveries: List<Delivery>,
     val teams: List<Team>,
-)
+) : AssignmentModel
+
+/**
+ * Represents an Assigment Model for the student.
+ */
+data class StudentAssignmentModel(
+    override val assignment: Assignment,
+    override val deliveries: List<Delivery>,
+    val team: Team?,
+) : AssignmentModel

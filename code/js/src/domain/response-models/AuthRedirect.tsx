@@ -1,9 +1,4 @@
-import {AssignmentDomain} from "../Assignment";
-import {DeliveryDomain} from "../Delivery";
-import {TeamDomain} from "../Team";
-import {AssignmentDto} from "../dto/AssignmentDtoProperties";
 import {AuthRedirectDto} from "../dto/AuthRedirectDtoProperties";
-
 
 export interface AuthRedirect{
     message: string,

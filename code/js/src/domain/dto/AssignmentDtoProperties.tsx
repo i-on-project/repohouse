@@ -3,24 +3,46 @@ import {AssignmentDomain} from "../Assignment";
 import {TeamDomain} from "../Team";
 import {DeliveryDomain} from "../Delivery";
 
-export type AssignmentDto = SirenEntity<AssignmentDtoProperties>
-
-export interface AssignmentDtoProperties {
-    assigment: AssignmentDomain,
-    deliveries: DeliveryDomain[],
-    teams: TeamDomain[],
-}
+export type TeacherAssignmentDto = SirenEntity<TeacherAssignmentDtoProperties>
+export type StudentAssignmentDto = SirenEntity<StudentAssignmentDtoProperties>
 
 export class AssignmentDtoProperties {
+    assignment: AssignmentDomain;
+    deliveries: DeliveryDomain[];
+}
+
+export class TeacherAssignmentDtoProperties extends AssignmentDtoProperties{
     constructor(
-        assigment: AssignmentDomain,
+        assignment: AssignmentDomain,
         deliveries: DeliveryDomain[],
         teams: TeamDomain[],
     ) {
-        this.assigment = assigment
+        super()
+        this.assignment = assignment
         this.deliveries = deliveries
         this.teams = teams
     }
+
+    assignment: AssignmentDomain;
+    deliveries: DeliveryDomain[];
+    teams: TeamDomain[];
+}
+
+export class StudentAssignmentDtoProperties extends AssignmentDtoProperties{
+    constructor(
+        assignment: AssignmentDomain,
+        deliveries: DeliveryDomain[],
+        team: TeamDomain,
+    ) {
+        super()
+        this.assignment = assignment
+        this.deliveries = deliveries
+        this.team = team
+    }
+
+    assignment: AssignmentDomain;
+    deliveries: DeliveryDomain[];
+    team: TeamDomain;
 }
 
 export interface AssignmentDeletedDtoProperties{

@@ -32,5 +32,6 @@ export const LOGOUT_KEY = "logout"
 export const ORGS_KEY = "orgs"
 export const CREATE_COURSE_KEY = "createCourse"
 export const COURSE_KEY = "course"
-
 export const TEACHERS_APPROVAL_KEY = "teachersApproval"
+export const CLASSROOM_KEY = "classroom"
+export const ASSIGNMENT_KEY = "assignment"

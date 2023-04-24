@@ -1,10 +1,6 @@
 import {fetchDelete, fetchGet, fetchPost} from "../siren/Fetch"
 import { SirenEntity } from "../siren/Siren"
 import * as Hypermedia from "../Dependecies"
-import {MenuDtoProperties} from "../domain/dto/MenuDtoProperties";
-import {CourseBody, CourseDtoProperties, CourseWithClassroomsDtoProperties} from "../domain/dto/CourseDtoProperties";
-import {GitHubOrgsDtoProperties} from "../domain/dto/GitHubOrgsDtoProperties";
-import {ClassroomDtoProperties} from "../domain/dto/ClassroomDtoProperties";
 import {
     AssignmentBody,
     AssignmentDeletedDtoProperties,
@@ -15,8 +11,7 @@ import {
 export class AssignmentServices {
 
     assignment = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
-        // TODO: Change this
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.ASSIGNMENT_KEY, Hypermedia.systemServices.home)
         const response = await fetchGet<AssignmentDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
             // TODO

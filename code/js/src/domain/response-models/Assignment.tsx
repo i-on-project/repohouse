@@ -1,23 +1,42 @@
 import {AssignmentDomain} from "../Assignment";
 import {DeliveryDomain} from "../Delivery";
 import {TeamDomain} from "../Team";
-import {AssignmentDto} from "../dto/AssignmentDtoProperties";
+import {StudentAssignmentDto, TeacherAssignmentDto} from "../dto/AssignmentDtoProperties";
 
 
 export interface Assignment {
     assignment: AssignmentDomain,
     deliveries: DeliveryDomain[],
-    teams: TeamDomain[],
 }
 
-export class Assignment {
+export class TeacherAssignment implements Assignment {
     constructor(
-        dto: AssignmentDto
+        dto: TeacherAssignmentDto
     ) {
         const assignment = dto.properties
         if(assignment == null) throw new Error("AssigmentDto properties is null")
-        this.assignment = assignment.assigment
+        this.assignment = assignment.assignment
         this.deliveries = assignment.deliveries
         this.teams = assignment.teams
     }
+
+    assignment: AssignmentDomain;
+    deliveries: DeliveryDomain[];
+    teams: TeamDomain[];
+}
+
+export class StudentAssignment implements Assignment {
+    constructor(
+        dto: StudentAssignmentDto
+    ) {
+        const assignment = dto.properties
+        if(assignment == null) throw new Error("AssigmentDto properties is null")
+        this.assignment = assignment.assignment
+        this.deliveries = assignment.deliveries
+        this.team = assignment.team
+    }
+
+    assignment: AssignmentDomain;
+    deliveries: DeliveryDomain[];
+    team: TeamDomain;
 }

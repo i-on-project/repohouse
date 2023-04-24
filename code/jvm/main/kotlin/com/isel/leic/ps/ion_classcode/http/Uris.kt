@@ -84,7 +84,7 @@ object Uris {
     fun courseStudentsUri(courseId: Int): String = UriTemplate(STUDENTS_COURSE_PATH).expand(courseId).toASCIIString()
     fun enterCourse(courseId: Int): String = UriTemplate(ENTER_COURSE_PATH).expand(courseId).toASCIIString()
     fun leaveCourse(courseId: Int): String = UriTemplate(LEAVE_COURSE_PATH).expand(courseId).toASCIIString()
-    fun classroomUri(courseId: Int, classroomId: Int): String = UriTemplate(CLASSROOMS_PATH).expand(courseId, classroomId).toASCIIString()
+    fun classroomUri(courseId: Int, classroomId: Int): String = UriTemplate(CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()
     fun createClassroomUri(courseId: Int): String = UriTemplate(CREATE_CLASSROOM_PATH).expand(courseId).toASCIIString()
     fun archiveClassroomUri(courseId: Int, classroomId: Int): String = UriTemplate(ARCHIVE_CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()
     fun syncClassroomUri(courseId: Int, classroomId: Int): String = UriTemplate(SYNC_CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()

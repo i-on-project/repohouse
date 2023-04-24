@@ -58,12 +58,12 @@ export function ShowMenuFetch({
                     </Typography>
                     <List>
                         {content.properties.courses.map( course => (
-                            <ListItem>
+                            <ListItem key={course.id}>
                                 <Link to={"/courses/" + course.id}>{course.name}</Link>
                                 <List>
                                     Teachers:
                                     {course.teacher.map( teacher => (
-                                        <ListItem>
+                                        <ListItem key={teacher.id}>
                                             {teacher.name}
                                         </ListItem>
                                     ))}
