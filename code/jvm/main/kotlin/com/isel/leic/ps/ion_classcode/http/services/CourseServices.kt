@@ -115,12 +115,14 @@ class CourseServices(
         }
     }
 
-
-    fun getTeacherGithubToken(userId: Int) : UserGithubTokenResponse {
-       return transactionManager.run {
+    fun getTeacherGithubToken(userId: Int): UserGithubTokenResponse {
+        return transactionManager.run {
             val githubToken = it.usersRepository.getTeacherGithubToken(userId)
-            if (githubToken == null) Either.Left(value = CourseServicesError.NotTeacher)
-            else Either.Right(AESDecrypt.decrypt(githubToken))
+            if (githubToken == null) {
+                Either.Left(value = CourseServicesError.NotTeacher)
+            } else {
+                Either.Right(AESDecrypt.decrypt(githubToken))
+            }
         }
     }
 }

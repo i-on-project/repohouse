@@ -82,22 +82,22 @@ CREATE TABLE Classroom(
 );
 
 CREATE TABLE Assignment(
-                           id serial primary key,
-                           classroom_id int not null,
-                           max_elems_per_group int not null,
-                           max_number_groups int not null,
-                           release_date timestamp not null,
-                           description text not null,
-                           title text not null,
-                           foreign key (classroom_id) references Classroom(id)
+   id serial primary key,
+   classroom_id int not null,
+   max_elems_per_group int not null,
+   max_number_groups int not null,
+   release_date timestamp not null,
+   description text not null,
+   title text not null,
+   foreign key (classroom_id) references Classroom(id)
 );
 
 CREATE TABLE Team(
-                     id serial primary key,
-                     name text not null,
-                     is_Created boolean not null,
-                     assignment int not null,
-                     foreign key (assignment) references Assignment(id)
+    id serial primary key,
+    name text not null,
+    is_Created boolean not null,
+    assignment int not null,
+    foreign key (assignment) references Assignment(id)
 );
 
 CREATE TABLE Request(

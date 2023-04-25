@@ -105,7 +105,7 @@ object Uris {
     fun joinTeamUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): String = UriTemplate(JOIN_TEAM_PATH).expand(courseId, classroomId, assigmentId, teamId).toASCIIString()
     fun teamRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): String = UriTemplate(TEAM_REQUESTS_PATH).expand(courseId, classroomId, assigmentId, teamId).toASCIIString()
     fun teamChangeStatusRequestsUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int, requestId: Int): String = UriTemplate(
-        TEAM_CHANGE_REQUEST_PATH
+        TEAM_CHANGE_REQUEST_PATH,
     ).expand(courseId, classroomId, assigmentId, teamId, requestId).toASCIIString()
     fun postFeedbackUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): String = UriTemplate(POST_FEEDBACK_PATH).expand(courseId, classroomId, assigmentId, teamId).toASCIIString()
     fun localCopyUri(courseId: Int, classroomId: Int): String = UriTemplate(LOCAL_COPY_PATH).expand(courseId, classroomId).toASCIIString()

@@ -212,7 +212,7 @@ class Problem {
             ),
         )
 
-        fun cooldown(time:Int) = response(
+        fun cooldown(time: Int) = response(
             HttpStatus.REQUEST_TIMEOUT,
             ErrorMessageModel(
                 URI("$BASE_URL/too-many-requests"),

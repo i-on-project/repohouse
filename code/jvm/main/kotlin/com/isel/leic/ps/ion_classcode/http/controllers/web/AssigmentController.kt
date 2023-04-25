@@ -5,7 +5,6 @@ import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.AssigmentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StudentAssignmentModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StudentAssignmentOutputModel

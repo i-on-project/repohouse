@@ -34,7 +34,7 @@ export interface TeacherPending {
 }
 
 export interface TeacherPendingApproval {
-    teacher: TeacherPending[]
+    teachers: TeacherPending[]
 }
 
 export class TeacherPendingApproval {
@@ -43,6 +43,6 @@ export class TeacherPendingApproval {
     ) {
         const teacher = dto.properties
         if(teacher == null) throw new Error("TeacherDto properties is null")
-        this.teacher = teacher.teacher
+        this.teachers = teacher.teachers
     }
 }

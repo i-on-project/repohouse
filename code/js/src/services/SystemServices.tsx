@@ -20,7 +20,4 @@ export class SystemServices {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.CREDITS_KEY, this.home)
         return await fetchGet<CreditsDtoProperties>(link.href)
     }
-
-
-
 }

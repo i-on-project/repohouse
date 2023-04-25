@@ -3,64 +3,57 @@ import { useAsync } from "./siren/Fetch";
 import {useCallback, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
-import { SystemServices } from "./services/SystemServices";
 import {List, ListItem, Typography} from "@mui/material";
 import {MenuServices} from "./services/MenuServices";
-import {MenuStudentDtoProperties, MenuTeacherDtoProperties} from "./domain/dto/MenuDtoProperties";
-import {Link} from "react-router-dom";
 import {Button} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Checkbox } from '@mui/material';
 
 export function ShowTeacherApprovalFetch({
-                                  menuServices,
-                              }: {
-    menuServices: MenuServices;
+    menuServices,
+}: {
+    menuServices: MenuServices
 }) {
     const content = useAsync(async () => {
-        return await menuServices.getTeachersPendingApproval();
+        return await menuServices.getTeachersPendingApproval()
     });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-    const [teachersApproved, setTeachersApproved] = useState<number[]>([]);
-    const [teachersRejected, setTeachersRejected] = useState<number[]>([]);
+    const [error, setError] = useState<ErrorMessageModel>(null)
+    const [teachersApproved, setTeachersApproved] = useState<number[]>([])
+    const [teachersRejected, setTeachersRejected] = useState<number[]>([])
+    const navigate = useNavigate()
     // TODO: Find a way to change active button
 
-    const handleApprove = useCallback((event:any) => {
-        event.preventDefault()
-        const teacherId = parseInt(event.currentTarget.value)
+    const handleApprove = useCallback((teacherId: number) => {
         if (teachersRejected.includes(teacherId)) {
             setTeachersRejected((teachersRejected.filter(id => id !== teacherId)))
         }
         setTeachersApproved([...teachersApproved, teacherId])
-    }, [teachersApproved, teachersRejected,setTeachersRejected,setTeachersApproved])
+    }, [teachersApproved, teachersRejected])
 
-    const handleReject = useCallback((event:any) => {
-        event.preventDefault()
-        const teacherId = parseInt(event.currentTarget.value)
+    const handleReject = useCallback((teacherId: number) => {
         if (teachersApproved.includes(teacherId)) {
             setTeachersApproved((teachersApproved.filter(id => id !== teacherId)))
         }
         setTeachersRejected([...teachersRejected, teacherId])
-    }, [teachersApproved, teachersRejected,setTeachersRejected,setTeachersApproved])
+    }, [teachersApproved, teachersRejected])
 
-    const handleNothing = useCallback((event:any) => {
-        event.preventDefault()
-        const teacherId = parseInt(event.currentTarget.value)
+    const handleNothing = useCallback((teacherId: number) => {
         if (teachersApproved.includes(teacherId)) {
             setTeachersApproved((teachersApproved.filter(id => id !== teacherId)))
         }
         if (teachersRejected.includes(teacherId)) {
             setTeachersRejected((teachersRejected.filter(id => id !== teacherId)))
         }
-    }, [teachersApproved, teachersRejected,setTeachersRejected,setTeachersApproved])
+    }, [teachersApproved, teachersRejected])
 
-    const handleSubmit = useCallback((event:any) => {
+    const handleSubmit = useCallback(async (event:any) => {
         event.preventDefault()
-        menuServices.approveTeacher(teachersApproved, teachersRejected).then(r => {
-            if (r instanceof ErrorMessageModel) {
-                setError(r)
-            } else {
-                window.location.reload()
-            }
-        })
+        const r = await menuServices.approveTeacher(teachersApproved, teachersRejected)
+        if (r instanceof ErrorMessageModel) {
+            setError(r)
+        } else {
+            navigate("/menu")
+        }
     }, [teachersApproved, teachersRejected])
 
     if (!content) {
@@ -90,23 +83,59 @@ export function ShowTeacherApprovalFetch({
                     <Typography
                         variant="h2"
                     >
-                        {"Teachers"}
+                        {"Teachers Apply Requests"}
+                    </Typography>
+                    <Typography
+                        variant="h4"
+                    >
+                        {"Approve, do Nothing or Reject"}
                     </Typography>
                     <List>
-                        {content.properties.teacher.map((teacher) => (
+                        {content.properties.teachers.map((teacher) => (
                             <ListItem
                                 key={teacher.id}
                             >
                                 {teacher.name} - {teacher.email}
-                                <Button onClick={handleApprove} value={teacher.id} active={false}> Approve </Button>
-                                <Button onClick={handleNothing} value={teacher.id} active={true} > Nothing </Button>
-                                <Button onClick={handleReject} value={teacher.id} active={false}> Reject </Button>
+                               <HandleTeachersCheckbox value={teacher.id} acceptHandler={handleApprove} rejectHandler={handleReject} nothingHandler={handleNothing}/>
                             </ListItem>
                         ))}
                     </List>
-                    <Button onClick={handleSubmit}> Submit </Button>
+                    { teachersApproved.length || teachersRejected.length ? <Button onClick={handleSubmit}> Submit </Button> : null}
                 </>
             ) : null}
         </div>
     );
+}
+
+function HandleTeachersCheckbox({ value, acceptHandler, rejectHandler, nothingHandler } : 
+    {
+        value : number, 
+        acceptHandler: (teacherId: number) => void, 
+        rejectHandler: (teacherId: number) => void,
+        nothingHandler: (teacherId: number) => void
+    }
+) {
+    const [isAcceptChecked, setAcceptChecked] = useState(false)
+    const [isRejectChecked, setRejectChecked] = useState(false)
+    const [isNothingChecked, setNothingChecked] = useState(true)   
+    return <>
+        <Checkbox checked={isAcceptChecked} value={value} color={"success"} onChange={() => {
+            setAcceptChecked(true)
+            setRejectChecked(false)
+            setNothingChecked(false)
+            acceptHandler(value)
+        }}/>
+        <Checkbox checked={isNothingChecked} value={value} color={"info"} onChange={() => {
+            setAcceptChecked(false)
+            setRejectChecked(false)
+            setNothingChecked(true)
+            nothingHandler(value)
+        }}/>
+        <Checkbox checked={isRejectChecked} value={value} color={"error"} onChange={() => {
+            setAcceptChecked(false)
+            setRejectChecked(true)
+            setNothingChecked(false)
+            rejectHandler(value)
+        }}/>
+    </>
 }

@@ -31,7 +31,7 @@ class IonClassCodeApplication : WebMvcConfigurer {
     fun jdbi() = Jdbi.create(
         PGSimpleDataSource().apply {
             setURL(System.getenv(DATABASE_URL))
-        }
+        },
     ).configure()
 
     @Bean
@@ -52,7 +52,7 @@ class IonClassCodeApplication : WebMvcConfigurer {
 @Configuration
 class PipelineConfigurer(
     val userArgumentResolver: UserArgumentResolver,
-    val authenticationInterceptor: AuthenticationInterceptor
+    val authenticationInterceptor: AuthenticationInterceptor,
 ) : WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {

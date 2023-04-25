@@ -30,7 +30,6 @@ import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
-import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
@@ -39,7 +38,6 @@ import jakarta.servlet.http.HttpServletResponse
 import okhttp3.Request
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CookieValue
@@ -81,15 +79,12 @@ class AuthController(
      */
     @GetMapping(Uris.AUTH_TEACHER_PATH)
     fun authTeacher(
-        response: HttpServletResponse
+        response: HttpServletResponse,
     ): ResponseEntity<*> {
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(TEACHER_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")) {
-            link(href = Uris.authUriTeacher(), rel = LinkRelation("self"))
-            link(href = Uris.callbackUri(), rel = LinkRelation("authCallback"))
-        }
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")) {}
     }
 
     /**
@@ -97,15 +92,12 @@ class AuthController(
      */
     @GetMapping(Uris.AUTH_STUDENT_PATH)
     fun authStudent(
-        response: HttpServletResponse
+        response: HttpServletResponse,
     ): ResponseEntity<*> {
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")) {
-            link(href = Uris.authUriStudent(), rel = LinkRelation("self"))
-            link(href = Uris.callbackUri(), rel = LinkRelation("authCallback"))
-        }
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")) {}
     }
 
     /**
@@ -234,13 +226,11 @@ class AuthController(
 
     @GetMapping(Uris.AUTH_REGISTER_PATH)
     fun getRegisterInfo(
-        @CookieValue userGithubId: String
+        @CookieValue userGithubId: String,
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val userInfo = userServices.getPendingUserByGithubId(githubId)) {
-            is Either.Right -> {
-                siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {}
-            }
+            is Either.Right -> siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {}
             is Either.Left -> problemUser(userInfo.value)
         }
     }
@@ -248,18 +238,12 @@ class AuthController(
     @PostMapping(Uris.AUTH_REGISTER_TEACHER_PATH)
     fun createTeacher(
         @CookieValue userGithubId: String,
-        @CookieValue position: String
+        @CookieValue position: String,
     ): ResponseEntity<*> {
         if (position != "Teacher") return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val teacher = userServices.createTeacher(githubId)) {
-            is Either.Right -> {
-                siren(StatusOutputModel("User Register", "Verify the status of your account")) {
-                    link(href = Uris.authStatusUri(), rel = LinkRelation("status"))
-                    link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                    link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                }
-            }
+            is Either.Right -> siren(StatusOutputModel("User Register", "Verify the status of your account")) {}
             is Either.Left -> problemUser(teacher.value)
         }
     }
@@ -275,29 +259,19 @@ class AuthController(
     ): ResponseEntity<*> {
         if (position != "Student") return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
-        return when (val student = userServices.createStudent(githubId,input.schoolId)) {
+        return when (val student = userServices.createStudent(githubId, input.schoolId)) {
             is Either.Right -> {
                 when (val userOutbox = outboxServices.createUserVerification(student.value.id)) {
-                    is Either.Right -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
-                        link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                        link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                        action("verify", href = Uris.authUriRegisterVerification(), method = HttpMethod.POST, type = "application/json") {
-                            numberField("otp")
-                        }
+                    is Either.Right -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {}
+                    is Either.Left -> when (userOutbox.value) {
+                        is OutboxServicesError.CooldownNotExpired -> siren(
+                            StatusOutputModel(
+                                "On cooldown",
+                                "You are on cooldown, try again in ${userOutbox.value.cooldown} seconds",
+                            ),
+                        ) {}
+                        else -> problemOtp(userOutbox.value)
                     }
-                    is Either.Left ->
-                        when (userOutbox.value) {
-                            is OutboxServicesError.CooldownNotExpired -> siren(
-                                StatusOutputModel(
-                                    "On cooldown",
-                                    "You are on cooldown, try again in ${userOutbox.value.cooldown} seconds",
-                                ),
-                            ) {
-                                link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                                link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                            }
-                            else -> problemOtp(userOutbox.value)
-                        }
                 }
             }
             is Either.Left -> problemUser(student.value)
@@ -307,38 +281,36 @@ class AuthController(
     @GetMapping(Uris.AUTH_STATUS_PATH)
     fun getStatus(
         @CookieValue position: String,
-        @CookieValue userGithubId: String
+        @CookieValue userGithubId: String,
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val userInfo = userServices.getUserByGithubId(githubId)) {
             is Either.Right -> {
-                if (userInfo.value.isCreated){
+                if (userInfo.value.isCreated) {
                     val cookie = generateSessionCookie(userInfo.value.token)
                     ResponseEntity
                         .status(Status.REDIRECT)
                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
                         .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback")
                         .body(EMPTY_REQUEST)
-                }else {
+                } else {
                     when (position) {
                         "Teacher" -> siren(
                             StatusOutputModel(
                                 "Needing approval",
-                                "Wait for approval from other teachers"
-                            )
+                                "Wait for approval from other teachers",
+                            ),
                         ) {}
                         else -> siren(
                             StatusOutputModel(
                                 "Needing action.",
-                                "Verify your email to proceed with the verification or register using your school id."
-                            )
+                                "Verify your email to proceed with the verification or register using your school id.",
+                            ),
                         ) {}
                     }
                 }
             }
-            is Either.Left -> {
-                problemUser(userInfo.value)
-            }
+            is Either.Left -> problemUser(userInfo.value)
         }
     }
 
@@ -359,11 +331,7 @@ class AuthController(
                         val cookie = generateSessionCookie(user.value.token)
                         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
                         response.setHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
-                        siren(StatusOutputModel("User verified.", "User verified successfully, you can navigate to menu.")) {
-                            link(href = Uris.menuUri(), rel = LinkRelation("menu"), needAuthentication = true)
-                            link(href = Uris.homeUri(), rel = LinkRelation("home"))
-                            link(href = Uris.creditsUri(), rel = LinkRelation("credits"))
-                        }
+                        siren(StatusOutputModel("User verified.", "User verified successfully, you can navigate to menu.")) {}
                     }
                     is Either.Left -> problemOtp(checkOTP.value)
                 }
@@ -441,7 +409,7 @@ class AuthController(
     /**
      * Create a user GitHub id cookie.
      */
-    private fun generateGithubIdCookie(gitHubId:Long): ResponseCookie {
+    private fun generateGithubIdCookie(gitHubId: Long): ResponseCookie {
         return ResponseCookie.from(GITHUB_ID_COOKIE_NAME, AESEncrypt.encrypt(gitHubId.toString()))
             .path("/api")
             .maxAge(HALF_HOUR)

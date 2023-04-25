@@ -51,25 +51,15 @@ class CourseController(
      */
     @GetMapping(Uris.ORGS_PATH, produces = ["application/vnd.siren+json"])
     suspend fun getTeacherOrgs(
-        user: User
+        user: User,
     ): ResponseEntity<*> {
-        if (user !is Teacher) return Problem.unauthorized
+        if (user !is Teacher) return Problem.notTeacher
         return when (val token = courseServices.getTeacherGithubToken(user.id)) {
             is Either.Left -> problem(token.value)
             is Either.Right -> {
                 val orgs = fetchTeacherOrgs(token.value)
                 siren(GitHubOrgsOutputModel(orgs)) {
                     clazz("course")
-                    action(
-                        title = "createCourse",
-                        method = HttpMethod.POST,
-                        href = Uris.COURSE_PATH,
-                        type = "application/json",
-                        block = {
-                            textField(name = "name")
-                            textField(name = "orgUrl")
-                            numberField(name = "id")
-                        })
                 }
             }
         }
@@ -85,7 +75,7 @@ class CourseController(
         user: User,
         @RequestBody courseInfo: CourseInputModel,
     ): ResponseEntity<*> {
-        if (user !is Teacher) return Problem.unauthorized
+        if (user !is Teacher) return Problem.notTeacher
         return when (val course = courseServices.createCourse(courseInfo, user.id)) {
             is Either.Left -> problem(course.value)
             is Either.Right -> siren(value = CourseCreatedOutputModel(course.value)) {

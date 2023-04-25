@@ -10,7 +10,6 @@ import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import okhttp3.Request
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
-import okhttp3.Response
 
 // TODO: Change the data classes to different files
 data class RepoOrg(
@@ -73,7 +72,7 @@ class GithubServices(
 ) {
 
     suspend fun getUserOrgs(token: String):List<GitHubOrgsModel>{
-        TODO()
+        // TODO()
         val orgsRequest = Request.Builder().url("")
             .addHeader("Authorization", "Bearer $token")
             .addHeader("Accept", "application/json")

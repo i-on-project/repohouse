@@ -1,7 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
-import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel

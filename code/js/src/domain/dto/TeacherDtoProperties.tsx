@@ -1,5 +1,5 @@
 import {SirenEntity} from "../../siren/Siren";
-import {Teacher, TeacherPending} from "../response-models/Teacher";
+import {TeacherPending} from "../response-models/Teacher";
 
 export type TeacherDto = SirenEntity<TeacherDtoProperties>
 export type TeacherPendingApprovalDto = SirenEntity<TeacherPendingApprovalDtoProperties>
@@ -35,13 +35,13 @@ export class TeacherDtoProperties {
 }
 
 export interface TeacherPendingApprovalDtoProperties{
-    teacher: TeacherPending[],
+    teachers: TeacherPending[],
 }
 
 export class TeacherPendingApprovalDtoProperties {
     constructor(
-        teacher: TeacherPending[],
+        teachers: TeacherPending[],
     ) {
-        this.teacher = teacher
+        this.teachers = teachers
     }
 }

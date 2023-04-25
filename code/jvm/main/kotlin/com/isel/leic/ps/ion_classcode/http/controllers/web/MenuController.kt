@@ -3,13 +3,11 @@ package com.isel.leic.ps.ion_classcode.http.controllers.web
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
-import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.TeachersPendingInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.MenuStudentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.MenuTeacherOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.OutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeachersPendingOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -20,10 +18,10 @@ import com.isel.leic.ps.ion_classcode.http.services.TeacherServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
-import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -56,7 +54,7 @@ class MenuController(
     private fun menuTeacher(
         user: User,
     ): ResponseEntity<*> {
-        if (user !is Teacher) return Problem.stateMismatch
+        if (user !is Teacher) return Problem.notTeacher
         return when (val courses = teacherServices.getCourses(user.id)) {
             is Either.Right -> siren(value = MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
                 clazz("menu")
@@ -71,7 +69,7 @@ class MenuController(
     private fun menuStudent(
         user: User,
     ): ResponseEntity<*> {
-        if (user !is Student) return Problem.stateMismatch
+        if (user !is Student) return Problem.notStudent
         val studentSchoolId = studentServices.getStudentSchoolId(user.id)
         if (studentSchoolId is Either.Left) return problemStudent(studentSchoolId.value)
         return when (val courses = studentServices.getCourses(user.id)) {
@@ -105,18 +103,12 @@ class MenuController(
      */
     @PostMapping(Uris.TEACHERS_APPROVAL_PATH, produces = ["application/vnd.siren+json"])
     fun teacherApproved(
+        @RequestBody
         input: TeachersPendingInputModel,
-    ): ResponseEntity<OutputModel> {
-        return when (teacherServices.approveTeachers(input)) {
-            is Either.Right ->
-                ResponseEntity
-                    .status(Status.REDIRECT)
-                    .header("Location", Uris.TEACHERS_APPROVAL_PATH)
-                    .build()
-            is Either.Left ->
-                ResponseEntity
-                    .status(Status.BAD_REQUEST)
-                    .build()
+    ): ResponseEntity<*> {
+        return when (val approved = teacherServices.approveTeachers(input)) {
+            is Either.Right -> siren(value = TeachersPendingOutputModel(approved.value)) {}
+            is Either.Left -> problemTeacher(approved.value)
         }
     }
 

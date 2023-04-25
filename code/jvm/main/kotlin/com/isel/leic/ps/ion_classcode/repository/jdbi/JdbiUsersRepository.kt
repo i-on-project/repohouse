@@ -503,34 +503,34 @@ class JdbiUsersRepository(
             WHERE id = :id
             """,
         )
-            .bind("token", token).
-            bind("id", id).
-            execute()
+            .bind("token", token)
+            .bind("id", id)
+            .execute()
     }
 }
 
-    /**
-     * Method to help get a user type
-     * Can be a student or a teacher
-     */
-    private fun helper(handle: Handle, id: Int): User? {
-        return handle.createQuery(
-            """
+/**
+ * Method to help get a user type
+ * Can be a student or a teacher
+ */
+private fun helper(handle: Handle, id: Int): User? {
+    return handle.createQuery(
+        """
                 SELECT name, email, Users.id, github_username, github_id, is_created, school_id,token FROM Student
                 JOIN Users on Users.id = student.id
                 WHERE Users.id = :id
                 """,
-        )
-            .bind("id", id)
-            .mapTo<Student>()
-            .firstOrNull() ?: handle.createQuery(
-            """
+    )
+        .bind("id", id)
+        .mapTo<Student>()
+        .firstOrNull() ?: handle.createQuery(
+        """
                 SELECT name, email, Users.id, github_username, github_id, is_created,token FROM Teacher
                 JOIN Users on Users.id = teacher.id
                 WHERE Users.id = :id
                 """,
-        )
-            .bind("id", id)
-            .mapTo<Teacher>()
-            .firstOrNull()
+    )
+        .bind("id", id)
+        .mapTo<Teacher>()
+        .firstOrNull()
 }
