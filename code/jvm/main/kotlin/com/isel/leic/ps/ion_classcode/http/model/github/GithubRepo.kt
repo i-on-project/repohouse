@@ -1,5 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.model.github
 
+import java.sql.Timestamp
+
 /**
  * GitHub Repository model.
  */
@@ -110,4 +112,55 @@ data class License(
     val spdx_id: String,
     val url: String,
     val node_id: String,
+)
+
+data class RepoOrg(
+    val name: String,
+    val full_name: String,
+    val owner: Owner,
+    val private: Boolean?,
+    val description: String?,
+    val commits_url: String,
+    val collaborators_url: String,
+    val tags_url: String,
+)
+
+data class RepoReponse(
+    val name: String,
+    val collaborators: List<Collaborator>,
+    val tags: List<Tag>
+)
+
+data class Collaborator(
+    val login: String,
+    val id: Int,
+    val permissions: Permissions
+)
+data class Tag(
+    val name: String,
+    val date: Timestamp
+)
+
+data class Tags(
+    val name: String,
+    val commit: CommitTag
+)
+
+data class CommitTag(
+    val sha: String,
+    val url: String
+)
+
+data class Commit(
+    val commit: CommitInfo
+)
+
+data class CommitInfo(
+    val author: Author
+)
+
+data class Author(
+    val name: String,
+    val email: String,
+    val date: String
 )

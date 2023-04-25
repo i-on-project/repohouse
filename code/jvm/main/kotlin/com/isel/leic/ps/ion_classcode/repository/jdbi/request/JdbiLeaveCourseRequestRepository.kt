@@ -16,7 +16,7 @@ class JdbiLeaveCourseRequestRepository(
     /**
      * Method to create a Leave Course Request
      */
-    override fun createLeaveCourseRequest(request: LeaveCourseInput): Int {
+    override fun createLeaveCourseRequest(request: LeaveCourseInput,creator:Int): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite,state)
@@ -24,7 +24,7 @@ class JdbiLeaveCourseRequestRepository(
             RETURNING id
             """,
         )
-            .bind("creator", request.creator)
+            .bind("creator", creator)
             .bind("compositeId", request.composite)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()

@@ -14,7 +14,6 @@ interface CourseRepository {
     fun checkIfCourseNameExists(name: String): Boolean
     fun createCourse(course: CourseInput): Course
     fun deleteCourse(courseId: Int)
-    fun enterCourse(courseId: Int, studentId: Int): Course
     fun leaveCourse(courseId: Int, studentId: Int): Course
     fun archiveCourse(courseId: Int)
     fun addTeacherToCourse(teacherId: Int, courseId: Int): Course

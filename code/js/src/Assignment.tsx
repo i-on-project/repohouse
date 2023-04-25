@@ -4,7 +4,7 @@ import {useAsync} from "./siren/Fetch";
 import {ErrorMessageModel} from "./domain/response-models/Error";
 import {SirenEntity} from "./siren/Siren";
 import {Box, ButtonGroup, CardActions, CardContent, TextField, Typography} from "@mui/material";
-import {Link} from "react-router-dom";
+import {Link, Navigate, useNavigate} from "react-router-dom";
 import {Button, Card} from "react-bootstrap";
 import {AssignmentServices} from "./services/AssignmentServices";
 import {ErrorAlert} from "./ErrorAlert";
@@ -14,6 +14,9 @@ import {
     StudentAssignmentDtoProperties,
     TeacherAssignmentDtoProperties
 } from "./domain/dto/AssignmentDtoProperties";
+import {Assignment} from "./domain/response-models/Assignment";
+import {CreateTeamBody, JoinTeamBody} from "./domain/dto/RequestDtoProperties";
+import {AssignmentDomain} from "./domain/Assignment";
 
 export function ShowAssignmentFetch({
                                   assignmentServices,
@@ -149,8 +152,8 @@ function ShowStudentAssignmentFetch({
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Link to={"/TODO"}>
-                                    More Info
+                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/"} state={{assignment:content.properties.assignment}}>
+                                    Join or Create Team
                                 </Link>
                             </CardActions>
                         </Card>
@@ -234,13 +237,13 @@ function ShowTeacherAssignmentFetch({
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Link to={"/assignments/" + content.properties.assignment.id + "/deliveries/" + delivery.id}>
+                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/" + delivery.id}>
                                     More Info
                                 </Link>
                             </CardActions>
                         </Card>
                     ))}
-                    {content.properties.teams.map((team,index) => (
+                    {content.properties.teams.map((team) => (
                         <Card>
                             <CardContent>
                                 <Typography
@@ -250,13 +253,13 @@ function ShowTeacherAssignmentFetch({
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Link to={"/teams/" + team.id}>
+                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + team.id}>
                                     More Info
                                 </Link>
                             </CardActions>
                         </Card>
                     ))}
-                    <Link to={"/assignments/" + content.properties.assignment.id + "/deliveries/create"}>Create Delivery</Link>
+                    <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/create"}>Create Delivery</Link>
                     {content.properties.deliveries.length == 0 ? (
                         <Button onClick={handleDeleteAssigment}>Delete Assigment</Button>
                     ) : null}
@@ -268,7 +271,7 @@ function ShowTeacherAssignmentFetch({
     )
 }
 
-export function ShowCreateAssignment({ assignmentServices,classroomId, error }: { assignmentServices: AssignmentServices,classroomId:number, error: ErrorMessageModel | null }) {
+export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, error }: { assignmentServices: AssignmentServices,courseId:number,classroomId:number, error: ErrorMessageModel | null }) {
     const [title, setTitle] = useState<string>(null)
     const [description, setDescription] = useState<string>(null)
     const [numbGroups, setNumbGroups] = useState(10)
@@ -304,7 +307,7 @@ export function ShowCreateAssignment({ assignmentServices,classroomId, error }: 
 
     if(create) {
         const assignment = new AssignmentBody(classroomId,numbElemPerGroup,numbGroups,title,description,new Date())
-        return <ShowCreateAssignmentPost assignmentServices={assignmentServices} assignment={assignment}/>
+        return <ShowCreateAssignmentPost assignmentServices={assignmentServices} assignment={assignment} courseId={courseId} classroomId={classroomId} error={serror}/>
     }
 
     const minNumbGroups = 5
@@ -344,11 +347,19 @@ export function ShowCreateAssignment({ assignmentServices,classroomId, error }: 
     )
 }
 
-function ShowCreateAssignmentPost({ assignmentServices, assignment }: { assignmentServices: AssignmentServices, assignment: AssignmentBody }) {
+function ShowCreateAssignmentPost({
+                                      assignmentServices, assignment, courseId,classroomId,error
+}: {
+    assignmentServices: AssignmentServices,
+    assignment: AssignmentBody,
+    courseId:number,
+    classroomId:number,
+    error: ErrorMessageModel
+}) {
     const content = useAsync(async () => {
         return await assignmentServices.createAssignment(assignment);
     });
-    const [error, setError] = useState<ErrorMessageModel>(null);
+    const [serror, setError] = useState<ErrorMessageModel>(error);
 
 
     if (!content) {
@@ -357,11 +368,125 @@ function ShowCreateAssignmentPost({ assignmentServices, assignment }: { assignme
         )
     }
 
+    if (serror){
+        return <ErrorAlert error={serror} onClose={() => setError(null)}/>
+    }
+
     if (content instanceof ErrorMessageModel) {
         setError(content)
     }
 
     if (content instanceof SirenEntity) {
-        //TODO: redirect to the new assignment
+        const assigmentId = content.properties.assignment.id
+        return <Navigate to={`/courses/${courseId}/classrooms/${classroomId}/assignments/${assigmentId}`}/>
     }
+}
+
+export function ShowAssigmentTeamsFetch({
+        assignmentServices,
+        courseId,
+        classroomId,
+        assignment,
+        error
+}:{
+    assignmentServices:AssignmentServices,
+    courseId:number,
+    classroomId:number,
+    assignment:AssignmentDomain,
+    error:ErrorMessageModel
+}){
+
+    const content = useAsync(async () => {
+        return await assignmentServices.teams(courseId,classroomId,assignment.id);
+    });
+
+    const [serror, setError] = useState<ErrorMessageModel>(error);
+    const [teamName, setTeamName] = useState<string>(null)
+    const navigate = useNavigate()
+
+    const handleJoinTeam = useCallback((event:any) => {
+        event.preventDefault()
+        const teamId = event.target.value
+        const body = new JoinTeamBody(assignment.id,teamId)
+        const response = assignmentServices.joinTeam(body,courseId,classroomId,assignment.id)
+        if(response instanceof ErrorMessageModel) {
+            setError(response)
+        }
+        if (response instanceof SirenEntity) {
+            navigate("/courses/" + courseId +"/classrooms/"+classroomId+"/assignments/"+assignment.id+"teams/"+teamId, { replace: true })
+        }
+    },[setError])
+
+    const handleCreateTeam = useCallback((event:any) => {
+        event.preventDefault()
+        const body = new CreateTeamBody(null)
+        const response = assignmentServices.createTeam(body,courseId,classroomId,assignment.id)
+        if(response instanceof ErrorMessageModel) {
+            setError(response)
+        }
+        if (response instanceof SirenEntity) {
+            //TODO: Check this, maybe id is not the correct property
+            navigate("/courses/" + courseId +"/classrooms/"+classroomId+"/assignments/"+assignment.id+"teams/"+response.properties.id, { replace: true })
+        }
+    },[setError])
+
+    if (!content) {
+        return (
+            <p>...loading...</p>
+        )
+    }
+
+    return(
+        <>
+            {content instanceof SirenEntity ?(
+                <>
+                <Typography variant="h3" component="h1" gutterBottom>
+                    {assignment.title}
+                </Typography>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Join a Team
+                </Typography>
+                {content.properties.teams.map((team) => (
+                    <Card>
+                        <CardContent>
+                            <Typography
+                                variant="h6"
+                            >
+                                {team.team.name}
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                            >
+                                {team.students.map((student) => (
+                                    <Typography
+                                        variant="h6"
+                                    >
+                                        {student.name}
+                                    </Typography>
+                                ))}
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button onClick={handleJoinTeam} value={team.team.id} disabled={team.students.length >= assignment.maxElemsPerGroup}>Join</Button>
+                        </CardActions>
+                    </Card>
+                ))}
+                    Or
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Create a Team
+                </Typography>
+                {content.properties.teams.length < assignment.maxNumberGroups ? (
+                    <>
+                        <Button onClick={handleCreateTeam}>Create</Button>
+                    </>
+                ): (
+                    <Typography variant="h6" component="h1" gutterBottom>
+                        You can't create a team, max number of teams reached
+                    </Typography>
+                )}
+                </>
+            ):null}
+            <ErrorAlert error={serror} onClose={() => setError(null)}/>
+        </>
+    )
 }

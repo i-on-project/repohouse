@@ -26,7 +26,7 @@ sealed class OutboxServicesError {
     class CooldownNotExpired(val cooldown: Int) : OutboxServicesError()
 }
 
-private const val COOLDOWN_TIME = 500000 // 5 minutes cooldown
+private const val COOLDOWN_TIME = 500000 // 5-minutes cooldown
 
 /**
  * Service to the outbox services
@@ -76,7 +76,7 @@ class OutboxServices(
                 it.usersRepository.updateUserStatus(id = userId)
                 Either.Right(value = Unit)
             } else {
-                //it.outboxRepository.deleteOutboxRequest(userId = outbox.userId) TODO: CHECK THIS
+                //it.outboxRepository.deleteOutboxRequest(userId = outbox.userId) TODO: Check this, maybe delete after expiration
                 it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
                 Either.Left(value = OutboxServicesError.OtpDifferent)
             }

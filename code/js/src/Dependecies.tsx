@@ -46,7 +46,7 @@ export const JOIN_TEAM_KEY = "joinTeam"
 export const CREATE_TEAM_KEY = "createTeam"
 export const DELETE_DELIVERY_KEY = "deleteDelivery"
 export const SYNC_DELIVERY_KEY = "syncDelivery"
-export const EXIT_TEAM_KEY = "exitTeam"
+export const EXIT_TEAM_KEY = "leaveTeam"
 export const POST_FEEDBACK_KEY = "postFeedback"
 
 

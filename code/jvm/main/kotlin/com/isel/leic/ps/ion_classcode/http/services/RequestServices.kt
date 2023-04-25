@@ -28,12 +28,12 @@ class RequestServices(
     /**
      * Method to create a new apply to teacher request
      */
-    fun createApplyRequest(applyInput: ApplyInput): CreateApplyRequestResult {
+    fun createApplyRequest(applyInput: ApplyInput, creator:Int): CreateApplyRequestResult {
         if (applyInput.isNotValid()) {
             return Either.Left(value = RequestServicesError.InvalidData)
         }
         return transactionManager.run {
-            val request = it.applyRequestRepository.createApplyRequest(request = applyInput)
+            val request = it.applyRequestRepository.createApplyRequest(request = applyInput, creator = creator)
             Either.Right(value = request)
         }
     }

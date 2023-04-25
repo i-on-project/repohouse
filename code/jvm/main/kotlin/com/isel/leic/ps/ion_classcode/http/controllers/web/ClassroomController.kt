@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 /**
- * Classrooms Controller
+ * Classroom Controller
  * All the write operations are done by the teacher
  */
 @RestController

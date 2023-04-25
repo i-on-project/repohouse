@@ -91,7 +91,7 @@ export function ShowTeacherApprovalFetch({
                         {"Approve, do Nothing or Reject"}
                     </Typography>
                     <List>
-                        {content.properties.teachers.map((teacher) => (
+                        {content.properties.teachers.map(teacher=> (
                             <ListItem
                                 key={teacher.id}
                             >

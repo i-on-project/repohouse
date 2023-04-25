@@ -5,12 +5,17 @@ import {RepoDomain} from "../Repo";
 import {FeedbackDomain} from "../Feedback";
 
 export type TeamDto = SirenEntity<TeamDtoProperties>
+export type TeamsDto = SirenEntity<TeamsDtoProperties>
 
 export interface TeamDtoProperties{
     team: TeamDomain,
     students: Student[],
     repos: RepoDomain[],
     feedbacks: FeedbackDomain[],
+}
+
+export interface TeamsDtoProperties{
+    teams: TeamDtoProperties[],
 }
 
 export class TeamDtoProperties {
@@ -24,6 +29,14 @@ export class TeamDtoProperties {
         this.students = students
         this.repos = repos
         this.feedbacks = feedbacks
+    }
+}
+
+export class TeamsDtoProperties {
+    constructor(
+        teams: TeamDtoProperties[],
+    ) {
+        this.teams = teams
     }
 }
 

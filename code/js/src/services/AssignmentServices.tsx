@@ -7,6 +7,9 @@ import {
     AssignmentDtoProperties
 } from "../domain/dto/AssignmentDtoProperties";
 import {parse} from "uri-template";
+import {CreateTeamBody, JoinTeamBody, RequestCreatedDtoProperties} from "../domain/dto/RequestDtoProperties";
+import {TeamDomain} from "../domain/Team";
+import {TeamDtoProperties, TeamsDtoProperties} from "../domain/dto/TeamDtoProperties";
 
 
 export class AssignmentServices {
@@ -18,7 +21,7 @@ export class AssignmentServices {
     }
 
     createAssignment = async (body: AssignmentBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         //TODO: Change this
         const response = await fetchPost<AssignmentDtoProperties>(link.href, body)
         if (response instanceof SirenEntity) {
@@ -28,7 +31,7 @@ export class AssignmentServices {
     }
 
     deleteAssignment = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         //TODO: Change this
         const response = await fetchDelete<AssignmentDeletedDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
@@ -38,7 +41,7 @@ export class AssignmentServices {
     }
 
     editAssignment = async (body: AssignmentBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         //TODO: Change this
         const response = await fetchPost<AssignmentDtoProperties>(link.href, body)
         if (response instanceof SirenEntity) {
@@ -47,5 +50,21 @@ export class AssignmentServices {
         return response
     }
 
+    joinTeam = async (body:JoinTeamBody,courseId,classroomId,assignmentId) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.JOIN_TEAM_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId})
+        return await fetchPost<RequestCreatedDtoProperties>(href,body)
+    }
 
+    createTeam = async (body: CreateTeamBody, courseId: number, classroomId: number, assignmentId: number) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.CREATE_TEAM_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId})
+        return await fetchPost<RequestCreatedDtoProperties>(href,body)
+    }
+
+    teams = async (courseId,classroomId,assignmentId) => {
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.TEAMS_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId})
+        return await fetchGet<TeamsDtoProperties>(href)
+    }
 }

@@ -12,6 +12,7 @@ import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
 interface ClassroomRepository {
     fun createClassroom(classroom: ClassroomInput, inviteLink: String): Int
     fun updateClassroomName(classroomId: Int, classroomUpdate: ClassroomUpdateInputModel)
+    fun enterClassroom(classroomId: Int, studentId: Int):Classroom
     fun deleteClassroom(classroomId: Int)
     fun getClassroomById(classroomId: Int): Classroom?
     fun getAssignmentsOfAClassroom(classroomId: Int): List<Assignment>

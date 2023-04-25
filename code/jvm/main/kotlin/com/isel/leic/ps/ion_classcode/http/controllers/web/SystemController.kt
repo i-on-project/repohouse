@@ -81,13 +81,18 @@ class SystemController {
         block.action("joinTeam", Uris.JOIN_TEAM_PATH, method = HttpMethod.POST, type = "application/json",) {
             hiddenField("assigmentId")
             numberField("teamId")
+            numberField("composite",null)
         }
         block.action("createTeam", Uris.CREATE_TEAM_PATH, method = HttpMethod.POST, type = "application/json") {
             hiddenField("assigmentId")
+            numberField("composite",null)
+        }
+        block.action("leaveTeam", Uris.EXIT_TEAM_PATH, method = HttpMethod.POST, type = "application/json") {
+            hiddenField("teamId")
+            numberField("composite",null)
         }
         block.action(title = "deleteDelivery", href = Uris.DELIVERY_PATH, method = HttpMethod.DELETE, type = "application/json",) {}
         block.action(title = "syncDelivery", href = Uris.SYNC_DELIVERY_PATH, method = HttpMethod.POST, type = "application/json",) {}
-        block.action(title = "exitTeam", href = Uris.TEAM_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
         block.action(title = "postFeedback", href = Uris.POST_FEEDBACK_PATH, method = HttpMethod.POST, type = "application/json") {
             hiddenField(name = "teamId")
             textField(name = "description")

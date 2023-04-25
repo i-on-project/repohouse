@@ -17,7 +17,7 @@ export class ClassroomServices {
     }
 
     createClassroom = async (body:ClassroomBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         // TODO: Change this
         const response = await fetchPost<ClassroomDtoProperties>(link.href,body)
         if (response instanceof SirenEntity) {
@@ -27,7 +27,7 @@ export class ClassroomServices {
     }
 
     archiveClassroom = async (courseId,classroomId) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         // TODO: Change this
         const response = await fetchGet<ClassroomDtoProperties>(link.href)
         if (response instanceof SirenEntity) {

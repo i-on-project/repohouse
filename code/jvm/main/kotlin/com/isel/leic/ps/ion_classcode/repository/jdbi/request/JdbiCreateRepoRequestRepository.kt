@@ -16,7 +16,7 @@ class JdbiCreateRepoRequestRepository(
     /**
      * Method to create a Create Repo Request
      */
-    override fun createCreateRepoRequest(request: CreateRepoInput): Int {
+    override fun createCreateRepoRequest(request: CreateRepoInput,creator:Int): Int {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)
@@ -24,7 +24,7 @@ class JdbiCreateRepoRequestRepository(
             RETURNING id
             """,
         )
-            .bind("creator", request.creator)
+            .bind("creator", creator)
             .bind("compositeId", request.composite)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()

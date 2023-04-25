@@ -41,7 +41,7 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
     override fun getOutboxPendingRequests(): List<Outbox> {
         return handle.createQuery(
             """
-            SELECT * FROM Outbox
+            SELECT * FROM outbox
             WHERE status = 'Pending'
             """,
         )

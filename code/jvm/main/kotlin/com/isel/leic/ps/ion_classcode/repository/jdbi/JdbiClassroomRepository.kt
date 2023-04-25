@@ -2,6 +2,7 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
+import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
@@ -46,6 +47,23 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .bind("name", classroomUpdate.name)
             .bind("id", classroomId)
             .execute()
+    }
+
+    /**
+     * Method to enter a Course
+     */
+    override fun enterClassroom(classroomId: Int, studentId: Int):Classroom {
+        handle.createUpdate(
+            """
+            INSERT INTO student_classroom (student,classroom)
+            VALUES (:student_id,:classroom_id)
+            """,
+        )
+            .bind("student_id", studentId)
+            .bind("classroom_id", classroomId)
+            .execute()
+
+        return getClassroomById(classroomId = classroomId)!!
     }
 
     /**
@@ -114,9 +132,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
         return handle.createQuery(
             """
             SELECT classroom.id FROM classroom
-            INNER JOIN course ON course.id = classroom.course_id
-            INNER JOIN student_course ON student_course.course = course.id
-            WHERE student_course.student = :student_id AND course.id = :course_id
+            JOIN student_classroom on student_classroom.classroom = classroom.id
+            JOIN course on course.id = classroom.course_id
+            WHERE student_classroom.student = :student_id AND course.id = :course_id
             """,
         )
             .bind("student_id", studentId)
@@ -162,10 +180,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
         return handle.createQuery(
             """
             SELECT distinct u.name, email, u.id, github_username, github_id, u.is_created, token, student.school_id from classroom
-            JOIN assignment on classroom.id = assignment.classroom_id
-            JOIN team on team.assignment = assignment.id JOIN student_team on student_team.team = team.id
-            JOIN users as u on u.id = student_team.student
-            JOIN student on u.id = student.id 
+            JOIN student_classroom on student_classroom.classroom = classroom.id
+            JOIN student on student.id = student_classroom.student
+            JOIN users u on u.id = student.id
             WHERE classroom.id = :classroom_id
             """,
         )
@@ -180,8 +197,8 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
     override fun addStudentToClassroom(classroomId: Int, studentId: Int) {
         handle.createUpdate(
             """
-            INSERT INTO student_course (student, course)
-            VALUES (:student_id, (SELECT course_id FROM classroom WHERE id = :classroom_id))
+            INSERT INTO student_classroom (student, classroom)
+            VALUES (:student_id, :classroom_id)
             """,
         )
             .bind("student_id", studentId)

@@ -25,9 +25,10 @@ import {ShowStatusCallbackFetch, ShowStatusFetch} from "./Status";
 import {ShowVerifyFetch} from "./Verify";
 import { HandleAuthFail, HandleAuthFailCallback } from './AuthFail'
 import {ShowClassroomFetch,ShowCreateClassroom} from "./Classroom";
-import {ShowAssignmentFetch, ShowCreateAssignment} from './Assignment'
+import {ShowAssigmentTeamsFetch, ShowAssignmentFetch, ShowCreateAssignment} from './Assignment'
 import {ShowCreateDelivery, ShowDeliveryFetch, ShowEditDelivery} from "./Delivery";
 import {ShowTeamFetch, ShowTeamRequestsFetch} from "./Team";
+import {Assignment} from "./domain/response-models/Assignment";
 
 const router = createBrowserRouter([
     {
@@ -126,6 +127,12 @@ const router = createBrowserRouter([
                 path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/deliveries/:deliveryId",
                 element: <RequireAuth>
                     <Delivery/>
+                </RequireAuth>
+            },
+            {
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/teams",
+                element: <RequireAuth>
+                    <JoinOrCreateTeam/>
                 </RequireAuth>
             },
             {
@@ -394,7 +401,7 @@ function AssignmentCreate() {
     const {courseId, classroomId} = useParams<{ courseId: string, classroomId: string }>();
     return (
         <div>
-            <ShowCreateAssignment assignmentServices={assignmentServices} classroomId={Number(classroomId)} error={null}/>
+            <ShowCreateAssignment assignmentServices={assignmentServices} courseId={Number(courseId)} classroomId={Number(classroomId)} error={null}/>
         </div>
     )
 }
@@ -436,6 +443,16 @@ function Team() {
     )
 }
 
+function JoinOrCreateTeam(){
+    const {courseId, classroomId} = useParams<{ courseId: string, classroomId: string}>();
+    const assignment = useLocation().state.assignment
+    return (
+        <div>
+            <ShowAssigmentTeamsFetch assignmentServices={assignmentServices} assignment={assignment} courseId={Number(courseId)} classroomId={Number(classroomId)} error={null}/>
+        </div>
+    )
+}
+
 function TeamRequests() {
     const {courseId, classroomId, assignmentId,teamId} = useParams<{ courseId: string, classroomId: string, assignmentId:string,teamId: string }>();
     return (
@@ -452,4 +469,5 @@ function TeacherApproval() {
         </div>
     )
 }
+
 

@@ -32,8 +32,8 @@ export function ShowTeamFetch({
     const user = useLoggedIn()
 
     const handleLeaveTeam = useCallback(async () => {
-        const body = new LeaveTeamBody(teamId, 0) // TODO: fill in the body
-        const result = await teamServices.leaveTeam(body);
+        const body = new LeaveTeamBody(teamId, null)
+        const result = await teamServices.leaveTeam(body,courseId,classroomId,assignmentId,teamId);
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }
@@ -48,7 +48,6 @@ export function ShowTeamFetch({
         }
     }, [setError, label, description]);
 
-
     if (!content) {
         return (
             <Typography
@@ -59,7 +58,6 @@ export function ShowTeamFetch({
             </Typography>
         );
     }
-
 
     if (content instanceof ErrorMessageModel) {
         setError(content);
@@ -210,3 +208,5 @@ export function ShowTeamRequestsFetch({
         </div>
     );
 }
+
+

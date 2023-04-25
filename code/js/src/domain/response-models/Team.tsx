@@ -1,4 +1,4 @@
-import {TeamDto} from "../dto/TeamDtoProperties";
+import {TeamDto, TeamsDto} from "../dto/TeamDtoProperties";
 import {TeamDomain} from "../Team";
 import {Student} from "../User";
 import {RepoDomain} from "../Repo";
@@ -10,6 +10,19 @@ export interface Team{
     students: Student[],
     repos: RepoDomain[],
     feedbacks: FeedbackDomain[],
+}
+
+export interface Teams{
+    teams: Team[],
+}
+export class Teams {
+    constructor(
+        dto: TeamsDto
+    ) {
+        const teams = dto.properties
+        if (teams == null) throw new Error("TeamDto properties is null")
+        this.teams = teams.teams
+    }
 }
 
 export class Team {

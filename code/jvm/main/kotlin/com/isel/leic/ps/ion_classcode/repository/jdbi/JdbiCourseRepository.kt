@@ -87,22 +87,6 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .execute()
     }
 
-    /**
-     * Method to enter a Course
-     */
-    override fun enterCourse(courseId: Int, studentId: Int): Course {
-        handle.createUpdate(
-            """
-            INSERT INTO student_course (student,course)
-            VALUES (:student_id,:course_id)
-            """,
-        )
-            .bind("student_id", studentId)
-            .bind("course_id", courseId)
-            .execute()
-
-        return getTheCourse(courseId = courseId)
-    }
 
     /**
      * Method to leave a Course
@@ -110,8 +94,8 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun leaveCourse(courseId: Int, studentId: Int): Course {
         handle.createUpdate(
             """
-            DELETE FROM student_course
-            WHERE student = :student_id AND course = :course_id
+            DELETE FROM student_classroom
+            WHERE student = :student_id AND classroom IN (SELECT id FROM classroom WHERE course_id = :course_id)
             """,
         )
             .bind("student_id", studentId)
@@ -212,10 +196,8 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return handle.createQuery(
             """
                 SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_link,classroom.is_archived,course_id FROM classroom
-                JOIN assignment on classroom.id = assignment.classroom_id
-                JOIN team  on assignment.id = team.assignment
-                JOIN student_team on team.id = student_team.team
-                WHERE course_id = :course_id AND student_team.student = :user_id
+                JOIN student_classroom ON classroom.id = student_classroom.classroom
+                WHERE course_id = :course_id AND student = :user_id
             """,
         )
             .bind("course_id", courseId)
@@ -259,10 +241,11 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getAllStudentCourses(studentId: Int):List<Course>{
         val dto = handle.createQuery(
             """
-            SELECT id, org_url, name, (
+            SELECT distinct course.id, org_url, course.name, (
                 SELECT array(SELECT teacher FROM teacher_course WHERE course = Course.id) as teachers
-                ), is_archived FROM student_course JOIN course ON course.id = student_course.course
-                WHERE student_course.student = :student_id
+                ), course.is_archived FROM student_classroom JOIN classroom ON classroom.id = student_classroom.classroom
+                JOIN course ON course.id = classroom.course_id
+                WHERE student_classroom.student = :student_id
             """,
         )
             .bind("student_id", studentId)
@@ -291,9 +274,12 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getStudentInCourse(courseId: Int): List<Student> {
         return handle.createQuery(
             """
-            SELECT name, email, s.id, github_username, github_id, is_created, users.token,s.school_id FROM student_course JOIN student as s ON student_course.student = s.id JOIN users on s.id = users.id
-            WHERE course = :course_id
-            """,
+            SELECT users.name, users.email, users.id, users.github_username, users.github_id,users.is_created,token FROM users
+            JOIN student_classroom on users.id = student_classroom.student
+            JOIN classroom on student_classroom.classroom = classroom.id
+            JOIN course on classroom.course_id = course.id
+            WHERE course.id = :course_id
+            """
         )
             .bind("course_id", courseId)
             .mapTo<Student>()
@@ -377,8 +363,10 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun isStudentInCourse(studentId: Int, courseId: Int): Boolean =
         handle.createQuery(
             """
-            SELECT student FROM student_course 
-            WHERE student = :studentId AND course = :courseId
+            SELECT student FROM student_classroom
+            JOIN classroom on student_classroom.classroom = classroom.id
+            JOIN course on classroom.course_id = course.id
+            WHERE course.id = :courseId AND student_classroom.student = :studentId
             """,
         )
             .bind("studentId", studentId)

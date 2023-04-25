@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component
  * Alias for the response of the services
  */
 typealias TeamResponse = Either<TeamServicesError, TeamModel>
+typealias TeamsResponse = Either<TeamServicesError, List<TeamModel>>
 typealias TeamRequestsResponse = Either<TeamServicesError, TeamRequestsModel>
 typealias TeamCreateRequestResponse = Either<TeamServicesError, Int>
 typealias TeamLeaveRequestResponse = Either<TeamServicesError, Int>
@@ -63,23 +64,42 @@ class TeamServices(
     }
 
     /**
+     * Method to get all the information about a team
+     */
+    fun getTeamsInfoByAssignment(assignmentId: Int): TeamsResponse{
+        if (assignmentId <= 0) return Either.Left(value = TeamServicesError.InvalidData)
+        return transactionManager.run {
+            val teams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
+            Either.Right(value = teams.map { team ->
+                    TeamModel(
+                        team = team,
+                        students = it.teamRepository.getStudentsFromTeam(teamId = team.id),
+                        repos = it.repoRepository.getReposByTeam(teamId = team.id),
+                        feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId = team.id)
+                    )
+            })
+        }
+    }
+
+    /**
      * Method to create a request to create a team
      * Needs a teacher to approve the request
      */
-    fun createTeamRequest(createTeamInfo: CreateTeamInput, assignmentId: Int, classroomId: Int): TeamCreateRequestResponse {
+    fun createTeamRequest(createTeamInfo: CreateTeamInput, creator:Int, assignmentId: Int, classroomId: Int): TeamCreateRequestResponse {
         if (assignmentId <= 0 || classroomId <= 0 || createTeamInfo.isNotValid()) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
             val classroom = it.classroomRepository.getClassroomById(classroomId = classroomId)
                 ?: return@run Either.Left(value = TeamServicesError.ClassroomNotFound)
             if (classroom.isArchived) return@run Either.Left(value = TeamServicesError.ClassroomArchived)
 
-            val teamId = it.createTeamRepository.createCreateTeamRequest(request = createTeamInfo)
+            val teamId = it.createTeamRepository.createCreateTeamRequest(request = createTeamInfo,creator=creator)
             // Join all requests in one composite request
             val composite = it.compositeRepository.createCompositeRequest(
-                CompositeInput(requests = listOf(teamId), creator = createTeamInfo.creator),
+                CompositeInput(requests = listOf(teamId)),
+                creator = creator
             )
-            it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(assignmentId = assignmentId, teamId = teamId, composite = composite, creator = createTeamInfo.creator))
-            it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(teamId = teamId, composite = composite, creator = createTeamInfo.creator))
+            it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(assignmentId = assignmentId, teamId = teamId, composite = composite), creator = creator)
+            it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(teamId = teamId, composite = composite), creator = creator)
 
             Either.Right(value = teamId)
         }
@@ -89,13 +109,13 @@ class TeamServices(
      * Method to create a request to leave a team
      * Needs a teacher to approve the request
      */
-    fun leaveTeamRequest(leaveInfo: LeaveTeamInput): TeamLeaveRequestResponse {
+    fun leaveTeamRequest(leaveInfo: LeaveTeamInput, creator:Int): TeamLeaveRequestResponse {
         if (leaveInfo.isNotValid()) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
             when (it.teamRepository.getTeamById(id = leaveInfo.teamId)) {
                 null -> Either.Left(value = TeamServicesError.TeamNotFound)
                 else -> {
-                    val request = it.leaveTeamRepository.createLeaveTeamRequest(request = leaveInfo)
+                    val request = it.leaveTeamRepository.createLeaveTeamRequest(request = leaveInfo, creator = creator)
                     Either.Right(value = request)
                 }
             }
@@ -106,7 +126,7 @@ class TeamServices(
      * Method to create a request to join a team
      * Needs a teacher to approve the request
      */
-    fun joinTeamRequest(joinInfo: JoinTeamInput): TeamJoinRequestResponse {
+    fun joinTeamRequest(joinInfo: JoinTeamInput, creator:Int): TeamJoinRequestResponse {
         if (joinInfo.isNotValid()) return Either.Left(value = TeamServicesError.InvalidData)
         return transactionManager.run {
             val assignment = it.assignmentRepository.getAssignmentById(assignmentId = joinInfo.assignmentId)
@@ -117,7 +137,7 @@ class TeamServices(
             when (it.teamRepository.getTeamById(id = joinInfo.teamId)) {
                 null -> Either.Left(value = TeamServicesError.TeamNotFound)
                 else -> {
-                    val request = it.joinTeamRepository.createJoinTeamRequest(request = joinInfo)
+                    val request = it.joinTeamRepository.createJoinTeamRequest(request = joinInfo,creator = creator)
                     Either.Right(value = request)
                 }
             }

@@ -1,5 +1,4 @@
 import {SirenEntity} from "../../siren/Siren";
-import {Teacher} from "../response-models/Teacher";
 import {JoinTeam, LeaveTeam} from "../Request";
 
 export type RequestDto = SirenEntity<RequestDtoProperties>
@@ -71,22 +70,43 @@ export class RequestChangeStatusDtoProperties {
 }
 
 export interface RequestBody{
-    creator: number,
     composite: number | null ,
 }
 
 export class LeaveTeamBody implements RequestBody{
     constructor(
         teamId: number,
-        creator: number,
         composite: number | null = null,
     ) {
         this.teamId = teamId
-        this.creator = creator
         this.composite = composite
     }
 
     composite: number | null;
-    creator: number;
     teamId: number;
+}
+
+
+export class JoinTeamBody implements RequestBody{
+    constructor(
+        assignmentId: number,
+        teamId: number,
+        composite: number | null = null,
+    ) {
+        this.assignmentId = assignmentId
+        this.teamId = teamId
+        this.composite = composite
+    }
+    assignmentId: number;
+    composite: number | null;
+    teamId: number;
+}
+
+export class CreateTeamBody implements RequestBody{
+    constructor(
+        composite: number | null = null,
+    ) {
+        this.composite = composite
+    }
+    composite: number | null
 }

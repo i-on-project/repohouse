@@ -16,7 +16,7 @@ class JdbiLeaveTeamRequestRepository(
     /**
      * Method to create a Leave Team Request
      */
-    override fun createLeaveTeamRequest(request: LeaveTeamInput): Int {
+    override fun createLeaveTeamRequest(request: LeaveTeamInput,creator:Int): Int {
         val id = handle.createUpdate(
             """
                 INSERT INTO request (creator, composite,state)
@@ -24,7 +24,7 @@ class JdbiLeaveTeamRequestRepository(
                 RETURNING id
                 """,
         )
-            .bind("creator", request.creator)
+            .bind("creator", creator)
             .bind("compositeId", request.composite)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()

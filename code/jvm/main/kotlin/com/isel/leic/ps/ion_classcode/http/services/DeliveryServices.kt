@@ -2,7 +2,10 @@ package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
+import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TagInput
+import com.isel.leic.ps.ion_classcode.http.model.github.Collaborator
+import com.isel.leic.ps.ion_classcode.http.model.github.Tag
 import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
@@ -174,7 +177,6 @@ class DeliveryServices(
                             if (student != null && student is Student) {
                                 it.teamRepository.enterTeam(team.id, student.id)
                             }
-                            // TODO: else create student ????
                         }
 
                         studentsToRemove.forEach { student ->

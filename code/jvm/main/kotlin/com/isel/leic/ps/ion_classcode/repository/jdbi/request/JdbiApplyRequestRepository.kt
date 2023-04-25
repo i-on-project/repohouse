@@ -16,7 +16,7 @@ class JdbiApplyRequestRepository(
     /**
      * Method to create an Apply Request
      */
-    override fun createApplyRequest(request: ApplyInput): Int {
+    override fun createApplyRequest(request: ApplyInput,creator:Int): Int {
         val requestId = handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)
@@ -24,7 +24,7 @@ class JdbiApplyRequestRepository(
             RETURNING id
             """,
         )
-            .bind("creator", request.creator)
+            .bind("creator", creator)
             .bind("compositeId", request.composite)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
@@ -38,7 +38,7 @@ class JdbiApplyRequestRepository(
             """,
         )
             .bind("id", requestId)
-            .bind("teacher_id", request.creator)
+            .bind("teacher_id", creator)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()

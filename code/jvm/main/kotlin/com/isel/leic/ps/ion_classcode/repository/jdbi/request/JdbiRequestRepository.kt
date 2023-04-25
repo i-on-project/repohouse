@@ -16,7 +16,7 @@ class JdbiRequestRepository(
     /**
      * Method to create a Request
      */
-    override fun createRequest(request: RequestInput): Int {
+    override fun createRequest(request: RequestInput,creator:Int): Int {
         return handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)
@@ -24,7 +24,7 @@ class JdbiRequestRepository(
             RETURNING id
             """,
         )
-            .bind("creator", request.creator)
+            .bind("creator", creator)
             .bind("compositeId", request.composite)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()

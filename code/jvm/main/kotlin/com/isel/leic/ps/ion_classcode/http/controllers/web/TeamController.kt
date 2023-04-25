@@ -13,6 +13,7 @@ import com.isel.leic.ps.ion_classcode.http.model.output.RequestChangeStatusOutpu
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.TeamsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.http.services.TeamServices
@@ -58,23 +59,40 @@ class TeamController(
     }
 
     /**
+     * Get all information about all teams from an assignment
+     */
+    @GetMapping(Uris.TEAMS_PATH)
+    fun getTeamsInfoByAssignment(
+        user: User,
+        @PathVariable courseId: Int,
+        @PathVariable classroomId: Int,
+        @PathVariable assignmentId: Int,
+    ): ResponseEntity<*> {
+        return when (val team = teamService.getTeamsInfoByAssignment(assignmentId)) {
+            is Either.Left -> problem(team.value)
+            is Either.Right -> siren(TeamsOutputModel(team.value)){
+                clazz("teams")
+                link(href = Uris.TEAMS_PATH, rel = LinkRelation("self"), needAuthentication = true)
+            }
+        }
+    }
+    /**
      * Create a request for a student to join a team
      * Needs then to be accepted by the teacher
      */
     @PostMapping(Uris.JOIN_TEAM_PATH)
     fun joinTeam(
         user: User,
-        @PathVariable teamId: Int,
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
         @PathVariable assignmentId: Int,
         @RequestBody joinTeamInfo: JoinTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val join = teamService.joinTeamRequest(joinTeamInfo)) {
+        return when (val join = teamService.joinTeamRequest(joinTeamInfo,user.id)) {
             is Either.Left -> problem(join.value)
             is Either.Right -> siren(RequestCreatedOutputModel(join.value, true)) {
-                link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
+                clazz("joinTeam")
             }
         }
     }
@@ -92,10 +110,10 @@ class TeamController(
         @RequestBody createTeamInfo: CreateTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val create = teamService.createTeamRequest(createTeamInfo, assignmentId, classroomId)) {
+        return when (val create = teamService.createTeamRequest(createTeamInfo,user.id, assignmentId, classroomId)) {
             is Either.Left -> problem(create.value)
-            is Either.Right -> siren(create.value) {
-                link(href = Uris.teamUri(courseId, classroomId, assignmentId, create.value), rel = LinkRelation("team"), needAuthentication = true)
+            is Either.Right -> siren(RequestCreatedOutputModel(create.value, true)) {
+                clazz("createTeam")
             }
         }
     }
@@ -156,10 +174,10 @@ class TeamController(
         @RequestBody leaveTeamInfo: LeaveTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val exit = teamService.leaveTeamRequest(leaveTeamInfo)) {
+        return when (val exit = teamService.leaveTeamRequest(leaveTeamInfo,user.id)) {
             is Either.Left -> problem(exit.value)
             is Either.Right -> siren(RequestCreatedOutputModel(exit.value, true)) {
-                link(href = Uris.assigmentUri(courseId, classroomId, assignmentId), rel = LinkRelation("assigment"), needAuthentication = true)
+                clazz("leaveTeam")
             }
         }
     }

@@ -13,13 +13,13 @@ import {parse} from "uri-template";
 export class DeliveryServices {
 
     delivery = async (courseId,classroomId,assignmentId,deliveryId) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.DELIVERY_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.DELIVERY_KEY, Hypermedia.systemServices.home)
         const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,deliveryId:deliveryId})
         return await fetchGet<DeliveryDtoProperties>(href)
     }
 
     createDelivery = async (body: DeliveryBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         //TODO: Change this
         const response = await fetchPost<DeliveryDtoProperties>(link.href, body)
         if (response instanceof SirenEntity) {
@@ -29,7 +29,7 @@ export class DeliveryServices {
     }
 
     syncDelivery = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY,Hypermedia.systemServices.home)
         // TODO: Change this
         const response = await fetchPost<DeliveryDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
@@ -39,7 +39,7 @@ export class DeliveryServices {
     }
 
     deleteDelivery = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         // TODO: Change this
         const response = await fetchDelete<DeliveryDeletedDtoProperties>(link.href)
         if (response instanceof SirenEntity) {
@@ -49,7 +49,7 @@ export class DeliveryServices {
     }
 
     editDelivery = async (body: DeliveryBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
         //TODO: Change this
         const response = await fetchPost<DeliveryDtoProperties>(link.href, body)
         if (response instanceof SirenEntity) {

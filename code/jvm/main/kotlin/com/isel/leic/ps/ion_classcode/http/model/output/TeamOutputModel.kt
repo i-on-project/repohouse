@@ -18,6 +18,13 @@ data class TeamOutputModel(
 )
 
 /**
+ * Represents a Teams Output Model.
+ */
+data class TeamsOutputModel(
+    val teams: List<TeamModel>,
+)
+
+/**
  * Represents a Team Model for inner functions.
  */
 data class TeamModel(
