@@ -86,7 +86,7 @@ class SirenTests {
                     {"rel": ["self"], "href": "https://example.com/teams/1", needAuthentication: false}
                 ],
                 "actions": [
-                    {"name": "remove user", "href":"https://example.com/teams/1/remove/1", "method":"POST", 
+                    {"title": "remove user", "href":"https://example.com/teams/1/remove/1", "method":"POST", 
                       "type": "application/json",
                       "fields": [
                         {"name":"reason", "type": "text"}

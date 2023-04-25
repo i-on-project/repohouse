@@ -45,8 +45,8 @@ class CourseServiceTests {
                 val mockedTransaction = mock<Transaction> {
                     val mockedUsersRepository = mock<UsersRepository> {
                         on { getTeacher(teacherId = 1) } doReturn teacher
-                        on { getUserById(id = 1) } doReturn teacher
-                        on { getUserById(id = 2) } doReturn student
+                        on { getUserById(userId = 1) } doReturn teacher
+                        on { getUserById(userId = 2) } doReturn student
                     }
                     val mockedCourseRepository = mock<CourseRepository> {
                         on {

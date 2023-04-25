@@ -90,7 +90,7 @@ class OutboxServices(
     fun sendEmails() {
         transactionManager.run {
             it.outboxRepository.getOutboxPendingRequests().forEach { outbox ->
-                it.usersRepository.getUserById(id = outbox.userId)?.let { user ->
+                it.usersRepository.getUserById(userId = outbox.userId)?.let { user ->
                     if (emailService.sendVerificationEmail(name = user.name, email = user.email, otp = outbox.otp) is Either.Right) {
                         it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId)
                     }

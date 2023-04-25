@@ -33,7 +33,7 @@ val mockedUsersRepository = mock<UsersRepository> {
     } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 123452, token = "token1", id = 2, email = "test1@alunos.isel.pt")
 
     on {
-        getUserById(id = 4)
+        getUserById(userId = 4)
     } doReturn Student(name = "student2", token = "token3", githubId = 1234152, githubUsername = "test12345", isCreated = false, email = "test3@alunos.isel.pt", id = 4, schoolId = 1235)
 
     on {

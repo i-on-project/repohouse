@@ -118,7 +118,7 @@ class UsersRepositoryTests {
     fun `can get a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val id = 3
-        val teacher = userRepo.getUserById(id = id) ?: fail("Teacher not found")
+        val teacher = userRepo.getUserById(userId = id) ?: fail("Teacher not found")
         assert(teacher is Student)
     }
 
@@ -126,7 +126,7 @@ class UsersRepositoryTests {
     fun `can get a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val id = 1
-        val teacher = userRepo.getUserById(id = id) ?: fail("Teacher not found")
+        val teacher = userRepo.getUserById(userId = id) ?: fail("Teacher not found")
         assert(teacher is Teacher)
     }
 
@@ -135,7 +135,7 @@ class UsersRepositoryTests {
         val userRepo = JdbiUsersRepository(handle = handle)
         val id = 5
         userRepo.updateUserStatus(id = id)
-        val user = userRepo.getUserById(id = id) ?: fail("User not found")
+        val user = userRepo.getUserById(userId = id) ?: fail("User not found")
         assert(user.isCreated)
     }
 
@@ -149,7 +149,7 @@ class UsersRepositoryTests {
     @Test
     fun `can get a user name`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val student = userRepo.getUserById(id = 3) ?: fail("Student not found")
+        val student = userRepo.getUserById(userId = 3) ?: fail("Student not found")
         assert(student.name == "student1")
     }
 
@@ -190,7 +190,7 @@ class UsersRepositoryTests {
         val userRepo = JdbiUsersRepository(handle = handle)
         val id = 8
         userRepo.deleteStudent(id = id)
-        val student = userRepo.getUserById(id = id)
+        val student = userRepo.getUserById(userId = id)
         assert(student == null)
     }
 
@@ -211,7 +211,7 @@ class UsersRepositoryTests {
         val userRepo = JdbiUsersRepository(handle = handle)
         val id = 7
         userRepo.deleteTeacher(id = id)
-        val teacher = userRepo.getUserById(id = id)
+        val teacher = userRepo.getUserById(userId = id)
         assert(teacher == null)
     }
 
