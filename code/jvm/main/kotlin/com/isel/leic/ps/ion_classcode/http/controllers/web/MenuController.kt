@@ -92,21 +92,8 @@ class MenuController(
         if (user !is Teacher) return Problem.stateMismatch
         return when (val teachers = teacherServices.getTeachersNeedingApproval()) {
             is Either.Right -> siren(value = TeachersPendingOutputModel(teachers.value)) {
+                clazz("teachersApproval")
                 link(rel = LinkRelation("self"), href = Uris.teachersApprovalUri(), needAuthentication = true)
-                link(rel = LinkRelation("menu"), href = Uris.menuUri(), needAuthentication = true)
-                link(rel = LinkRelation("credits"), href = Uris.creditsUri())
-                teachers.value.forEach {
-                    action(
-                        title = "approveTeacher",
-                        href = Uris.teachersApprovalUri(),
-                        method = HttpMethod.POST,
-                        type = "application/x-www-form-urlencoded",
-                        block = {
-                            hiddenField(name = "teacherId", value = it.id.toString())
-                        },
-                    )
-                }
-                action(title = "logout", href = Uris.logoutUri(), method = HttpMethod.POST, type = "application/json", block = {})
             }
 
             is Either.Left -> problemTeacher(teachers.value)

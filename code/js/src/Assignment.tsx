@@ -118,7 +118,7 @@ function ShowStudentAssignmentFetch({
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Link to={"/assignments/" + content.properties.assignment.id + "/deliveries/" + delivery.id}>
+                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + delivery.id}>
                                     More Info
                                 </Link>
                             </CardActions>
@@ -134,7 +134,7 @@ function ShowStudentAssignmentFetch({
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                <Link to={"/teams/" + content.properties.team.id}>
+                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/" + content.properties.team.id}>
                                     More Info
                                 </Link>
                             </CardActions>

@@ -33,14 +33,27 @@ export const ORGS_KEY = "orgs"
 export const CREATE_COURSE_KEY = "createCourse"
 export const COURSE_KEY = "course"
 export const TEACHERS_APPROVAL_KEY = "teachersApproval"
+export const APPROVE_TEACHERS_KEY = "approveTeacher"
 export const CLASSROOM_KEY = "classroom"
 export const ASSIGNMENT_KEY = "assignment"
+export const ASSIGNMENTS_KEY = "assignments"
+export const DELIVERY_KEY = "delivery"
+export const DELIVERIES_KEY = "deliveries"
+export const TEAM_KEY = "team"
+export const TEAMS_KEY = "teams"
+export const REQUESTS_KEY = "requestsHistory"
+export const JOIN_TEAM_KEY = "joinTeam"
+export const CREATE_TEAM_KEY = "createTeam"
+export const DELETE_DELIVERY_KEY = "deleteDelivery"
+export const SYNC_DELIVERY_KEY = "syncDelivery"
+export const EXIT_TEAM_KEY = "exitTeam"
+export const POST_FEEDBACK_KEY = "postFeedback"
 
 
 export const systemLinkKeys = [
     HOME_KEY,
-    MENU_KEY,
     CREDITS_KEY,
+    MENU_KEY,
     AUTH_TEACHER_KEY,
     AUTH_STUDENT_KEY,
     AUTH_REGISTER_INFO,
@@ -48,7 +61,13 @@ export const systemLinkKeys = [
     ORGS_KEY,
     COURSE_KEY,
     CLASSROOM_KEY,
-    ASSIGNMENT_KEY
+    ASSIGNMENT_KEY,
+    ASSIGNMENTS_KEY,
+    DELIVERY_KEY,
+    DELIVERIES_KEY,
+    TEAM_KEY,
+    TEAMS_KEY,
+    REQUESTS_KEY
 ]
 
 export const systemActionKeys = [
@@ -56,5 +75,12 @@ export const systemActionKeys = [
     AUTH_REGISTER_STUDENT,
     AUTH_REGISTER_TEACHER,
     AUTH_VERIFY_STUDENT_KEY,
-    CREATE_COURSE_KEY
+    CREATE_COURSE_KEY,
+    APPROVE_TEACHERS_KEY,
+    JOIN_TEAM_KEY,
+    CREATE_TEAM_KEY,
+    DELETE_DELIVERY_KEY,
+    SYNC_DELIVERY_KEY,
+    EXIT_TEAM_KEY,
+    POST_FEEDBACK_KEY
 ]

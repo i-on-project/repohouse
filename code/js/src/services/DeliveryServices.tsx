@@ -7,18 +7,15 @@ import {GitHubOrgsDtoProperties} from "../domain/dto/GitHubOrgsDtoProperties";
 import {ClassroomDtoProperties} from "../domain/dto/ClassroomDtoProperties";
 import {AssignmentDtoProperties} from "../domain/dto/AssignmentDtoProperties";
 import {DeliveryBody, DeliveryDeletedDtoProperties, DeliveryDtoProperties} from "../domain/dto/DeliveryDtoProperties";
+import {parse} from "uri-template";
 
 
 export class DeliveryServices {
 
-    delivery = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
-        // TODO: Change this
-        const response = await fetchGet<DeliveryDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    delivery = async (courseId,classroomId,assignmentId,deliveryId) => {
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.DELIVERY_KEY, Hypermedia.menuServices.menu)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,deliveryId:deliveryId})
+        return await fetchGet<DeliveryDtoProperties>(href)
     }
 
     createDelivery = async (body: DeliveryBody) => {

@@ -123,43 +123,43 @@ const router = createBrowserRouter([
                 </RequireAuth>
             },
             {
-                path: "deliveries/:deliveryId",
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/deliveries/:deliveryId",
                 element: <RequireAuth>
                     <Delivery/>
                 </RequireAuth>
             },
             {
-                path: "teams/:teamId",
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/teams/:teamId",
                 element: <RequireAuth>
                     <Team/>
                 </RequireAuth>
             },
             {
-                path: "requests",
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/teams/:teamId/requests",
                 element: <RequireAuth>
                     <TeamRequests/>
                 </RequireAuth>
             },
             {
-                path: "edit",
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/teams/:teamId/edit",
                 element: <RequireAuth>
                     <DeliveryEdit/>
                 </RequireAuth>
             },
             {
-                path: "deliveries/create",
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/deliveries/create",
                 element: <RequireAuth>
                     <DeliveryCreate/>
                 </RequireAuth>
             },
             {
-                path: "assignments/create",
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/create",
                 element: <RequireAuth>
                     <AssignmentCreate/>
                 </RequireAuth>
             },
             {
-                path: "classrooms/create",
+                path: "/courses/:courseId/classrooms/create",
                 element: <RequireAuth>
                     <ClassroomCreate/>
                 </RequireAuth>
@@ -403,7 +403,7 @@ function Delivery() {
     const {courseId, classroomId, assignmentId, deliveryId} = useParams<{ courseId: string, classroomId: string, assignmentId: string, deliveryId: string }>();
     return (
         <div>
-            <ShowDeliveryFetch deliveryServices={deliveryServices} />
+            <ShowDeliveryFetch deliveryServices={deliveryServices} courseId={Number(courseId)} classroomId={Number(classroomId)} deliveryId={Number(deliveryId)} assignmentId={Number(assignmentId)}/>
         </div>
     )
 }
@@ -412,35 +412,35 @@ function DeliveryCreate() {
     const {courseId, classroomId, assignmentId} = useParams<{ courseId: string, classroomId: string, assignmentId: string }>();
     return (
         <div>
-            <ShowCreateDelivery deliveryServices={deliveryServices} assignmentId={Number(assignmentId)} error={null}/>
+            <ShowCreateDelivery deliveryServices={deliveryServices} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)} error={null}/>
         </div>
     )
 }
 
 function DeliveryEdit() {
-    const {courseId, classroomId, assignmentId, deliveryId} = useParams<{ courseId: string, classroomId: string, assignmentId: string, deliveryId: string }>();
+    const {courseId, classroomId, assignmentId} = useParams<{ courseId: string, classroomId: string, assignmentId: string}>();
     const delivery = useLocation().state.delivery
     return (
         <div>
-            <ShowEditDelivery deliveryServices={deliveryServices} delivery={delivery} error={null}/>
+            <ShowEditDelivery deliveryServices={deliveryServices} delivery={delivery} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)} error={null}/>
         </div>
     )
 }
 
 function Team() {
-    const {courseId, classroomId, teamId} = useParams<{ courseId: string, classroomId: string, teamId: string }>();
+    const {courseId, classroomId, assignmentId,teamId} = useParams<{ courseId: string, classroomId: string, assignmentId:string ,teamId: string }>();
     return (
         <div>
-            <ShowTeamFetch teamServices={teamServices}/>
+            <ShowTeamFetch teamServices={teamServices} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)} teamId={Number(teamId)} error={null}/>
         </div>
     )
 }
 
 function TeamRequests() {
-    const {courseId, classroomId, teamId} = useParams<{ courseId: string, classroomId: string, teamId: string }>();
+    const {courseId, classroomId, assignmentId,teamId} = useParams<{ courseId: string, classroomId: string, assignmentId:string,teamId: string }>();
     return (
         <div>
-            <ShowTeamRequestsFetch teamServices={teamServices}/>
+            <ShowTeamRequestsFetch teamServices={teamServices} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)} teamId={Number(teamId)} error={null}/>
         </div>
     )
 }

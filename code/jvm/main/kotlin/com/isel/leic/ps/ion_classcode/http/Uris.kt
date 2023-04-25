@@ -46,9 +46,9 @@ object Uris {
     const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assignments"
     const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assignmentId}"
     const val CREATE_ASSIGMENT_PATH = "$ASSIGMENTS_PATH/create"
-    const val DELIVERYS_PATH = "$ASSIGMENT_PATH/deliveries"
-    const val DELIVERY_PATH = "$DELIVERYS_PATH/{deliveryId}"
-    const val CREATE_DELIVERY_PATH = "$DELIVERYS_PATH/create"
+    const val DELIVERIES_PATH = "$ASSIGMENT_PATH/deliveries"
+    const val DELIVERY_PATH = "$DELIVERIES_PATH/{deliveryId}"
+    const val CREATE_DELIVERY_PATH = "$DELIVERIES_PATH/create"
     const val DELETE_ASSIGMENT_PATH = "$ASSIGMENT_PATH/delete"
     const val TEAMS_PATH = "$ASSIGMENT_PATH/teams"
     const val TEAM_PATH = "$TEAMS_PATH/{teamId}"
@@ -93,7 +93,7 @@ object Uris {
     fun assigmentsUri(courseId: Int, classroomId: Int): String = UriTemplate(ASSIGMENTS_PATH).expand(courseId, classroomId).toASCIIString()
     fun assigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
     fun createAssigmentUri(courseId: Int, classroomId: Int): String = UriTemplate(CREATE_ASSIGMENT_PATH).expand(courseId, classroomId).toASCIIString()
-    fun deliverysUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(DELIVERYS_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
+    fun deliverysUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(DELIVERIES_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
     fun deliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): String = UriTemplate(DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId).toASCIIString()
     fun createDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(CREATE_DELIVERY_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
     fun deleteAssigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(DELETE_ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()

@@ -51,19 +51,8 @@ class TeamController(
         return when (val team = teamService.getTeamInfo(teamId)) {
             is Either.Left -> problem(team.value)
             is Either.Right -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repos, team.value.feedbacks)) {
+                clazz("team")
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
-                link(href = Uris.teamRequestsUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("requestsHistory"), needAuthentication = true)
-                link(href = Uris.assigmentUri(courseId, classroomId, assignmentId), rel = LinkRelation("assigment"), needAuthentication = true)
-                if (user is Student) {
-                    action(title = "exitTeam", href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), method = HttpMethod.PUT, type = "application/json", block = {})
-                }
-                if (user is Teacher) {
-                    action(title = "postFeedback", href = Uris.postFeedbackUri(courseId, classroomId, assignmentId, teamId), method = HttpMethod.POST, type = "application/json") {
-                        hiddenField(name = "teamId", teamId)
-                        textField(name = "description")
-                        textField(name = "label")
-                    }
-                }
             }
         }
     }
@@ -125,15 +114,8 @@ class TeamController(
         return when (val requests = teamService.getTeamsRequests(teamId)) {
             is Either.Left -> problem(requests.value)
             is Either.Right -> siren(TeamRequestsOutputModel(requests.value.joinTeam, requests.value.leaveTeam)) {
-                link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
-                if (user is Teacher) {
-                    requests.value.joinTeam.forEach {
-                        if (it.state == "Rejected") action(title = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assignmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
-                    }
-                    requests.value.leaveTeam.forEach {
-                        if (it.state == "Rejected") action(title = "change-status-request", href = Uris.teamChangeStatusRequestsUri(courseId, classroomId, assignmentId, teamId, it.id), method = HttpMethod.POST, type = "application/json", block = {})
-                    }
-                }
+                clazz("requests")
+                link(href = Uris.teamRequestsUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
             }
         }
     }

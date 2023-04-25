@@ -12,18 +12,15 @@ import {
     TeamRequestsDtoProperties
 } from "../domain/dto/RequestDtoProperties";
 import {FeedbackDtoProperties} from "../domain/dto/FeedbackDtoProperties";
+import {parse} from "uri-template";
 
 
 export class TeamServices {
 
-    team = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
-        // TODO: Change this
-        const response = await fetchGet<TeamDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    team = async (courseId,classroomId,assignmentId,teamId) => {
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.TEAM_KEY, Hypermedia.menuServices.menu)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,teamId:teamId})
+        return await fetchGet<TeamDtoProperties>(href)
     }
 
     leaveTeam = async (body:LeaveTeamBody) => {
@@ -36,14 +33,10 @@ export class TeamServices {
         return response
     }
 
-    teamRequests = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.menuServices.menu)
-        // TODO: Change this
-        const response = await fetchGet<TeamRequestsDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    teamRequests = async (courseId,classroomId,assignmentId,teamId) => {
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.REQUESTS_KEY, Hypermedia.menuServices.menu)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,teamId:teamId})
+        return await fetchGet<TeamRequestsDtoProperties>(href)
     }
 
     changeRequestStatus = async () => {

@@ -38,43 +38,25 @@ class DeliveryController(
     fun getDeliveryInfo(
         user: User,
         @PathVariable deliveryId: Int,
-        @PathVariable assigmentId: Int,
+        @PathVariable assignmentId: Int,
         @PathVariable classroomId: Int,
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         return when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
             is Either.Left -> problem(delivery.value)
             is Either.Right -> siren(DeliveryOutputModel(delivery = delivery.value.delivery, teamsDelivered = delivery.value.teamsDelivered, teamsNotDelivered = delivery.value.teamsNotDelivered)) {
-                link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("self"), needAuthentication = true)
-                link(href = Uris.deliverysUri(courseId, classroomId, assigmentId), rel = LinkRelation("deliveries"), needAuthentication = true)
-                delivery.value.teamsNotDelivered.forEach {
-                    link(href = Uris.teamUri(courseId, classroomId, assigmentId, it.id), rel = LinkRelation("team"), needAuthentication = true)
-                }
-                delivery.value.teamsDelivered.forEach {
-                    link(href = Uris.teamUri(courseId, classroomId, assigmentId, it.id), rel = LinkRelation("team"), needAuthentication = true)
-                }
+                link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId), rel = LinkRelation("self"), needAuthentication = true)
                 if (user is Teacher) {
+                    //TODO: Check this action because content
                     action(
                         title = "edit-delivery",
-                        href = Uris.editDeliveryUri(courseId, classroomId, assigmentId, deliveryId),
+                        href = Uris.editDeliveryUri(courseId, classroomId, assignmentId, deliveryId),
                         method = HttpMethod.POST,
                         type = "application/json",
                     ) {
                         timestampField(name = "dueDate", delivery.value.delivery.dueDate)
                         textField(name = "tagControl", delivery.value.delivery.tagControl)
                     }
-                    action(
-                        title = "delete-delivery",
-                        href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId),
-                        method = HttpMethod.DELETE,
-                        type = "application/json",
-                    ) {}
-                    action(
-                        title = "sync-delivery",
-                        href = Uris.syncDeliveryUri(courseId, classroomId, assigmentId, deliveryId),
-                        method = HttpMethod.POST,
-                        type = "application/json",
-                    ) {}
                 }
             }
         }
@@ -86,7 +68,7 @@ class DeliveryController(
     @PostMapping(Uris.CREATE_DELIVERY_PATH)
     fun createDelivery(
         user: User,
-        @PathVariable assigmentId: Int,
+        @PathVariable assignmentId: Int,
         @PathVariable classroomId: Int,
         @PathVariable courseId: Int,
         @RequestBody deliveryInfo: DeliveryInput,
@@ -97,17 +79,17 @@ class DeliveryController(
             is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId.value)) {
                 is Either.Left -> problem(delivery.value)
                 is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
-                    link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId.value), rel = LinkRelation("self"), needAuthentication = true)
-                    link(href = Uris.deliverysUri(courseId, classroomId, assigmentId), rel = LinkRelation("deliveries"), needAuthentication = true)
+                    link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId.value), rel = LinkRelation("self"), needAuthentication = true)
+                    link(href = Uris.deliverysUri(courseId, classroomId, assignmentId), rel = LinkRelation("deliveries"), needAuthentication = true)
                     delivery.value.teamsNotDelivered.forEach {
-                        link(href = Uris.teamUri(courseId, classroomId, assigmentId, it.id), rel = LinkRelation("team"), needAuthentication = true)
+                        link(href = Uris.teamUri(courseId, classroomId, assignmentId, it.id), rel = LinkRelation("team"), needAuthentication = true)
                     }
                     delivery.value.teamsDelivered.forEach {
-                        link(href = Uris.teamUri(courseId, classroomId, assigmentId, it.id), rel = LinkRelation("team"), needAuthentication = true)
+                        link(href = Uris.teamUri(courseId, classroomId, assignmentId, it.id), rel = LinkRelation("team"), needAuthentication = true)
                     }
                     action(
                         title = "edit-delivery",
-                        href = Uris.editDeliveryUri(courseId, classroomId, assigmentId, deliveryId.value),
+                        href = Uris.editDeliveryUri(courseId, classroomId, assignmentId, deliveryId.value),
                         method = HttpMethod.POST,
                         type = "application/json",
                     ) {
@@ -116,13 +98,13 @@ class DeliveryController(
                     }
                     action(
                         title = "delete-delivery",
-                        href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId.value),
+                        href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId.value),
                         method = HttpMethod.DELETE,
                         type = "application/json",
                     ) {}
                     action(
                         title = "sync-delivery",
-                        href = Uris.syncDeliveryUri(courseId, classroomId, assigmentId, deliveryId.value),
+                        href = Uris.syncDeliveryUri(courseId, classroomId, assignmentId, deliveryId.value),
                         method = HttpMethod.POST,
                         type = "application/json",
                     ) {}
@@ -138,7 +120,7 @@ class DeliveryController(
     fun deleteDelivery(
         user: User,
         @PathVariable deliveryId: Int,
-        @PathVariable assigmentId: Int,
+        @PathVariable assignmentId: Int,
         @PathVariable classroomId: Int,
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
@@ -147,7 +129,7 @@ class DeliveryController(
             is Either.Left -> problem(delivery.value)
             is Either.Right -> siren(DeliveryDeleteOutputModel(deliveryId, delivery.value)) {
                 clazz("delivery-deleted")
-                link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, assigmentId), needAuthentication = true)
+                link(rel = LinkRelation("assigment"), href = Uris.assigmentUri(courseId, classroomId, assignmentId), needAuthentication = true)
             }
         }
     }
@@ -159,7 +141,7 @@ class DeliveryController(
     fun editDelivery(
         user: User,
         @PathVariable deliveryId: Int,
-        @PathVariable assigmentId: Int,
+        @PathVariable assignmentId: Int,
         @PathVariable classroomId: Int,
         @PathVariable courseId: Int,
         @RequestBody deliveryInfo: DeliveryInput,
@@ -170,7 +152,7 @@ class DeliveryController(
             is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
                 is Either.Left -> problem(delivery.value)
                 is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
-                    link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
+                    link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
                 }
             }
         }
@@ -183,7 +165,7 @@ class DeliveryController(
     suspend fun syncDelivery(
         user: User,
         @PathVariable deliveryId: Int,
-        @PathVariable assigmentId: Int,
+        @PathVariable assignmentId: Int,
         @PathVariable classroomId: Int,
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
@@ -193,7 +175,7 @@ class DeliveryController(
             is Either.Right -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
                 is Either.Left -> problem(delivery.value)
                 is Either.Right -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
-                    link(href = Uris.deliveryUri(courseId, classroomId, assigmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
+                    link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId), rel = LinkRelation("delivery"), needAuthentication = true)
                 }
             }
         }

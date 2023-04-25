@@ -3,10 +3,9 @@ import {useCallback, useState} from "react";
 import {useAsync} from "./siren/Fetch";
 import {ErrorMessageModel} from "./domain/response-models/Error";
 import {SirenEntity} from "./siren/Siren";
-import {CardActions, CardContent, TextField, Typography} from "@mui/material";
+import {CardContent, TextField, Typography} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import {Button, Card} from "react-bootstrap";
-import {AssignmentServices} from "./services/AssignmentServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {AuthState, useLoggedIn} from "./Auth";
 import {DeliveryServices} from "./services/DeliveryServices";
@@ -14,31 +13,19 @@ import {DeliveryBody} from "./domain/dto/DeliveryDtoProperties";
 import {DeliveryDomain} from "./domain/Delivery";
 
 export function ShowDeliveryFetch({
-                                  deliveryServices
+                                  deliveryServices,courseId,classroomId,assignmentId,deliveryId
                               }: {
     deliveryServices: DeliveryServices;
+    courseId: number;
+    classroomId: number;
+    assignmentId: number;
+    deliveryId: number;
 }) {
     const content = useAsync(async () => {
-        return await deliveryServices.delivery();
+        return await deliveryServices.delivery(courseId,classroomId,assignmentId,deliveryId);
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
     const user = useLoggedIn()
-    const navigate = useNavigate();
-
-    if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
-    }
-
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
-    }
 
     const handleSyncDelivery = useCallback(async () => {
         const result = await deliveryServices.syncDelivery();
@@ -58,7 +45,22 @@ export function ShowDeliveryFetch({
         if (result instanceof SirenEntity) {
             // TODO : navigate to the delivery page if deleted
         }
-    }, [deliveryServices]);
+    }, [setError]);
+
+    if (!content) {
+        return (
+            <Typography
+                variant="h6"
+                gutterBottom
+            >
+                ...loading...
+            </Typography>
+        );
+    }
+
+    if (content instanceof ErrorMessageModel && !error) {
+        setError(content);
+    }
 
     return (
         <div
@@ -77,33 +79,44 @@ export function ShowDeliveryFetch({
                     <Typography
                         variant="h4"
                     >
-                        {content.properties.delivery.tagControl + " -  " + content.properties.delivery.dueDate}
+                        {content.properties.delivery.tagControl + " -  " + new Date(content.properties.delivery.dueDate).toLocaleString(
+                            "en-GB",
+                            {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                month: "long",
+                                day: "2-digit",
+                                year: "numeric",
+                            }
+                        )}
                     </Typography>
                     <Typography
                         variant="h4"
                     >
                         {"Last Sync Time: "}
                     </Typography>
+                    Teams delivered:
                     {content.properties.teamsDelivered.map((team) => (
                         <Card>
                             <CardContent>
                                 <Typography
                                     variant="h6"
                                 >
-                                    <Link to={"/assignments/" + content.properties.delivery.assignmentId + "/teams/" + team.id}>
+                                    <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/" + team.id}>
                                         {team.name}
                                     </Link>
                                 </Typography>
                             </CardContent>
                         </Card>
                     ))}
+                    Teams not delivered:
                     {content.properties.teamsNotDelivered.map((team) => (
                         <Card>
                             <CardContent>
                                 <Typography
                                     variant="h6"
                                 >
-                                    <Link to={"/assignments/" + content.properties.delivery.assignmentId + "/teams/" + team.id}>
+                                    <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/" + team.id}>
                                         {team.name}
                                     </Link>
                                 </Typography>
@@ -113,7 +126,7 @@ export function ShowDeliveryFetch({
                     {user == AuthState.Teacher ? (
                         <>
                             <Button onClick={handleSyncDelivery}>Sync</Button>
-                            <Link to={"/assignments/" + content.properties.delivery.assignmentId + "/deliveries/" + content.properties.delivery.id + "/edit"} state={{delivery:content.properties.delivery}}> Edit </Link>
+                            <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + content.properties.delivery.id + "/edit"} state={{delivery:content.properties.delivery}}> Edit </Link>
                             {content.properties.teamsDelivered.length == 0 && content.properties.teamsNotDelivered.length == 0 ? (
                                 <Button onClick={handleDeleteDelivery}>Delete</Button>
                             ) : null}
@@ -126,7 +139,7 @@ export function ShowDeliveryFetch({
     );
 }
 
-export function ShowCreateDelivery({ deliveryServices,assignmentId, error }: { deliveryServices: DeliveryServices, assignmentId:number,error: ErrorMessageModel }) {
+export function ShowCreateDelivery({ deliveryServices,courseId,classroomId,assignmentId, error }: { deliveryServices: DeliveryServices, courseId:number,classroomId:number,assignmentId:number,error: ErrorMessageModel }) {
     const [serror, setError] = useState<ErrorMessageModel>(error);
     const [tagControl, setTagControl] = useState<string>("");
     const [dueDate, setDueDate] = useState<string>("");
@@ -139,7 +152,7 @@ export function ShowCreateDelivery({ deliveryServices,assignmentId, error }: { d
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            navigate("/assignments/" + assignmentId + "/deliveries/" + result.properties.delivery.id);
+            navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + result.properties.delivery.id);
         }
     }, [deliveryServices, tagControl, dueDate, assignmentId, navigate]);
 
@@ -173,7 +186,7 @@ export function ShowCreateDelivery({ deliveryServices,assignmentId, error }: { d
     );
 }
 
-export function ShowEditDelivery({ deliveryServices, delivery, error }: { deliveryServices: DeliveryServices, delivery: DeliveryDomain,error: ErrorMessageModel }) {
+export function ShowEditDelivery({ deliveryServices, delivery,courseId,classroomId,assignmentId, error }: { deliveryServices: DeliveryServices, delivery: DeliveryDomain, courseId:number,classroomId:number,assignmentId:number,error: ErrorMessageModel }) {
     const [serror, setError] = useState<ErrorMessageModel>(error);
     const [tagControl, setTagControl] = useState<string>(delivery.tagControl);
     const [dueDate, setDueDate] = useState<string>(delivery.dueDate.toISOString().split("T")[0]);
@@ -186,7 +199,7 @@ export function ShowEditDelivery({ deliveryServices, delivery, error }: { delive
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            navigate("/assignments/" + result.properties.delivery.assignmentId + "/deliveries/" + result.properties.delivery.id);
+            navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + result.properties.delivery.id);
         }
     }, [deliveryServices, tagControl, dueDate, navigate]);
 

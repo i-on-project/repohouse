@@ -14,11 +14,7 @@ export class MenuServices {
 
     getTeachersPendingApproval = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.TEACHERS_APPROVAL_KEY, Hypermedia.systemServices.home)
-        const response = await fetchGet<TeacherPendingApprovalDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+        return await fetchGet<TeacherPendingApprovalDtoProperties>(link.href)
     }
 
     approveTeacher = async (approved:number[],rejected:number[]) => {

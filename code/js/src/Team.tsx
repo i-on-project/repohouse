@@ -13,19 +13,40 @@ import {LeaveTeamBody} from "./domain/dto/RequestDtoProperties";
 import {FeedbackBody} from "./domain/dto/TeamDtoProperties";
 
 export function ShowTeamFetch({
-    teamServices,
+    teamServices,courseId,classroomId,assignmentId,teamId,error
 }: {
-  teamServices: TeamServices,
+    teamServices: TeamServices,
+    courseId: number,
+    classroomId: number,
+    assignmentId: number,
+    teamId: number,
+    error: ErrorMessageModel
 }) {
 
     const content = useAsync(async () => {
-        return await teamServices.team();
+        return await teamServices.team(courseId,classroomId,assignmentId,teamId);
     });
-    const [error, setError] = useState<ErrorMessageModel>(null);
+    const [serror, setError] = useState<ErrorMessageModel>(error);
     const [label, setLabel] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const user = useLoggedIn()
 
+    const handleLeaveTeam = useCallback(async () => {
+        const body = new LeaveTeamBody(teamId, 0) // TODO: fill in the body
+        const result = await teamServices.leaveTeam(body);
+        if (result instanceof ErrorMessageModel) {
+            setError(result);
+        }
+    }, [setError]);
+
+    const handleSendFeedback = useCallback(async () => {
+        if (label === "" || description === "") return
+        const body = new FeedbackBody(label, description, teamId)
+        const result = await teamServices.sendFeedback(body);
+        if (result instanceof ErrorMessageModel) {
+            setError(result);
+        }
+    }, [setError, label, description]);
 
 
     if (!content) {
@@ -38,23 +59,6 @@ export function ShowTeamFetch({
             </Typography>
         );
     }
-
-    const handleLeaveTeam = useCallback(async () => {
-        const body = new LeaveTeamBody(0, 0) // TODO: fill in the body
-        const result = await teamServices.leaveTeam(body);
-        if (result instanceof ErrorMessageModel) {
-            setError(result);
-        }
-    }, [setError]);
-
-    const handleSendFeedback = useCallback(async () => {
-        if (label === "" || description === "") return
-        const body = new FeedbackBody(label, description, 0) // TODO: fill in the body
-        const result = await teamServices.sendFeedback(body);
-        if (result instanceof ErrorMessageModel) {
-            setError(result);
-        }
-    }, [setError, label, description]);
 
 
     if (content instanceof ErrorMessageModel) {
@@ -117,30 +121,39 @@ export function ShowTeamFetch({
                             <Button onClick={handleSendFeedback}>Send Feedback</Button>
                         </>
                     ): null}
-                    <Link to={"/team/" + content.properties.team.id + "/requests"}> Requests History </Link>
+                    <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + content.properties.team.id + "/requests"}> Requests History </Link>
                     {user === AuthState.Student ? (
-                        <>
-                            <Button onClick={handleLeaveTeam}>Leave Team</Button>
-                        </>
+                        <Button onClick={handleLeaveTeam}>Leave Team</Button>
                     ): null}
                 </>
             ) : null}
-            <ErrorAlert error={error} onClose={() => setError(null)}/>
+            <ErrorAlert error={serror} onClose={() => setError(null)}/>
         </div>
     );
 }
 
 export function ShowTeamRequestsFetch({
-    teamServices,
+    teamServices,courseId,classroomId,assignmentId,teamId,error
 }: {
-  teamServices: TeamServices,
+    teamServices: TeamServices,
+    courseId: number,
+    classroomId: number,
+    assignmentId: number,
+    teamId: number,
+    error: ErrorMessageModel
 }) {
-
     const content = useAsync(async () => {
-        return await teamServices.teamRequests();
+        return await teamServices.teamRequests(courseId,classroomId,assignmentId,teamId);
     });
-    const [error, setError] = useState<ErrorMessageModel>(null);
+    const [serror, setError] = useState<ErrorMessageModel>(error);
     const user = useLoggedIn()
+
+    const handleChangeStatus = useCallback(async () => {
+        const result = await teamServices.changeRequestStatus();
+        if (result instanceof ErrorMessageModel) {
+            setError(result);
+        }
+    }, [setError]);
 
     if (!content) {
         return (
@@ -152,13 +165,6 @@ export function ShowTeamRequestsFetch({
             </Typography>
         );
     }
-
-    const handleChangeStatus = useCallback(async () => {
-        const result = await teamServices.changeRequestStatus();
-        if (result instanceof ErrorMessageModel) {
-            setError(result);
-        }
-    }, [setError]);
 
     if (content instanceof ErrorMessageModel) {
         setError(content);
@@ -200,7 +206,7 @@ export function ShowTeamRequestsFetch({
                     </List>
                 </>
             ) : null}
-            <ErrorAlert error={error} onClose={() => setError(null)}/>
+            <ErrorAlert error={serror} onClose={() => setError(null)}/>
         </div>
     );
 }
