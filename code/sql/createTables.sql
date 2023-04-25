@@ -225,26 +225,3 @@ Create TABLE Outbox(
 );
 
 COMMIT;
-
-
-insert into users (email,github_username, github_id, token, name) values ('admin@admin','admin', 0, 'admin', 'admin');
-insert into Teacher (id, github_token) values (31, 'admin');
-insert into Course (org_url, name) values ('demo', 'demo');
-insert into Teacher_Course (teacher, course) values (31, 3);
-insert into Student_Course (student, course) values (29, 3);
-insert into Classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id) values ('demo', '2019-01-01', 'demo', false, 3, 31);
-insert into Classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id) values ('demo2', '2019-01-01', 'demo2', false, 3, 31);
-insert into Assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title) values (1, 2, 2, '2019-01-01', 'demo', 'demo');
-insert into Assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title) values (2, 2, 2, '2019-01-01', 'demo2', 'demo2');
-insert into Team (name, is_Created, assignment) values ('demo', false, 1);
-insert into Team (name, is_Created, assignment) values ('demo', false, 4);
-insert into Student_Team (student, team) values (29, 1);
-insert into Student_Team (student, team) values (29, 3);
-insert into Delivery (due_date, tag_control, assignment_id) values ('2019-01-01', 'demo', 1);
-insert into Delivery (due_date, tag_control, assignment_id) values ('2019-01-01', 'demo', 4);
-insert into Repo (name, url, is_created, team_id) values ('demo', 'demo', false, 1);
-insert into Repo (name, url, is_created, team_id) values ('demo2', 'demo2', false, 3);
-insert into Tags (name, is_delivered, tag_date, delivery_id, repo_id) values ('demo', false, '2019-01-01', 1, 1);
-insert into Tags (name, is_delivered, tag_date, delivery_id, repo_id) values ('demo', false, '2019-01-01', 2, 3);
-insert into Feedback (description, label, team_id) values ('demo', 'demo', 1);
-insert into Feedback (description, label, team_id) values ('demo', 'demo', 3);

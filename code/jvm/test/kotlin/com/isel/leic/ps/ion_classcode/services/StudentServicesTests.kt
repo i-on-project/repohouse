@@ -47,38 +47,6 @@ class StudentServicesTests {
         }
     }
 
-    // TEST: getCourses
-
-    @Test
-    fun `getCourses should give an InvalidInput because the studentId is invalid`() {
-        // given: an invalid student id
-        val studentId = -1
-
-        // when: getting an error because of an invalid student id
-        val courses = studentServices.getCourses(studentId = studentId)
-
-        if (courses is Either.Left) {
-            assert(courses.value is StudentServicesError.InvalidInput)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `getCourses should give a list of courses`() {
-        // given: a valid student id
-        val studentId = 1
-
-        // when: getting a list of courses
-        val courses = studentServices.getCourses(studentId = studentId)
-
-        if (courses is Either.Right) {
-            assert(courses.value.size == 1)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
-
     // TEST: getStudentSchoolId
 
     @Test
@@ -90,7 +58,7 @@ class StudentServicesTests {
         val student = studentServices.getStudentSchoolId(studentId = studentId)
 
         if (student is Either.Left) {
-            assert(student.value is StudentServicesError.InvalidInput)
+            assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
         }
@@ -105,7 +73,7 @@ class StudentServicesTests {
         val courses = studentServices.getStudentSchoolId(studentId = studentId)
 
         if (courses is Either.Left) {
-            assert(courses.value is StudentServicesError.UserNotFound)
+            assert(courses.value is StudentServicesError.StudentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -137,7 +105,7 @@ class StudentServicesTests {
         val student = studentServices.updateStudent(userId = userId, schoolId = 1234)
 
         if (student is Either.Left) {
-            assert(student.value is StudentServicesError.InvalidInput)
+            assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
         }
@@ -152,7 +120,7 @@ class StudentServicesTests {
         val student = studentServices.updateStudent(userId = 1, schoolId = schoolId)
 
         if (student is Either.Left) {
-            assert(student.value is StudentServicesError.InvalidInput)
+            assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
         }

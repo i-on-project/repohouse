@@ -5,39 +5,32 @@ import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInputModel
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
-import com.isel.leic.ps.ion_classcode.http.GITHUB_ACCESS_TOKEN_URI
-import com.isel.leic.ps.ion_classcode.http.GITHUB_API_BASE_URL
 import com.isel.leic.ps.ion_classcode.http.GITHUB_BASE_URL
 import com.isel.leic.ps.ion_classcode.http.GITHUB_OAUTH_URI
-import com.isel.leic.ps.ion_classcode.http.GITHUB_USERINFO_URI
-import com.isel.leic.ps.ion_classcode.http.GITHUB_USERMAILS_URI
-import com.isel.leic.ps.ion_classcode.http.OkHttp
 import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
-import com.isel.leic.ps.ion_classcode.http.makeCallToList
-import com.isel.leic.ps.ion_classcode.http.makeCallToObject
 import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AuthRedirect
-import com.isel.leic.ps.ion_classcode.http.model.output.ClientToken
-import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserEmail
-import com.isel.leic.ps.ion_classcode.http.model.output.GitHubUserInfo
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.model.output.RegisterOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
+import com.isel.leic.ps.ion_classcode.http.services.GithubServices
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
+import com.isel.leic.ps.ion_classcode.http.services.StudentServices
+import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
+import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import jakarta.servlet.http.HttpServletResponse
-import okhttp3.Request
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CookieValue
@@ -69,9 +62,11 @@ const val AUTHORIZATION_COOKIE_NAME = "Session"
  */
 @RestController
 class AuthController(
-    private val okHttp: OkHttp,
     private val userServices: UserServices,
+    private val studentServices: StudentServices,
+    private val teacherServices: TeacherServices,
     private val outboxServices: OutboxServices,
+    private val githubServices: GithubServices,
 ) {
 
     /**
@@ -84,7 +79,10 @@ class AuthController(
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(TEACHER_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")) {}
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")) {
+            clazz("auth")
+            link(rel = LinkRelation("self"), href = Uris.AUTH_TEACHER_PATH)
+        }
     }
 
     /**
@@ -97,7 +95,10 @@ class AuthController(
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")) {}
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")) {
+            clazz("auth")
+            link(rel = LinkRelation("self"), href = Uris.AUTH_STUDENT_PATH)
+        }
     }
 
     /**
@@ -114,13 +115,13 @@ class AuthController(
         response: HttpServletResponse,
     ): ResponseEntity<*> {
         if (state != userState) return Problem.stateMismatch
-        val accessToken = fetchAccessToken(code)
-        val userGithubInfo = fetchUserInfo(accessToken.access_token)
+        val accessToken = githubServices.fetchAccessToken(code)
+        val userGithubInfo = githubServices.fetchUserInfo(accessToken.access_token)
         return when (val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
             is Either.Right -> {
                 if (userInfo.value.isCreated) {
                     when {
-                        userInfo.value is Student && position == "Student" -> {
+                        userInfo.value is Student && position == STUDENT_COOKIE_NAME -> {
                             val cookie = generateSessionCookie(userInfo.value.token)
                             ResponseEntity
                                 .status(Status.REDIRECT)
@@ -128,9 +129,12 @@ class AuthController(
                                 .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
-                        userInfo.value is Teacher && position == "Teacher" -> {
-                            when (val update = userServices.updateTeacherGithubToken(userInfo.value.id, accessToken.access_token)) {
-                                is Either.Left -> problemUser(update.value)
+                        userInfo.value is Teacher && position == TEACHER_COOKIE_NAME -> {
+                            when (teacherServices.updateTeacherGithubToken(userInfo.value.id, accessToken.access_token)) {
+                                is Either.Left -> ResponseEntity
+                                    .status(Status.REDIRECT)
+                                    .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                    .body(EMPTY_REQUEST)
                                 is Either.Right -> {
                                     val cookie = generateSessionCookie(userInfo.value.token)
                                     ResponseEntity
@@ -153,7 +157,7 @@ class AuthController(
                         }
                     }
                 } else {
-                    if (position == "Teacher") {
+                    if (position == TEACHER_COOKIE_NAME) {
                         val cookie = generateGithubIdCookie(userGithubInfo.id)
                         ResponseEntity
                             .status(Status.REDIRECT)
@@ -171,18 +175,18 @@ class AuthController(
                 }
             }
             is Either.Left -> {
-                val userEmail = fetchUserEmails(accessToken.access_token).first { it.primary }
-                if (position == "Teacher") {
+                val userEmail = githubServices.fetchUserEmails(accessToken.access_token).first { it.primary }
+                if (position == TEACHER_COOKIE_NAME) {
                     when (
-                        val user = userServices.createPendingTeacher(
+                        teacherServices.createPendingTeacher(
                             TeacherInput(
-                                userEmail.email,
-                                userGithubInfo.login,
-                                userGithubInfo.id,
-                                generateRandomToken(),
-                                userGithubInfo.name,
-                                accessToken.access_token,
-                            ),
+                                email = userEmail.email,
+                                githubUsername =  userGithubInfo.login,
+                                githubId = userGithubInfo.id,
+                                token = generateRandomToken(),
+                                name = userGithubInfo.name,
+                                githubToken = accessToken.access_token,
+                            )
                         )
                     ) {
                         is Either.Right -> {
@@ -193,19 +197,21 @@ class AuthController(
                                 .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
                                 .body(EMPTY_REQUEST)
                         }
-
-                        is Either.Left -> problemUser(user.value)
+                        is Either.Left -> ResponseEntity
+                            .status(Status.REDIRECT)
+                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                            .body(EMPTY_REQUEST)
                     }
                 } else {
                     when (
-                        val user = userServices.createPendingStudent(
+                        studentServices.createPendingStudent(
                             StudentInput(
                                 email = userEmail.email,
                                 githubUsername = userGithubInfo.login,
                                 githubId = userGithubInfo.id,
                                 token = generateRandomToken(),
                                 name = userGithubInfo.name,
-                            ),
+                            )
                         )
                     ) {
                         is Either.Right -> {
@@ -216,8 +222,10 @@ class AuthController(
                                 .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
-
-                        is Either.Left -> problemUser(user.value)
+                        is Either.Left -> ResponseEntity
+                            .status(Status.REDIRECT)
+                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                            .body(EMPTY_REQUEST)
                     }
                 }
             }
@@ -230,8 +238,11 @@ class AuthController(
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val userInfo = userServices.getPendingUserByGithubId(githubId)) {
-            is Either.Right -> siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {}
-            is Either.Left -> problemUser(userInfo.value)
+            is Either.Right -> siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {
+                clazz("registerInfo")
+                link(rel = LinkRelation("self"), href = Uris.AUTH_REGISTER_PATH)
+            }
+            is Either.Left -> userServices.problem(userInfo.value)
         }
     }
 
@@ -240,11 +251,14 @@ class AuthController(
         @CookieValue userGithubId: String,
         @CookieValue position: String,
     ): ResponseEntity<*> {
-        if (position != "Teacher") return Problem.badRequest
+        if (position != TEACHER_COOKIE_NAME) return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
-        return when (val teacher = userServices.createTeacher(githubId)) {
-            is Either.Right -> siren(StatusOutputModel("User Register", "Verify the status of your account")) {}
-            is Either.Left -> problemUser(teacher.value)
+        return when (val teacher = teacherServices.createTeacher(githubId)) {
+            is Either.Right -> siren(StatusOutputModel("User Register", "Verify the status of your account")) {
+                clazz("registerTeacher")
+                action(title = "registerTeacher", href = Uris.AUTH_REGISTER_TEACHER_PATH, method = HttpMethod.POST, type = "application/json", block = {})
+            }
+            is Either.Left -> teacherServices.problem(teacher.value)
         }
     }
 
@@ -257,24 +271,32 @@ class AuthController(
         @CookieValue position: String,
         @RequestBody input: SchoolIdInputModel,
     ): ResponseEntity<*> {
-        if (position != "Student") return Problem.badRequest
+        if (position != STUDENT_COOKIE_NAME) return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
-        return when (val student = userServices.createStudent(githubId, input.schoolId)) {
+        return when (val student = studentServices.createStudent(githubId, input.schoolId)) {
             is Either.Right -> {
                 when (val userOutbox = outboxServices.createUserVerification(student.value.id)) {
-                    is Either.Right -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {}
+                    is Either.Right -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
+                        clazz("registerStudent")
+                        action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
+                            numberField("schoolId")
+                        })
+                    }
                     is Either.Left -> when (userOutbox.value) {
-                        is OutboxServicesError.CooldownNotExpired -> siren(
-                            StatusOutputModel(
+                        is OutboxServicesError.CooldownNotExpired -> siren(StatusOutputModel(
                                 "On cooldown",
                                 "You are on cooldown, try again in ${userOutbox.value.cooldown} seconds",
-                            ),
-                        ) {}
+                            )) {
+                            clazz("registerStudent")
+                            action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
+                                numberField("schoolId")
+                            })
+                        }
                         else -> problemOtp(userOutbox.value)
                     }
                 }
             }
-            is Either.Left -> problemUser(student.value)
+            is Either.Left -> studentServices.problem(student.value)
         }
     }
 
@@ -287,30 +309,33 @@ class AuthController(
         return when (val userInfo = userServices.getUserByGithubId(githubId)) {
             is Either.Right -> {
                 if (userInfo.value.isCreated) {
-                    val cookie = generateSessionCookie(userInfo.value.token)
-                    ResponseEntity
-                        .status(Status.REDIRECT)
-                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback")
-                        .body(EMPTY_REQUEST)
+                    siren(StatusOutputModel(
+                        "You are now eligible to use the application.",
+                        "Return to home to authenticate yourself.",
+                    )) {
+                        clazz("status")
+                        link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
+                    }
                 } else {
                     when (position) {
-                        "Teacher" -> siren(
-                            StatusOutputModel(
-                                "Needing approval",
-                                "Wait for approval from other teachers",
-                            ),
-                        ) {}
-                        else -> siren(
-                            StatusOutputModel(
-                                "Needing action.",
-                                "Verify your email to proceed with the verification or register using your school id.",
-                            ),
-                        ) {}
+                        TEACHER_COOKIE_NAME -> siren(StatusOutputModel(
+                            "Needing approval.",
+                            "Wait for approval from other teachers.",
+                        )) {
+                            clazz("status")
+                            link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
+                        }
+                        else -> siren(StatusOutputModel(
+                            "Needing action.",
+                            "Verify your email to proceed with the verification or register using your school id.",
+                        )) {
+                            clazz("status")
+                            link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
+                        }
                     }
                 }
             }
-            is Either.Left -> problemUser(userInfo.value)
+            is Either.Left -> userServices.problem(userInfo.value)
         }
     }
 
@@ -324,19 +349,22 @@ class AuthController(
         response: HttpServletResponse,
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
-        return when (val user = userServices.getUserByGithubId(githubId = githubId)) {
-            is Either.Right -> {
-                when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
-                    is Either.Right -> {
-                        val cookie = generateSessionCookie(user.value.token)
-                        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-                        response.setHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
-                        siren(StatusOutputModel("User verified.", "User verified successfully, you can navigate to menu.")) {}
+        return when (val user = userServices.getUserByGithubId(githubId)) {
+            is Either.Right -> when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
+                is Either.Right -> {
+                    val cookie = generateSessionCookie(user.value.token)
+                    response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+                    response.setHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
+                    siren(StatusOutputModel("User verified.", "User verified successfully, you can navigate to menu.")) {
+                        clazz("verifyStudent")
+                        action(title = "verify", href = Uris.AUTH_REGISTER_VERIFICATION_PATH, method = HttpMethod.POST, type = "application/json", block = {
+                            numberField("otp")
+                        })
                     }
-                    is Either.Left -> problemOtp(checkOTP.value)
                 }
+                is Either.Left -> problemOtp(checkOTP.value)
             }
-            is Either.Left -> problemUser(user.value)
+            is Either.Left -> userServices.problem(user.value)
         }
     }
 
@@ -351,7 +379,10 @@ class AuthController(
         val githubIdCookie = deleteGithubIdCookie()
         response.setHeader(HttpHeaders.SET_COOKIE, authorizationCookie.toString())
         response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
-        return siren(null) {}
+        return siren(null) {
+            clazz("logout")
+            action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})
+        }
     }
 
     private fun generateUserState(): OAuthState {
@@ -433,66 +464,10 @@ class AuthController(
     }
 
     /**
-     * Method to fetch the user access token from GitHub.
-     */
-    private suspend fun fetchAccessToken(code: String): ClientToken {
-        val request = Request.Builder().url("$GITHUB_BASE_URL${GITHUB_ACCESS_TOKEN_URI(code)}")
-            .addHeader("Accept", "application/json")
-            .post(EMPTY_REQUEST)
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    /**
-     * Method to fetch the user info from GitHub.
-     */
-    private suspend fun fetchUserInfo(accessToken: String): GitHubUserInfo {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL$GITHUB_USERINFO_URI")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/json")
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    /**
-     * Method to fetch the user emails from GitHub.
-     */
-    private suspend fun fetchUserEmails(accessToken: String): List<GitHubUserEmail> {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL$GITHUB_USERMAILS_URI")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .addHeader("Accept", "application/vnd.github+json")
-            .build()
-
-        return okHttp.makeCallToList(request)
-    }
-
-    /**
      * Generate a random token.
      */
     private fun generateRandomToken(): String {
         return UUID.randomUUID().toString()
-    }
-
-    /**
-     * Function to handle errors about the user.
-     */
-    private fun problemUser(error: UserServicesError): ResponseEntity<ErrorMessageModel> {
-        return when (error) {
-            UserServicesError.InvalidData -> Problem.invalidInput
-            UserServicesError.UserNotFound -> Problem.notFound
-            UserServicesError.UserNotAuthenticated -> Problem.unauthenticated
-            UserServicesError.ErrorCreatingUser -> Problem.internalError
-            UserServicesError.InvalidGithubId -> Problem.internalError
-            UserServicesError.InvalidToken -> Problem.unauthenticated
-            UserServicesError.GithubIdInUse -> Problem.internalError
-            UserServicesError.TokenInUse -> Problem.internalError
-            UserServicesError.EmailInUse -> Problem.internalError
-            UserServicesError.GithubUserNameInUse -> Problem.internalError
-            UserServicesError.GithubTokenInUse -> Problem.internalError
-            UserServicesError.SchoolIdInUse -> Problem.conflict
-        }
     }
 
     /**

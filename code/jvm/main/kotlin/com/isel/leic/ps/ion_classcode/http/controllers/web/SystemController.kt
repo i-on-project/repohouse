@@ -25,6 +25,7 @@ class SystemController {
     @GetMapping(Uris.HOME, produces = ["application/vnd.siren+json"])
     fun home(): ResponseEntity<SirenModel<HomeOutputModel>> {
         return siren(value = HomeOutputModel()) {
+            clazz("home")
             allSystemLinks(this)
             allSystemActions(this)
         }
@@ -36,11 +37,12 @@ class SystemController {
     @GetMapping(Uris.CREDITS, produces = ["application/vnd.siren+json"])
     fun credits(): ResponseEntity<SirenModel<OutputModel>> {
         return siren(value = CreditsOutputModel()) {
+            clazz("credits")
             link(rel = LinkRelation("self"), href = Uris.creditsUri())
         }
     }
 
-    private fun <T> allSystemLinks(block:SirenBuilderScope<T>){
+    private fun <T> allSystemLinks(block:SirenBuilderScope<T>) {
         block.link(rel = LinkRelation("home"), href = Uris.HOME)
         block.link(rel = LinkRelation("credits"), href = Uris.CREDITS)
         block.link(rel = LinkRelation("menu"), href = Uris.MENU_PATH, needAuthentication = true)
@@ -61,9 +63,10 @@ class SystemController {
         block.link(rel = LinkRelation("requestsHistory"),href = Uris.TEAM_REQUESTS_PATH, needAuthentication = true)
     }
 
-    private fun <T> allSystemActions(block:SirenBuilderScope<T>){
+    private fun <T> allSystemActions(block:SirenBuilderScope<T>) {
         block.action(title = "approveTeacher", href = Uris.TEACHERS_APPROVAL_PATH, method = HttpMethod.POST, type = "application/x-www-form-urlencoded", block = {
-            hiddenField(name = "teacherId")
+            rangeField(name = "approved")
+            rangeField(name = "rejected")
         })
         block.action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
             numberField("schoolId")
@@ -76,7 +79,6 @@ class SystemController {
         block.action(title = "createCourse", href = Uris.COURSES_PATH, method = HttpMethod.POST, type = "application/json", block = {
             textField("orgUrl")
             textField("name")
-            numberField("teacherId")
         })
         block.action("joinTeam", Uris.JOIN_TEAM_PATH, method = HttpMethod.POST, type = "application/json",) {
             hiddenField("assigmentId")
@@ -95,5 +97,4 @@ class SystemController {
         }
         block.action(title = "changeStatusRequest", href = Uris.TEAM_CHANGE_REQUEST_PATH, method = HttpMethod.POST, type = "application/json") {}
     }
-
 }

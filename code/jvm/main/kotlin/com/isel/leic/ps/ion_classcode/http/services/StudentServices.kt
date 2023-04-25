@@ -1,14 +1,21 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
-import com.isel.leic.ps.ion_classcode.domain.Course
+import com.isel.leic.ps.ion_classcode.domain.PendingStudent
+import com.isel.leic.ps.ion_classcode.domain.Student
+import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
+import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
+import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ion_classcode.tokenHash.TokenHash
 import com.isel.leic.ps.ion_classcode.utils.Either
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 
 /**
  * Alias for the response of the services
  */
-typealias StudentCoursesResponse = Either<StudentServicesError, List<Course>>
+typealias StudentCreationResult = Either<StudentServicesError, Student>
+typealias PendingStudentCreationResult = Either<StudentServicesError, PendingStudent>
 typealias StudentSchoolIdResponse = Either<StudentServicesError, Int>
 typealias StudentSchoolIdUpdateResponse = Either<StudentServicesError, Boolean>
 
@@ -16,9 +23,14 @@ typealias StudentSchoolIdUpdateResponse = Either<StudentServicesError, Boolean>
  * Error codes for the services
  */
 sealed class StudentServicesError {
-    object CourseNotFound : StudentServicesError()
-    object UserNotFound : StudentServicesError()
-    object InvalidInput : StudentServicesError()
+    object StudentNotFound : StudentServicesError()
+    object InvalidData : StudentServicesError()
+    object GithubUserNameInUse : StudentServicesError()
+    object GithubIdInUse : StudentServicesError()
+    object EmailInUse : StudentServicesError()
+    object TokenInUse : StudentServicesError()
+    object SchoolIdInUse : StudentServicesError()
+    object InternalError: StudentServicesError()
 }
 
 /**
@@ -27,16 +39,57 @@ sealed class StudentServicesError {
 @Component
 class StudentServices(
     private val transactionManager: TransactionManager,
+    private val tokenHash: TokenHash,
 ) {
 
     /**
-     * Method to get all the courses of a student
+     * Method to create a user as a student
      */
-    fun getCourses(studentId: Int): StudentCoursesResponse {
-        if (studentId <= 0) return Either.Left(value = StudentServicesError.InvalidInput)
+    fun createStudent(githubId: Long, schoolId: Int): StudentCreationResult {
+        if (schoolId <= 0 || githubId <= 0) return Either.Left(StudentServicesError.InvalidData)
         return transactionManager.run {
-            val courses = it.courseRepository.getAllStudentCourses(studentId = studentId)
-            Either.Right(value = courses)
+            val student = it.usersRepository.getPendingUserByGithubId(githubId) ?: Either.Left(StudentServicesError.StudentNotFound)
+            if (student is Student) {
+                if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) Either.Left(StudentServicesError.GithubUserNameInUse)
+                if (it.usersRepository.checkIfEmailExists(student.email)) Either.Left(StudentServicesError.EmailInUse)
+                if (it.usersRepository.checkIfGithubIdExists(student.githubId)) Either.Left(StudentServicesError.GithubIdInUse)
+                if (it.usersRepository.checkIfTokenExists(student.token)) Either.Left(StudentServicesError.TokenInUse)
+                if (it.usersRepository.checkIfSchoolIdExists(schoolId)) Either.Left(StudentServicesError.SchoolIdInUse)
+                val studentRes = it.usersRepository.createStudent(
+                    StudentInput(
+                        name = student.name,
+                        email = student.email,
+                        githubUsername = student.githubUsername,
+                        githubId = student.githubId,
+                        token = student.token,
+                        schoolId = schoolId,
+                    )
+                )
+                if (studentRes == null) Either.Left(StudentServicesError.InternalError) else Either.Right(studentRes)
+            } else {
+                Either.Left(StudentServicesError.StudentNotFound)
+            }
+        }
+    }
+
+    /**
+     * Method to create a pending user as a student
+     */
+    fun createPendingStudent(student: StudentInput): PendingStudentCreationResult {
+        if (student.isNotValid()) return Either.Left(StudentServicesError.InternalError)
+        return transactionManager.run {
+            val hash = tokenHash.getTokenHash(student.token)
+            val studentRes = it.usersRepository.createPendingStudent(
+                StudentInput(
+                    name = student.name,
+                    email = student.email,
+                    githubUsername = student.githubUsername,
+                    githubId = student.githubId,
+                    token = hash,
+                    schoolId = student.schoolId,
+                )
+            )
+            Either.Right(studentRes)
         }
     }
 
@@ -44,13 +97,13 @@ class StudentServices(
      * Method to get the school id of a student
      */
     fun getStudentSchoolId(studentId: Int): StudentSchoolIdResponse {
-        if (studentId <= 0) return Either.Left(value = StudentServicesError.InvalidInput)
+        if (studentId <= 0) return Either.Left(value = StudentServicesError.InvalidData)
         return transactionManager.run {
             val schoolId = it.usersRepository.getStudentSchoolId(id = studentId)
             if (schoolId != null) {
                 Either.Right(value = schoolId)
             } else {
-                Either.Left(value = StudentServicesError.UserNotFound)
+                Either.Left(value = StudentServicesError.StudentNotFound)
             }
         }
     }
@@ -59,10 +112,26 @@ class StudentServices(
      * Method to update the school id of a student
      */
     fun updateStudent(userId: Int, schoolId: Int): StudentSchoolIdUpdateResponse {
-        if (userId <= 0 || schoolId <= 0) return Either.Left(value = StudentServicesError.InvalidInput)
+        if (userId <= 0 || schoolId <= 0) return Either.Left(value = StudentServicesError.InvalidData)
         return transactionManager.run {
             it.usersRepository.updateStudentSchoolId(userId = userId, schoolId = schoolId)
             Either.Right(value = true)
+        }
+    }
+
+    /**
+     * Function to handle errors from student
+     */
+    fun problem(error: StudentServicesError): ResponseEntity<ErrorMessageModel> {
+        return when (error) {
+            is StudentServicesError.StudentNotFound -> Problem.userNotFound
+            is StudentServicesError.InvalidData -> Problem.invalidInput
+            is StudentServicesError.EmailInUse -> Problem.internalError
+            is StudentServicesError.GithubIdInUse -> Problem.internalError
+            is StudentServicesError.GithubUserNameInUse -> Problem.internalError
+            is StudentServicesError.TokenInUse -> Problem.internalError
+            is StudentServicesError.SchoolIdInUse -> Problem.conflict
+            is StudentServicesError.InternalError -> Problem.internalError
         }
     }
 }

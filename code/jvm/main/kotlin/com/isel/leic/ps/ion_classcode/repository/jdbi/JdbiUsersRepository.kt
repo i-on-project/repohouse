@@ -242,8 +242,8 @@ class JdbiUsersRepository(
     /**
      * Method to get a user by id
      */
-    override fun getUserById(id: Int): User? {
-        return helper(handle = handle, id = id)
+    override fun getUserById(userId: Int): User? {
+        return helper(handle = handle, id = userId)
     }
 
     /**

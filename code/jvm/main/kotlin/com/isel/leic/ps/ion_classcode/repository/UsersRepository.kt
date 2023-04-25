@@ -27,7 +27,7 @@ interface UsersRepository {
     fun getTeacher(teacherId: Int): Teacher?
     fun getAllStudents(): List<Student>
     fun getAllTeachers(): List<Teacher>
-    fun getUserById(id: Int): User?
+    fun getUserById(userId: Int): User?
     fun getUserByEmail(email: String): User?
     fun getUserByToken(token: String): User?
     fun getUserByGithubId(githubId: Long): User?

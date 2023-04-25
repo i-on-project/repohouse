@@ -23,7 +23,7 @@ import {ShowTeacherApprovalFetch} from "./ApproveTeachers";
 import {ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentFetch, ShowCreateStudentFetchPost, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost} from "./Create";
 import {ShowStatusCallbackFetch, ShowStatusFetch} from "./Status";
 import {ShowVerifyFetch} from "./Verify";
-import { HandleAuthFail, HandleAuthFailCallback } from './AuthFail'
+import { HandleAuthError, HandleAuthErrorCallback, HandleAuthFail, HandleAuthFailCallback } from './AuthProblem'
 import {ShowClassroomFetch,ShowCreateClassroom} from "./Classroom";
 import {ShowAssignmentFetch, ShowCreateAssignment} from './Assignment'
 import {ShowCreateDelivery, ShowDeliveryFetch, ShowEditDelivery} from "./Delivery";
@@ -93,6 +93,14 @@ const router = createBrowserRouter([
             {
                 path: "/auth/fail/callback",
                 element: <AuthFailCallback/>
+            },
+            {
+                path: "/auth/error",
+                element: <AuthError/>
+            },
+            {
+                path: "/auth/error/callback",
+                element: <AuthErrorCallback/>
             },
             {
                 path: "/menu",
@@ -319,6 +327,23 @@ function AuthFailCallback() {
         </div>
     )
 }
+
+function AuthError() {
+    return (
+        <div>
+             <HandleAuthError/>
+        </div>
+    )
+}
+
+function AuthErrorCallback() {
+    return (
+        <div>
+             <HandleAuthErrorCallback/>
+        </div>
+    )
+}
+
 
 function Menu() {
     return (

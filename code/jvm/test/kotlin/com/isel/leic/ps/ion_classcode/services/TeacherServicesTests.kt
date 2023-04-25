@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean
 
 @SpringBootTest
 class TeacherServicesTests {
+
     @Autowired
     lateinit var teacherServices: TeacherServices
 
@@ -41,8 +42,8 @@ class TeacherServicesTests {
                         } doReturn listOf(Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf<Teacher>(), isArchived = false))
                     }
                     val mockedUserRepository = mock<UsersRepository> {
-                        on { getUserById(id = 1) } doReturn Teacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false)
-                        on { getUserById(id = 2) } doReturn Student(name = "test142", id = 2, email = "test1@alunos.isel.pt", githubUsername = "test124", githubId = 1235, token = "token1", isCreated = false, schoolId = 1234)
+                        on { getUserById(userId = 1) } doReturn Teacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false)
+                        on { getUserById(userId = 2) } doReturn Student(name = "test142", id = 2, email = "test1@alunos.isel.pt", githubUsername = "test124", githubId = 1235, token = "token1", isCreated = false, schoolId = 1234)
                         on { getTeacherGithubToken(id = 1) } doReturn "githubToken"
                     }
                     val mockedApplyRequestRepository = mock<ApplyRequestRepository> {
@@ -62,37 +63,6 @@ class TeacherServicesTests {
         }
     }
 
-    // TEST: getCourses
-
-    @Test
-    fun `getCourses should give an InvalidData because the teacherId is invalid`() {
-        // given: an invalid teacher id
-        val teacherId = -1
-
-        // when: getting an error because of an invalid teacher id
-        val user = teacherServices.getCourses(teacherId = teacherId)
-
-        if (user is Either.Left) {
-            assert(user.value is TeacherServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `getCourses should give the list of courses of a teacher`() {
-        // given: a valid teacher id
-        val teacherId = 1
-
-        // when: getting a list of courses
-        val user = teacherServices.getCourses(teacherId = teacherId)
-
-        if (user is Either.Right) {
-            assert(user.value.size == 1)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
     // TEST: getTeachersNeedingApproval
 
     @Test
@@ -131,13 +101,14 @@ class TeacherServicesTests {
         // when: getting a flag  that everything went well
         val user = teacherServices.approveTeachers(
             teachers = TeachersPendingInputModel(
-                approved = listOf<Int>(1),
-                rejected = listOf<Int>(2),
+                approved = listOf(1),
+                rejected = listOf(2),
             ),
         )
 
         if (user is Either.Right) {
-            assert(user.value)
+            println(user.value)
+            assert(user.value.find { it.id == 1 || it.id == 2 } == null)
         } else {
             fail("Should not be Either.Left")
         }
