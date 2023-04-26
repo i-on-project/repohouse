@@ -1,13 +1,11 @@
 package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
-import com.isel.leic.ps.ion_classcode.http.services.StudentServices
-import com.isel.leic.ps.ion_classcode.http.services.StudentServicesError
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -57,7 +55,7 @@ class StudentServicesTests {
         // when: getting an error because of an invalid student id
         val student = studentServices.getStudentSchoolId(studentId = studentId)
 
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -72,7 +70,7 @@ class StudentServicesTests {
         // when: getting the school id
         val courses = studentServices.getStudentSchoolId(studentId = studentId)
 
-        if (courses is Either.Left) {
+        if (courses is Result.Problem) {
             assert(courses.value is StudentServicesError.StudentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -87,7 +85,7 @@ class StudentServicesTests {
         // when: getting the school id
         val courses = studentServices.getStudentSchoolId(studentId = studentId)
 
-        if (courses is Either.Right) {
+        if (courses is Result.Success) {
             assert(courses.value == 123)
         } else {
             fail("Should not be Either.Left")
@@ -104,7 +102,7 @@ class StudentServicesTests {
         // when: getting an error because of an invalid user id
         val student = studentServices.updateStudent(userId = userId, schoolId = 1234)
 
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -119,7 +117,7 @@ class StudentServicesTests {
         // when: getting an error because of an invalid school id
         val student = studentServices.updateStudent(userId = 1, schoolId = schoolId)
 
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -131,7 +129,7 @@ class StudentServicesTests {
         // when: getting the school id
         val student = studentServices.updateStudent(userId = 1, schoolId = 1234)
 
-        if (student is Either.Right) {
+        if (student is Result.Success) {
             assert(student.value)
         } else {
             fail("Should not be Either.Left")

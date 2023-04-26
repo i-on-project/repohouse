@@ -10,12 +10,12 @@ import com.isel.leic.ps.ion_classcode.http.model.output.MenuStudentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.MenuTeacherOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeachersPendingOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.http.services.StudentServices
-import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServices
+import com.isel.leic.ps.ion_classcode.services.StudentServices
+import com.isel.leic.ps.ion_classcode.services.TeacherServices
+import com.isel.leic.ps.ion_classcode.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -56,11 +56,11 @@ class MenuController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val courses = userServices.getAllUserCourses(user.id)) {
-            is Either.Right -> siren(MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
+            is Result.Success -> siren(MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
                 clazz("menu")
                 link(rel = LinkRelation("self"), href = Uris.MENU_PATH, needAuthentication = true)
             }
-            is Either.Left -> userServices.problem(courses.value)
+            is Result.Problem -> userServices.problem(courses.value)
         }
     }
 
@@ -72,13 +72,13 @@ class MenuController(
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
         val studentSchoolId = studentServices.getStudentSchoolId(user.id)
-        if (studentSchoolId is Either.Left) return studentServices.problem(studentSchoolId.value)
+        if (studentSchoolId is Result.Problem) return studentServices.problem(studentSchoolId.value)
         return when (val courses = userServices.getAllUserCourses(user.id)) {
-            is Either.Right -> siren(MenuStudentOutputModel(user.name, (studentSchoolId as Either.Right).value, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
+            is Result.Success -> siren(MenuStudentOutputModel(user.name, (studentSchoolId as Result.Success).value, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
                 clazz("menu")
                 link(rel = LinkRelation("self"), href = Uris.MENU_PATH, needAuthentication = true)
             }
-            is Either.Left -> userServices.problem(courses.value)
+            is Result.Problem -> userServices.problem(courses.value)
         }
     }
 
@@ -91,12 +91,12 @@ class MenuController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.stateMismatch
         return when (val teachers = teacherServices.getTeachersNeedingApproval()) {
-            is Either.Right -> siren(TeachersPendingOutputModel(teachers.value)) {
+            is Result.Success -> siren(TeachersPendingOutputModel(teachers.value)) {
                 clazz("teachersApproval")
                 link(rel = LinkRelation("self"), href = Uris.TEACHERS_APPROVAL_PATH, needAuthentication = true)
             }
 
-            is Either.Left -> teacherServices.problem(teachers.value)
+            is Result.Problem -> teacherServices.problem(teachers.value)
         }
     }
 
@@ -109,14 +109,14 @@ class MenuController(
         input: TeachersPendingInputModel,
     ): ResponseEntity<*> {
         return when (val approved = teacherServices.approveTeachers(input)) {
-            is Either.Right -> siren(TeachersPendingOutputModel(approved.value)) {
+            is Result.Success -> siren(TeachersPendingOutputModel(approved.value)) {
                 clazz("teachersApproval")
                 action(title = "approveTeacher", href = Uris.TEACHERS_APPROVAL_PATH, method = HttpMethod.POST, type = "application/x-www-form-urlencoded", block = {
                     rangeField(name = "approved")
                     rangeField(name = "rejected")
                 })
             }
-            is Either.Left -> teacherServices.problem(approved.value)
+            is Result.Problem -> teacherServices.problem(approved.value)
         }
     }
 }

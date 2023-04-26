@@ -1,8 +1,8 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
@@ -10,7 +10,7 @@ import java.sql.Timestamp
 /**
  * Alias for the response of the services
  */
-typealias OutboxResponse = Either<OutboxServicesError, Unit>
+typealias OutboxResponse = Result<OutboxServicesError, Unit>
 
 /**
  * Services for the outbox
@@ -41,18 +41,18 @@ class OutboxServices(
      * Method to create a new outbox request
      */
     fun createUserVerification(userId: Int): OutboxResponse {
-        if (userId <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
+        if (userId <= 0) return Result.Problem(value = OutboxServicesError.InvalidInput)
         val otp = createRandomOtp()
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId = userId)
             if (cooldown != null) {
-                return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
+                return@run Result.Problem(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
             }
             val outbox = it.outboxRepository.createOutboxRequest(outbox = OutboxInput(userId = userId, otp = otp))
             if (outbox == null) {
-                Either.Left(value = OutboxServicesError.ErrorCreatingRequest)
+                Result.Problem(value = OutboxServicesError.ErrorCreatingRequest)
             } else {
-                Either.Right(value = Unit)
+                Result.Success(value = Unit)
             }
         }
     }
@@ -61,24 +61,24 @@ class OutboxServices(
      * Method to check the otp
      */
     fun checkOtp(userId: Int, otp: Int): OutboxResponse {
-        if (userId <= 0 || otp <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
+        if (userId <= 0 || otp <= 0) return Result.Problem(value = OutboxServicesError.InvalidInput)
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId = userId)
             if (cooldown != null) {
-                return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
+                return@run Result.Problem(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
             }
-            val outbox = it.outboxRepository.getOutboxRequest(userId = userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
+            val outbox = it.outboxRepository.getOutboxRequest(userId = userId) ?: return@run Result.Problem(value = OutboxServicesError.OtpNotFound)
             if (outbox.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
                 it.outboxRepository.deleteOutboxRequest(userId = outbox.userId)
-                return@run Either.Left(value = OutboxServicesError.OtpExpired)
+                return@run Result.Problem(value = OutboxServicesError.OtpExpired)
             }
             if (outbox.otp == otp) {
                 it.usersRepository.updateUserStatus(id = userId)
-                Either.Right(value = Unit)
+                Result.Success(value = Unit)
             } else {
                 //it.outboxRepository.deleteOutboxRequest(userId = outbox.userId) TODO: Check this, maybe delete after expiration
                 it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
-                Either.Left(value = OutboxServicesError.OtpDifferent)
+                Result.Problem(value = OutboxServicesError.OtpDifferent)
             }
         }
     }
@@ -91,7 +91,7 @@ class OutboxServices(
         transactionManager.run {
             it.outboxRepository.getOutboxPendingRequests().forEach { outbox ->
                 it.usersRepository.getUserById(userId = outbox.userId)?.let { user ->
-                    if (emailService.sendVerificationEmail(name = user.name, email = user.email, otp = outbox.otp) is Either.Right) {
+                    if (emailService.sendVerificationEmail(name = user.name, email = user.email, otp = outbox.otp) is Result.Success) {
                         it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId)
                     }
                 }

@@ -6,8 +6,6 @@ import com.isel.leic.ps.ion_classcode.domain.Delivery
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.AssignmentInput
 import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
-import com.isel.leic.ps.ion_classcode.http.services.AssignmentServices
-import com.isel.leic.ps.ion_classcode.http.services.AssignmentServicesError
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
@@ -15,7 +13,7 @@ import com.isel.leic.ps.ion_classcode.repository.TeamRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -102,7 +100,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -127,7 +125,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -152,7 +150,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -177,7 +175,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -202,7 +200,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -227,7 +225,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -252,7 +250,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.NotTeacher)
         } else {
             fail("Should not be Either.Right")
@@ -277,7 +275,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -302,7 +300,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -324,7 +322,7 @@ class AssignmentServiceTests {
             ),
         )
 
-        if (assignment is Either.Right) {
+        if (assignment is Result.Success) {
             assert(assignment.value.description == "description")
         } else {
             fail("Should not be Either.Left")
@@ -341,7 +339,7 @@ class AssignmentServiceTests {
         // when: getting an error because the assignment id is invalid
         val assignment = assignmentServices.getTeacherAssignmentInfo(assignmentId = assignmentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -356,7 +354,7 @@ class AssignmentServiceTests {
         // when: getting an error because the assignment id is not in database
         val assignment = assignmentServices.getTeacherAssignmentInfo(assignmentId = assignmentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -371,7 +369,7 @@ class AssignmentServiceTests {
         // when: getting the assignment
         val assignment = assignmentServices.getTeacherAssignmentInfo(assignmentId = assignmentId)
 
-        if (assignment is Either.Right) {
+        if (assignment is Result.Success) {
             assert(assignment.value.assignment.id == assignmentId)
         } else {
             fail("Should not be Either.Left")
@@ -388,7 +386,7 @@ class AssignmentServiceTests {
         // when: getting an error because the assignment id is invalid
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -403,7 +401,7 @@ class AssignmentServiceTests {
         // when: getting an error because the assignment id is not in database
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -418,7 +416,7 @@ class AssignmentServiceTests {
         // when: getting an error because the classroom id is not in database
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -433,7 +431,7 @@ class AssignmentServiceTests {
         // when: getting an error because the classroom is archived
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -448,7 +446,7 @@ class AssignmentServiceTests {
         // when: getting an error because the assignment still have deliveries
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotDeleted)
         } else {
             fail("Should not be Either.Right")
@@ -463,7 +461,7 @@ class AssignmentServiceTests {
         // when: getting a true because the assignment was deleted
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
 
-        if (assignment is Either.Right) {
+        if (assignment is Result.Success) {
             assert(assignment.value)
         } else {
             fail("Should not be Either.Left")
@@ -480,7 +478,7 @@ class AssignmentServiceTests {
         // when: getting an error because the assignment id is invalid
         val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 1)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -495,7 +493,7 @@ class AssignmentServiceTests {
         // when: getting an error because the student id is invalid
         val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = 1, studentId = studentId)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -510,7 +508,7 @@ class AssignmentServiceTests {
         // when: getting a list of teams
         val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 1)
 
-        if (assignment is Either.Left) {
+        if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -522,7 +520,7 @@ class AssignmentServiceTests {
         // when: getting an error because the assignment id is not in database
         val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = 1, studentId = 1)
 
-        if (assignment is Either.Right) {
+        if (assignment is Result.Success) {
             assert(assignment.value.isEmpty())
         } else {
             fail("Should not be Either.Left")

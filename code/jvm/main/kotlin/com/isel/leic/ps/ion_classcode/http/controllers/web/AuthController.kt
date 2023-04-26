@@ -16,15 +16,15 @@ import com.isel.leic.ps.ion_classcode.http.model.output.RegisterOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.http.services.GithubServices
-import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
-import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
-import com.isel.leic.ps.ion_classcode.http.services.StudentServices
-import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServices
+import com.isel.leic.ps.ion_classcode.services.GithubServices
+import com.isel.leic.ps.ion_classcode.services.OutboxServices
+import com.isel.leic.ps.ion_classcode.services.OutboxServicesError
+import com.isel.leic.ps.ion_classcode.services.StudentServices
+import com.isel.leic.ps.ion_classcode.services.TeacherServices
+import com.isel.leic.ps.ion_classcode.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import jakarta.servlet.http.HttpServletResponse
@@ -114,11 +114,14 @@ class AuthController(
         @CookieValue position: String,
         response: HttpServletResponse,
     ): ResponseEntity<*> {
-        if (state != userState) return Problem.stateMismatch
+        if (state != userState) return ResponseEntity
+            .status(Status.REDIRECT)
+            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+            .body(EMPTY_REQUEST)
         val accessToken = githubServices.fetchAccessToken(code)
         val userGithubInfo = githubServices.fetchUserInfo(accessToken.access_token)
         return when (val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
-            is Either.Right -> {
+            is Result.Success -> {
                 if (userInfo.value.isCreated) {
                     when {
                         userInfo.value is Student && position == STUDENT_COOKIE_NAME -> {
@@ -131,11 +134,11 @@ class AuthController(
                         }
                         userInfo.value is Teacher && position == TEACHER_COOKIE_NAME -> {
                             when (teacherServices.updateTeacherGithubToken(userInfo.value.id, accessToken.access_token)) {
-                                is Either.Left -> ResponseEntity
+                                is Result.Problem -> ResponseEntity
                                     .status(Status.REDIRECT)
                                     .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
                                     .body(EMPTY_REQUEST)
-                                is Either.Right -> {
+                                is Result.Success -> {
                                     val cookie = generateSessionCookie(userInfo.value.token)
                                     ResponseEntity
                                         .status(Status.REDIRECT)
@@ -174,7 +177,7 @@ class AuthController(
                     }
                 }
             }
-            is Either.Left -> {
+            is Result.Problem -> {
                 val userEmail = githubServices.fetchUserEmails(accessToken.access_token).first { it.primary }
                 if (position == TEACHER_COOKIE_NAME) {
                     when (
@@ -189,7 +192,7 @@ class AuthController(
                             )
                         )
                     ) {
-                        is Either.Right -> {
+                        is Result.Success -> {
                             val cookie = generateGithubIdCookie(userGithubInfo.id)
                             ResponseEntity
                                 .status(Status.REDIRECT)
@@ -197,7 +200,7 @@ class AuthController(
                                 .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
                                 .body(EMPTY_REQUEST)
                         }
-                        is Either.Left -> ResponseEntity
+                        is Result.Problem -> ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
                             .body(EMPTY_REQUEST)
@@ -214,7 +217,7 @@ class AuthController(
                             )
                         )
                     ) {
-                        is Either.Right -> {
+                        is Result.Success -> {
                             val cookie = generateGithubIdCookie(userGithubInfo.id)
                             ResponseEntity
                                 .status(Status.REDIRECT)
@@ -222,7 +225,7 @@ class AuthController(
                                 .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
-                        is Either.Left -> ResponseEntity
+                        is Result.Problem -> ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
                             .body(EMPTY_REQUEST)
@@ -238,11 +241,11 @@ class AuthController(
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val userInfo = userServices.getPendingUserByGithubId(githubId)) {
-            is Either.Right -> siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {
+            is Result.Success -> siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {
                 clazz("registerInfo")
                 link(rel = LinkRelation("self"), href = Uris.AUTH_REGISTER_PATH)
             }
-            is Either.Left -> userServices.problem(userInfo.value)
+            is Result.Problem -> userServices.problem(userInfo.value)
         }
     }
 
@@ -254,11 +257,11 @@ class AuthController(
         if (position != TEACHER_COOKIE_NAME) return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val teacher = teacherServices.createTeacher(githubId)) {
-            is Either.Right -> siren(StatusOutputModel("User Register", "Verify the status of your account")) {
+            is Result.Success -> siren(StatusOutputModel("User Register", "Verify the status of your account")) {
                 clazz("registerTeacher")
                 action(title = "registerTeacher", href = Uris.AUTH_REGISTER_TEACHER_PATH, method = HttpMethod.POST, type = "application/json", block = {})
             }
-            is Either.Left -> teacherServices.problem(teacher.value)
+            is Result.Problem -> teacherServices.problem(teacher.value)
         }
     }
 
@@ -274,15 +277,15 @@ class AuthController(
         if (position != STUDENT_COOKIE_NAME) return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val student = studentServices.createStudent(githubId, input.schoolId)) {
-            is Either.Right -> {
+            is Result.Success -> {
                 when (val userOutbox = outboxServices.createUserVerification(student.value.id)) {
-                    is Either.Right -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
+                    is Result.Success -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
                         clazz("registerStudent")
                         action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
                             numberField("schoolId")
                         })
                     }
-                    is Either.Left -> when (userOutbox.value) {
+                    is Result.Problem -> when (userOutbox.value) {
                         is OutboxServicesError.CooldownNotExpired -> siren(StatusOutputModel(
                                 "On cooldown",
                                 "You are on cooldown, try again in ${userOutbox.value.cooldown} seconds",
@@ -296,7 +299,7 @@ class AuthController(
                     }
                 }
             }
-            is Either.Left -> studentServices.problem(student.value)
+            is Result.Problem -> studentServices.problem(student.value)
         }
     }
 
@@ -307,7 +310,7 @@ class AuthController(
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val userInfo = userServices.getUserByGithubId(githubId)) {
-            is Either.Right -> {
+            is Result.Success -> {
                 if (userInfo.value.isCreated) {
                     siren(StatusOutputModel(
                         "You are now eligible to use the application.",
@@ -335,7 +338,7 @@ class AuthController(
                     }
                 }
             }
-            is Either.Left -> userServices.problem(userInfo.value)
+            is Result.Problem -> userServices.problem(userInfo.value)
         }
     }
 
@@ -350,8 +353,8 @@ class AuthController(
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val user = userServices.getUserByGithubId(githubId)) {
-            is Either.Right -> when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
-                is Either.Right -> {
+            is Result.Success -> when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
+                is Result.Success -> {
                     val cookie = generateSessionCookie(user.value.token)
                     response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
                     response.setHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
@@ -362,9 +365,9 @@ class AuthController(
                         })
                     }
                 }
-                is Either.Left -> problemOtp(checkOTP.value)
+                is Result.Problem -> problemOtp(checkOTP.value)
             }
-            is Either.Left -> userServices.problem(user.value)
+            is Result.Problem -> userServices.problem(user.value)
         }
     }
 

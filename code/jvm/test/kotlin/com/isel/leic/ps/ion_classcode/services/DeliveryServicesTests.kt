@@ -6,15 +6,13 @@ import com.isel.leic.ps.ion_classcode.domain.Delivery
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
-import com.isel.leic.ps.ion_classcode.http.services.DeliveryServices
-import com.isel.leic.ps.ion_classcode.http.services.DeliveryServicesError
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doReturn
@@ -176,7 +174,7 @@ class DeliveryServicesTests {
             userId = userId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -198,7 +196,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -220,7 +218,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -242,7 +240,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -264,7 +262,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -286,7 +284,7 @@ class DeliveryServicesTests {
             userId = userId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.NotTeacher)
         } else {
             fail("Should not be Either.Right")
@@ -305,7 +303,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Right) {
+        if (delivery is Result.Success) {
             assert(delivery.value == 1)
         } else {
             fail("Should not be Either.Right")
@@ -324,7 +322,7 @@ class DeliveryServicesTests {
             deliveryId = deliveryId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -341,7 +339,7 @@ class DeliveryServicesTests {
             deliveryId = deliveryId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.DeliveryNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -355,7 +353,7 @@ class DeliveryServicesTests {
             deliveryId = 1,
         )
 
-        if (delivery is Either.Right) {
+        if (delivery is Result.Success) {
             assert(delivery.value.delivery.tagControl == "tagControl")
         } else {
             fail("Should not be Either.Left")
@@ -375,7 +373,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -393,7 +391,7 @@ class DeliveryServicesTests {
             userId = userId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -411,7 +409,7 @@ class DeliveryServicesTests {
             userId = userId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.NotTeacher)
         } else {
             fail("Should not be Either.Right")
@@ -429,7 +427,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -447,7 +445,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -465,7 +463,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -483,7 +481,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Right) {
+        if (delivery is Result.Success) {
             assert(delivery.value)
         } else {
             fail("Should not be Either.Left")
@@ -508,7 +506,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -531,7 +529,7 @@ class DeliveryServicesTests {
             userId = userId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -554,7 +552,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -577,7 +575,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -600,7 +598,7 @@ class DeliveryServicesTests {
             userId = userId,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.NotTeacher)
         } else {
             fail("Should not be Either.Right")
@@ -623,7 +621,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -646,7 +644,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -669,7 +667,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Left) {
+        if (delivery is Result.Problem) {
             assert(delivery.value is DeliveryServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -692,7 +690,7 @@ class DeliveryServicesTests {
             userId = 1,
         )
 
-        if (delivery is Either.Right) {
+        if (delivery is Result.Success) {
             assert(delivery.value)
         } else {
             fail("Should not be Either.Left")

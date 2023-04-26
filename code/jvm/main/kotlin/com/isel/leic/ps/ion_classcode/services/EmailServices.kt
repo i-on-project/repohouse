@@ -1,6 +1,6 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import com.sendgrid.Method
 import com.sendgrid.Request
 import com.sendgrid.Response
@@ -14,7 +14,7 @@ import java.io.IOException
 /**
  * Alias for the response of the services
  */
-typealias EmailResponse = Either<EmailServiceError, Response>
+typealias EmailResponse = Result<EmailServiceError, Response>
 
 /**
  * Error codes for the services
@@ -44,7 +44,7 @@ class EmailService {
      */
     fun sendVerificationEmail(name: String, email: String, otp: Int): EmailResponse {
         if (name.isEmpty() || email.isEmpty() || otp < 0) {
-            return Either.Left(EmailServiceError.InvalidInput)
+            return Result.Problem(EmailServiceError.InvalidInput)
         }
         val to = Email(email)
         val content = Content(
@@ -60,9 +60,9 @@ class EmailService {
             request.endpoint = ENDPOINT
             request.body = mail.build()
 
-            Either.Right(sendGrid.api(request))
+            Result.Success(sendGrid.api(request))
         } catch (ex: IOException) {
-            Either.Left(EmailServiceError.SendEmailError)
+            Result.Problem(EmailServiceError.SendEmailError)
         }
     }
 }

@@ -1,11 +1,11 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component
 /**
  * Alias for the response of the services
  */
-typealias UserAuthenticationResult = Either<UserServicesError, User>
-typealias UserByGithubIdResult = Either<UserServicesError, User>
-typealias UserCoursesResponse = Either<UserServicesError, List<Course>>
+typealias UserAuthenticationResult = Result<UserServicesError, User>
+typealias UserByGithubIdResult = Result<UserServicesError, User>
+typealias UserCoursesResponse = Result<UserServicesError, List<Course>>
 
 /**
  * Error codes for the services
@@ -39,13 +39,13 @@ class UserServices(
      * Method to check the token from a user
      */
     fun checkAuthentication(token: String): UserAuthenticationResult {
-        if (token.isEmpty()) return Either.Left(UserServicesError.InvalidToken)
+        if (token.isEmpty()) return Result.Problem(UserServicesError.InvalidToken)
         return transactionManager.run {
             val user = it.usersRepository.getUserByToken(token)
             if (user == null) {
-                Either.Left(UserServicesError.UserNotAuthenticated)
+                Result.Problem(UserServicesError.UserNotAuthenticated)
             } else {
-                Either.Right(user)
+                Result.Success(user)
             }
         }
     }
@@ -57,9 +57,9 @@ class UserServices(
         return transactionManager.run {
             val user = it.usersRepository.getUserByGithubId(githubId)
             if (user == null) {
-                Either.Left(UserServicesError.UserNotFound)
+                Result.Problem(UserServicesError.UserNotFound)
             } else {
-                Either.Right(user)
+                Result.Success(user)
             }
         }
     }
@@ -71,9 +71,9 @@ class UserServices(
         return transactionManager.run {
             val user = it.usersRepository.getPendingUserByGithubId(githubId)
             if (user == null) {
-                Either.Left(UserServicesError.UserNotFound)
+                Result.Problem(UserServicesError.UserNotFound)
             } else {
-                Either.Right(user)
+                Result.Success(user)
             }
         }
     }
@@ -94,9 +94,9 @@ class UserServices(
      */
     fun getAllUserCourses(userId: Int): UserCoursesResponse {
         return transactionManager.run {
-            it.usersRepository.getUserById(userId) ?: Either.Left(UserServicesError.InternalError)
+            it.usersRepository.getUserById(userId) ?: Result.Problem(UserServicesError.InternalError)
             val courses = it.courseRepository.getAllUserCourses(userId)
-            Either.Right(courses)
+            Result.Success(courses)
         }
     }
 

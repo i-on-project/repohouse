@@ -6,14 +6,12 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
-import com.isel.leic.ps.ion_classcode.http.services.CourseServices
-import com.isel.leic.ps.ion_classcode.http.services.CourseServicesError
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedResult
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -105,7 +103,7 @@ class CourseServiceTests {
         // when: getting an error because of an invalid course id
         val course = courseService.getCourseById(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -121,7 +119,7 @@ class CourseServiceTests {
         // when: getting an error because of an invalid user id
         val course = courseService.getCourseById(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -137,7 +135,7 @@ class CourseServiceTests {
         // when: getting an error because the course id that doesn't exist in database
         val course = courseService.getCourseById(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.CourseNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -145,7 +143,7 @@ class CourseServiceTests {
     }
 
     @Test
-    fun `getCourseById should give an UserNotFound because the the user id does not exist in database`() {
+    fun `getCourseById should give an InternalError because the the user id does not exist in database`() {
         // given: a valid user id and a valid course id
         val courseId = 1
         val userId = 3
@@ -153,8 +151,8 @@ class CourseServiceTests {
         // when: getting an error because the user id that doesn't exist in database
         val course = courseService.getCourseById(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
-            assert(course.value is CourseServicesError.UserNotFound)
+        if (course is Result.Problem) {
+            assert(course.value is CourseServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -169,7 +167,7 @@ class CourseServiceTests {
         // when: getting an error because the user id that doesn't exist in database
         val course = courseService.getCourseById(courseId = courseId, userId = userId)
 
-        if (course is Either.Right) {
+        if (course is Result.Success) {
             assert(course.value.id == courseId)
         } else {
             fail("Should not be Either.Left")
@@ -193,7 +191,7 @@ class CourseServiceTests {
         )
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -215,7 +213,7 @@ class CourseServiceTests {
         )
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -234,7 +232,7 @@ class CourseServiceTests {
         )
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -256,7 +254,7 @@ class CourseServiceTests {
         )
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.CourseNameAlreadyExists)
         } else {
             fail("Should not be Either.Right")
@@ -275,7 +273,7 @@ class CourseServiceTests {
         )
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.NotTeacher)
         } else {
             fail("Should not be Either.Right")
@@ -294,7 +292,7 @@ class CourseServiceTests {
         )
 
         // the result should be an error
-        if (course is Either.Right) {
+        if (course is Result.Success) {
             assert(course.value.teachers.size == 2)
         } else {
             fail("Should not be Either.Left")
@@ -313,7 +311,7 @@ class CourseServiceTests {
         )
 
         // the result should be an error
-        if (course is Either.Right) {
+        if (course is Result.Success) {
             assert(course.value.id == 2)
         } else {
             fail("Should not be Either.Left")
@@ -331,7 +329,7 @@ class CourseServiceTests {
         val course = courseService.archiveOrDeleteCourse(courseId = courseId)
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -347,7 +345,7 @@ class CourseServiceTests {
         val course = courseService.archiveOrDeleteCourse(courseId = courseId)
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.CourseNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -363,7 +361,7 @@ class CourseServiceTests {
         val course = courseService.archiveOrDeleteCourse(courseId = courseId)
 
         // the result should be an error
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.CourseArchived)
         } else {
             fail("Should not be Either.Right")
@@ -379,8 +377,8 @@ class CourseServiceTests {
         val course = courseService.archiveOrDeleteCourse(courseId = courseId)
 
         // the result should be an CourseArchivedModel
-        if (course is Either.Right) {
-            assert(course.value is CourseArchivedOutputModel.CourseArchived)
+        if (course is Result.Success) {
+            assert(course.value is CourseArchivedResult.CourseArchived)
         } else {
             fail("Should not be Either.Left")
         }
@@ -395,8 +393,8 @@ class CourseServiceTests {
         val course = courseService.archiveOrDeleteCourse(courseId = courseId)
 
         // the result should be an CourseArchivedModel
-        if (course is Either.Right) {
-            assert(course.value is CourseArchivedOutputModel.CourseDeleted)
+        if (course is Result.Success) {
+            assert(course.value is CourseArchivedResult.CourseDeleted)
         } else {
             fail("Should not be Either.Left")
         }
@@ -412,7 +410,7 @@ class CourseServiceTests {
         // when: getting an error because of an invalid course id
         val course = courseService.leaveCourse(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -428,7 +426,7 @@ class CourseServiceTests {
         // when: getting an error because of an invalid user id
         val course = courseService.leaveCourse(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -444,7 +442,7 @@ class CourseServiceTests {
         // when: getting an error because the course id that doesn't exist in database
         val course = courseService.leaveCourse(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.CourseNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -460,7 +458,7 @@ class CourseServiceTests {
         // when: getting an error because the user id that doesn't exist in database
         val course = courseService.leaveCourse(courseId = courseId, userId = userId)
 
-        if (course is Either.Left) {
+        if (course is Result.Problem) {
             assert(course.value is CourseServicesError.UserNotInCourse)
         } else {
             fail("Should not be Either.Right")
@@ -476,7 +474,7 @@ class CourseServiceTests {
         // when: doing with success the leave course
         val course = courseService.leaveCourse(courseId = courseId, userId = userId)
 
-        if (course is Either.Right) {
+        if (course is Result.Success) {
             assert(course.value.name == "courseName")
         } else {
             fail("Should not be Either.Right")

@@ -5,15 +5,13 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.requests.Apply
 import com.isel.leic.ps.ion_classcode.http.model.input.TeachersPendingInputModel
-import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.http.services.TeacherServicesError
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -70,7 +68,7 @@ class TeacherServicesTests {
         // given: a list of teachers that need approval
         val teachers = teacherServices.getTeachersNeedingApproval()
 
-        if (teachers is Either.Right) {
+        if (teachers is Result.Success) {
             assert(teachers.value.size == 1)
         } else {
             fail("Should not be Either.Left")
@@ -89,7 +87,7 @@ class TeacherServicesTests {
             ),
         )
 
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -106,7 +104,7 @@ class TeacherServicesTests {
             ),
         )
 
-        if (user is Either.Right) {
+        if (user is Result.Success) {
             println(user.value)
             assert(user.value.find { it.id == 1 || it.id == 2 } == null)
         } else {
@@ -124,7 +122,7 @@ class TeacherServicesTests {
         // when: getting an error because of an invalid teacher id
         val user = teacherServices.getTeacherGithubToken(teacherId = teacherId)
 
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -139,7 +137,7 @@ class TeacherServicesTests {
         // when: getting an error because the teacher id is not in database
         val user = teacherServices.getTeacherGithubToken(teacherId = teacherId)
 
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is TeacherServicesError.TeacherNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -154,7 +152,7 @@ class TeacherServicesTests {
         // when: getting the github token of a teacher
         val user = teacherServices.getTeacherGithubToken(teacherId = teacherId)
 
-        if (user is Either.Right) {
+        if (user is Result.Success) {
             assert(user.value == "githubToken")
         } else {
             fail("Should not be Either.Left")

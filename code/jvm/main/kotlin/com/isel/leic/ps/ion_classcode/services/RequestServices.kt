@@ -1,14 +1,14 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.stereotype.Component
 
 /**
  * Alias for the response of the services
  */
-typealias CreateApplyRequestResult = Either<RequestServicesError, Int>
+typealias CreateApplyRequestResult = Result<RequestServicesError, Int>
 
 /**
  * Error codes for the services
@@ -30,11 +30,11 @@ class RequestServices(
      */
     fun createApplyRequest(applyInput: ApplyInput, creator:Int): CreateApplyRequestResult {
         if (applyInput.isNotValid()) {
-            return Either.Left(value = RequestServicesError.InvalidData)
+            return Result.Problem(value = RequestServicesError.InvalidData)
         }
         return transactionManager.run {
             val request = it.applyRequestRepository.createApplyRequest(request = applyInput, creator = creator)
-            Either.Right(value = request)
+            Result.Success(value = request)
         }
     }
 }

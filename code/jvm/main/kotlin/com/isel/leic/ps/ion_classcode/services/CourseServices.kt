@@ -1,40 +1,35 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.CourseWithClassrooms
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.http.model.input.CourseInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedResult
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 
 /**
  * Alias for the response of the services
  */
-typealias CourseResponse = Either<CourseServicesError, CourseWithClassrooms>
-typealias CourseCreatedResponse = Either<CourseServicesError, Course>
-typealias CourseArchivedResponse = Either<CourseServicesError, CourseArchivedOutputModel>
-typealias LeaveCourseResponse = Either<CourseServicesError, Course>
+typealias CourseResponse = Result<CourseServicesError, CourseWithClassrooms>
+typealias CourseCreatedResponse = Result<CourseServicesError, Course>
+typealias CourseArchivedResponse = Result<CourseServicesError, CourseArchivedResult>
+typealias LeaveCourseResponse = Result<CourseServicesError, Course>
 
 /**
  * Error codes for the services
  */
 sealed class CourseServicesError {
     object CourseNotFound : CourseServicesError()
-    object CourseAlreadyExists : CourseServicesError()
-    object UserInCourse : CourseServicesError()
     object UserNotInCourse : CourseServicesError()
-    object UserNotFound : CourseServicesError()
-    object NotStudent : CourseServicesError()
     object NotTeacher : CourseServicesError()
     object InvalidInput : CourseServicesError()
     object CourseArchived : CourseServicesError()
     object CourseNameAlreadyExists : CourseServicesError()
-    object CourseUrlAlreadyExists : CourseServicesError()
     object InternalError : CourseServicesError()
 }
 
@@ -51,10 +46,11 @@ class CourseServices(
      */
     fun getCourseById(courseId: Int, userId: Int): CourseResponse {
         return transactionManager.run {
-            val course = it.courseRepository.getCourse(courseId) ?: return@run Either.Left(CourseServicesError.CourseNotFound)
+            if (it.usersRepository.getUserById(userId) == null) Result.Problem(CourseServicesError.InternalError)
+            val course = it.courseRepository.getCourse(courseId) ?: return@run Result.Problem(CourseServicesError.CourseNotFound)
             val classrooms = it.courseRepository.getCourseUserClassrooms(courseId, userId)
             val students = it.courseRepository.getStudentInCourse(courseId)
-            Either.Right(CourseWithClassrooms(
+            Result.Success(CourseWithClassrooms(
                 id = course.id,
                 orgUrl = course.orgUrl,
                 name = course.name,
@@ -70,22 +66,18 @@ class CourseServices(
      * Method that creates a course
      */
     fun createCourse(courseInfo: CourseInputModel, teacherId: Int): CourseCreatedResponse {
-        if (courseInfo.isNotValid()) return Either.Left(CourseServicesError.InvalidInput)
+        if (courseInfo.isNotValid()) return Result.Problem(CourseServicesError.InvalidInput)
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(teacherId) == null) {
-                return@run Either.Left(CourseServicesError.NotTeacher)
-            }
+            if (it.usersRepository.getTeacher(teacherId) == null) Result.Problem(CourseServicesError.NotTeacher)
             val courseByOrg = it.courseRepository.getCourseByOrg(courseInfo.orgUrl)
             if (courseByOrg != null) {
-                return@run Either.Right(it.courseRepository.addTeacherToCourse(teacherId, courseByOrg.id))
-            } else {
-                if (it.courseRepository.checkIfCourseNameExists(courseInfo.name)) {
-                    return@run Either.Left(CourseServicesError.CourseNameAlreadyExists)
-                }
+                Result.Success(it.courseRepository.addTeacherToCourse(teacherId, courseByOrg.id))
+            } else if (it.courseRepository.checkIfCourseNameExists(courseInfo.name)) {
+                Result.Problem(CourseServicesError.CourseNameAlreadyExists)
             }
             val id = it.courseRepository.createCourse(CourseInput(courseInfo.orgUrl, courseInfo.name, teacherId)).id
             val course = it.courseRepository.addTeacherToCourse(teacherId, id)
-            Either.Right(course)
+            Result.Success(course)
         }
     }
 
@@ -94,17 +86,16 @@ class CourseServices(
      * If the course has classrooms, it archives it
      */
     fun archiveOrDeleteCourse(courseId: Int): CourseArchivedResponse {
-        if (courseId <= 0) return Either.Left(CourseServicesError.CourseNotFound)
         return transactionManager.run {
-            val course = it.courseRepository.getCourse(courseId) ?: return@run Either.Left(CourseServicesError.CourseNotFound)
-            if (course.isArchived) return@run Either.Left(CourseServicesError.CourseArchived)
+            val course = it.courseRepository.getCourse(courseId) ?: return@run Result.Problem(CourseServicesError.CourseNotFound)
+            if (course.isArchived) Result.Problem(CourseServicesError.CourseArchived)
             val classrooms = it.courseRepository.getCourseAllClassrooms(courseId)
             if (classrooms.isNotEmpty()) {
                 it.courseRepository.archiveCourse(courseId)
-                Either.Right(CourseArchivedOutputModel.CourseArchived)
+                Result.Success(CourseArchivedResult.CourseArchived)
             } else {
                 it.courseRepository.deleteCourse(courseId)
-                Either.Right(CourseArchivedOutputModel.CourseDeleted)
+                Result.Success(CourseArchivedResult.CourseDeleted)
             }
         }
     }
@@ -114,10 +105,10 @@ class CourseServices(
      */
     fun leaveCourse(courseId: Int, userId: Int): LeaveCourseResponse {
         return transactionManager.run {
-            if (it.courseRepository.getCourse(courseId) == null) return@run Either.Left(CourseServicesError.CourseNotFound)
-            if (!it.courseRepository.isStudentInCourse(userId, courseId)) return@run Either.Left(CourseServicesError.UserNotInCourse)
+            if (it.courseRepository.getCourse(courseId) == null) Result.Problem(CourseServicesError.CourseNotFound)
+            if (!it.courseRepository.isStudentInCourse(userId, courseId)) Result.Problem(CourseServicesError.UserNotInCourse)
             val course = it.courseRepository.leaveCourse(courseId, userId)
-            Either.Right(course)
+            Result.Success(course)
         }
     }
 
@@ -127,16 +118,11 @@ class CourseServices(
     fun problem(error: CourseServicesError): ResponseEntity<ErrorMessageModel> {
         return when (error) {
             CourseServicesError.CourseNotFound -> Problem.courseNotFound
-            CourseServicesError.CourseAlreadyExists -> Problem.courseAlreadyExists
-            CourseServicesError.UserInCourse -> Problem.userInCourse
             CourseServicesError.UserNotInCourse -> Problem.userNotInCourse
-            CourseServicesError.UserNotFound -> Problem.userNotFound
-            CourseServicesError.NotStudent -> Problem.notStudent
             CourseServicesError.NotTeacher -> Problem.notTeacher
             CourseServicesError.InvalidInput -> Problem.invalidInput
             CourseServicesError.CourseArchived -> Problem.invalidOperation
             CourseServicesError.CourseNameAlreadyExists -> Problem.conflict
-            CourseServicesError.CourseUrlAlreadyExists -> Problem.conflict
             CourseServicesError.InternalError -> Problem.internalError
         }
     }

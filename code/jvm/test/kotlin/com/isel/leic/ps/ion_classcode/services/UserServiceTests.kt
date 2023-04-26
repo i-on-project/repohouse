@@ -6,16 +6,10 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
-import com.isel.leic.ps.ion_classcode.http.services.StudentServices
-import com.isel.leic.ps.ion_classcode.http.services.StudentServicesError
-import com.isel.leic.ps.ion_classcode.http.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.http.services.TeacherServicesError
-import com.isel.leic.ps.ion_classcode.http.services.UserServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServicesError
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -178,7 +172,7 @@ class UserServiceTests {
         // when: getting an error because of an invalid github id
         val user = userServices.getUserByGithubId(githubId = githubId)
 
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is UserServicesError.UserNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -194,7 +188,7 @@ class UserServiceTests {
         val user = userServices.getUserByGithubId(githubId = githubId)
 
         // the result should be an error
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is UserServicesError.UserNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -211,7 +205,7 @@ class UserServiceTests {
         val user = userServices.getUserByGithubId(githubId = githubId)
 
         // the result should be a user
-        if (user is Either.Right) {
+        if (user is Result.Success) {
             assert(user.value.name == name)
         } else {
             fail("User not found")
@@ -228,7 +222,7 @@ class UserServiceTests {
         // when: getting an error because of an invalid github id
         val user = userServices.checkAuthentication(token = bearerToken)
 
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is UserServicesError.InvalidToken)
         } else {
             fail("Should not be Either.Right")
@@ -244,7 +238,7 @@ class UserServiceTests {
         val user = userServices.checkAuthentication(token = bearerToken)
 
         // the result should be an error
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is UserServicesError.UserNotAuthenticated)
         } else {
             fail("Should not be Either.Right")
@@ -261,7 +255,7 @@ class UserServiceTests {
         val user = userServices.checkAuthentication(token = bearerToken)
 
         // the result should be a user
-        if (user is Either.Right) {
+        if (user is Result.Success) {
             assert(user.value.name == name)
         } else {
             fail("User not found")
@@ -278,7 +272,7 @@ class UserServiceTests {
         // when: getting an error because of an invalid student id
         val courses = userServices.getAllUserCourses(userId = studentId)
 
-        if (courses is Either.Left) {
+        if (courses is Result.Problem) {
             assert(courses.value is UserServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
@@ -293,7 +287,7 @@ class UserServiceTests {
         // when: getting a list of courses
         val courses = userServices.getAllUserCourses(userId = studentId)
 
-        if (courses is Either.Right) {
+        if (courses is Result.Success) {
             assert(courses.value.size == 1)
         } else {
             fail("Should not be Either.Left")
@@ -310,7 +304,7 @@ class UserServiceTests {
         // when: getting an error because of an invalid teacher id
         val user = userServices.getAllUserCourses(userId = teacherId)
 
-        if (user is Either.Left) {
+        if (user is Result.Problem) {
             assert(user.value is UserServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
@@ -325,7 +319,7 @@ class UserServiceTests {
         // when: getting a list of courses
         val user = userServices.getAllUserCourses(userId = teacherId)
 
-        if (user is Either.Right) {
+        if (user is Result.Success) {
             assert(user.value.size == 1)
         } else {
             fail("Should not be Either.Left")
@@ -351,7 +345,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -375,7 +369,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -400,7 +394,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -424,7 +418,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -448,7 +442,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -472,7 +466,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -493,7 +487,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Right) {
+        if (student is Result.Success) {
             assert(student.value.id == 1)
         } else {
             fail("Should not be Either.Left")
@@ -512,7 +506,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -531,7 +525,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -550,7 +544,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.EmailInUse)
         } else {
             fail("Should not be Either.Right")
@@ -569,7 +563,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.GithubIdInUse)
         } else {
             fail("Should not be Either.Right")
@@ -588,7 +582,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.GithubUserNameInUse)
         } else {
             fail("Should not be Either.Right")
@@ -607,7 +601,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.TokenInUse)
         } else {
             fail("Should not be Either.Right")
@@ -626,7 +620,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (student is Either.Left) {
+        if (student is Result.Problem) {
             assert(student.value is StudentServicesError.SchoolIdInUse)
         } else {
             fail("Should not be Either.Right")
@@ -639,7 +633,7 @@ class UserServiceTests {
         val studentRes = studentServices.createStudent(githubId = 12345, schoolId = 1238)
 
         // the result should be a student
-        if (studentRes is Either.Right) {
+        if (studentRes is Result.Success) {
             assert(studentRes.value.id == 1)
         } else {
             fail("Should not be Either.Left")
@@ -666,7 +660,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -691,7 +685,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -716,7 +710,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -741,7 +735,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -766,7 +760,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -791,7 +785,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -813,7 +807,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Right) {
+        if (teacher is Result.Success) {
             assert(teacher.value.id == 1)
         } else {
             fail("Should not be Either.Right")
@@ -831,7 +825,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.EmailInUse)
         } else {
             fail("Should not be Either.Right")
@@ -849,7 +843,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.GithubIdInUse)
         } else {
             fail("Should not be Either.Right")
@@ -867,7 +861,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.GithubUserNameInUse)
         } else {
             fail("Should not be Either.Right")
@@ -885,7 +879,7 @@ class UserServiceTests {
         )
 
         // the result should be an error
-        if (teacher is Either.Left) {
+        if (teacher is Result.Problem) {
             assert(teacher.value is TeacherServicesError.TokenInUse)
         } else {
             fail("Should not be Either.Right")
@@ -898,7 +892,7 @@ class UserServiceTests {
         val teacherRes = teacherServices.createTeacher(githubId = 12346)
 
         // the result should be a teacher
-        if (teacherRes is Either.Right) {
+        if (teacherRes is Result.Success) {
             assert(teacherRes.value.id == 1)
         } else {
             fail("Should not be Either.Left")
