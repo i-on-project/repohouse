@@ -2,6 +2,9 @@ package isel.ps.classcode.domain
 
 import isel.ps.classcode.domain.deserialization.UserInfoDeserialization
 
+/**
+ * Represents the user information
+ */
 data class UserInfo(
     val login: String,
     val id: Long,

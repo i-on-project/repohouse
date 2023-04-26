@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.exc.StreamReadException
 import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.domain.deserialization.ProblemJsonDeserialization
 import isel.ps.classcode.domain.deserialization.GithubErrorDeserialization
+import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.utils.Either
 import okhttp3.Call
 import okhttp3.Callback
@@ -15,16 +17,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-sealed class HandleGitHubResponseError {
-    class FailDeserialize(val error: String) : HandleGitHubResponseError()
-    class FailRequest(val error: GithubErrorDeserialization) : HandleGitHubResponseError()
-}
-
-sealed class HandleClassCodeResponseError {
-    class FailDeserialize(val error: String) : HandleClassCodeResponseError()
-    class FailRequest(val error: ProblemJsonDeserialization) : HandleClassCodeResponseError()
-}
-
+/**
+ * Sends a request using the given [okHttpClient] and returns the response body as a string.
+ * The handler function is used to handle the response body.
+ */
 suspend fun <T> Request.send(okHttpClient: OkHttpClient, handler: (Response) -> T): T {
     val response = suspendCoroutine { continuation ->
         okHttpClient.newCall(request = this).enqueue(object : Callback {
@@ -39,6 +35,10 @@ suspend fun <T> Request.send(okHttpClient: OkHttpClient, handler: (Response) -> 
     }
     return handler(response)
 }
+
+/**
+ * Handle the response from the GitHub API.
+ */
 
 inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper: ObjectMapper): Either<HandleGitHubResponseError, R> {
     val body = response.body?.string()
@@ -58,6 +58,10 @@ inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper
         }
     }
 }
+
+/**
+ * Handle the response from the ClassCode API.
+ */
 
 inline fun <reified R : Any> handleResponseClassCode(response: Response, jsonMapper: ObjectMapper): Either<HandleClassCodeResponseError, R> {
     val body = response.body?.string()

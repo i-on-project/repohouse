@@ -9,8 +9,12 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 
-data class DecryptionSecret(val iv: String, val data: String)
-data class EncryptionSecret(val data: String)
+/**
+ * The class that will be used to encrypt and decrypt the token. Uses a androidKeyStore.
+ * The key is generated if it doesn't exist, and if it exists it is used to encrypt and decrypt the token.
+ * The algorithm used was AED, the block mode was CBC and the padding was PKCS7.
+ */
+
 class CryptoManager {
 
     private val keyStore: KeyStore = KeyStore.getInstance("AndroidKeyStore").apply {

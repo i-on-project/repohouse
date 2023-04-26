@@ -8,7 +8,7 @@ import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.GitHubError
 import isel.ps.classcode.domain.UserInfo
 import isel.ps.classcode.domain.deserialization.UserInfoDeserialization
-import isel.ps.classcode.http.HandleGitHubResponseError
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.http.handleResponseGitHub
 import isel.ps.classcode.http.send
 import isel.ps.classcode.presentation.utils.ClassCodeResponseServicesError
@@ -17,6 +17,10 @@ import isel.ps.classcode.presentation.utils.GitHubResponseServicesError
 import kotlinx.coroutines.flow.first
 import okhttp3.OkHttpClient
 import okhttp3.Request
+
+/**
+ * The implementation of menu services that will be used on the final product
+ */
 
 class RealMenuServices(private val sessionStore: SessionStore, private val objectMapper: ObjectMapper, private val httpClient: OkHttpClient) : MenuServices {
     override suspend fun getUserInfo(): Either<GitHubResponseServicesError, UserInfo> {

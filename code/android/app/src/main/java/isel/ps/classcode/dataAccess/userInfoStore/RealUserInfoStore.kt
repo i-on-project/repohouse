@@ -1,4 +1,4 @@
-package isel.ps.classcode.dataAccess.sessionStore
+package isel.ps.classcode.dataAccess.userInfoStore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -8,12 +8,16 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import isel.ps.classcode.dataAccess.userInfoStore.UserInfoStore
 import isel.ps.classcode.domain.UserInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+
+/**
+ * The implementation of UserInfoStore that will be used in the final product.
+ * It uses the preferences data store to store the user info.
+ */
 
 class RealUserInfoStore(context: Context): UserInfoStore {
     companion object {

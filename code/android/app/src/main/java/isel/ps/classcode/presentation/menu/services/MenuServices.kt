@@ -6,6 +6,9 @@ import isel.ps.classcode.presentation.utils.ClassCodeResponseServicesError
 import isel.ps.classcode.presentation.utils.Either
 import isel.ps.classcode.presentation.utils.GitHubResponseServicesError
 
+/**
+ * Represents the services that can be used on the menu
+ */
 interface MenuServices {
     suspend fun getUserInfo(): Either<GitHubResponseServicesError, UserInfo>
     suspend fun getCourses(): Either<ClassCodeResponseServicesError, List<Course>>

@@ -15,6 +15,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
+/**
+ * The implementation of session store that will be used in the final product.
+ * It uses the preferences data store to store the encrypted token and the iv(used to decrypt the token),
+ * and the [CryptoManager] to encrypt and decrypt the token.
+ */
 class RealSessionStore(private val cryptoManager: CryptoManager, context: Context): SessionStore {
     companion object {
         val githubTokenKey = stringPreferencesKey("github_token")

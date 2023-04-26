@@ -2,6 +2,9 @@ package isel.ps.classcode.domain.deserialization
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/**
+ * Class used to deserialize the user info from github
+ */
 data class UserInfoDeserialization(
     @JsonProperty("login") val login: String,
     @JsonProperty("id") val id: Long,

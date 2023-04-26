@@ -9,15 +9,18 @@ import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.AuthInfo
 import isel.ps.classcode.domain.GitHubError
 import isel.ps.classcode.domain.deserialization.AuthInfoDeserialization
-import isel.ps.classcode.http.HandleGitHubResponseError
 import isel.ps.classcode.http.handleResponseGitHub
 import isel.ps.classcode.http.send
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.utils.Either
 import isel.ps.classcode.presentation.utils.GitHubResponseServicesError
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
+/**
+ * The implementation of login services that will be used on the final product
+ */
 class RealGithubLoginServices(private val httpClient: OkHttpClient, val objectMapper: ObjectMapper, val sessionStore: SessionStore) :
     LoginServices {
     override suspend fun tradeAndStoreAccessToken(code: String): Either<GitHubResponseServicesError, AuthInfo> {

@@ -8,5 +8,7 @@
     <string name="user_avatar">User avatar</string>
     <string name="course_image">Course image</string>
     <string name="credits_icon">Credits icon</string>
+    <string name="logout_icon">Logout icon</string>
+    <string name="logout">Logout</string>
 
 </resources>

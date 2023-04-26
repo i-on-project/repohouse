@@ -15,6 +15,11 @@ const val TAG = "Classcode"
 
 private const val API_HOME =  "https://b135-95-95-191-117.eu.ngrok.io"
 
+/**
+ * The implementations of the various modules that are referenced in [DependenciesContainer].
+ */
+
+
 class ClassCodeApplication : DependenciesContainer, Application() {
     private val httpClient: OkHttpClient by lazy { OkHttpClient() }
     private val objectMapper: ObjectMapper by lazy { ObjectMapper() }
@@ -24,6 +29,9 @@ class ClassCodeApplication : DependenciesContainer, Application() {
     override val menuServices: MenuServices by lazy { RealMenuServices(httpClient = httpClient, objectMapper = objectMapper, sessionStore = sessionStore) }
 }
 
+/**
+ * The various dependencies of the project
+ */
 interface DependenciesContainer {
     val sessionStore: SessionStore
     val loginServices: LoginServices
