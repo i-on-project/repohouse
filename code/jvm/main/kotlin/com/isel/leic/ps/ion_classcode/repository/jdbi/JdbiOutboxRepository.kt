@@ -8,7 +8,6 @@ import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
 import java.time.Instant
 
-const val INTERVAL = "10 MINUTES"
 
 /**
  * Implementation of the Outbox methods
@@ -20,16 +19,13 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
     override fun createOutboxRequest(outbox: OutboxInput): Int? {
         return handle.createUpdate(
             """
-            INSERT INTO Outbox (user_id, otp, status, expired_at, sent_at)
-            VALUES (:user_id,:otp,:status,:expired_at,:sent_at)
+            INSERT INTO Outbox (user_id, status)
+            VALUES (:user_id,:status)
             RETURNING user_id
             """,
         )
             .bind("user_id", outbox.userId)
-            .bind("otp", outbox.otp)
             .bind("status", "Pending")
-            .bind("expired_at", toTimestamp())
-            .bind("sent_at", Timestamp.from(Instant.now()))
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .firstOrNull()
@@ -67,14 +63,31 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
     /**
      * Method to update a Outbox state
      */
-    override fun updateOutboxStateRequest(userId: Int): Boolean {
+    override fun updateOutboxStateRequest(userId: Int,state:String): Boolean {
         return handle.createUpdate(
             """
             UPDATE Outbox
-            SET status = 'Sent'
+            SET status = :state
             WHERE user_id = :id
             """,
         )
+            .bind("state",state)
+            .bind("id", userId)
+            .execute() == 1
+    }
+
+    /**
+     * Method to update an Outbox send time
+     */
+    override fun updateOutboxSentTimeRequest(userId: Int): Boolean {
+        return handle.createUpdate(
+            """
+            UPDATE Outbox
+            SET sent_at = :sent_at
+            WHERE user_id = :id
+            """,
+        )
+            .bind("sent_at",Timestamp.from(Instant.now()))
             .bind("id", userId)
             .execute() == 1
     }
@@ -91,19 +104,5 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
         )
             .bind("id", userId)
             .execute() == 1
-    }
-
-    /**
-     * Method to create a query for add to timestamp
-     */
-    private fun toTimestamp(): Timestamp {
-        return handle.createQuery(
-            """
-            SELECT NOW() + :interval::interval AS timestamp
-            """,
-        )
-            .bind("interval", INTERVAL)
-            .mapTo<Timestamp>()
-            .first()
     }
 }

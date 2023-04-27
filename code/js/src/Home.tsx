@@ -20,16 +20,6 @@ export function ShowHomeFetch({
         return await systemServices.home()
     });
     const [error, setError] = useState<ErrorMessageModel>(null)
-    const navigate = useNavigate()
-    const loggedIn = useLoggedIn()
-
-    const handleAuthTeacherClick = useCallback(() => {
-        navigate("/auth/teacher")
-    }, [navigate])
-
-    const handleAuthStudentClick = useCallback (() => {
-        navigate("/auth/student")
-    }, [navigate])
 
     if (!content) {
         return (
@@ -70,13 +60,6 @@ export function ShowHomeFetch({
                     >
                         {"est: "+ content.properties.est}
                     </Typography>
-                    {!loggedIn &&
-                        <>
-                        <Button onClick={handleAuthTeacherClick}> {"Teacher"} </Button> 
-                        <Button onClick={handleAuthStudentClick}> {"Student"} </Button>
-                        </>
-                    }
-                    
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => { setError(null) }}/>

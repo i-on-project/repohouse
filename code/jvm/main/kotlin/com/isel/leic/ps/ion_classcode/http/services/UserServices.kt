@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
+import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -95,7 +96,12 @@ class UserServices(
     fun getAllUserCourses(userId: Int): UserCoursesResponse {
         return transactionManager.run {
             it.usersRepository.getUserById(userId) ?: Either.Left(UserServicesError.InternalError)
-            val courses = it.courseRepository.getAllUserCourses(userId)
+            val user = it.usersRepository.getUserById(userId) ?: return@run Either.Left(UserServicesError.InternalError)
+            val courses = if (user is Student){
+                it.courseRepository.getAllStudentCourses(userId)
+            }else {
+                it.courseRepository.getAllUserCourses(userId)
+            }
             Either.Right(courses)
         }
     }

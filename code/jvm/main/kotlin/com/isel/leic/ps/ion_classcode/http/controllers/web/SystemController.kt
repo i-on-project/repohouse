@@ -75,6 +75,7 @@ class SystemController {
         block.action(title = "verify", href = Uris.AUTH_REGISTER_VERIFICATION_PATH, method = HttpMethod.POST, type = "application/json", block = {
             numberField("otp")
         })
+        block.action(title ="resendEmail", href = Uris.AUTH_RESEND_EMAIL_PATH, method = HttpMethod.POST, type = "application/json", block = {})
         block.action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})
         block.action(title = "createCourse", href = Uris.COURSES_PATH, method = HttpMethod.POST, type = "application/json", block = {
             textField("orgUrl")
@@ -101,5 +102,6 @@ class SystemController {
             textField(name = "label")
         }
         block.action(title = "changeStatusRequest", href = Uris.TEAM_CHANGE_REQUEST_PATH, method = HttpMethod.POST, type = "application/json") {}
+        block.action(title = "inviteCode", href = Uris.INVITE_LINK_PATH, method = HttpMethod.POST, type = "application/json") {}
     }
 }

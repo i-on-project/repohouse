@@ -39,7 +39,6 @@ export function ShowAuthStudentFetch({
             if (e.data.type === "Menu") {
                 setLogin(AuthState.Student)
             }
-            console.log(e.data.data)
             setData(e.data.data)
         }, false);
     }, [windowRef,useLoggedIn,useSetLogin])

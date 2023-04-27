@@ -7,7 +7,7 @@ import {Typography} from "@mui/material";
 import {AuthServices} from "./services/AuthServices";
 import {ErrorAlert} from "./ErrorAlert";
 import {useNavigate} from "react-router-dom";
-import {AuthState, useSetLogin} from "./Auth";
+import {AuthState, useLoggedIn, useSetLogin} from "./Auth";
 
 export function ShowAuthTeacherFetch({
     authServices,
@@ -20,6 +20,7 @@ export function ShowAuthTeacherFetch({
     const [error, setError] = useState<ErrorMessageModel>(null);
     const [windowRef, setWindowRef] = useState<Window>(null);
     const [isOpen, setOpen] = useState<Boolean>(false);
+    const [data, setData] = useState<string>(null);
     const setLogin = useSetLogin()
     const navigate = useNavigate()
 
@@ -38,9 +39,16 @@ export function ShowAuthTeacherFetch({
             if (e.data.type === "Menu") {
                setLogin(AuthState.Teacher)
             }
-            navigate(e.data.data)
+            setData(e.data.data)
         }, false);
-    }, [windowRef])
+    }, [windowRef,useLoggedIn,useSetLogin])
+
+    useEffect(() => {
+        if (data) {
+            console.log("Navigating to " + data)
+            navigate(data)
+        }
+    }, [data, navigate])
 
     if (!content) {
         return (

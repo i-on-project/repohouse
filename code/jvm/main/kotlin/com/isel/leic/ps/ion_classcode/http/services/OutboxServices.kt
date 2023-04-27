@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.http.services
 
+import com.isel.leic.ps.ion_classcode.domain.input.OtpInput
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Either
@@ -11,6 +12,9 @@ import java.sql.Timestamp
  * Alias for the response of the services
  */
 typealias OutboxResponse = Either<OutboxServicesError, Unit>
+
+const val EMAIL_RESEND_TIME = 300000 // 5-minutes cooldown
+const val MAX_TRIES = 3
 
 /**
  * Services for the outbox
@@ -48,7 +52,11 @@ class OutboxServices(
             if (cooldown != null) {
                 return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
             }
-            val outbox = it.outboxRepository.createOutboxRequest(outbox = OutboxInput(userId = userId, otp = otp))
+            val otpRequest = it.otpRepository.createOtpRequest(otp= OtpInput(userId = userId, otp = otp))
+            if (otpRequest == null) {
+                Either.Left(value = OutboxServicesError.ErrorCreatingRequest)
+            }
+            val outbox = it.outboxRepository.createOutboxRequest(outbox = OutboxInput(userId = userId))
             if (outbox == null) {
                 Either.Left(value = OutboxServicesError.ErrorCreatingRequest)
             } else {
@@ -67,19 +75,49 @@ class OutboxServices(
             if (cooldown != null) {
                 return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
             }
-            val outbox = it.outboxRepository.getOutboxRequest(userId = userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
-            if (outbox.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
-                it.outboxRepository.deleteOutboxRequest(userId = outbox.userId)
+            val otpRequest = it.otpRepository.getOtpRequest(userId= userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
+            if (otpRequest.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
+                it.outboxRepository.deleteOutboxRequest(userId = userId)
+                it.otpRepository.deleteOtpRequest(userId = userId)
                 return@run Either.Left(value = OutboxServicesError.OtpExpired)
             }
-            if (outbox.otp == otp) {
+            if (otpRequest.otp == otp) {
                 it.usersRepository.updateUserStatus(id = userId)
                 Either.Right(value = Unit)
-            } else {
-                //it.outboxRepository.deleteOutboxRequest(userId = outbox.userId) TODO: Check this, maybe delete after expiration
+            }
+            if (otpRequest.tries == MAX_TRIES) {
                 it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
+                Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = COOLDOWN_TIME))
+            }else{
+                while (!it.otpRepository.addTryToOtpRequest(userId = userId, numbTry = otpRequest.tries + 1)){
+                    val checkOtpRequest = it.otpRepository.getOtpRequest(userId= userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
+                    if (checkOtpRequest.tries == MAX_TRIES) {
+                        it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
+                        return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = COOLDOWN_TIME))
+                    }
+                }
                 Either.Left(value = OutboxServicesError.OtpDifferent)
             }
+        }
+    }
+
+    /**
+     * Method to resend the email
+     */
+    fun resendEmail(userId: Int): OutboxResponse {
+        if (userId <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
+        return transactionManager.run {
+            val outbox = it.outboxRepository.getOutboxRequest(userId = userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
+            if (outbox.sentAt == null) {
+                /** Not yet sent, needs to wait */
+                return@run Either.Right(value = Unit)
+            }
+            if (outbox.sentAt.before((System.currentTimeMillis() + EMAIL_RESEND_TIME).toTimestamp())) {
+                   return@run Either.Left(value = OutboxServicesError.EmailNotSent)
+            }
+            /** Changes state, so next verification can be sent */
+            it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId, state = "Pending")
+            return@run Either.Right(value = Unit)
         }
     }
 
@@ -91,8 +129,16 @@ class OutboxServices(
         transactionManager.run {
             it.outboxRepository.getOutboxPendingRequests().forEach { outbox ->
                 it.usersRepository.getUserById(userId = outbox.userId)?.let { user ->
-                    if (emailService.sendVerificationEmail(name = user.name, email = user.email, otp = outbox.otp) is Either.Right) {
-                        it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId)
+                    it.otpRepository.getOtpRequest(userId = outbox.userId)?.let { otpRequest ->
+                        if (emailService.sendVerificationEmail(
+                                name = user.name,
+                                email = user.email,
+                                otp = otpRequest.otp
+                            ) is Either.Right
+                        ) {
+                            it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId, state = "Sent")
+                            it.outboxRepository.updateOutboxSentTimeRequest(userId = outbox.userId)
+                        }
                     }
                 }
             }

@@ -6,6 +6,7 @@ import com.isel.leic.ps.ion_classcode.repository.CooldownRepository
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
 import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
+import com.isel.leic.ps.ion_classcode.repository.OtpRepository
 import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
 import com.isel.leic.ps.ion_classcode.repository.RepoRepository
 import com.isel.leic.ps.ion_classcode.repository.TagRepository
@@ -17,6 +18,7 @@ import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiCooldownRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiCourseRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiDeliveryRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiFeedbackRepository
+import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiOtpRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiOutboxRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiRepoRepository
 import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiTagRepository
@@ -67,6 +69,7 @@ class JdbiTransaction(
     override val requestRepository: RequestRepository by lazy { JdbiRequestRepository(handle = handle) }
     override val outboxRepository: OutboxRepository by lazy { JdbiOutboxRepository(handle = handle) }
     override val cooldownRepository: CooldownRepository by lazy { JdbiCooldownRepository(handle = handle) }
+    override val otpRepository: OtpRepository by lazy { JdbiOtpRepository(handle = handle) }
     override fun rollback() {
         handle.rollback()
     }

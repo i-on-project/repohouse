@@ -6,6 +6,7 @@ import com.isel.leic.ps.ion_classcode.repository.CooldownRepository
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.DeliveryRepository
 import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
+import com.isel.leic.ps.ion_classcode.repository.OtpRepository
 import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
 import com.isel.leic.ps.ion_classcode.repository.RepoRepository
 import com.isel.leic.ps.ion_classcode.repository.TagRepository
@@ -44,6 +45,7 @@ interface Transaction {
     val leaveCourseRepository: LeaveCourseRepository
     val requestRepository: RequestRepository
     val outboxRepository: OutboxRepository
+    val otpRepository: OtpRepository
     val cooldownRepository: CooldownRepository
     fun rollback()
 }

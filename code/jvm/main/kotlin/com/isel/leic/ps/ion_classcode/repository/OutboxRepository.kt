@@ -11,6 +11,7 @@ interface OutboxRepository {
     fun createOutboxRequest(outbox: OutboxInput): Int?
     fun getOutboxPendingRequests(): List<Outbox>
     fun getOutboxRequest(userId: Int): Outbox?
-    fun updateOutboxStateRequest(userId: Int): Boolean
+    fun updateOutboxStateRequest(userId: Int,state:String): Boolean
+    fun updateOutboxSentTimeRequest(userId: Int): Boolean
     fun deleteOutboxRequest(userId: Int): Boolean
 }

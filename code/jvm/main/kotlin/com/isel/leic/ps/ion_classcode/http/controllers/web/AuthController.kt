@@ -369,6 +369,28 @@ class AuthController(
     }
 
     /**
+     * Resend email verification.
+     */
+    @PostMapping(Uris.AUTH_RESEND_EMAIL_PATH, produces = ["application/vnd.siren+json"])
+    fun authResendEmailPath(
+        @CookieValue userGithubId: String,
+    ): ResponseEntity<*> {
+        val githubId = AESDecrypt.decrypt(userGithubId).toLong()
+        return when (val user = userServices.getUserByGithubId(githubId)) {
+            is Either.Right -> when (val resendEmail = outboxServices.resendEmail(user.value.id)) {
+                is Either.Right -> {
+                    siren(StatusOutputModel("Email sent.", "Email sent successfully, check your email.")) {
+                        clazz("resendEmail")
+                        action(title = "self", href = Uris.AUTH_RESEND_EMAIL_PATH, method = HttpMethod.POST, type = "application/json", block = {})
+                    }
+                }
+                is Either.Left -> problemOtp(resendEmail.value)
+            }
+            is Either.Left -> userServices.problem(user.value)
+        }
+    }
+
+    /**
      * Logout the user.
      */
     @PostMapping(Uris.LOGOUT)

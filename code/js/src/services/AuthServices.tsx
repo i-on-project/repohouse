@@ -9,7 +9,10 @@ export class AuthServices {
 
     authTeacher = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_TEACHER_KEY, Hypermedia.systemServices.home)
-        return await fetchGet<AuthRedirectDtoProperties>(link.href)
+        console.log(link)
+        const response = await fetchGet<AuthRedirectDtoProperties>(link.href)
+        console.log(response)
+        return response
     }
 
     authStudent = async () => {

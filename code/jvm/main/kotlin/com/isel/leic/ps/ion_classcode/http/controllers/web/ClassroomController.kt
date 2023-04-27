@@ -143,7 +143,6 @@ class ClassroomController(
     @PostMapping(Uris.INVITE_LINK_PATH, produces = ["application/vnd.siren+json"])
     fun inviteLink(
         user: User,
-        @PathVariable courseId: Int,
         @PathVariable inviteLink: String
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.unauthorized
@@ -151,7 +150,6 @@ class ClassroomController(
             is Either.Left -> problem(enter.value)
             is Either.Right -> siren(value = ClassroomOutputModel(id = enter.value.id, name = enter.value.name, isArchived = enter.value.isArchived, lastSync = enter.value.lastSync, assignments = enter.value.assignments, students = enter.value.students)) {
                 clazz("classroom")
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, enter.value.id), needAuthentication = true)
             }
         }
     }

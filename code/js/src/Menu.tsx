@@ -1,13 +1,27 @@
 import * as React from "react";
 import { useAsync } from "./siren/Fetch";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import { ErrorMessageModel } from "./domain/response-models/Error";
 import { SirenEntity } from "./siren/Siren";
-import {List, ListItem, Typography} from "@mui/material";
+import {Box, List, ListItem, Modal, TextField, Typography} from "@mui/material";
 import {MenuServices} from "./services/MenuServices";
 import {Link, useParams} from "react-router-dom";
 import {ErrorAlert} from "./ErrorAlert";
 import {AuthState, toState, useLoggedIn} from "./Auth";
+import {Button} from "react-bootstrap";
+
+const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
 
 export function ShowMenuFetch({
     menuServices,
@@ -19,7 +33,23 @@ export function ShowMenuFetch({
         return await menuServices.menu()
     })
     const [error, setError] = useState<ErrorMessageModel>(null)
+    const [isOpened, setIsOpened] = useState(false)
+    const [inviteCode, setInviteCode] = useState<string>('')
     const loggedIn = useLoggedIn()
+
+    const handleChangeInviteCode = useCallback(async (value) => {
+        setInviteCode(value.target.value)
+    }, [inviteCode,setInviteCode])
+
+    const handleSubmit = useCallback(async () => {
+        if (inviteCode === '') return
+        const response = await menuServices.inviteLink(inviteCode)
+        if (response instanceof ErrorMessageModel) {
+            setError(response)
+        } else {
+            setIsOpened(false)
+        }
+    }, [inviteCode, setIsOpened, setError])
 
     if (!content) {
         return (
@@ -56,6 +86,25 @@ export function ShowMenuFetch({
                     >
                         {"Welcome " + content.properties.name}
                     </Typography>
+                    <Button onClick={() => setIsOpened(true)}>
+                        Invite Code
+                    </Button>
+                    <Modal
+                        open={isOpened}
+                        onClose={() => setIsOpened(false)}
+                    >
+                        <Box sx={style}>
+                            <TextField
+                                onChange={handleChangeInviteCode} value={inviteCode} id="inviteCode" label="InviteCode" variant="outlined"
+                            />
+                            <Button onClick={handleSubmit}>
+                                Submit
+                            </Button>
+                            <Button onClick={() => setIsOpened(false)}>
+                                Close
+                            </Button>
+                        </Box>
+                    </Modal>
                     <List>
                         {content.properties.courses.map( course => (
                             <ListItem key={course.id}>

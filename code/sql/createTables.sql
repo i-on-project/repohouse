@@ -218,11 +218,18 @@ CREATE TABLE Cooldown(
 
 Create TABLE Outbox(
     user_id int primary key,
-    otp int not null,
     status text not null check ( status in ('Pending', 'Sent') ),
-    expired_at timestamp not null,
     sent_at timestamp default null,
     foreign key (user_id) references users(id)
 );
+
+CREATE TABLE OTP(
+    user_id int not null,
+    otp int not null,
+    expired_at timestamp not null,
+    tries int not null,
+    foreign key (user_id) references users(id)
+);
+
 
 COMMIT;

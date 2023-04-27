@@ -48,6 +48,7 @@ export const DELETE_DELIVERY_KEY = "deleteDelivery"
 export const SYNC_DELIVERY_KEY = "syncDelivery"
 export const EXIT_TEAM_KEY = "leaveTeam"
 export const POST_FEEDBACK_KEY = "postFeedback"
+export const INVITE_CODE_KEY = "inviteCode"
 
 
 export const systemLinkKeys = [
@@ -82,5 +83,6 @@ export const systemActionKeys = [
     DELETE_DELIVERY_KEY,
     SYNC_DELIVERY_KEY,
     EXIT_TEAM_KEY,
-    POST_FEEDBACK_KEY
+    POST_FEEDBACK_KEY,
+    INVITE_CODE_KEY
 ]

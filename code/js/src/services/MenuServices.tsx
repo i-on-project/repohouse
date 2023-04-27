@@ -2,6 +2,8 @@ import {fetchGet, fetchPost} from "../siren/Fetch"
 import * as Hypermedia from "../Dependecies"
 import {MenuDtoProperties} from "../domain/dto/MenuDtoProperties";
 import {TeacherPendingApprovalDtoProperties} from "../domain/dto/TeacherDtoProperties";
+import {parse} from "uri-template";
+import {ClassroomDtoProperties} from "../domain/dto/ClassroomDtoProperties";
 
 
 export class MenuServices {
@@ -23,6 +25,15 @@ export class MenuServices {
             rejected: rejected
         }
         return await fetchPost<TeacherPendingApprovalDtoProperties>(link.href, body)
+    }
+
+    inviteLink = async (inviteCode) => {
+        console.log(inviteCode)
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.INVITE_CODE_KEY, Hypermedia.systemServices.home)
+        console.log(link.href)
+        const href = parse(link.href).expand({inviteLink: inviteCode})
+        console.log(href)
+        return await fetchPost<ClassroomDtoProperties>(href, null)
     }
 
 }
