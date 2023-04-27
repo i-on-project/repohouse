@@ -12,7 +12,7 @@ import com.isel.leic.ps.ion_classcode.http.model.output.TeachersPendingOutputMod
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.services.StudentServices
 import com.isel.leic.ps.ion_classcode.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.services.UserServices
+import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Result

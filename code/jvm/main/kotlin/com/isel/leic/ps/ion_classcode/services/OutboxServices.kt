@@ -3,7 +3,9 @@ package com.isel.leic.ps.ion_classcode.http.services
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInput
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ion_classcode.services.EmailService
 import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
@@ -134,7 +136,7 @@ class OutboxServices(
                                 name = user.name,
                                 email = user.email,
                                 otp = otpRequest.otp
-                            ) is Either.Right
+                            ) is Result.Success
                         ) {
                             it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId, state = "Sent")
                             it.outboxRepository.updateOutboxSentTimeRequest(userId = outbox.userId)

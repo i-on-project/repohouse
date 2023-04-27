@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ion_classcode.http.pipeline
 
 import com.isel.leic.ps.ion_classcode.domain.User
-import com.isel.leic.ps.ion_classcode.services.UserServices
+import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.stereotype.Component
 

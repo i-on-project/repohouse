@@ -83,9 +83,9 @@ class ClassroomController(
                         textField("name")
                     })
                 }
-            }
         }
     }
+
 
     /**
      * Archive a classroom

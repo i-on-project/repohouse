@@ -17,13 +17,14 @@ import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.services.GithubServices
-import com.isel.leic.ps.ion_classcode.services.OutboxServices
-import com.isel.leic.ps.ion_classcode.services.OutboxServicesError
+import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
+import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.services.StudentServices
 import com.isel.leic.ps.ion_classcode.services.TeacherServices
-import com.isel.leic.ps.ion_classcode.services.UserServices
+import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
+import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
@@ -279,13 +280,13 @@ class AuthController(
         return when (val student = studentServices.createStudent(githubId, input.schoolId)) {
             is Result.Success -> {
                 when (val userOutbox = outboxServices.createUserVerification(student.value.id)) {
-                    is Result.Success -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
+                    is Either.Right -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
                         clazz("registerStudent")
                         action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
                             numberField("schoolId")
                         })
                     }
-                    is Result.Problem -> when (userOutbox.value) {
+                    is Either.Left -> when (userOutbox.value) {
                         is OutboxServicesError.CooldownNotExpired -> siren(StatusOutputModel(
                                 "On cooldown",
                                 "You are on cooldown, try again in ${userOutbox.value.cooldown} seconds",
@@ -354,7 +355,7 @@ class AuthController(
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val user = userServices.getUserByGithubId(githubId)) {
             is Result.Success -> when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
-                is Result.Success -> {
+                is Either.Right -> {
                     val cookie = generateSessionCookie(user.value.token)
                     response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
                     response.setHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
@@ -365,7 +366,7 @@ class AuthController(
                         })
                     }
                 }
-                is Result.Problem -> problemOtp(checkOTP.value)
+                is Either.Left -> problemOtp(checkOTP.value)
             }
             is Result.Problem -> userServices.problem(user.value)
         }
@@ -380,7 +381,7 @@ class AuthController(
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val user = userServices.getUserByGithubId(githubId)) {
-            is Either.Right -> when (val resendEmail = outboxServices.resendEmail(user.value.id)) {
+            is Result.Success -> when (val resendEmail = outboxServices.resendEmail(user.value.id)) {
                 is Either.Right -> {
                     siren(StatusOutputModel("Email sent.", "Email sent successfully, check your email.")) {
                         clazz("resendEmail")
@@ -389,7 +390,7 @@ class AuthController(
                 }
                 is Either.Left -> problemOtp(resendEmail.value)
             }
-            is Either.Left -> userServices.problem(user.value)
+            is Result.Problem -> userServices.problem(user.value)
         }
     }
 
