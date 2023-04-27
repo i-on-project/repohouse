@@ -11,8 +11,6 @@ import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ion_classcode.domain.requests.Request
-import com.isel.leic.ps.ion_classcode.http.services.TeamServices
-import com.isel.leic.ps.ion_classcode.http.services.TeamServicesError
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.FeedbackRepository
@@ -26,7 +24,7 @@ import com.isel.leic.ps.ion_classcode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ion_classcode.repository.request.RequestRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doReturn
@@ -127,7 +125,7 @@ class TeamServicesTests {
         // when: getting an error because of an invalid team id
         val team = teamServices.getTeamInfo(teamId = teamId)
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -142,7 +140,7 @@ class TeamServicesTests {
         // when: getting an error because the team id is not in database
         val team = teamServices.getTeamInfo(teamId = teamId)
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -157,7 +155,7 @@ class TeamServicesTests {
         // when: getting the team info
         val team = teamServices.getTeamInfo(teamId = teamId)
 
-        if (team is Either.Right) {
+        if (team is Result.Success) {
             assert(team.value.team.name == "Team1")
         } else {
             fail("Should not be Either.Left")
@@ -181,7 +179,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -203,7 +201,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -225,7 +223,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -247,7 +245,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -269,7 +267,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -291,7 +289,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -310,7 +308,7 @@ class TeamServicesTests {
             classroomId = 2,
         )
 
-        if (team is Either.Right) {
+        if (team is Result.Success) {
             assert(team.value == 2)
         } else {
             fail("Should not be Either.Left")
@@ -333,7 +331,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -354,7 +352,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -375,7 +373,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -396,7 +394,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -414,7 +412,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Right) {
+        if (team is Result.Success) {
             assert(team.value == 1)
         } else {
             fail("Should not be Either.Left")
@@ -438,7 +436,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -460,7 +458,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -482,7 +480,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -504,7 +502,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -526,7 +524,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -548,7 +546,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -570,7 +568,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -592,7 +590,7 @@ class TeamServicesTests {
             ),
         )
 
-        if (team is Either.Right) {
+        if (team is Result.Success) {
             assert(team.value == 1)
         } else {
             fail("Should not be Either.Left")
@@ -613,7 +611,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -632,7 +630,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -651,7 +649,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -670,7 +668,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -689,7 +687,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -708,7 +706,7 @@ class TeamServicesTests {
             classroomId = 2,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -727,7 +725,7 @@ class TeamServicesTests {
             classroomId = 2,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.RequestNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -746,7 +744,7 @@ class TeamServicesTests {
             classroomId = 2,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.RequestNotRejected)
         } else {
             fail("Should not be Either.Right")
@@ -763,7 +761,7 @@ class TeamServicesTests {
             classroomId = 2,
         )
 
-        if (team is Either.Right) {
+        if (team is Result.Success) {
             assert(team.value)
         } else {
             fail("Should not be Either.Left")
@@ -787,7 +785,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -809,7 +807,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -831,7 +829,7 @@ class TeamServicesTests {
             classroomId = 1,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -853,7 +851,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -875,7 +873,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -897,7 +895,7 @@ class TeamServicesTests {
             classroomId = classroomId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -919,7 +917,7 @@ class TeamServicesTests {
             classroomId = 2,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -938,7 +936,7 @@ class TeamServicesTests {
             classroomId = 2,
         )
 
-        if (team is Either.Right) {
+        if (team is Result.Success) {
             assert(team.value == 1)
         } else {
             fail("Should not be Either.Left")
@@ -957,7 +955,7 @@ class TeamServicesTests {
             teamId = teamId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -974,7 +972,7 @@ class TeamServicesTests {
             teamId = teamId,
         )
 
-        if (team is Either.Left) {
+        if (team is Result.Problem) {
             assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -991,7 +989,7 @@ class TeamServicesTests {
             teamId = teamId,
         )
 
-        if (team is Either.Right) {
+        if (team is Result.Success) {
             assert(team.value.team.name == "Team1")
         } else {
             fail("Should not be Either.Right")

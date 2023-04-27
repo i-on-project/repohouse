@@ -54,6 +54,7 @@ class SystemController {
         block.link(rel = LinkRelation("course"), href = Uris.COURSE_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("teachersApproval"), href = Uris.TEACHERS_APPROVAL_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("classroom"), href = Uris.CLASSROOM_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("local"), href = Uris.LOCAL_COPY_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("assignment"), href = Uris.ASSIGMENT_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("assigments"), href = Uris.ASSIGMENTS_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("delivery"), href = Uris.DELIVERY_PATH, needAuthentication = true)
@@ -81,6 +82,19 @@ class SystemController {
             textField("orgUrl")
             textField("name")
         })
+        block.action(title = "leaveCourse", href = Uris.LEAVE_COURSE_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
+        block.action(title = "archiveCourse", href = Uris.COURSE_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
+        block.action(title = "createClassroom", href = Uris.CREATE_CLASSROOM_PATH, method = HttpMethod.POST, type = "application/json", block = {
+            textField("name")
+        })
+        block.action(title = "archiveClassroom", href = Uris.ARCHIVE_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
+        block.action(title = "editClassroom", href = Uris.EDIT_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json", block = {
+            textField("name")
+        })
+        block.action(title = "classroomInvite", href = Uris.INVITE_LINK_PATH, method = HttpMethod.POST, type = "application/json", block = {
+            textField("name")
+        })
+        block.action(title = "syncClassroom", href = Uris.SYNC_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
         block.action("joinTeam", Uris.JOIN_TEAM_PATH, method = HttpMethod.POST, type = "application/json",) {
             hiddenField("assigmentId")
             numberField("teamId")

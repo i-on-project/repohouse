@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Classcode</string>
+    <string name="logo">ISEL Logo</string>
+    <string name="login">Login</string>
+    <string name="failed_url_open">Failed to open URL</string>
+    <string name="arrow_back_text">Arrow back text</string>
+    <string name="menu_top_page">Menu</string>
+    <string name="user_avatar">User avatar</string>
+    <string name="course_image">Course image</string>
+    <string name="credits_icon">Credits icon</string>
+    <string name="logout_icon">Logout icon</string>
+    <string name="logout">Logout</string>
+
 </resources>

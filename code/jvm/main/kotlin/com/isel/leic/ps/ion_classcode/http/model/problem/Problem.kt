@@ -131,24 +131,6 @@ class Problem {
             ),
         )
 
-        val courseAlreadyExists = response(
-            HttpStatus.CONFLICT,
-            ErrorMessageModel(
-                URI("$BASE_URL/course-already-exists"),
-                "Course already exists.",
-                "The name or url specified are already in use.",
-            ),
-        )
-
-        val userInCourse = response(
-            HttpStatus.CONFLICT,
-            ErrorMessageModel(
-                URI("$BASE_URL/user-in-course"),
-                "User already in course.",
-                "You are already in this course.",
-            ),
-        )
-
         val userNotInCourse = response(
             HttpStatus.CONFLICT,
             ErrorMessageModel(

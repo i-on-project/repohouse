@@ -12,11 +12,11 @@ import com.isel.leic.ps.ion_classcode.http.model.output.TeacherAssignmentModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeacherAssignmentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.http.services.AssignmentServices
-import com.isel.leic.ps.ion_classcode.http.services.AssignmentServicesError
+import com.isel.leic.ps.ion_classcode.services.AssignmentServices
+import com.isel.leic.ps.ion_classcode.services.AssignmentServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -53,16 +53,16 @@ class AssigmentController(
      * Get all information about an assigment for a student
      */
     private fun getStudentAssigmentInfo(user : User, courseId : Int, classroomId : Int, assignmentId: Int): ResponseEntity<*> {
-        return when (val assignment = assigmentService.getStudentAssignmentInfo(assignmentId,user.id) as Either<AssignmentServicesError, StudentAssignmentModel>) {
-            is Either.Left -> problem(assignment.value)
-            is Either.Right -> siren(value = StudentAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.team)) {
+        return when (val assignment = assigmentService.getStudentAssignmentInfo(assignmentId,user.id) as Result<AssignmentServicesError, StudentAssignmentModel>) {
+            is Result.Problem -> problem(assignment.value)
+            is Result.Success -> siren(value = StudentAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.team)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignmentId), needAuthentication = true)
                 // TODO: Check under this line
                 if (assignment.value.team == null){
                     when (val studentTeams = assigmentService.getAssignmentStudentTeams(assignmentId, user.id)) {
-                        is Either.Left -> problem(studentTeams.value)
-                        is Either.Right -> {
+                        is Result.Problem -> problem(studentTeams.value)
+                        is Result.Success -> {
                             studentTeams.value.forEach {
                                 action(
                                     "join-team",
@@ -97,9 +97,9 @@ class AssigmentController(
      * Get all information about an assigment for a teacher
      */
     private fun getTeacherAssigmentInfo(user : User, courseId : Int, classroomId : Int, assignmentId: Int): ResponseEntity<*> {
-        return when (val assignment = assigmentService.getTeacherAssignmentInfo(assignmentId) as Either<AssignmentServicesError, TeacherAssignmentModel>) {
-            is Either.Left -> problem(assignment.value)
-            is Either.Right -> siren(value = TeacherAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.teams)) {
+        return when (val assignment = assigmentService.getTeacherAssignmentInfo(assignmentId) as Result<AssignmentServicesError, TeacherAssignmentModel>) {
+            is Result.Problem -> problem(assignment.value)
+            is Result.Success -> siren(value = TeacherAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.teams)) {
                 clazz("assigment")
                 link(
                     rel = LinkRelation("self"),
@@ -114,7 +114,7 @@ class AssigmentController(
                 )
                 link(
                     rel = LinkRelation("assigments"),
-                    href = Uris.assigmentsUri(courseId, classroomId),
+                    href = Uris.assignmentsUri(courseId, classroomId),
                     needAuthentication = true
                 )
                 assignment.value.deliveries.forEach {
@@ -157,13 +157,13 @@ class AssigmentController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val assignment = assigmentService.createAssignment(assignmentInfo, user.id)) {
-            is Either.Left -> problem(assignment.value)
-            is Either.Right -> siren(value = AssignmentCreatedOutputModel(assignment.value)) {
+            is Result.Problem -> problem(assignment.value)
+            is Result.Success -> siren(value = AssignmentCreatedOutputModel(assignment.value)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignment.value.id), needAuthentication = true)
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
                 link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
-                link(rel = LinkRelation("assignments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
+                link(rel = LinkRelation("assignments"), href = Uris.assignmentsUri(courseId, classroomId), needAuthentication = true)
             }
         }
     }
@@ -181,12 +181,12 @@ class AssigmentController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val delete = assigmentService.deleteAssignment(assignmentId)) {
-            is Either.Left -> problem(delete.value)
-            is Either.Right -> siren(value = delete.value) {
+            is Result.Problem -> problem(delete.value)
+            is Result.Success -> siren(value = delete.value) {
                 clazz("assigment-deleted")
                 link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
                 link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
-                link(rel = LinkRelation("assigments"), href = Uris.assigmentsUri(courseId, classroomId), needAuthentication = true)
+                link(rel = LinkRelation("assignments"), href = Uris.assignmentsUri(courseId, classroomId), needAuthentication = true)
             }
         }
     }

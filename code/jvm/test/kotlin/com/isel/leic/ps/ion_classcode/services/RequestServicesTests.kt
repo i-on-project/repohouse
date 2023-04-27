@@ -1,12 +1,10 @@
 package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
-import com.isel.leic.ps.ion_classcode.http.services.RequestServices
-import com.isel.leic.ps.ion_classcode.http.services.RequestServicesError
 import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doReturn
@@ -47,7 +45,7 @@ class RequestServicesTests {
             applyInput = ApplyInput(creator = creator, composite = null),
         )
 
-        if (request is Either.Left) {
+        if (request is Result.Problem) {
             assert(request.value is RequestServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -64,7 +62,7 @@ class RequestServicesTests {
             applyInput = ApplyInput(creator = 1, composite = composite),
         )
 
-        if (request is Either.Left) {
+        if (request is Result.Problem) {
             assert(request.value is RequestServicesError.InvalidData)
         } else {
             fail("Should not be Either.Right")
@@ -78,7 +76,7 @@ class RequestServicesTests {
             applyInput = ApplyInput(creator = 1, composite = null),
         )
 
-        if (request is Either.Right) {
+        if (request is Result.Success) {
             assert(request.value == 1)
         } else {
             fail("Should not be Either.Left")

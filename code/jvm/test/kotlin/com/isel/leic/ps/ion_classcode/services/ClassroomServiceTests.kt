@@ -5,14 +5,12 @@ import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOutputModel
-import com.isel.leic.ps.ion_classcode.http.services.ClassroomServices
-import com.isel.leic.ps.ion_classcode.http.services.ClassroomServicesError
+import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -54,7 +52,7 @@ class ClassroomServiceTests {
                         on { updateClassroomName(classroomId = 1, classroomUpdate = ClassroomUpdateInputModel(name = "newName")) } doAnswer {}
                         on {
                             createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteLink = "Mockito.anyString()")
-                        } doReturn 2
+                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on {
                             getClassroomByInviteLink(inviteLink = "inviteLink2")
                         } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
@@ -86,7 +84,7 @@ class ClassroomServiceTests {
         // when: getting an error because of an invalid classroom id
         val classroom = classroomServices.getClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -101,7 +99,7 @@ class ClassroomServiceTests {
         // when: getting an error because the classroom id is not in database
         val classroom = classroomServices.getClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -116,7 +114,7 @@ class ClassroomServiceTests {
         // when: getting the classroom
         val classroom = classroomServices.getClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Right) {
+        if (classroom is Result.Success) {
             assert(classroom.value.name == "Classroom 1")
         } else {
             fail("Should not be Either.Left")
@@ -135,7 +133,7 @@ class ClassroomServiceTests {
             classroomInput = ClassroomInput(name = name, courseId = 1, teacherId = 1),
         )
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -152,7 +150,7 @@ class ClassroomServiceTests {
             classroomInput = ClassroomInput(name = "name", courseId = courseId, teacherId = 1),
         )
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -169,7 +167,7 @@ class ClassroomServiceTests {
             classroomInput = ClassroomInput(name = "name", courseId = 1, teacherId = teacherId),
         )
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -181,8 +179,8 @@ class ClassroomServiceTests {
         // when: getting an error because the classroom id is not in database
         val classroom = classroomServices.createClassroom(classroomInput = ClassroomInput(name = "name", courseId = 1, teacherId = 1))
 
-        if (classroom is Either.Right) {
-            assert(classroom.value == 2)
+        if (classroom is Result.Success) {
+            assert(classroom.value.id == 2)
         } else {
             fail("Should not be Either.Left")
         }
@@ -198,7 +196,7 @@ class ClassroomServiceTests {
         // when: getting an error because of an invalid classroom id
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -213,7 +211,7 @@ class ClassroomServiceTests {
         // when: getting an error because classroom id does not exists
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -228,8 +226,8 @@ class ClassroomServiceTests {
         // when: getting a ClassroomArchived
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Right) {
-            assert(classroom.value is ClassroomArchivedOutputModel.ClassroomArchived)
+        if (classroom is Result.Success) {
+            assert(classroom.value is ClassroomArchivedResult.ClassroomArchived)
         } else {
             fail("Should not be Either.Left")
         }
@@ -243,8 +241,8 @@ class ClassroomServiceTests {
         // when: getting a ClassroomArchived
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Right) {
-            assert(classroom.value is ClassroomArchivedOutputModel.ClassroomArchived)
+        if (classroom is Result.Success) {
+            assert(classroom.value is ClassroomArchivedResult.ClassroomArchived)
         } else {
             fail("Should not be Either.Left")
         }
@@ -258,8 +256,8 @@ class ClassroomServiceTests {
         // when: getting a ClassroomDeleted
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
-        if (classroom is Either.Right) {
-            assert(classroom.value is ClassroomArchivedOutputModel.ClassroomDeleted)
+        if (classroom is Result.Success) {
+            assert(classroom.value is ClassroomArchivedResult.ClassroomDeleted)
         } else {
             fail("Should not be Either.Left")
         }
@@ -278,7 +276,7 @@ class ClassroomServiceTests {
             classroomUpdateInput = ClassroomUpdateInputModel(name = name),
         )
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -296,7 +294,7 @@ class ClassroomServiceTests {
             classroomUpdateInput = ClassroomUpdateInputModel(name = "name"),
         )
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -314,7 +312,7 @@ class ClassroomServiceTests {
             classroomUpdateInput = ClassroomUpdateInputModel(name = "name"),
         )
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -332,7 +330,7 @@ class ClassroomServiceTests {
             classroomUpdateInput = ClassroomUpdateInputModel(name = "name"),
         )
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -350,7 +348,7 @@ class ClassroomServiceTests {
             classroomUpdateInput = ClassroomUpdateInputModel(name = "newName"),
         )
 
-        if (classroom is Either.Right) {
+        if (classroom is Result.Success) {
             assert(classroom.value.name == "newName")
         } else {
             fail("Should not be Either.Left")
@@ -366,7 +364,7 @@ class ClassroomServiceTests {
         // when: getting an error because of an invalid invite link
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = inviteLink, studentId = 1)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -381,7 +379,7 @@ class ClassroomServiceTests {
         // when: getting an error because of an invalid student id
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = "inviteLink", studentId = studentId)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -396,7 +394,7 @@ class ClassroomServiceTests {
         // when: getting an error because the invite link that is not in database
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = inviteLink, studentId = 1)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -411,7 +409,7 @@ class ClassroomServiceTests {
         // when: getting an error because the classroom is archived
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = inviteLink, studentId = 1)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
@@ -426,7 +424,7 @@ class ClassroomServiceTests {
         // when: getting an error because the classroom is archived
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = "inviteLink", studentId = studentId)
 
-        if (classroom is Either.Left) {
+        if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.AlreadyInClassroom)
         } else {
             fail("Should not be Either.Right")
@@ -441,7 +439,7 @@ class ClassroomServiceTests {
         // when: getting the classroom with the new student
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = "inviteLink", studentId = studentId)
 
-        if (classroom is Either.Right) {
+        if (classroom is Result.Success) {
             assert(classroom.value.students.size == 1)
         } else {
             fail("Should not be Either.Left")

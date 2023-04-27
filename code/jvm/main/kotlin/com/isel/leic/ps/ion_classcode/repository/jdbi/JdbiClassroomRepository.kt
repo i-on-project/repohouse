@@ -2,7 +2,6 @@ package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
-import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
@@ -17,8 +16,8 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
     /**
      * Method to create a Classroom
      */
-    override fun createClassroom(classroom: ClassroomInput, inviteLink: String): Int =
-        handle.createUpdate(
+    override fun createClassroom(classroom: ClassroomInput, inviteLink: String): Classroom? {
+        val id = handle.createUpdate(
             """
             INSERT INTO Classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
             VALUES (:name, CURRENT_DATE, :invite_link, false, :course_id, :teacher_id)
@@ -32,6 +31,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        if (id < 0) return null
+        return getClassroomById(id)
+    }
 
     /**
      * Method to update a Classroom name

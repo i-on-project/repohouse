@@ -3,14 +3,12 @@ package com.isel.leic.ps.ion_classcode.services
 import com.isel.leic.ps.ion_classcode.domain.Outbox
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
-import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
-import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.repository.CooldownRepository
 import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.utils.Either
+import com.isel.leic.ps.ion_classcode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doReturn
@@ -67,7 +65,7 @@ class OutboxServicesTests {
             userId = userId,
         )
 
-        if (outboxOtp is Either.Left) {
+        if (outboxOtp is Result.Problem) {
             assert(outboxOtp.value is OutboxServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -84,7 +82,7 @@ class OutboxServicesTests {
             userId = userId,
         )
 
-        if (outboxOtp is Either.Left) {
+        if (outboxOtp is Result.Problem) {
             assert(outboxOtp.value is OutboxServicesError.CooldownNotExpired)
         } else {
             fail("Should not be Either.Right")
@@ -104,7 +102,7 @@ class OutboxServicesTests {
             otp = 1,
         )
 
-        if (outboxOtp is Either.Left) {
+        if (outboxOtp is Result.Problem) {
             assert(outboxOtp.value is OutboxServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
@@ -122,7 +120,7 @@ class OutboxServicesTests {
             otp = 1,
         )
 
-        if (outboxOtp is Either.Left) {
+        if (outboxOtp is Result.Problem) {
             assert(outboxOtp.value is OutboxServicesError.OtpNotFound)
         } else {
             fail("Should not be Either.Right")
@@ -140,7 +138,7 @@ class OutboxServicesTests {
             otp = otp,
         )
 
-        if (outboxOtp is Either.Left) {
+        if (outboxOtp is Result.Problem) {
             assert(outboxOtp.value is OutboxServicesError.OtpExpired)
         } else {
             fail("Should not be Either.Right")
@@ -159,7 +157,7 @@ class OutboxServicesTests {
             otp = otp,
         )
 
-        if (outboxOtp is Either.Left) {
+        if (outboxOtp is Result.Problem) {
             assert(outboxOtp.value is OutboxServicesError.OtpDifferent)
         } else {
             fail("Should not be Either.Right")
@@ -178,7 +176,7 @@ class OutboxServicesTests {
             otp = otp,
         )
 
-        if (outboxOtp is Either.Right) {
+        if (outboxOtp is Result.Success) {
             assert(outboxOtp.value == Unit)
         } else {
             fail("Should not be Either.Left")
