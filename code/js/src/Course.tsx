@@ -24,6 +24,20 @@ export function ShowCourseFetch({
     const navigate = useNavigate();
     const user = useLoggedIn()
 
+    const handleArchiveButton = useCallback(async () => {
+        const result = await courseServices.archiveCourse(courseId);
+        if (result instanceof ErrorMessageModel) {
+            setError(result);
+        }
+        if (result instanceof SirenEntity) {
+            navigate("/menu")
+        }
+    }, [setError]);
+
+    const handleCreateClassroom = useCallback(async () => {
+        navigate("/courses/" + courseId + "/classrooms/create");
+    }, [navigate]);
+
     if (!content) {
         return (
             <Typography
@@ -33,16 +47,6 @@ export function ShowCourseFetch({
                 ...loading...
             </Typography>
         );
-    }
-
-    const handleArchiveButton = async () => {
-        const result = await courseServices.archiveCourse(courseId);
-        if (result instanceof ErrorMessageModel) {
-            setError(result);
-        }
-        if (result instanceof SirenEntity) {
-            navigate("/menu")
-        }
     }
 
     if (content instanceof ErrorMessageModel && !error) {
@@ -74,17 +78,17 @@ export function ShowCourseFetch({
                     <a href={content.properties.orgUrl} target={"_blank"}>GitHub Page</a>
                     <List>
                         {content.properties.classrooms.map( classroom => (
-                            <>
-                                {console.log(classroom)}
-                                <ListItem key={classroom.id}>
+                            <ListItem key={classroom.id}>
 
-                                    <Link to={"/courses/"+ courseId + "/classrooms/" + classroom.id}>
-                                        {classroom.name}
-                                    </Link>
-                                </ListItem>
-                            </>
+                                <Link to={"/courses/"+ courseId + "/classrooms/" + classroom.id}>
+                                    {classroom.name}
+                                </Link>
+                            </ListItem>
                         ))}
                     </List>
+                    { user == AuthState.Teacher ? (
+                        <Button onClick={handleCreateClassroom}>Create Classroom</Button>
+                    ) : null}
                     { user == AuthState.Teacher  && !content.properties.isArchived ? (
                         <Button onClick={handleArchiveButton}>Archive</Button>
                     ) : null}

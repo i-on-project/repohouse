@@ -92,8 +92,6 @@ Restrições
 - created_at - não pode ser null. formato de data.
 - github_token - não pode ser vazio ou null. 
 
-``School``
-
 ``Course``
 > Entidade que representa uma disciplina/cadeira do sistema.
 - id - identificador da disciplina/cadeira.
@@ -222,10 +220,10 @@ Restrições
 - delivery_id - valor numérico inteiro não negativo. Chave estrangeira para ``Delivery``.
 - repo_id - valor numérico inteiro não negativo. Chave estrangeira para ``Repo``.
 
-``Student_Course``
-> Entidade que representa a associação entre um aluno e uma cadeira.
+``Student_Classroom``
+> Entidade que representa a associação entre um aluno e uma turma.
 > - student_id - identificador do aluno.
-> - course_id - identificador da cadeira.
+> - classroom_id - identificador da turma.
 
 Restrições
 
@@ -334,3 +332,40 @@ Restrições
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
+
+``Outbox``
+> Entidade que representa a caixa de saída de um utilizador.
+- user_id - identificador do utilizador.
+- state - estado atual da caixa de saída.
+- sent_at - data de envio da caixa de saída.
+
+Restrições
+
+- user_id - valor numérico inteiro não negativo. Chave estrangeira para ``Users``.
+- state - não pode ser null. Toma os valores 'Pending' ou 'Sent'.
+
+``Cooldown``
+> Entidade que representa o tempo de espera de um utilizador.
+- id - identificador do tempo de espera.
+- user_id - identificador do utilizador.
+- end_date - data de fim do tempo de espera.
+
+Restrições
+
+- id - valor numérico inteiro não negativo. Chave primária.
+- user_id - valor numérico inteiro não negativo. Chave estrangeira para ``Users``.
+- end_date - não pode ser null. formato de data.
+
+``OTP``
+> Entidade que representa um código de autenticação de dois fatores.
+- user_id - identificador do utilizador.
+- otp - código de autenticação de dois fatores.
+- expires_at - data de expiração do código de autenticação de dois fatores.
+- tries - número de tentativas de autenticação de dois fatores.
+
+Restrições  
+
+- user_id - valor numérico inteiro não negativo. Chave estrangeira para ``Users``.
+- otp - não pode ser null. valor numérico inteiro não negativo de 6 dígitos.
+- expires_at - não pode ser null. formato de data.
+- tries - valor numérico inteiro não negativo.

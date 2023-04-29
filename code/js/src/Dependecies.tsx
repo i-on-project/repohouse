@@ -49,6 +49,9 @@ export const SYNC_DELIVERY_KEY = "syncDelivery"
 export const EXIT_TEAM_KEY = "leaveTeam"
 export const POST_FEEDBACK_KEY = "postFeedback"
 export const INVITE_CODE_KEY = "inviteCode"
+export const LOCAL_COPY_KEY = "localCopy"
+export const CREATE_CLASSROOM_KEY = "createClassroom"
+export const ARCHIVE_CLASSROOM_KEY = "archiveClassroom"
 
 
 export const systemLinkKeys = [
@@ -68,6 +71,7 @@ export const systemLinkKeys = [
     DELIVERIES_KEY,
     TEAM_KEY,
     TEAMS_KEY,
+    LOCAL_COPY_KEY,
     REQUESTS_KEY
 ]
 
@@ -84,5 +88,7 @@ export const systemActionKeys = [
     SYNC_DELIVERY_KEY,
     EXIT_TEAM_KEY,
     POST_FEEDBACK_KEY,
-    INVITE_CODE_KEY
+    INVITE_CODE_KEY,
+    CREATE_CLASSROOM_KEY,
+    ARCHIVE_CLASSROOM_KEY
 ]

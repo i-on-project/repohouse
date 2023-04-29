@@ -4,6 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomModel
+import com.isel.leic.ps.ion_classcode.http.model.output.LocalCopy
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Result
@@ -22,7 +23,7 @@ typealias ClassroomArchivedResponse = Result<ClassroomServicesError, ClassroomAr
 typealias ClassroomCreateResponse = Result<ClassroomServicesError, ClassroomModel>
 typealias ClassroomEnterResponse = Result<ClassroomServicesError, ClassroomModel>
 typealias ClassroomSyncResponse = Result<ClassroomServicesError, Boolean>
-typealias ClassroomLocalCopyResponse = Result<ClassroomServicesError, Boolean>
+typealias ClassroomLocalCopyResponse = Result<ClassroomServicesError, LocalCopy>
 
 /**
  * Error codes for the services
@@ -195,28 +196,36 @@ class ClassroomServices(
      * Method to get the local copy of the classroom to path in the personal computer
      */
     fun localCopy(classroomId: Int, path: String): ClassroomLocalCopyResponse {
-        return transactionManager.run {
+        val reposArray = mutableMapOf<String,String>()
+        var classroomName = ""
+        transactionManager.run {
             val classroom = it.classroomRepository.getClassroomById(classroomId)
                 ?: return@run Result.Problem(ClassroomServicesError.ClassroomNotFound)
             it.assignmentRepository.getAssignmentsByClassroom(classroomId).forEach { assigment ->
                 it.deliveryRepository.getDeliveriesByAssignment(assigment.id).forEach { delivery ->
                     it.deliveryRepository.getTeamsByDelivery(delivery.id).forEach { team ->
                         it.repoRepository.getReposByTeam(team.id).forEach { repo ->
-                            val directory = "$path\\ClassCode\\${classroom.name}\\${team.name}"
-                            if (File(directory).exists()) {
-                                File(directory).listFiles()?.forEach { file ->
-                                    deleteDirectoryRecursion(file)
-                                }
-                            }
-                            File(directory).mkdirs()
-                            // TODO: If need just folders, user :folder-name
-                            ProcessBuilder("git", "clone", repo.url, directory).start()
+                            reposArray[repo.name] = repo.url
                         }
                     }
                 }
             }
-            Result.Success(true)
+            classroomName = classroom.name
         }
+        val fileName = "localCopy_$classroomName.sh"
+        val shellFile = File("$path/$fileName")
+        shellFile.writeText("#!/bin/bash\n")
+        shellFile.appendText("ClassroomName=$classroomName\n")
+        shellFile.appendText("mkdir classcode\n")
+        shellFile.appendText("cd classcode\n")
+        shellFile.appendText("mkdir ${'$'}ClassroomName\n")
+        shellFile.appendText("cd ${'$'}ClassroomName\n")
+        shellFile.appendText("declare -A repos\n")
+        reposArray.forEach { (name, url) ->
+            shellFile.appendText("repos['$name']='$url'\n")
+        }
+        val resFile = shellFileReposLogic(shellFile)
+        return Result.Success(LocalCopy(fileName,resFile))
     }
 
     /**
@@ -256,5 +265,19 @@ class ClassroomServices(
             file.listFiles()?.forEach { deleteDirectoryRecursion(it) }
         }
         file.delete()
+    }
+
+    private fun shellFileReposLogic(file: File):File{
+        file.appendText("for repoKey in ${'$'}{!repos[@]}\n")
+        file.appendText("do\n")
+        file.appendText("if [ -d ${'$'}repoKey ];then\n")
+        file.appendText("cd ${'$'}repoKey\n")
+        file.appendText("git pull\n")
+        file.appendText("cd ..\n")
+        file.appendText("else\n")
+        file.appendText("git clone ${'$'}{repos[${'$'}repoKey]}\n")
+        file.appendText("fi\n")
+        file.appendText("done\n")
+        return file
     }
 }

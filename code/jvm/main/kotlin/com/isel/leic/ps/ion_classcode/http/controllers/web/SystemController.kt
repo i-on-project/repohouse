@@ -62,6 +62,7 @@ class SystemController {
         block.link(rel = LinkRelation("team"), href = Uris.TEAM_PATH,needAuthentication = true)
         block.link(rel = LinkRelation("teams"), href = Uris.TEAMS_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("requestsHistory"),href = Uris.TEAM_REQUESTS_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("localCopy"), href = Uris.LOCAL_COPY_PATH, needAuthentication = true)
     }
 
     private fun <T> allSystemActions(block:SirenBuilderScope<T>) {
@@ -117,5 +118,9 @@ class SystemController {
         }
         block.action(title = "changeStatusRequest", href = Uris.TEAM_CHANGE_REQUEST_PATH, method = HttpMethod.POST, type = "application/json") {}
         block.action(title = "inviteCode", href = Uris.INVITE_LINK_PATH, method = HttpMethod.POST, type = "application/json") {}
+        block.action(title= "archiveClassroom", href = Uris.ARCHIVE_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json") {}
+        block.action(title = "createClassroom", href = Uris.CREATE_CLASSROOM_PATH, method = HttpMethod.POST, type = "application/json") {
+            textField(name = "name")
+        }
     }
 }

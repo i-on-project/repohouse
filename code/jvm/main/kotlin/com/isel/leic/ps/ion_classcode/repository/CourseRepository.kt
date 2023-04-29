@@ -19,7 +19,7 @@ interface CourseRepository {
     fun addTeacherToCourse(teacherId: Int, courseId: Int): Course
     fun getCourseTeachers(courseId: Int): List<Teacher>
     fun getCourseAllClassrooms(courseId: Int): List<Classroom>
-    fun getCourseUserClassrooms(courseId: Int, userId: Int): List<Classroom>
+    fun getCourseUserClassrooms(courseId: Int, userId: Int,student:Boolean): List<Classroom>
     fun getAllUserCourses(userId: Int): List<Course>
     fun getAllStudentCourses(studentId: Int):List<Course>
     fun getStudentInCourse(courseId: Int): List<Student>

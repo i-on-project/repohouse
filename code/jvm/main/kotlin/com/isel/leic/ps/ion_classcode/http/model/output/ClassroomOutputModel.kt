@@ -2,7 +2,9 @@ package com.isel.leic.ps.ion_classcode.http.model.output
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Student
+import java.io.File
 import java.sql.Timestamp
+import org.springframework.core.io.InputStreamResource
 
 /**
  * Represents a Classroom Output Model.
@@ -35,3 +37,9 @@ data class ClassroomModel(
     val assignments: List<Assignment>,
     val students: List<Student>,
 ) : OutputModel
+
+
+data class LocalCopy(
+    val fileName: String,
+    val file:File
+)

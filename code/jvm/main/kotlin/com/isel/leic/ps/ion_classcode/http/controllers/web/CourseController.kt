@@ -92,7 +92,7 @@ class CourseController(
         user: User,
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
-        return when (val course = courseServices.getCourseById(courseId, user.id)) {
+        return when (val course = courseServices.getCourseById(courseId, user.id, user is Student)) {
             is Result.Problem -> courseServices.problem(course.value)
             is Result.Success -> siren(CourseWithClassroomOutputModel(course.value.id, course.value.orgUrl, course.value.name, course.value.teachers, course.value.isArchived, course.value.classrooms)) {
                 clazz("course")
@@ -139,7 +139,7 @@ class CourseController(
             is Result.Problem -> courseServices.problem(archive.value)
             is Result.Success ->
                 if (archive.value is CourseArchivedResult.CourseArchived) {
-                    when (val course = courseServices.getCourseById(courseId, user.id)) {
+                    when (val course = courseServices.getCourseById(courseId, user.id,false)) {
                         is Result.Problem -> courseServices.problem(course.value)
                         is Result.Success -> siren(CourseWithClassroomOutputModel(
                                 course.value.id,

@@ -4,6 +4,7 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
+import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomInputModel
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
@@ -15,7 +16,12 @@ import com.isel.leic.ps.ion_classcode.services.ClassroomServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Result
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.InputStreamResource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -79,9 +85,7 @@ class ClassroomController(
                     students = classroom.value.students
                 )) {
                     clazz("classroom")
-                    action(title = "createClassroom", href = Uris.CREATE_CLASSROOM_PATH, method = HttpMethod.POST, type = "application/json", block = {
-                        textField("name")
-                    })
+                    link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, classroom.value.id), needAuthentication = true)
                 }
         }
     }
@@ -113,13 +117,11 @@ class ClassroomController(
                             students = classroom.value.students
                         )) {
                             clazz("classroom")
-                            action(title = "archiveClassroom", href = Uris.archiveClassroomUri(courseId, classroomId), method = HttpMethod.PUT, type = "application/json", block = {})
                         }
                     }
                 } else {
                     siren(ClassroomDeletedOutputModel(classroomId, true)) {
                         clazz("classroom")
-                        action(title = "archiveClassroom", href = Uris.archiveClassroomUri(courseId, classroomId), method = HttpMethod.PUT, type = "application/json", block = {})
                     }
                 }
         }
@@ -176,7 +178,7 @@ class ClassroomController(
                 students = enter.value.students
             )) {
                 clazz("classroom")
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, enter.value.id), needAuthentication = true)
+                link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, enter.value.id), needAuthentication = true)
             }
         }
     }
@@ -221,12 +223,14 @@ class ClassroomController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val localCopy = classroomServices.localCopy(classroomId, "C:\\Users\\ricar\\OneDrive\\Documentos")) { //TODO
+        return when (val localCopy = classroomServices.localCopy(classroomId, "C:\\Users\\ricar\\OneDrive\\Documentos")) {
             is Result.Problem -> classroomServices.problem(localCopy.value)
-            is Result.Success -> siren(null) {
-                clazz("classroom")
-                link(rel = LinkRelation("self"), href = Uris.LOCAL_COPY_PATH, needAuthentication = true)
-            }
+            is Result.Success -> ResponseEntity
+                    .ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${localCopy.value.fileName}\"")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(localCopy.value.file.length())
+                    .body(InputStreamResource(localCopy.value.file.inputStream()))
         }
     }
 }

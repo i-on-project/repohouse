@@ -192,18 +192,31 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     /**
      * Method to get all classrooms from a user in a Course
      */
-    override fun getCourseUserClassrooms(courseId: Int, userId: Int): List<Classroom> {
-        return handle.createQuery(
-            """
+    override fun getCourseUserClassrooms(courseId: Int, userId: Int,student:Boolean): List<Classroom> {
+        return if (student) {
+            handle.createQuery(
+                """
                 SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_link,classroom.is_archived,course_id FROM classroom
                 JOIN student_classroom ON classroom.id = student_classroom.classroom
-                WHERE course_id = :course_id AND student = :user_id
+                WHERE student_classroom.student = :user_id AND classroom.course_id = :course_id
             """,
-        )
-            .bind("course_id", courseId)
-            .bind("user_id", userId)
-            .mapTo<Classroom>()
-            .list()
+            )
+                .bind("course_id", courseId)
+                .bind("user_id", userId)
+                .mapTo<Classroom>()
+                .list()
+        } else {
+             handle.createQuery(
+                """
+                    SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_link,classroom.is_archived,course_id FROM classroom
+                    WHERE classroom.teacher_id = :user_id AND classroom.course_id = :course_id
+                """,
+            )
+                .bind("course_id", courseId)
+                .bind("user_id", userId)
+                .mapTo<Classroom>()
+                .list()
+        }
     }
 
     /**

@@ -25,6 +25,25 @@ export function ShowClassroomFetch({
     const user = useLoggedIn()
     const navigate = useNavigate();
 
+    const handleCreateAssigment = useCallback(async () => {
+        navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assigments/create");
+    }, [navigate]);
+
+    const handleArchiveClassroom = useCallback(async () => {
+        const result = await classroomServices.archiveClassroom(courseId,classroomId);
+        if (result instanceof ErrorMessageModel) {
+            setError(result);
+        }
+        if (result instanceof SirenEntity) {
+            // TODO: navigate to the course page if deleted
+        }
+    }, [setError]);
+
+    const handleLocalCopy = useCallback(async () => {
+        const href = await classroomServices.localCopy(courseId, classroomId);
+        window.open(href, "_blank");
+    }, [setError]);
+
     if (!content) {
         return (
             <Typography
@@ -34,20 +53,6 @@ export function ShowClassroomFetch({
                 ...loading...
             </Typography>
         );
-    }
-
-    const handleCreateAssigment = async () => {
-        navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assigments/create");
-    }
-
-    const handleArchiveClassroom = async () => {
-        const result = await classroomServices.archiveClassroom(courseId,classroomId);
-        if (result instanceof ErrorMessageModel) {
-            setError(result);
-        }
-        if (result instanceof SirenEntity) {
-            // TODO: navigate to the course page if deleted
-        }
     }
 
     if (content instanceof ErrorMessageModel && !error) {
@@ -104,6 +109,7 @@ export function ShowClassroomFetch({
                         <>
                             <Button onClick={handleCreateAssigment}>Create Assigment</Button>
                             <Button onClick={handleArchiveClassroom}>Archive Classroom</Button>
+                            <Button onClick={handleLocalCopy}>Local Copy</Button>
                         </>
                     ):null}
                 </>
@@ -125,7 +131,8 @@ export function ShowCreateClassroom({
     const handleCreateClassroom = useCallback(async () => {
         if (name == "") return
         const body = new ClassroomBody(name)
-        const result = await classroomServices.createClassroom(body);
+        console.log(body)
+        const result = await classroomServices.createClassroom(courseId,body);
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }

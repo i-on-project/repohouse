@@ -225,7 +225,7 @@ Create TABLE Outbox(
 
 CREATE TABLE OTP(
     user_id int not null,
-    otp int not null,
+    otp int not null check ( otp between 100000 and 999999 ),
     expired_at timestamp not null,
     tries int not null,
     foreign key (user_id) references users(id)

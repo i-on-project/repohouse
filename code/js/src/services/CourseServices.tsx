@@ -34,8 +34,8 @@ export class CourseServices {
 
     archiveCourse = async (courseId) => {
         const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        // TODO: Change this
-        const response = await fetchPost<CourseDtoProperties>(link.href, courseId)
+        const href = parse(link.href).expand(courseId)
+        const response = await fetchPost<CourseDtoProperties>(href, courseId)
         if (response instanceof SirenEntity) {
             // TODO
         }
