@@ -50,6 +50,7 @@ class SystemController {
         block.link(rel = LinkRelation("authStudent"), href = Uris.AUTH_STUDENT_PATH)
         block.link(rel = LinkRelation("registerInfo"), href = Uris.AUTH_REGISTER_PATH)
         block.link(rel = LinkRelation("status"), href = Uris.AUTH_STATUS_PATH)
+        block.link(rel = LinkRelation("state"), href = Uris.AUTH_STATE_PATH)
         block.link(rel = LinkRelation("orgs"), href = Uris.ORGS_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("course"), href = Uris.COURSE_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("teachersApproval"), href = Uris.TEACHERS_APPROVAL_PATH, needAuthentication = true)

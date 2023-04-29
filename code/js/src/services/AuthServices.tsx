@@ -3,16 +3,14 @@ import {fetchGet, fetchPost} from "../siren/Fetch";
 import {StatusDtoProperties} from "../domain/dto/StatusDtoProperties";
 import {AuthRedirectDtoProperties} from "../domain/dto/AuthRedirectDtoProperties";
 import { PendingUserDtoProperties } from "../domain/dto/PendingUserDtoProperties";
+import { StateDtoProperties } from "../domain/dto/AuthState";
 
 
 export class AuthServices {
 
     authTeacher = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_TEACHER_KEY, Hypermedia.systemServices.home)
-        console.log(link)
-        const response = await fetchGet<AuthRedirectDtoProperties>(link.href)
-        console.log(response)
-        return response
+        return await fetchGet<AuthRedirectDtoProperties>(link.href)
     }
 
     authStudent = async () => {
@@ -44,6 +42,11 @@ export class AuthServices {
     status = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_STATUS_KEY,Hypermedia.systemServices.home)
         return await fetchGet<StatusDtoProperties>(link.href)
+    }
+
+    state = async () => {
+        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.AUTH_STATE_KEY,Hypermedia.systemServices.home)
+        return await fetchGet<StateDtoProperties>(link.href)
     }
 
     async logout() {

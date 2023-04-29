@@ -27,6 +27,7 @@ export const AUTH_REGISTER_INFO = "registerInfo"
 export const AUTH_REGISTER_STUDENT = "registerStudent"
 export const AUTH_REGISTER_TEACHER = "registerTeacher"
 export const AUTH_STATUS_KEY = "status"
+export const AUTH_STATE_KEY = "state"
 export const AUTH_VERIFY_STUDENT_KEY = "verify"
 export const LOGOUT_KEY = "logout"
 export const ORGS_KEY = "orgs"
@@ -62,6 +63,7 @@ export const systemLinkKeys = [
     AUTH_STUDENT_KEY,
     AUTH_REGISTER_INFO,
     AUTH_STATUS_KEY,
+    AUTH_STATE_KEY,
     ORGS_KEY,
     COURSE_KEY,
     CLASSROOM_KEY,

@@ -52,7 +52,7 @@ export function HandleAuthError() {
             variant="h6"
             gutterBottom
         >
-            An Internal Server error happened. Please try again at <NavLink to={"/"}  onClick={handleLogout} className="navbar-brand" > Home </NavLink>
+            An error has happened. Please try again at <NavLink to={"/"}  onClick={handleLogout} className="navbar-brand" > Home </NavLink>
         </Typography>
    </>
 }

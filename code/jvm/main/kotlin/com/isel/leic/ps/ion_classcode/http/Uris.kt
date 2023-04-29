@@ -22,6 +22,7 @@ object Uris {
     const val AUTH_REGISTER_STUDENT_PATH = "$AUTH_REGISTER_PATH/student"
     const val AUTH_REGISTER_TEACHER_PATH = "$AUTH_REGISTER_PATH/teacher"
     const val AUTH_STATUS_PATH = "$AUTH_PATH/status"
+    const val AUTH_STATE_PATH = "$AUTH_PATH/state"
     const val AUTH_RESEND_EMAIL_PATH = "$AUTH_REGISTER_STUDENT_PATH/resend"
     const val AUTH_REGISTER_VERIFICATION_PATH = "$AUTH_REGISTER_STUDENT_PATH/verify"
     const val LOGOUT = "$AUTH_PATH/logout"

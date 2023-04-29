@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
     useState,
     createContext,
-    useContext, useEffect,
+    useContext,
 } from 'react'
 
 export enum AuthState {
@@ -30,7 +30,7 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
     const [loggedin, setLoggedin] = useState(undefined)
 
     return (
-        <LoggedInContext.Provider value={{loggedin: loggedin,setLogin: setLoggedin}}>
+        <LoggedInContext.Provider value={{loggedin: loggedin, setLogin: setLoggedin}}>
             {children}
         </LoggedInContext.Provider>
     )
@@ -43,5 +43,4 @@ export function useLoggedIn() {
 export function useSetLogin() {
     return useContext(LoggedInContext).setLogin
 }
-
 

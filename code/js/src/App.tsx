@@ -218,7 +218,7 @@ function NavBar() {
 function Home() {
     return (
         <div>
-            <ShowHomeFetch systemServices={systemServices}/>
+            <ShowHomeFetch authServices={authServices} systemServices={systemServices}/>
         </div>
     )
 }

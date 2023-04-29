@@ -2,6 +2,7 @@ package com.isel.leic.ps.ion_classcode.http.controllers.web
 
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
+import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInputModel
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
@@ -11,6 +12,7 @@ import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AuthRedirect
+import com.isel.leic.ps.ion_classcode.http.model.output.AuthStateOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.model.output.RegisterOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
@@ -23,6 +25,7 @@ import com.isel.leic.ps.ion_classcode.services.StudentServices
 import com.isel.leic.ps.ion_classcode.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
+import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
@@ -99,6 +102,19 @@ class AuthController(
         return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")) {
             clazz("auth")
             link(rel = LinkRelation("self"), href = Uris.AUTH_STUDENT_PATH)
+        }
+    }
+
+    /**
+     * Checks if user is authenticated.
+     */
+    @GetMapping(Uris.AUTH_STATE_PATH)
+    fun authState(
+        user: User,
+    ): ResponseEntity<SirenModel<AuthStateOutputModel>> {
+        return siren(AuthStateOutputModel(user, true)) {
+            clazz("auth")
+            link(rel = LinkRelation("self"), href = Uris.AUTH_STATE_PATH)
         }
     }
 
