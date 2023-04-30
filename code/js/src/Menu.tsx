@@ -139,7 +139,7 @@ export function ShowMenuCallbackFetch() {
     const params = useParams()
     const state = toState(params.user)
     if (state !== undefined) {
-        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, 'http://127.0.0.1:3000/')
+        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, 'http://localhost:3000/')
         window.close()
         return (<></>)
     }

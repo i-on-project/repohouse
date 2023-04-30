@@ -32,7 +32,7 @@ export function HandleAuthFail() {
 }
 
 export function HandleAuthErrorCallback() {
-    window.opener.postMessage({type:"Auth", data:'/auth/error'},'http://127.0.0.1:3000/')
+    window.opener.postMessage({type:"Auth", data:'/auth/error'},'http://localhost:3000/')
     window.close()
     return (<> </>)
 }

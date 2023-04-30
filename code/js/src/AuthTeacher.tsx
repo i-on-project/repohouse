@@ -36,7 +36,7 @@ export function ShowAuthTeacherFetch({
 
     useEffect(() => {
         window.addEventListener('message', function(e) {
-            if(e.origin !== 'http://127.0.0.1:3000')
+            if(e.origin !== 'http://localhost:3000')
                 return;
             if (e.data.type === "Menu") {
                setLogin(AuthState.Teacher)

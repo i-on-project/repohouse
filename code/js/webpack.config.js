@@ -6,10 +6,9 @@ module.exports = {
     devServer: {
         port: process.env.PORT ? process.env.PORT : 3000,
         historyApiFallback: true,
-        host: '127.0.0.1',
         proxy: {
             '/api': {
-                target: 'http://127.0.0.1:8080',
+                target: 'http://localhost:8080',
                 changeOrigin: true
             }
         }

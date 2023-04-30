@@ -19,7 +19,7 @@ export function ShowVerifyFetch({
 }) {
 
     if (window.opener) {
-        window.opener.postMessage({type:"Auth", data:'/auth/verify'},'http://127.0.0.1:3000/')
+        window.opener.postMessage({type:"Auth", data:'/auth/verify'},'http://localhost:3000/')
         window.close()
     }
 
