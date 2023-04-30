@@ -32,6 +32,9 @@
             android:name=".presentation.menu.MenuActivity"
             android:exported="false" />
         <activity
+            android:name=".presentation.course.CourseActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.bootUp.BootUpActivity"
             android:noHistory="true"
             android:exported="true"

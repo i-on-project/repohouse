@@ -115,4 +115,10 @@ object Uris {
     fun authUriRegisterStudent(): String = URI(AUTH_REGISTER_STUDENT_PATH).toASCIIString()
     fun authStatusUri(): String = URI(AUTH_STATUS_PATH).toASCIIString()
     /** Mobile Uris **/
+
+
+    const val MOBILE_API = "/api/mobile"
+    const val MOBILE_AUTH_PATH = "$MOBILE_API/auth"
+    const val MOBILE_CALLBACK_PATH = "$MOBILE_AUTH_PATH/callback"
+
 }

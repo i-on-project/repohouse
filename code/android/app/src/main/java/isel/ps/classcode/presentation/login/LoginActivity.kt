@@ -8,18 +8,17 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import isel.ps.classcode.AUTH_ENDPOINT
-import isel.ps.classcode.BuildConfig.CLIENT_ID
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.GITHUB_BASE_URL
 import isel.ps.classcode.R
-import isel.ps.classcode.SCOPE
 import isel.ps.classcode.TAG
 import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.menu.MenuActivity
-import java.util.UUID
+import isel.ps.classcode.ui.theme.ClasscodeTheme
+
 
 class LoginActivity : ComponentActivity() {
     private val githubLoginServices: LoginServices by lazy { (application as DependenciesContainer).loginServices }
@@ -37,7 +36,7 @@ class LoginActivity : ComponentActivity() {
     private val vm by viewModels<LoginViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return LoginViewModel(githubLoginServices = githubLoginServices) as T
+                return LoginViewModel(loginServices = githubLoginServices) as T
             }
         }
     }
@@ -45,13 +44,19 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GithubLoginScreen(
-                loginHandler = {
-                    openGitHubLoginPage(state = UUID.randomUUID().toString())
-               },
-            )
-            if (vm.finished) {
-                MenuActivity.navigate(origin = this)
+            ClasscodeTheme {
+                LoginScreen(
+                    loginHandler = {
+                        vm.auth()
+                    },
+                )
+                val requestInfo = vm.requestInfo
+                if (requestInfo != null) {
+                    openGitHubLoginPage(url = requestInfo.url)
+                }
+                if (vm.finished) {
+                    MenuActivity.navigate(origin = this)
+                }
             }
         }
     }
@@ -59,22 +64,17 @@ class LoginActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val uri = intent?.data
-        val code = uri?.getQueryParameter("code")
-        if (code != null) {
-            vm.tradeAndStoreAccessToken(code = code)
-        }
+
     }
 
-    private fun openGitHubLoginPage(state: String) {
+    private fun openGitHubLoginPage(url: String) {
         try {
-            val uri = Uri.parse("$GITHUB_BASE_URL$AUTH_ENDPOINT")
-                .buildUpon()
-                .appendQueryParameter("client_id", CLIENT_ID)
-                .appendQueryParameter("scope", SCOPE)
-                .appendQueryParameter("state", state)
-                .build()
-
-            val intent = Intent(Intent.ACTION_VIEW, uri)
+            val uri = Uri.parse(url)
+            val builder = CustomTabsIntent.Builder()
+            val intent = builder.build().intent.apply {
+                putExtra("com.google.android.apps.chrome.EXTRA_OPEN_NEW_INCOGNITO_TAB", true)
+                data = uri
+            }
             startActivity(intent)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open URL", e)

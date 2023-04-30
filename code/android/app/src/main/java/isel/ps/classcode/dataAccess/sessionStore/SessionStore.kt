@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
  */
 interface SessionStore {
     suspend fun storeGithubToken(token: String)
+    suspend fun storeClassCodeToken(token: String)
     fun getGithubToken(): Flow<String>
+    fun getClassCodeToken(): Flow<String>
     suspend fun checkIfTokenExists(): Boolean
 }

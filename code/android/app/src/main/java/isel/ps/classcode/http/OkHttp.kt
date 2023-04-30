@@ -2,10 +2,14 @@ package isel.ps.classcode.http
 
 import com.fasterxml.jackson.core.exc.StreamReadException
 import com.fasterxml.jackson.databind.ObjectMapper
+import isel.ps.classcode.domain.CallBackResponse
 import isel.ps.classcode.domain.deserialization.ProblemJsonDeserialization
 import isel.ps.classcode.domain.deserialization.GithubErrorDeserialization
+import isel.ps.classcode.domain.deserialization.LoginResponseDeserialization
+import isel.ps.classcode.http.hypermedia.SirenEntity
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
+import isel.ps.classcode.http.utils.HandleRedirectClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 import okhttp3.Call
 import okhttp3.Callback
@@ -63,44 +67,42 @@ inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper
  * Handle the response from the ClassCode API.
  */
 
-inline fun <reified R : Any> handleResponseClassCode(response: Response, jsonMapper: ObjectMapper): Either<HandleClassCodeResponseError, R> {
+inline fun <reified R : Any, reified T> handleSirenResponseClassCode(response: Response, jsonMapper: ObjectMapper): Either<HandleClassCodeResponseError, R> {
     val body = response.body?.string()
     return if (response.isSuccessful) {
         try {
-            Either.Right(value = jsonMapper.readValue(body, R::class.java))
-        }
-        catch (e: StreamReadException) {
+            Either.Right(value = jsonMapper.readValue(body, SirenEntity.getType<T>()))
+        } catch (e: StreamReadException) {
             Either.Left(value = HandleClassCodeResponseError.FailDeserialize(error = "Failed to deserialize response body: $body"))
         }
-    }
-    else {
+    } else {
         try {
-            Either.Left(value = HandleClassCodeResponseError.FailRequest(error = jsonMapper.readValue(body, ProblemJsonDeserialization::class.java)))
+            Either.Left(
+                value = HandleClassCodeResponseError.FailRequest(
+                    error = jsonMapper.readValue(
+                        body,
+                        ProblemJsonDeserialization::class.java
+                    )
+                )
+            )
         } catch (e: StreamReadException) {
             Either.Left(value = HandleClassCodeResponseError.FailDeserialize(error = "Failed to deserialize error response body: $body"))
         }
     }
 }
 
-/*
-suspend fun <T : Any> makeCallToObject(okHttpClient: OkHttpClient, request: Request, kClass: Class<T>, jsonMapper: ObjectMapper): T {
-    val body = send(okHttpClient, request)
-    try {
-        return jsonMapper.readValue(body, kClass)
-    } catch (e: Exception) {
-        throw e
+fun handleCallbackResponseClassCode(response: Response, jsonMapper: ObjectMapper): Either<HandleRedirectClassCodeResponseError, CallBackResponse> {
+    val cookie = response.headers["Set-Cookie"]
+    val location = response.headers["Location"] ?: return Either.Left(value = HandleRedirectClassCodeResponseError.FailToGetTheLocation(error = "Failed to get the header Location"))
+    return if (cookie != null) {
+        val body = response.body?.string()
+        try {
+            val content = jsonMapper.readValue(body, LoginResponseDeserialization::class.java)
+            Either.Right(value = CallBackResponse(loginResponse = content, cookie = cookie, deepLink = location))
+        } catch (e: StreamReadException) {
+            Either.Left(value = HandleRedirectClassCodeResponseError.FailDeserialize(error = "Failed to deserialize response body: $body"))
+        }
+    } else {
+        Either.Left(value = HandleRedirectClassCodeResponseError.FailFromClasscode(error = CallBackResponse(deepLink = location)))
     }
 }
-
-suspend fun <T : Any> makeCallToList(okHttpClient: OkHttpClient, request: Request, kClass: Class<T>, jsonMapper: ObjectMapper): List<T> {
-
-    val body = send(okHttpClient, request)
-    val listType = jsonMapper.typeFactory.constructCollectionType(ArrayList::class.java, kClass)
-    try {
-        return jsonMapper.readValue(body, listType)
-    } catch (e: Exception) {
-        throw e
-    }
-}
-
- */

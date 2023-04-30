@@ -1,7 +1,9 @@
 package com.isel.leic.ps.ion_classcode.infra
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.net.URI
 import java.sql.Timestamp
@@ -146,4 +148,13 @@ fun <T> siren(value: T, block: SirenBuilderScope<T>.() -> Unit): ResponseEntity<
     val scope = SirenBuilderScope(value)
     scope.block()
     return ResponseEntity.ok(scope.build())
+}
+
+fun <T> siren(value: T, headers: HttpHeaders = HttpHeaders(), statusCode: HttpStatus = HttpStatus.OK, block: SirenBuilderScope<T>.() -> Unit): ResponseEntity<SirenModel<T>> {
+    val scope = SirenBuilderScope(value)
+    scope.block()
+    return ResponseEntity
+        .status(statusCode)
+        .headers(headers)
+        .body(scope.build())
 }

@@ -23,7 +23,9 @@ import java.io.IOException
 class RealSessionStore(private val cryptoManager: CryptoManager, context: Context): SessionStore {
     companion object {
         val githubTokenKey = stringPreferencesKey("github_token")
-        val iv = stringPreferencesKey("iv")
+        val classCodeTokenKey = stringPreferencesKey("classCode_token")
+        val githubIv = stringPreferencesKey("github_iv")
+        val classCodeIv = stringPreferencesKey("classCode_iv")
     }
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sessionManager")
     private val dataStore = context.dataStore
@@ -32,7 +34,15 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
         val encryptedToken = cryptoManager.encrypt(data = token)
         dataStore.edit { preferences ->
             preferences[githubTokenKey] = encryptedToken.data
-            preferences[iv] = encryptedToken.iv
+            preferences[githubIv] = encryptedToken.iv
+        }
+    }
+
+    override suspend fun storeClassCodeToken(token: String) {
+        val encryptedToken = cryptoManager.encrypt(data = token)
+        dataStore.edit { preferences ->
+            preferences[classCodeTokenKey] = encryptedToken.data
+            preferences[classCodeIv] = encryptedToken.iv
         }
     }
 
@@ -44,8 +54,25 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
                 throw exception
             }
         }.map { preferences ->
-            val iv = preferences[iv] ?: ""
+            val iv = preferences[githubIv] ?: ""
             val encryptedData = preferences[githubTokenKey] ?: ""
+            cryptoManager.decrypt(decryptionSecret = DecryptionSecret(
+                iv = iv,
+                data = encryptedData
+            )
+            ).data
+        }
+
+    override fun getClassCodeToken(): Flow<String> =
+        dataStore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            val iv = preferences[classCodeIv] ?: ""
+            val encryptedData = preferences[classCodeTokenKey] ?: ""
             cryptoManager.decrypt(decryptionSecret = DecryptionSecret(
                 iv = iv,
                 data = encryptedData
