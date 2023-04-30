@@ -27,7 +27,7 @@ import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GithubLoginScreen(loginHandler: () -> Unit = {  }) {
+fun LoginScreen(loginHandler: () -> Unit = {  }) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { TopBar(name = stringResource(id = R.string.login)) },
@@ -48,7 +48,9 @@ fun GithubLoginScreen(loginHandler: () -> Unit = {  }) {
                 modifier = Modifier.size(200.dp)
             )
             OutlinedButton(
-                onClick = { loginHandler() },
+                onClick = {
+                    loginHandler()
+                },
             ) {
                 Text(text = stringResource(id = R.string.login), style = MaterialTheme.typography.titleMedium,)
             }
@@ -60,6 +62,6 @@ fun GithubLoginScreen(loginHandler: () -> Unit = {  }) {
 @Composable
 fun GithubLoginScreenPreview() {
     ClasscodeTheme() {
-        GithubLoginScreen()
+        LoginScreen()
     }
 }

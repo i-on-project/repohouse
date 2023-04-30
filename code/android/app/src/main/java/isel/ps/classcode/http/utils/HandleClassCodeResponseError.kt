@@ -8,4 +8,5 @@ import isel.ps.classcode.domain.deserialization.ProblemJsonDeserialization
 sealed class HandleClassCodeResponseError {
     class FailDeserialize(val error: String) : HandleClassCodeResponseError()
     class FailRequest(val error: ProblemJsonDeserialization) : HandleClassCodeResponseError()
+    class FailToGetTheHeader(val error: String) : HandleClassCodeResponseError()
 }

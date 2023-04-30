@@ -1,5 +1,6 @@
 package isel.ps.classcode.http.hypermedia
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.type.TypeFactory
 import okhttp3.MediaType.Companion.toMediaType
 import java.net.URI
@@ -18,9 +19,9 @@ val SirenMediaType = "$APPLICATION_TYPE/$SIREN_SUBTYPE".toMediaType()
  * Class whose instances represent links as they are represented in Siren.
  */
 data class SirenLink(
-    val href: URI,
-    val rel: List<String>,
-    val requiredAuthentication: Boolean? = null,
+    @JsonProperty("href") val href: URI,
+    @JsonProperty("rel") val rel: List<String>,
+    @JsonProperty("needAuthentication") val needAuthentication: Boolean? = null,
 )
 
 /**
@@ -44,13 +45,15 @@ data class SirenAction(
 }
 
 data class SirenEntity<T>(
-    val cls: List<String>? = null,
-    val properties: T? =null,
-    val actions: List<SirenAction>? = null,
-    val links: List<SirenLink>? = null,
+    @JsonProperty("class") val cls: List<String>? = null,
+    @JsonProperty("properties") val properties: T,
+    @JsonProperty("actions") val actions: List<SirenAction>? = null,
+    @JsonProperty("links") val links: List<SirenLink>? = null,
+    @JsonProperty("entities") val entities: List<SubEntity>? = null,
 ) {
     companion object {
-        inline fun <reified T> getType() = TypeFactory.defaultInstance().constructParametricType(SirenEntity::class.java, T::class.java)
+        inline fun <reified T> getType() =
+            TypeFactory.defaultInstance().constructParametricType(SirenEntity::class.java, T::class.java)
     }
 }
 

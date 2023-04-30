@@ -10,3 +10,5 @@ data class AuthInfoDeserialization(
     @JsonProperty("token_type") val tokenType: String,
     @JsonProperty("scope") val scope: String
 )
+
+

@@ -6,13 +6,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
+import isel.ps.classcode.domain.dto.LocalCourseDto
+import isel.ps.classcode.presentation.course.CourseActivity
 import isel.ps.classcode.presentation.credits.CreditsActivity
 import isel.ps.classcode.presentation.menu.services.MenuServices
+import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class MenuActivity : ComponentActivity() {
     private val menuServices: MenuServices by lazy { (application as DependenciesContainer).menuServices }
@@ -40,15 +41,17 @@ class MenuActivity : ComponentActivity() {
         vm.getUserInfo()
         vm.getCourses()
         setContent {
-            MenuScreen(
-                userInfo = vm.userInfo,
-                courses = vm.courses,
-                onBackRequest = { vm.logout() },
-                onCreditsRequested = { CreditsActivity.navigate(origin = this) },
-                onCourseSelected = { course ->
-                    // TODO(): Navigate to course details
-                }
-            )
+            ClasscodeTheme {
+                MenuScreen(
+                    userInfo = vm.userInfo,
+                    courses = vm.courses,
+                    onBackRequest = { vm.logout() },
+                    onCreditsRequested = { CreditsActivity.navigate(origin = this) },
+                    onCourseSelected = { course ->
+                        CourseActivity.navigate(origin = this, course = LocalCourseDto(id = course.id, name = course.name, imageUrl = course.imageUrl))
+                    }
+                )
+            }
         }
     }
 }

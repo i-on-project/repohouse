@@ -1,56 +1,66 @@
 package isel.ps.classcode.presentation.login.services
 
-import android.graphics.Bitmap
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.ACCESS_TOKEN_ENDPOINT
-import isel.ps.classcode.BuildConfig
-import isel.ps.classcode.GITHUB_BASE_URL
+import isel.ps.classcode.CLASSCODE_AUTH_URL
+import isel.ps.classcode.CLASSCODE_CALLBACK_URL
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
+import isel.ps.classcode.dataAccess.userInfoStore.UserInfoStore
 import isel.ps.classcode.domain.AuthInfo
-import isel.ps.classcode.domain.GitHubError
-import isel.ps.classcode.domain.deserialization.AuthInfoDeserialization
-import isel.ps.classcode.http.handleResponseGitHub
+import isel.ps.classcode.domain.UserInfo
+import isel.ps.classcode.domain.deserialization.ClassCodeAuthDeserialization
+import isel.ps.classcode.domain.deserialization.ClassCodeAuthDto
+import isel.ps.classcode.http.handleCallbackResponseClassCode
+import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
-import isel.ps.classcode.http.utils.HandleGitHubResponseError
+import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.http.utils.HandleRedirectClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
-import isel.ps.classcode.presentation.utils.GitHubResponseServicesError
-import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
  * The implementation of login services that will be used on the final product
  */
-class RealGithubLoginServices(private val httpClient: OkHttpClient, val objectMapper: ObjectMapper, val sessionStore: SessionStore) :
-    LoginServices {
-    override suspend fun tradeAndStoreAccessToken(code: String): Either<GitHubResponseServicesError, AuthInfo> {
-        val requestBody = FormBody.Builder()
-            .add("client_id", BuildConfig.CLIENT_ID)
-            .add("client_secret", BuildConfig.CLIENT_SECRET)
-            .add("code", code)
-            .build()
 
+data class RequestInfo(val url: String,  val stateCookie: String)
+
+class RealGithubLoginServices(private val httpClient: OkHttpClient, private val objectMapper: ObjectMapper, private val sessionStore: SessionStore) :
+    LoginServices {
+    override suspend fun auth(): Either<HandleClassCodeResponseError, RequestInfo> {
         val request = Request.Builder()
-            .url("$GITHUB_BASE_URL$ACCESS_TOKEN_ENDPOINT")
-            .post(requestBody)
-            .addHeader("Accept", "application/json")
+            .url(CLASSCODE_AUTH_URL)
+            .build()
+        return request.send(httpClient) { response ->
+            val headerName = "Set-Cookie"
+            val stateCookie = response.headers[headerName] ?: return@send Either.Left(value = HandleClassCodeResponseError.FailToGetTheHeader(error = "Fail to get the value in header $headerName"))
+            when (val body = handleSirenResponseClassCode<ClassCodeAuthDto, ClassCodeAuthDeserialization>(response = response,jsonMapper = objectMapper)){
+                is Either.Right -> Either.Right(value = RequestInfo(url = body.value.properties.url, stateCookie = stateCookie))
+                is Either.Left -> Either.Left(value = body.value)
+            }
+        }
+    }
+
+    override suspend fun tradeAndStoreAccessToken(code: String, stateCookie: String, state: String): Either<HandleRedirectClassCodeResponseError, AuthInfo> {
+        val request = Request.Builder()
+            .url("$CLASSCODE_CALLBACK_URL?code=$code&state=$state")
+            .addHeader("Cookie", stateCookie)
             .build()
 
         val result = request.send(httpClient) { response ->
-            handleResponseGitHub<AuthInfoDeserialization>(response = response, jsonMapper = objectMapper)
+            handleCallbackResponseClassCode(response = response, jsonMapper = objectMapper)
         }
 
         return when (result) {
             is Either.Right -> {
-                sessionStore.storeGithubToken(token = result.value.accessToken)
-                Either.Right(value = AuthInfo(accessToken = result.value.accessToken))
-            }
-            is Either.Left -> {
-                when (result.value) {
-                    is HandleGitHubResponseError.FailRequest -> Either.Left(value = GitHubResponseServicesError.FailGitHub(error = GitHubError(message=  result.value.error.message)))
-                    is HandleGitHubResponseError.FailDeserialize -> Either.Left(value = GitHubResponseServicesError.FailDeserialization(error = result.value.error))
+                if (result.value.loginResponse != null && result.value.cookie != null) {
+                    sessionStore.storeClassCodeToken(token = result.value.cookie)
+                    sessionStore.storeGithubToken(token = result.value.loginResponse.tokenInfo.accessToken)
+                    Either.Right(value = AuthInfo(accessToken = result.value.loginResponse.tokenInfo.accessToken))
+                }else {
+                    Either.Left(value = HandleRedirectClassCodeResponseError.Fail(error = "The cookie or the response body were null when its not supposed to be"))
                 }
             }
+            is Either.Left -> Either.Left(value = result.value)
         }
     }
 }

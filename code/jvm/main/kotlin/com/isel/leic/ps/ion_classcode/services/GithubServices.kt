@@ -1,14 +1,6 @@
 package com.isel.leic.ps.ion_classcode.services
 
-import com.isel.leic.ps.ion_classcode.http.GITHUB_API_BASE_URL
-import com.isel.leic.ps.ion_classcode.http.GITHUB_BASE_URL
-import com.isel.leic.ps.ion_classcode.http.GITHUB_USERINFO_URI
-import com.isel.leic.ps.ion_classcode.http.GITHUB_USERMAILS_URI
-import com.isel.leic.ps.ion_classcode.http.GITHUB_USER_ORGS
-import com.isel.leic.ps.ion_classcode.http.GITHUB_ACCESS_TOKEN_URI
-import com.isel.leic.ps.ion_classcode.http.OkHttp
-import com.isel.leic.ps.ion_classcode.http.makeCallToList
-import com.isel.leic.ps.ion_classcode.http.makeCallToObject
+import com.isel.leic.ps.ion_classcode.http.*
 import com.isel.leic.ps.ion_classcode.http.model.github.Collaborator
 import com.isel.leic.ps.ion_classcode.http.model.github.Commit
 import com.isel.leic.ps.ion_classcode.http.model.github.RepoOrg
@@ -35,8 +27,9 @@ class GithubServices(
     /**
      * Method to fetch the user access token from GitHub.
      */
-    suspend fun fetchAccessToken(code: String): ClientToken {
-        val request = Request.Builder().url("$GITHUB_BASE_URL${GITHUB_ACCESS_TOKEN_URI(code)}")
+    suspend fun fetchAccessToken(code: String, isMobile: Boolean = false): ClientToken {
+        val githubAccessTokenUri = if (isMobile) MOBILE_GITHUB_ACCESS_TOKEN_URI(code) else GITHUB_ACCESS_TOKEN_URI(code)
+        val request = Request.Builder().url("$GITHUB_BASE_URL$githubAccessTokenUri")
             .addHeader("Accept", "application/json")
             .post(EMPTY_REQUEST)
             .build()
@@ -80,7 +73,7 @@ class GithubServices(
         return okHttp.makeCallToList(request)
     }
 
-    suspend fun getUserOrgs(token: String):List<GitHubOrgsModel>{
+    suspend fun getUserOrgs(token: String): List<GitHubOrgsModel> {
         val orgsRequest = Request.Builder().url("")
             .addHeader("Authorization", "Bearer $token")
             .addHeader("Accept", "application/json")
