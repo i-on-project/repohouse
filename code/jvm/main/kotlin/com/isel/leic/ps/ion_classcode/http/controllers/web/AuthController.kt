@@ -88,7 +88,7 @@ class AuthController(
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(TEACHER_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value, null)}")) {
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_TEACHER_SCOPE, state.value)}")) {
             clazz("auth")
             link(rel = LinkRelation("self"), href = Uris.AUTH_TEACHER_PATH)
         }
@@ -104,7 +104,7 @@ class AuthController(
         val state = generateUserState()
         response.addHeader(HttpHeaders.SET_COOKIE, state.cookie.toString())
         response.addHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
-        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value, null)}")) {
+        return siren(AuthRedirect(url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(GITHUB_STUDENT_SCOPE, state.value)}")) {
             clazz("auth")
             link(rel = LinkRelation("self"), href = Uris.AUTH_STUDENT_PATH)
         }

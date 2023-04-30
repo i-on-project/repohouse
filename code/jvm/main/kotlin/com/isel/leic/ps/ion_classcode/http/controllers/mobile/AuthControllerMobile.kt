@@ -38,7 +38,7 @@ class AuthControllerMobile(
         val state = generateUserState()
         return siren(
             value = AuthRedirect(
-                url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(MOBILE_GITHUB_TEACHER_SCOPE, state.value, "https://2c4f-2001-818-e975-8500-5c24-94b1-29c4-34e2.ngrok-free.app/api/auth/callback/mobile")}",
+                url = "$GITHUB_BASE_URL${GITHUB_OAUTH_URI(MOBILE_GITHUB_TEACHER_SCOPE, state.value)}",
             ),
             headers = HttpHeaders().apply {
                 add(HttpHeaders.SET_COOKIE, state.cookie.toString())
