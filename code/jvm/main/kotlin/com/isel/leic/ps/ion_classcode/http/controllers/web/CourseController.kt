@@ -10,6 +10,7 @@ import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedResult
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -35,8 +36,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class CourseController(
     private val courseServices: CourseServices,
-    private val teacherServices: TeacherServices,
-    private val githubServices: GithubServices,
+    private val teacherServices: TeacherServices
 ) {
 
     /**
@@ -52,10 +52,12 @@ class CourseController(
         return when (val token = teacherServices.getTeacherGithubToken(user.id)) {
             is Result.Problem -> teacherServices.problem(token.value)
             is Result.Success -> {
-                val orgs = githubServices.fetchTeacherOrgs(token.value)
-                siren(GitHubOrgsOutputModel(orgs)) {
-                    clazz("orgs")
-                    link(rel = LinkRelation("self"), href = Uris.ORGS_PATH, needAuthentication = true)
+                when (val orgs = teacherServices.getTeacherOrgs(user.id,token.value)){
+                    is Result.Problem -> teacherServices.problem(orgs.value)
+                    is Result.Success -> siren(GitHubOrgsOutputModel(orgs.value)) {
+                        clazz("orgs")
+                        link(rel = LinkRelation("self"), href = Uris.ORGS_PATH, needAuthentication = true)
+                    }
                 }
             }
         }

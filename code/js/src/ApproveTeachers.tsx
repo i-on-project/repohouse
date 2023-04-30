@@ -9,7 +9,6 @@ import {Button} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from '@mui/material';
 import {Check, Close, Remove} from "@mui/icons-material";
-import {mainTheme} from "./utils/Theme";
 
 export function ShowTeacherApprovalFetch({
     menuServices,

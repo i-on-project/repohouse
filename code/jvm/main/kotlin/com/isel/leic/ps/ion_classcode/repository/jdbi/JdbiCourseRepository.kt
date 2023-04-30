@@ -79,7 +79,16 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun deleteCourse(courseId: Int) {
         handle.createUpdate(
             """
-            DELETE FROM Course
+            DELETE FROM teacher_course
+            WHERE course = :id
+            """,
+        )
+            .bind("id", courseId)
+            .execute()
+
+        handle.createUpdate(
+            """
+                DELETE FROM Course
             WHERE id = :id
             """,
         )
@@ -386,6 +395,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("courseId", courseId)
             .mapTo<Int>()
             .firstOrNull() != null
+
 
     /**
      * Method to get a Course by is id

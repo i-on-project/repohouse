@@ -15,6 +15,6 @@ data class GitHubOrgsModel(
  * Represents a GitHubOrgs Output Model.
  */
 data class GitHubOrgsOutputModel(
-    val orgs : List<GitHubOrgsModel>
+    var orgs : List<GitHubOrgsModel>
 ) : OutputModel
 

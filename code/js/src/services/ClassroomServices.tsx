@@ -1,6 +1,10 @@
 import {fetchGet, fetchPost, fetchPut} from "../siren/Fetch"
 import * as Hypermedia from "../Dependecies"
-import {ClassroomBody, ClassroomDtoProperties} from "../domain/dto/ClassroomDtoProperties";
+import {
+    ClassroomArchievedOrDeletedDtoProperties,
+    ClassroomBody,
+    ClassroomDtoProperties
+} from "../domain/dto/ClassroomDtoProperties";
 import {parse} from "uri-template";
 
 
@@ -14,7 +18,6 @@ export class ClassroomServices {
 
     createClassroom = async (courseId,body:ClassroomBody) => {
         const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.CREATE_CLASSROOM_KEY, Hypermedia.systemServices.home)
-        console.log(link.href)
         const href = parse(link.href).expand({courseId: courseId})
         return await fetchPost<ClassroomDtoProperties>(href,body)
     }
@@ -22,7 +25,7 @@ export class ClassroomServices {
     archiveClassroom = async (courseId,classroomId) => {
         const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.ARCHIVE_CLASSROOM_KEY, Hypermedia.systemServices.home)
         const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId})
-        return await fetchPut<ClassroomDtoProperties>(href)
+        return await fetchPut<ClassroomArchievedOrDeletedDtoProperties>(href)
     }
 
     localCopy = async (courseId,classroomId) => {

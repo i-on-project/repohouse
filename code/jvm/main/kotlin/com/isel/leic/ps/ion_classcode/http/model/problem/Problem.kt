@@ -41,6 +41,15 @@ class Problem {
             ),
         )
 
+        val alreadyExists = response(
+            HttpStatus.CONFLICT,
+            ErrorMessageModel(
+                URI("$BASE_URL/already-exists"),
+                "Resource already exists.",
+                "The resource you are trying to create already exists.",
+            ),
+        )
+
         val methodNotAllowed = response(
             HttpStatus.METHOD_NOT_ALLOWED,
             ErrorMessageModel(

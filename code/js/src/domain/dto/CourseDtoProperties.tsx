@@ -64,3 +64,16 @@ export class CourseBody{
     name: string
     orgUrl: string
 }
+
+export interface CourseCreatedDtoProperties{
+    course: CourseDtoProperties
+}
+
+export class CourseCreatedDtoProperties {
+    constructor(
+        course: CourseDtoProperties
+    ) {
+        this.course = course
+    }
+    course: CourseDtoProperties
+}

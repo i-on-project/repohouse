@@ -4,23 +4,20 @@ import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.domain.input.ClassroomInput
-import com.isel.leic.ps.ion_classcode.http.Status
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomInputModel
 import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOrDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedResult
-import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.services.ClassroomServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.utils.Result
-import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -108,19 +105,12 @@ class ClassroomController(
                 if (archive.value is ClassroomArchivedResult.ClassroomArchived) {
                     when (val classroom = classroomServices.getClassroom(classroomId)) {
                         is Result.Problem -> classroomServices.problem(classroom.value)
-                        is Result.Success -> siren(ClassroomOutputModel(
-                            id = classroom.value.id,
-                            name = classroom.value.name,
-                            isArchived = classroom.value.isArchived,
-                            lastSync = classroom.value.lastSync,
-                            assignments = classroom.value.assignments,
-                            students = classroom.value.students
-                        )) {
+                        is Result.Success -> siren(ClassroomArchivedOrDeletedOutputModel(classroomId,  archived=true, deleted = false)) {
                             clazz("classroom")
                         }
                     }
                 } else {
-                    siren(ClassroomDeletedOutputModel(classroomId, true)) {
+                    siren(ClassroomArchivedOrDeletedOutputModel(classroomId, archived= false, deleted = true)) {
                         clazz("classroom")
                     }
                 }

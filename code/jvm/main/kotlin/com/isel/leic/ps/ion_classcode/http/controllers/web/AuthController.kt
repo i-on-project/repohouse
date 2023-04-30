@@ -134,7 +134,7 @@ class AuthController(
     ): ResponseEntity<*> {
         if (state != userState) return ResponseEntity
             .status(Status.REDIRECT)
-            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+            .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/error/callback")
             .body(EMPTY_REQUEST)
         val accessToken = githubServices.fetchAccessToken(code)
         val userGithubInfo = githubServices.fetchUserInfo(accessToken.access_token)
@@ -147,21 +147,21 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/student")
+                                .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/menu/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
                         userInfo.value is Teacher && position == TEACHER_COOKIE_NAME -> {
                             when (teacherServices.updateTeacherGithubToken(userInfo.value.id, accessToken.access_token)) {
                                 is Result.Problem -> ResponseEntity
                                     .status(Status.REDIRECT)
-                                    .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                    .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/error/callback")
                                     .body(EMPTY_REQUEST)
                                 is Result.Success -> {
                                     val cookie = generateSessionCookie(userInfo.value.token)
                                     ResponseEntity
                                         .status(Status.REDIRECT)
                                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/teacher")
+                                        .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/menu/callback/teacher")
                                         .body(EMPTY_REQUEST)
                                 }
                             }
@@ -173,7 +173,7 @@ class AuthController(
                             response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
                             return ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/fail/callback")
+                                .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/fail/callback")
                                 .body(EMPTY_REQUEST)
                         }
                     }
@@ -183,14 +183,14 @@ class AuthController(
                         ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/status")
+                            .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/status")
                             .body(EMPTY_REQUEST)
                     } else {
                         val cookie = generateGithubIdCookie(userGithubInfo.id)
                         ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/verify")
+                            .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/verify")
                             .body(EMPTY_REQUEST)
                     }
                 }
@@ -215,12 +215,12 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
+                                .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/create/callback/teacher")
                                 .body(EMPTY_REQUEST)
                         }
                         is Result.Problem -> ResponseEntity
                             .status(Status.REDIRECT)
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                            .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/error/callback")
                             .body(EMPTY_REQUEST)
                     }
                 } else {
@@ -240,12 +240,12 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
+                                .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/create/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
                         is Result.Problem -> ResponseEntity
                             .status(Status.REDIRECT)
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                            .header(HttpHeaders.LOCATION, "http://127.0.0.1:3000/auth/error/callback")
                             .body(EMPTY_REQUEST)
                     }
                 }

@@ -19,10 +19,11 @@ data class ClassroomOutputModel(
 ) : OutputModel
 
 /**
- * Represents a Classroom Deleted Output Model.
+ * Represents a Classroom Archieved or Deleted Output Model.
  */
-data class ClassroomDeletedOutputModel(
+data class ClassroomArchivedOrDeletedOutputModel(
     val id: Int,
+    val archived: Boolean,
     val deleted: Boolean
 ) : OutputModel
 

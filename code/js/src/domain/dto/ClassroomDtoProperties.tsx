@@ -42,3 +42,21 @@ export class ClassroomBody {
         this.name = name
     }
 }
+
+export interface ClassroomArchievedOrDeletedDtoProperties{
+    id: number
+    archived: Boolean
+    deleted: Boolean
+}
+
+export class ClassroomArchievedOrDeletedDtoProperties {
+    constructor(
+        id: number,
+        archived: Boolean,
+        deleted: Boolean
+    ) {
+        this.id = id
+        this.archived = archived
+        this.deleted = deleted
+    }
+}

@@ -86,9 +86,11 @@ export function ShowMenuFetch({
                     >
                         {"Welcome " + content.properties.name}
                     </Typography>
-                    <Button onClick={() => setIsOpened(true)}>
-                        Invite Code
-                    </Button>
+                    { loggedIn === AuthState.Student ? (
+                        <Button onClick={() => setIsOpened(true)}>
+                            Invite Code
+                        </Button>
+                    ) : null}
                     <Modal
                         open={isOpened}
                         onClose={() => setIsOpened(false)}
@@ -137,7 +139,7 @@ export function ShowMenuCallbackFetch() {
     const params = useParams()
     const state = toState(params.user)
     if (state !== undefined) {
-        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, 'http://localhost:3000/')
+        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, 'http://127.0.0.1:3000/')
         window.close()
         return (<></>)
     }

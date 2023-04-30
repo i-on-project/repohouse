@@ -5,11 +5,12 @@ import { ErrorMessageModel } from "./domain/response-models/Error"
 import { SirenEntity } from "./siren/Siren"
 import {List, ListItem, Typography, Card, CardActionArea, CardContent} from "@mui/material"
 import {CourseServices} from "./services/CourseServices"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import {Link, Navigate, useLocation, useNavigate} from "react-router-dom"
 import {CourseBody} from "./domain/dto/CourseDtoProperties"
 import {Button, Image} from "react-bootstrap"
 import { GitHubOrg } from "./domain/response-models/GitHubOrgs"
 import {AuthState, useLoggedIn} from "./Auth";
+import {ErrorAlert} from "./ErrorAlert";
 
 export function ShowCourseFetch({
     courseServices, courseId
@@ -86,11 +87,11 @@ export function ShowCourseFetch({
                             </ListItem>
                         ))}
                     </List>
-                    { user == AuthState.Teacher ? (
-                        <Button onClick={handleCreateClassroom}>Create Classroom</Button>
-                    ) : null}
                     { user == AuthState.Teacher  && !content.properties.isArchived ? (
-                        <Button onClick={handleArchiveButton}>Archive</Button>
+                        <>
+                            <Button onClick={handleCreateClassroom}>Create Classroom</Button>
+                            <Button onClick={handleArchiveButton}>Archive</Button>
+                        </>
                     ) : null}
                 </>
             ) : null}
@@ -149,6 +150,7 @@ export function ShowCourseCreateFetch({
                         {"Select an Organization:"}
                     </Typography>
                     {content.properties.orgs.map(org => <OrgsDetailsBox org={org} onClick={handleSubmit}/>)}
+                    <Button onClick={() => navigate(-1)}>Back</Button>
                 </>
             ) : null}
         </div>
@@ -172,7 +174,9 @@ export function ShowCourseCreatePost({ courseServices }: { courseServices: Cours
         setError(content)
     }
 
-    return <>Posted</>
+    if (content instanceof SirenEntity) {
+        return <Navigate to={"/courses/" + content.properties.course.id} />
+    }
 }
 
 
@@ -192,7 +196,7 @@ function OrgsDetailsBox({ org, onClick } : { org: GitHubOrg, onClick: (org: GitH
                         </Typography>
                     </CardContent>
                 </CardActionArea>
-                <a href={"https://github.com/" + org.login} target="_blank" rel="noopener noreferrer">Open on Github</a>
+                <a href={org.url} target="_blank" rel="noopener noreferrer">Open on Github</a>
             </Card>
         </>
     )

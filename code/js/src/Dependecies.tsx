@@ -52,6 +52,8 @@ export const POST_FEEDBACK_KEY = "postFeedback"
 export const INVITE_CODE_KEY = "inviteCode"
 export const LOCAL_COPY_KEY = "localCopy"
 export const CREATE_CLASSROOM_KEY = "createClassroom"
+export const ARCHIVE_COURSE_KEY = "archiveCourse"
+
 export const ARCHIVE_CLASSROOM_KEY = "archiveClassroom"
 
 
@@ -93,5 +95,6 @@ export const systemActionKeys = [
     POST_FEEDBACK_KEY,
     INVITE_CODE_KEY,
     CREATE_CLASSROOM_KEY,
-    ARCHIVE_CLASSROOM_KEY
+    ARCHIVE_CLASSROOM_KEY,
+    ARCHIVE_COURSE_KEY
 ]

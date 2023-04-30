@@ -1,7 +1,12 @@
-import {fetchGet, fetchPost} from "../siren/Fetch"
+import {fetchGet, fetchPost, fetchPut} from "../siren/Fetch"
 import { SirenEntity } from "../siren/Siren"
 import * as Hypermedia from "../Dependecies"
-import {CourseBody, CourseDtoProperties, CourseWithClassroomsDtoProperties} from "../domain/dto/CourseDtoProperties";
+import {
+    CourseBody,
+    CourseCreatedDtoProperties,
+    CourseDtoProperties,
+    CourseWithClassroomsDtoProperties
+} from "../domain/dto/CourseDtoProperties";
 import {GitHubOrgsDtoProperties} from "../domain/dto/GitHubOrgsDtoProperties";
 import {parse} from "uri-template";
 
@@ -16,30 +21,18 @@ export class CourseServices {
 
     getTeacherOrgs = async () => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.ORGS_KEY, Hypermedia.systemServices.home)
-        const response = await fetchGet<GitHubOrgsDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+        return await fetchGet<GitHubOrgsDtoProperties>(link.href)
     }
 
     createCourse = async (course: CourseBody) => {
         const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.CREATE_COURSE_KEY, Hypermedia.systemServices.home)
-        const response = await fetchPost<CourseDtoProperties>(link.href, course)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+        return await fetchPost<CourseCreatedDtoProperties>(link.href, course)
     }
 
     archiveCourse = async (courseId) => {
-        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        const href = parse(link.href).expand(courseId)
-        const response = await fetchPost<CourseDtoProperties>(href, courseId)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.ARCHIVE_COURSE_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId})
+        return await fetchPut<CourseDtoProperties>(href)
     }
 
 }

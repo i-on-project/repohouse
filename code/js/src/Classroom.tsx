@@ -35,7 +35,9 @@ export function ShowClassroomFetch({
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            // TODO: navigate to the course page if deleted
+            if (result.properties.deleted) {
+                navigate("/courses/" + courseId);
+            }
         }
     }, [setError]);
 
@@ -131,8 +133,9 @@ export function ShowCreateClassroom({
     const handleCreateClassroom = useCallback(async () => {
         if (name == "") return
         const body = new ClassroomBody(name)
-        console.log(body)
         const result = await classroomServices.createClassroom(courseId,body);
+        console.log("result")
+        console.log(result)
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }
@@ -141,9 +144,6 @@ export function ShowCreateClassroom({
         }
     }, [name,setError,navigate]);
 
-    if (error) {
-        return <ErrorAlert error={error} onClose={() => setError(null)}/>;
-    }
 
     return (
         <div>
@@ -153,6 +153,7 @@ export function ShowCreateClassroom({
                 onChange={(e) => setName(e.target.value)}
             />
             <Button onClick={handleCreateClassroom}>Create Classroom</Button>
+            <ErrorAlert error={error} onClose={() => setError(null)}/>;
         </div>
     )
 }

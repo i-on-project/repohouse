@@ -220,4 +220,15 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .mapTo<String>()
             .list()
     }
+    override fun getAllCourseClassrooms(courseId: Int): List<Classroom> {
+        return handle.createQuery(
+            """
+            SELECT * FROM Classroom
+            WHERE course_id = :course_id
+            """,
+        )
+            .bind("course_id", courseId)
+            .mapTo<Classroom>()
+            .list()
+    }
 }

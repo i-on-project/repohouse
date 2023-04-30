@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import java.io.File
+import java.util.*
 
 /**
  * Alias for the response of the services
@@ -32,6 +33,7 @@ sealed class ClassroomServicesError {
     object ClassroomNotFound : ClassroomServicesError()
     object ClassroomArchived : ClassroomServicesError()
     object AlreadyInClassroom : ClassroomServicesError()
+    object NameAlreadyExists : ClassroomServicesError()
     object InviteLinkNotFound : ClassroomServicesError()
     object InvalidInput : ClassroomServicesError()
     object InternalError: ClassroomServicesError()
@@ -77,9 +79,13 @@ class ClassroomServices(
         return transactionManager.run {
             val otherInviteLinks = it.classroomRepository.getAllInviteLinks()
             val inviteLink = generateRandomInviteLink(otherInviteLinks)
+            val otherClassroomNames = it.classroomRepository.getAllCourseClassrooms(classroomInput.courseId).map { classroom -> classroom.name }
+            if (otherClassroomNames.map { name -> name.lowercase() }.contains(classroomInput.name.lowercase())) {
+                return@run Result.Problem(ClassroomServicesError.NameAlreadyExists)
+            }
             val classroom = it.classroomRepository.createClassroom(classroomInput, inviteLink)
-            if (classroom == null) Result.Problem(ClassroomServicesError.InternalError)
-            else Result.Success(ClassroomModel(
+            if (classroom == null) return@run Result.Problem(ClassroomServicesError.InternalError)
+            else  return@run Result.Success(ClassroomModel(
                 id = classroom.id,
                 name = classroom.name,
                 isArchived = classroom.isArchived,
@@ -92,7 +98,7 @@ class ClassroomServices(
 
     /**
      * Method that archives or deletes a classroom
-     * If the classroom has no assignments, it is deleted
+     * If the classroom has no assignments it is deleted
      */
     fun archiveOrDeleteClassroom(classroomId: Int): ClassroomArchivedResponse {
         return transactionManager.run {
@@ -239,6 +245,7 @@ class ClassroomServices(
             ClassroomServicesError.InvalidInput -> Problem.invalidInput
             ClassroomServicesError.InviteLinkNotFound -> Problem.notFound
             ClassroomServicesError.InternalError -> Problem.internalError
+            ClassroomServicesError.NameAlreadyExists -> Problem.alreadyExists
         }
     }
 

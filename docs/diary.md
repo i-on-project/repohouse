@@ -39,3 +39,4 @@
 ## 30 Abril - Ricardo
 - Remoção do 'Apply' dos requests, pois não existe um utilizador ainda para o fazer, mas sim um professor pendente
 - Implementação de ‘triggers’
+- localhost para 127.0.0.1 devido ao redirect da documetnação do github oauth

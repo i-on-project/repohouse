@@ -95,7 +95,6 @@ class MenuController(
                 clazz("teachersApproval")
                 link(rel = LinkRelation("self"), href = Uris.TEACHERS_APPROVAL_PATH, needAuthentication = true)
             }
-
             is Result.Problem -> teacherServices.problem(teachers.value)
         }
     }

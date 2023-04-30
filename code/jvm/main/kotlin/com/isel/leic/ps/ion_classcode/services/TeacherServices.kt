@@ -5,6 +5,7 @@ import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.domain.input.ApplyInput
 import com.isel.leic.ps.ion_classcode.http.model.input.TeachersPendingInputModel
+import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeacherPending
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -26,6 +27,8 @@ typealias TeacherPendingResponse = Result<TeacherServicesError, List<TeacherPend
 typealias TeachersApproveResponse = Result<TeacherServicesError, List<TeacherPending>>
 typealias TeachersGetGithubTokenResponse = Result<TeacherServicesError, String>
 typealias UpdateTeacherGithubTokenResult = Result<TeacherServicesError, Unit>
+typealias TeacherOrgsResponse = Result<TeacherServicesError, List<GitHubOrgsModel>>
+
 
 /**
  * Error codes for the services
@@ -44,6 +47,7 @@ sealed class TeacherServicesError {
 @Component
 class TeacherServices(
     private val transactionManager: TransactionManager,
+    private val githubServices: GithubServices,
     private val tokenHash: TokenHash,
 ) {
 
@@ -161,6 +165,20 @@ class TeacherServices(
             is TeacherServicesError.GithubIdInUse -> Problem.internalError
             is TeacherServicesError.GithubUserNameInUse -> Problem.internalError
             is TeacherServicesError.InternalError -> Problem.internalError
+        }
+    }
+
+    suspend fun getTeacherOrgs(teacherId: Int, githubToken:String): TeacherOrgsResponse {
+       val orgs = githubServices.fetchTeacherOrgs(githubToken).map {GitHubOrgsModel(it.login,it.url.replace("api.github.com/orgs","github.com"),it.avatar_url) }
+        return transactionManager.run {
+            it.usersRepository.getTeacher(teacherId) ?: Result.Problem(TeacherServicesError.TeacherNotFound)
+            val teacherCourses = it.courseRepository.getAllUserCourses(teacherId)
+            val orgsToAdd = orgs.filter { org ->
+                teacherCourses.none { teacherOrg ->
+                    teacherOrg.orgUrl == org.url
+                }
+            }
+            Result.Success(orgsToAdd)
         }
     }
 
