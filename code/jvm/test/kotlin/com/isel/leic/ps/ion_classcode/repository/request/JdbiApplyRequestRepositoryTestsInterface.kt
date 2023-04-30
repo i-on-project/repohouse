@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ion_classcode.repository.request
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
-import com.isel.leic.ps.ion_classcode.repository.jdbi.request.JdbiApplyRequestRepository
+import com.isel.leic.ps.ion_classcode.domain.input.ApplyInput
+import com.isel.leic.ps.ion_classcode.repository.jdbi.JdbiApplyRequestRepository
 import com.isel.leic.ps.ion_classcode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test

@@ -3,6 +3,7 @@ package com.isel.leic.ps.ion_classcode.services
 import com.isel.leic.ps.ion_classcode.domain.PendingTeacher
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
+import com.isel.leic.ps.ion_classcode.domain.input.ApplyInput
 import com.isel.leic.ps.ion_classcode.http.model.input.TeachersPendingInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeacherPending
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
@@ -94,6 +95,7 @@ class TeacherServices(
                     githubToken = githubToken,
                 ),
             )
+            it.applyRequestRepository.createApplyRequest(ApplyInput( teacherRes.id))
             Result.Success(teacherRes)
         }
     }
@@ -114,10 +116,10 @@ class TeacherServices(
         if (teachers.isNotValid()) return Result.Problem(TeacherServicesError.InvalidData)
         return transactionManager.run {
             teachers.approved.map { teacherRequest ->
-                it.requestRepository.changeStateRequest(teacherRequest, "Accepted")
+                it.applyRequestRepository.changeApplyRequestState(teacherRequest, "Accepted")
             }
             teachers.rejected.map { teacherRequest ->
-                it.requestRepository.changeStateRequest(teacherRequest, "Rejected")
+                it.applyRequestRepository.changeApplyRequestState(teacherRequest, "Rejected")
             }
             Result.Success(getTeachersNeedingApproval(it))
         }
@@ -163,14 +165,17 @@ class TeacherServices(
     }
 
     private fun getTeachersNeedingApproval(transaction: Transaction): List<TeacherPending> {
-        val requestsPending = transaction.applyRequestRepository.getApplyRequests().filter { request -> request.state == "Pending" }
-        return requestsPending.mapNotNull { request ->
-            val teacher = transaction.usersRepository.getUserById(request.creator)
-            if (teacher is Teacher) {
-                TeacherPending(teacher.name, teacher.email, teacher.id, request.id)
-            } else {
-                null
-            }
+        val requestsPending = transaction.applyRequestRepository.getApplyRequests().filter { request ->
+            request.state == "Pending"
+        }
+        return requestsPending.mapNotNull { apply ->
+            val teacher = transaction.applyRequestRepository.getPendingTeacherByApply(apply.id) ?: return@mapNotNull null
+            TeacherPending(
+                id = teacher.id,
+                name = teacher.name,
+                email = teacher.email,
+                applyRequestId = apply.id
+            )
         }
     }
 }

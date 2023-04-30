@@ -74,7 +74,8 @@ export const systemLinkKeys = [
     TEAM_KEY,
     TEAMS_KEY,
     LOCAL_COPY_KEY,
-    REQUESTS_KEY
+    REQUESTS_KEY,
+    TEACHERS_APPROVAL_KEY
 ]
 
 export const systemActionKeys = [

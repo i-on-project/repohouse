@@ -8,6 +8,8 @@ import {MenuServices} from "./services/MenuServices";
 import {Button} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from '@mui/material';
+import {Check, Close, Remove} from "@mui/icons-material";
+import {mainTheme} from "./utils/Theme";
 
 export function ShowTeacherApprovalFetch({
     menuServices,
@@ -21,7 +23,6 @@ export function ShowTeacherApprovalFetch({
     const [teachersApproved, setTeachersApproved] = useState<number[]>([])
     const [teachersRejected, setTeachersRejected] = useState<number[]>([])
     const navigate = useNavigate()
-    // TODO: Find a way to change active button
 
     const handleApprove = useCallback((teacherId: number) => {
         if (teachersRejected.includes(teacherId)) {
@@ -119,19 +120,19 @@ function HandleTeachersCheckbox({ value, acceptHandler, rejectHandler, nothingHa
     const [isRejectChecked, setRejectChecked] = useState(false)
     const [isNothingChecked, setNothingChecked] = useState(true)   
     return <>
-        <Checkbox checked={isAcceptChecked} value={value} color={"success"} onChange={() => {
+        <Checkbox checked={isAcceptChecked} value={value} icon={<Check/>} checkedIcon={<Check />} color={"success"} onChange={() => {
             setAcceptChecked(true)
             setRejectChecked(false)
             setNothingChecked(false)
             acceptHandler(value)
         }}/>
-        <Checkbox checked={isNothingChecked} value={value} color={"info"} onChange={() => {
+        <Checkbox checked={isNothingChecked} value={value} icon={<Remove/>} checkedIcon={<Remove />} color={"default"} onChange={() => {
             setAcceptChecked(false)
             setRejectChecked(false)
             setNothingChecked(true)
             nothingHandler(value)
         }}/>
-        <Checkbox checked={isRejectChecked} value={value} color={"error"} onChange={() => {
+        <Checkbox checked={isRejectChecked} value={value} icon={<Close />} checkedIcon={<Close />} color={"error"} onChange={() => {
             setAcceptChecked(false)
             setRejectChecked(true)
             setNothingChecked(false)

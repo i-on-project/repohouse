@@ -34,4 +34,8 @@
 ## 24 Abril - Ricardo & André
 - Decisao dos templates todos no home
 - Nenhum siren retorna links e actions sem ser o home
-- O react trata dos expand
+- O react trata dos expand e de arranjar os templates
+
+## 30 Abril - Ricardo
+- Remoção do 'Apply' dos requests, pois não existe um utilizador ainda para o fazer, mas sim um professor pendente
+- Implementação de ‘triggers’

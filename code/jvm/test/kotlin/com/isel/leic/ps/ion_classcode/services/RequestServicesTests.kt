@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ion_classcode.services
 
-import com.isel.leic.ps.ion_classcode.domain.input.request.ApplyInput
-import com.isel.leic.ps.ion_classcode.repository.request.ApplyRequestRepository
+import com.isel.leic.ps.ion_classcode.domain.input.ApplyInput
+import com.isel.leic.ps.ion_classcode.repository.ApplyRequestRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Result

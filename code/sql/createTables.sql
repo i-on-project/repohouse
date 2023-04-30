@@ -159,10 +159,10 @@ CREATE TABLE LeaveTeam(
 );
 
 CREATE TABLE Apply(
-    id int primary key,
-    teacher_id int not null,
-    foreign key (id) references Request(id),
-    foreign key (teacher_id) references Users(id)
+    id serial primary key,
+    pending_teacher_id int not null,
+    state text not null check ( state in ('Pending', 'Accepted', 'Rejected') ),
+    foreign key (pending_teacher_id) references PendingTeacher(id)
 );
 
 CREATE TABLE Student_Team(
@@ -233,3 +233,11 @@ CREATE TABLE OTP(
 
 
 COMMIT;
+
+insert into pendingteacher (email, github_username, github_id, token, name, github_token, created_at)
+values ('asdasd@gmail.com', 'asdasd', 123, 'asdasd', 'asdasd', 'asdasd', '2020-01-01');
+insert into pendingteacher (email, github_username, github_id, token, name, github_token, created_at)
+values ('asdasd@gmail.com', 'asdasd', 123, 'asdasd', 'asdasd', 'asdasd', '2020-01-01');
+
+insert into apply (pending_teacher_id, state) values (8, 'Pending');
+insert into apply (pending_teacher_id, state) values (9, 'Pending');

@@ -48,15 +48,8 @@ export function ShowHomeFetch({
         );
     }
 
-    if (home instanceof ErrorMessageModel && !error) {
+    if (home instanceof ErrorMessageModel) {
         setError(home);
-    }
-
-    if (home) {
-        if (loggedin) {
-            return <Navigate to="/menu"/>
-        }
-        return 
     }
 
     return (

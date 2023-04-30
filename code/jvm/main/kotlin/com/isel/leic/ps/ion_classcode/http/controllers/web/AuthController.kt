@@ -31,6 +31,7 @@ import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
@@ -415,12 +416,15 @@ class AuthController(
      */
     @PostMapping(Uris.LOGOUT)
     fun logout(
+        request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<*> {
-        val authorizationCookie = deleteSessionCookie()
-        val githubIdCookie = deleteGithubIdCookie()
-        response.setHeader(HttpHeaders.SET_COOKIE, authorizationCookie.toString())
-        response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
+        val requestCookies = request.cookies
+        requestCookies.forEach { cookie ->
+            cookie.maxAge = 0
+            cookie.path = "/api"
+            response.addCookie(cookie)
+        }
         return siren(null) {
             clazz("logout")
             action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})

@@ -14,5 +14,5 @@ data class TeacherPending(
     val name: String,
     val email: String,
     val id: Int,
-    val requestId: Int
+    val applyRequestId: Int
 )
