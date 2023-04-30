@@ -161,10 +161,7 @@ class AssigmentController(
             is Result.Success -> siren(value = AssignmentCreatedOutputModel(assignment.value)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignment.value.id), needAuthentication = true)
-                link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
-                link(rel = LinkRelation("assignments"), href = Uris.assignmentsUri(courseId, classroomId), needAuthentication = true)
-            }
+               }
         }
     }
 
@@ -184,9 +181,7 @@ class AssigmentController(
             is Result.Problem -> problem(delete.value)
             is Result.Success -> siren(value = delete.value) {
                 clazz("assigment-deleted")
-                link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
-                link(rel = LinkRelation("classroom"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
-                link(rel = LinkRelation("assignments"), href = Uris.assignmentsUri(courseId, classroomId), needAuthentication = true)
+                link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignmentId), needAuthentication = true)
             }
         }
     }

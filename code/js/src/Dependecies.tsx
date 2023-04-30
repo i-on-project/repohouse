@@ -37,6 +37,8 @@ export const TEACHERS_APPROVAL_KEY = "teachersApproval"
 export const APPROVE_TEACHERS_KEY = "approveTeacher"
 export const CLASSROOM_KEY = "classroom"
 export const ASSIGNMENT_KEY = "assignment"
+export const CREATE_ASSIGNMENT_KEY = "createAssignment"
+export const DELETE_ASSIGNMENT_KEY = "deleteAssignment"
 export const ASSIGNMENTS_KEY = "assignments"
 export const DELIVERY_KEY = "delivery"
 export const DELIVERIES_KEY = "deliveries"
@@ -96,5 +98,7 @@ export const systemActionKeys = [
     INVITE_CODE_KEY,
     CREATE_CLASSROOM_KEY,
     ARCHIVE_CLASSROOM_KEY,
-    ARCHIVE_COURSE_KEY
+    ARCHIVE_COURSE_KEY,
+    CREATE_ASSIGNMENT_KEY,
+    DELETE_ASSIGNMENT_KEY
 ]
