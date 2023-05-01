@@ -8,6 +8,7 @@ declare
     teacherId integer;
 begin
     if (new.is_created = true) then
+        delete from teacher where id = new.id;
         insert into users (email, is_created,github_id,github_username,token,name) values (new.email, new.is_created,new.github_id,new.github_username,new.token,new.name) returning id into teacherId;
         insert into teacher (id,github_token) values (teacherId,new.github_token);
     end if;
@@ -80,3 +81,4 @@ after delete on teacher
 for each row execute procedure DeleteTeachers();
 
 COMMIT TRANSACTION;
+

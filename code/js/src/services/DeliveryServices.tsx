@@ -1,4 +1,4 @@
-import {fetchDelete, fetchGet, fetchPost} from "../siren/Fetch"
+import {fetchDelete, fetchGet, fetchPost, fetchPut} from "../siren/Fetch"
 import { SirenEntity } from "../siren/Siren"
 import * as Hypermedia from "../Dependecies"
 import {MenuDtoProperties} from "../domain/dto/MenuDtoProperties";
@@ -18,43 +18,27 @@ export class DeliveryServices {
         return await fetchGet<DeliveryDtoProperties>(href)
     }
 
-    createDelivery = async (body: DeliveryBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        //TODO: Change this
-        const response = await fetchPost<DeliveryDtoProperties>(link.href, body)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    createDelivery = async (courseId,classroomId,assignmentId,body: DeliveryBody) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.CREATE_DELIVERY_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId:courseId,classroomId:classroomId,assignmentId:assignmentId})
+        return await fetchPost<DeliveryDtoProperties>(href, body)
     }
 
-    syncDelivery = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY,Hypermedia.systemServices.home)
-        // TODO: Change this
-        const response = await fetchPost<DeliveryDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    syncDelivery = async (courseId,classroomId,assignmentId,deliveryId) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.SYNC_DELIVERY_KEY,Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId:courseId,classroomId:classroomId,assignmentId:assignmentId,deliveryId:deliveryId})
+        return await fetchPost<DeliveryDtoProperties>(href)
     }
 
-    deleteDelivery = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        // TODO: Change this
-        const response = await fetchDelete<DeliveryDeletedDtoProperties>(link.href)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    deleteDelivery = async (courseId,classroomId,assignmentId,deliveryId) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.DELETE_DELIVERY_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId:courseId,classroomId:classroomId,assignmentId:assignmentId,deliveryId:deliveryId})
+        return await fetchDelete<DeliveryDeletedDtoProperties>(href)
     }
 
-    editDelivery = async (body: DeliveryBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        //TODO: Change this
-        const response = await fetchPost<DeliveryDtoProperties>(link.href, body)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    editDelivery = async (courseId,classroomId,assignmentId,deliveryId,body: DeliveryBody) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.EDIT_DELIVERY_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId:courseId,classroomId:classroomId,assignmentId:assignmentId,deliveryId:deliveryId})
+        return await fetchPost<DeliveryDtoProperties>(href, body)
     }
 }

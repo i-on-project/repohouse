@@ -47,7 +47,7 @@ object Uris {
     const val INVITE_LINK_PATH = "$API/invite/{inviteLink}"
     const val ASSIGMENTS_PATH = "$CLASSROOM_PATH/assignments"
     const val ASSIGMENT_PATH = "$ASSIGMENTS_PATH/{assignmentId}"
-    const val CREATE_ASSIGMENT_PATH = "$ASSIGMENTS_PATH/create"
+    const val CREATE_ASSIGNMENT_PATH = "$ASSIGMENTS_PATH/create"
     const val DELIVERIES_PATH = "$ASSIGMENT_PATH/deliveries"
     const val DELIVERY_PATH = "$DELIVERIES_PATH/{deliveryId}"
     const val CREATE_DELIVERY_PATH = "$DELIVERIES_PATH/create"
@@ -94,7 +94,7 @@ object Uris {
     fun inviteLinkUri(courseId: Int, inviteLink: String): String = UriTemplate(INVITE_LINK_PATH).expand(courseId, inviteLink).toASCIIString()
     fun assignmentsUri(courseId: Int, classroomId: Int): String = UriTemplate(ASSIGMENTS_PATH).expand(courseId, classroomId).toASCIIString()
     fun assigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
-    fun createAssigmentUri(courseId: Int, classroomId: Int): String = UriTemplate(CREATE_ASSIGMENT_PATH).expand(courseId, classroomId).toASCIIString()
+    fun createAssigmentUri(courseId: Int, classroomId: Int): String = UriTemplate(CREATE_ASSIGNMENT_PATH).expand(courseId, classroomId).toASCIIString()
     fun deliveriesUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(DELIVERIES_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
     fun deliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): String = UriTemplate(DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId).toASCIIString()
     fun createDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(CREATE_DELIVERY_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
@@ -114,11 +114,10 @@ object Uris {
 
     fun authUriRegisterStudent(): String = URI(AUTH_REGISTER_STUDENT_PATH).toASCIIString()
     fun authStatusUri(): String = URI(AUTH_STATUS_PATH).toASCIIString()
-    /** Mobile Uris **/
 
+    /** Mobile Uris **/
 
     const val MOBILE_API = "/api/mobile"
     const val MOBILE_AUTH_PATH = "$MOBILE_API/auth"
     const val MOBILE_CALLBACK_PATH = "$MOBILE_AUTH_PATH/callback"
-
 }

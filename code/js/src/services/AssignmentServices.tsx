@@ -26,20 +26,16 @@ export class AssignmentServices {
         return await fetchPost<AssignmentDtoProperties>(href, body)
     }
 
-    deleteAssignment = async (courseId,classroomId) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.DELETE_ASSIGNMENT_KEY, Hypermedia.systemServices.home)
-        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId})
+    deleteAssignment = async (courseId,classroomId,assignmentId) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.DELETE_ASSIGNMENT_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId})
         return await fetchDelete<AssignmentDeletedDtoProperties>(href)
     }
 
     editAssignment = async (body: AssignmentBody) => {
         const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        //TODO: Change this
-        const response = await fetchPost<AssignmentDtoProperties>(link.href, body)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+        //TODO
+        return await fetchPost<AssignmentDtoProperties>(link.href, body)
     }
 
     joinTeam = async (body:JoinTeamBody,courseId,classroomId,assignmentId) => {

@@ -35,23 +35,15 @@ export class TeamServices {
         return await fetchGet<TeamRequestsDtoProperties>(href)
     }
 
-    changeRequestStatus = async () => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        // TODO: Change this
-        const response = await fetchPost<RequestChangeStatusDtoProperties>(link.href,null)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    changeRequestStatus = async (courseId,classroomId,assignmentId,teamId,requestId) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.CHANGE_REQUEST_STATUS_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,teamId:teamId,requestId:requestId})
+        return await fetchPost<RequestChangeStatusDtoProperties>(href)
     }
 
-    sendFeedback = async (body:FeedbackBody) => {
-        const link = await Hypermedia.navigationRepository.ensureLink(Hypermedia.COURSE_KEY, Hypermedia.systemServices.home)
-        // TODO: Change this
-        const response = await fetchPost<FeedbackDtoProperties>(link.href,body)
-        if (response instanceof SirenEntity) {
-            // TODO
-        }
-        return response
+    sendFeedback = async (courseId,classroomId,assignmentId,teamId,body:FeedbackBody) => {
+        const link = await Hypermedia.navigationRepository.ensureAction(Hypermedia.POST_FEEDBACK_KEY, Hypermedia.systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,teamId:teamId})
+        return await fetchPost<FeedbackDtoProperties>(href,body)
     }
 }

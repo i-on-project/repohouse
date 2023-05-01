@@ -156,7 +156,7 @@ const router = createBrowserRouter([
                 </RequireAuth>
             },
             {
-                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/teams/:teamId/edit",
+                path: "/courses/:courseId/classrooms/:classroomId/assignments/:assignmentId/deliveries/:deliveryId/edit",
                 element: <RequireAuth>
                     <DeliveryEdit/>
                 </RequireAuth>
@@ -451,7 +451,7 @@ function DeliveryCreate() {
 
 function DeliveryEdit() {
     const {courseId, classroomId, assignmentId} = useParams<{ courseId: string, classroomId: string, assignmentId: string}>();
-    const delivery = useLocation().state.delivery
+    const delivery = useLocation().state
     return (
         <div>
             <ShowEditDelivery deliveryServices={deliveryServices} delivery={delivery} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)} error={null}/>

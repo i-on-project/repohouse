@@ -16,10 +16,10 @@ import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.services.TeamServices
-import com.isel.leic.ps.ion_classcode.services.TeamServicesError
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
+import com.isel.leic.ps.ion_classcode.services.TeamServices
+import com.isel.leic.ps.ion_classcode.services.TeamServicesError
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -69,12 +69,13 @@ class TeamController(
     ): ResponseEntity<*> {
         return when (val team = teamService.getTeamsInfoByAssignment(assignmentId)) {
             is Result.Problem -> problem(team.value)
-            is Result.Success -> siren(TeamsOutputModel(team.value)){
+            is Result.Success -> siren(TeamsOutputModel(team.value)) {
                 clazz("teams")
                 link(href = Uris.TEAMS_PATH, rel = LinkRelation("self"), needAuthentication = true)
             }
         }
     }
+
     /**
      * Create a request for a student to join a team
      * Needs then to be accepted by the teacher
@@ -88,7 +89,7 @@ class TeamController(
         @RequestBody joinTeamInfo: JoinTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val join = teamService.joinTeamRequest(joinTeamInfo,user.id)) {
+        return when (val join = teamService.joinTeamRequest(joinTeamInfo, user.id)) {
             is Result.Problem -> problem(join.value)
             is Result.Success -> siren(RequestCreatedOutputModel(join.value, true)) {
                 clazz("joinTeam")
@@ -109,7 +110,7 @@ class TeamController(
         @RequestBody createTeamInfo: CreateTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val create = teamService.createTeamRequest(createTeamInfo,user.id, assignmentId, classroomId)) {
+        return when (val create = teamService.createTeamRequest(createTeamInfo, user.id, assignmentId, classroomId)) {
             is Result.Problem -> problem(create.value)
             is Result.Success -> siren(RequestCreatedOutputModel(create.value, true)) {
                 clazz("createTeam")
@@ -173,7 +174,7 @@ class TeamController(
         @RequestBody leaveTeamInfo: LeaveTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val exit = teamService.leaveTeamRequest(leaveTeamInfo,user.id)) {
+        return when (val exit = teamService.leaveTeamRequest(leaveTeamInfo, user.id)) {
             is Result.Problem -> problem(exit.value)
             is Result.Success -> siren(RequestCreatedOutputModel(exit.value, true)) {
                 clazz("leaveTeam")

@@ -42,7 +42,7 @@ class SystemController {
         }
     }
 
-    private fun <T> allSystemLinks(block:SirenBuilderScope<T>) {
+    private fun <T> allSystemLinks(block: SirenBuilderScope<T>) {
         block.link(rel = LinkRelation("home"), href = Uris.HOME)
         block.link(rel = LinkRelation("credits"), href = Uris.CREDITS)
         block.link(rel = LinkRelation("menu"), href = Uris.MENU_PATH, needAuthentication = true)
@@ -60,13 +60,13 @@ class SystemController {
         block.link(rel = LinkRelation("assigments"), href = Uris.ASSIGMENTS_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("delivery"), href = Uris.DELIVERY_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("deliveries"), href = Uris.DELIVERIES_PATH, needAuthentication = true)
-        block.link(rel = LinkRelation("team"), href = Uris.TEAM_PATH,needAuthentication = true)
+        block.link(rel = LinkRelation("team"), href = Uris.TEAM_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("teams"), href = Uris.TEAMS_PATH, needAuthentication = true)
-        block.link(rel = LinkRelation("requestsHistory"),href = Uris.TEAM_REQUESTS_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("requestsHistory"), href = Uris.TEAM_REQUESTS_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("localCopy"), href = Uris.LOCAL_COPY_PATH, needAuthentication = true)
     }
 
-    private fun <T> allSystemActions(block:SirenBuilderScope<T>) {
+    private fun <T> allSystemActions(block: SirenBuilderScope<T>) {
         block.action(title = "approveTeacher", href = Uris.TEACHERS_APPROVAL_PATH, method = HttpMethod.POST, type = "application/x-www-form-urlencoded", block = {
             rangeField(name = "approved")
             rangeField(name = "rejected")
@@ -78,7 +78,7 @@ class SystemController {
         block.action(title = "verify", href = Uris.AUTH_REGISTER_VERIFICATION_PATH, method = HttpMethod.POST, type = "application/json", block = {
             numberField("otp")
         })
-        block.action(title ="resendEmail", href = Uris.AUTH_RESEND_EMAIL_PATH, method = HttpMethod.POST, type = "application/json", block = {})
+        block.action(title = "resendEmail", href = Uris.AUTH_RESEND_EMAIL_PATH, method = HttpMethod.POST, type = "application/json", block = {})
         block.action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})
         block.action(title = "createCourse", href = Uris.COURSES_PATH, method = HttpMethod.POST, type = "application/json", block = {
             textField("orgUrl")
@@ -97,21 +97,21 @@ class SystemController {
             textField("name")
         })
         block.action(title = "syncClassroom", href = Uris.SYNC_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
-        block.action("joinTeam", Uris.JOIN_TEAM_PATH, method = HttpMethod.POST, type = "application/json",) {
+        block.action("joinTeam", Uris.JOIN_TEAM_PATH, method = HttpMethod.POST, type = "application/json") {
             hiddenField("assigmentId")
             numberField("teamId")
-            numberField("composite",null)
+            numberField("composite", null)
         }
         block.action("createTeam", Uris.CREATE_TEAM_PATH, method = HttpMethod.POST, type = "application/json") {
             hiddenField("assigmentId")
-            numberField("composite",null)
+            numberField("composite", null)
         }
         block.action("leaveTeam", Uris.EXIT_TEAM_PATH, method = HttpMethod.POST, type = "application/json") {
             hiddenField("teamId")
-            numberField("composite",null)
+            numberField("composite", null)
         }
-        block.action(title = "deleteDelivery", href = Uris.DELIVERY_PATH, method = HttpMethod.DELETE, type = "application/json",) {}
-        block.action(title = "syncDelivery", href = Uris.SYNC_DELIVERY_PATH, method = HttpMethod.POST, type = "application/json",) {}
+        block.action(title = "deleteDelivery", href = Uris.DELIVERY_PATH, method = HttpMethod.DELETE, type = "application/json") {}
+        block.action(title = "syncDelivery", href = Uris.SYNC_DELIVERY_PATH, method = HttpMethod.POST, type = "application/json") {}
         block.action(title = "postFeedback", href = Uris.POST_FEEDBACK_PATH, method = HttpMethod.POST, type = "application/json") {
             hiddenField(name = "teamId")
             textField(name = "description")
@@ -119,13 +119,29 @@ class SystemController {
         }
         block.action(title = "changeStatusRequest", href = Uris.TEAM_CHANGE_REQUEST_PATH, method = HttpMethod.POST, type = "application/json") {}
         block.action(title = "inviteCode", href = Uris.INVITE_LINK_PATH, method = HttpMethod.POST, type = "application/json") {}
-        block.action(title= "archiveClassroom", href = Uris.ARCHIVE_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json") {}
+        block.action(title = "archiveClassroom", href = Uris.ARCHIVE_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json") {}
         block.action(title = "createClassroom", href = Uris.CREATE_CLASSROOM_PATH, method = HttpMethod.POST, type = "application/json") {
             textField(name = "name")
         }
         block.action(title = "createAssignment", href = Uris.CREATE_ASSIGNMENT_PATH, method = HttpMethod.POST, type = "application/json") {
             textField(name = "name")
         }
-        block.action(title = "deleteAssignment", href = Uris.ASSIGMENT_PATH, method = HttpMethod.DELETE, type = "application/json") {}
+        block.action(title = "deleteAssignment", href = Uris.DELETE_ASSIGMENT_PATH, method = HttpMethod.DELETE, type = "application/json") {
+            textField(name = "title")
+            textField(name = "description")
+            numberField(name = "maxNumbOfGroups")
+            numberField(name = "maxElemsPerGroup")
+        }
+        block.action(title = "createDelivery", href = Uris.CREATE_DELIVERY_PATH, method = HttpMethod.POST, type = "application/json") {
+            hiddenField(name = "assignmentId")
+            textField(name = "tagControl")
+            timestampField(name = "dueDate")
+        }
+        block.action(title = "editDelivery", href = Uris.EDIT_DELIVERY_PATH, method = HttpMethod.POST, type = "application/json") {
+            hiddenField(name = "assignmentId")
+            textField(name = "tagControl")
+            timestampField(name = "dueDate")
+        }
+        block.action(title="changeRequestStatus", href = Uris.TEAM_CHANGE_REQUEST_PATH, method = HttpMethod.POST, type = "application/json") {}
     }
 }

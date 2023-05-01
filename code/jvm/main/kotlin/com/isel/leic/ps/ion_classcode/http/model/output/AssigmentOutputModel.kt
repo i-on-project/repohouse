@@ -33,6 +33,13 @@ data class AssignmentCreatedOutputModel(
 )
 
 /**
+ * Represents a Assigment Created Output Model.
+ */
+data class AssignmentDeletedOutputModel(
+    val deleted: Boolean,
+)
+
+/**
  * Represents a Assigment Model for inner functions.
  */
 interface AssignmentModel {

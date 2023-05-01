@@ -233,11 +233,3 @@ CREATE TABLE OTP(
 
 
 COMMIT;
-
-insert into pendingteacher (email, github_username, github_id, token, name, github_token, created_at)
-values ('asdasd@gmail.com', 'asdasd', 123, 'asdasd', 'asdasd', 'asdasd', '2020-01-01');
-insert into pendingteacher (email, github_username, github_id, token, name, github_token, created_at)
-values ('asdasd@gmail.com', 'asdasd', 123, 'asdasd', 'asdasd', 'asdasd', '2020-01-01');
-
-insert into apply (pending_teacher_id, state) values (8, 'Pending');
-insert into apply (pending_teacher_id, state) values (9, 'Pending');

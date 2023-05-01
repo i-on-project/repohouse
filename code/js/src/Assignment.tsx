@@ -177,11 +177,18 @@ function ShowTeacherAssignmentFetch({
         return await assignmentServices.assignment(courseId,classroomId,assignmentId) as SirenEntity<TeacherAssignmentDtoProperties>
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
+    const navigate = useNavigate()
 
     const handleDeleteAssigment = useCallback(async () => {
-        const response = await assignmentServices.deleteAssignment()
+        const response = await assignmentServices.deleteAssignment(courseId,classroomId,assignmentId)
         if (response instanceof ErrorMessageModel) {
             setError(response)
+        }
+        if (response instanceof SirenEntity) {
+            console.log(response)
+            if (response.properties.deleted) {
+                navigate("/courses/" + courseId + "/classrooms/" + classroomId)
+            }
         }
     }, [setError])
 
@@ -299,13 +306,15 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
 
     const handleSubmit = useCallback((event:any) => {
         event.preventDefault()
+        console.log("submit")
         if (title == null || description == null) {
             return
         }
         setCreate(true)
-    },[setCreate])
+    },[setCreate, title, description])
 
     if(create) {
+        console.log("create")
         const assignment = new AssignmentBody(classroomId,numbElemPerGroup,numbGroups,title,description,new Date())
         return <ShowCreateAssignmentPost assignmentServices={assignmentServices} assignment={assignment} courseId={courseId} classroomId={classroomId} error={serror}/>
     }
@@ -357,7 +366,7 @@ function ShowCreateAssignmentPost({
     error: ErrorMessageModel
 }) {
     const content = useAsync(async () => {
-        return await assignmentServices.createAssignment(assignment);
+        return await assignmentServices.createAssignment(courseId,classroomId,assignment);
     });
     const [serror, setError] = useState<ErrorMessageModel>(error);
 

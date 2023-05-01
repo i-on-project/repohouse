@@ -26,7 +26,7 @@ export function ShowClassroomFetch({
     const navigate = useNavigate();
 
     const handleCreateAssigment = useCallback(async () => {
-        navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assigments/create");
+        navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assignments/create");
     }, [navigate]);
 
     const handleArchiveClassroom = useCallback(async () => {
@@ -109,13 +109,18 @@ export function ShowClassroomFetch({
                     </List>
                     { user == AuthState.Teacher ? (
                         <>
-                            <Button onClick={handleCreateAssigment}>Create Assigment</Button>
-                            <Button onClick={handleArchiveClassroom}>Archive Classroom</Button>
+                            { !content.properties.isArchived ? (
+                                <>
+                                    <Button onClick={handleCreateAssigment}>Create Assigment</Button>
+                                    <Button onClick={handleArchiveClassroom}>Archive Classroom</Button>
+                                </>
+                            ):null}
                             <Button onClick={handleLocalCopy}>Local Copy</Button>
                         </>
                     ):null}
                 </>
             ) : null}
+            <ErrorAlert error={error} onClose={() => setError(null)}/>
         </div>
     );
 }

@@ -25,10 +25,11 @@ export function ShowDeliveryFetch({
         return await deliveryServices.delivery(courseId,classroomId,assignmentId,deliveryId);
     });
     const [error, setError] = useState<ErrorMessageModel>(null);
+    const navigate = useNavigate();
     const user = useLoggedIn()
 
     const handleSyncDelivery = useCallback(async () => {
-        const result = await deliveryServices.syncDelivery();
+        const result = await deliveryServices.syncDelivery(courseId,classroomId,assignmentId,deliveryId);
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }
@@ -38,12 +39,14 @@ export function ShowDeliveryFetch({
     }, [setError]);
 
     const handleDeleteDelivery = useCallback(async () => {
-        const result = await deliveryServices.deleteDelivery();
+        const result = await deliveryServices.deleteDelivery(courseId,classroomId,assignmentId,deliveryId);
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            // TODO : navigate to the delivery page if deleted
+            if (result.properties.deleted) {
+                navigate(`/courses/${courseId}/classrooms/${classroomId}/assignments/${assignmentId}`, {replace: true})
+            }
         }
     }, [setError]);
 
@@ -126,7 +129,7 @@ export function ShowDeliveryFetch({
                     {user == AuthState.Teacher ? (
                         <>
                             <Button onClick={handleSyncDelivery}>Sync</Button>
-                            <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + content.properties.delivery.id + "/edit"} state={{delivery:content.properties.delivery}}> Edit </Link>
+                            <Button onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + content.properties.delivery.id + "/edit",{state:content.properties.delivery})}> Edit </Button>
                             {content.properties.teamsDelivered.length == 0 && content.properties.teamsNotDelivered.length == 0 ? (
                                 <Button onClick={handleDeleteDelivery}>Delete</Button>
                             ) : null}
@@ -147,7 +150,7 @@ export function ShowCreateDelivery({ deliveryServices,courseId,classroomId,assig
 
     const handleCreateDelivery = useCallback(async () => {
         const body = new DeliveryBody(tagControl, dueDate, assignmentId)
-        const result = await deliveryServices.createDelivery(body);
+        const result = await deliveryServices.createDelivery(courseId, classroomId,assignmentId, body);
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }
@@ -189,12 +192,12 @@ export function ShowCreateDelivery({ deliveryServices,courseId,classroomId,assig
 export function ShowEditDelivery({ deliveryServices, delivery,courseId,classroomId,assignmentId, error }: { deliveryServices: DeliveryServices, delivery: DeliveryDomain, courseId:number,classroomId:number,assignmentId:number,error: ErrorMessageModel }) {
     const [serror, setError] = useState<ErrorMessageModel>(error);
     const [tagControl, setTagControl] = useState<string>(delivery.tagControl);
-    const [dueDate, setDueDate] = useState<string>(delivery.dueDate.toISOString().split("T")[0]);
+    const [dueDate, setDueDate] = useState<string>(String(delivery.dueDate).split("T")[0])
     const navigate = useNavigate();
 
     const handleEditDelivery = useCallback(async () => {
-        const body = new DeliveryBody(tagControl, dueDate, null)
-        const result = await deliveryServices.editDelivery(body);
+        const body = new DeliveryBody(tagControl, dueDate, assignmentId)
+        const result = await deliveryServices.editDelivery(courseId, classroomId,assignmentId, delivery.id, body)
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }

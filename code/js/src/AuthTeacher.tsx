@@ -47,7 +47,6 @@ export function ShowAuthTeacherFetch({
 
     useEffect(() => {
         if (data) {
-            console.log("Navigating to " + data)
             navigate(data)
         }
     }, [data, navigate])

@@ -18,15 +18,15 @@ import com.isel.leic.ps.ion_classcode.http.model.output.RegisterOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.services.GithubServices
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
 import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
-import com.isel.leic.ps.ion_classcode.services.StudentServices
-import com.isel.leic.ps.ion_classcode.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.http.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
+import com.isel.leic.ps.ion_classcode.services.GithubServices
+import com.isel.leic.ps.ion_classcode.services.StudentServices
+import com.isel.leic.ps.ion_classcode.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
@@ -61,8 +61,8 @@ const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
 
-//const val NGROK_DOMAIN = "947b-2001-818-e975-8500-5c24-94b1-29c4-34e2.ngrok-free.app"
-//const val NGROK_URI = "https://$NGROK_DOMAIN"
+// const val NGROK_DOMAIN = "947b-2001-818-e975-8500-5c24-94b1-29c4-34e2.ngrok-free.app"
+// const val NGROK_URI = "https://$NGROK_DOMAIN"
 
 /**
  * This controller is responsible for the authentication of the users.
@@ -136,10 +136,12 @@ class AuthController(
         @CookieValue position: String,
         response: HttpServletResponse,
     ): ResponseEntity<*> {
-        if (state != userState) return ResponseEntity
-            .status(Status.REDIRECT)
-            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
-            .body(EMPTY_REQUEST)
+        if (state != userState) {
+            return ResponseEntity
+                .status(Status.REDIRECT)
+                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                .body(EMPTY_REQUEST)
+        }
         val accessToken = githubServices.fetchAccessToken(code)
         val userGithubInfo = githubServices.fetchUserInfo(accessToken.access_token)
         return when (val userInfo = userServices.getUserByGithubId(userGithubInfo.id)) {
@@ -156,10 +158,11 @@ class AuthController(
                         }
                         userInfo.value is Teacher && position == TEACHER_COOKIE_NAME -> {
                             when (teacherServices.updateTeacherGithubToken(userInfo.value.id, accessToken.access_token)) {
-                                is Result.Problem -> ResponseEntity
-                                    .status(Status.REDIRECT)
-                                    .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
-                                    .body(EMPTY_REQUEST)
+                                is Result.Problem ->
+                                    ResponseEntity
+                                        .status(Status.REDIRECT)
+                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                        .body(EMPTY_REQUEST)
                                 is Result.Success -> {
                                     val cookie = generateSessionCookie(userInfo.value.token)
                                     ResponseEntity
@@ -206,12 +209,12 @@ class AuthController(
                         teacherServices.createPendingTeacher(
                             TeacherInput(
                                 email = userEmail.email,
-                                githubUsername =  userGithubInfo.login,
+                                githubUsername = userGithubInfo.login,
                                 githubId = userGithubInfo.id,
                                 token = generateRandomToken(),
                                 name = userGithubInfo.name,
                                 githubToken = accessToken.access_token,
-                            )
+                            ),
                         )
                     ) {
                         is Result.Success -> {
@@ -222,10 +225,11 @@ class AuthController(
                                 .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
                                 .body(EMPTY_REQUEST)
                         }
-                        is Result.Problem -> ResponseEntity
-                            .status(Status.REDIRECT)
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
-                            .body(EMPTY_REQUEST)
+                        is Result.Problem ->
+                            ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                .body(EMPTY_REQUEST)
                     }
                 } else {
                     when (
@@ -236,7 +240,7 @@ class AuthController(
                                 githubId = userGithubInfo.id,
                                 token = generateRandomToken(),
                                 name = userGithubInfo.name,
-                            )
+                            ),
                         )
                     ) {
                         is Result.Success -> {
@@ -247,10 +251,11 @@ class AuthController(
                                 .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
-                        is Result.Problem -> ResponseEntity
-                            .status(Status.REDIRECT)
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
-                            .body(EMPTY_REQUEST)
+                        is Result.Problem ->
+                            ResponseEntity
+                                .status(Status.REDIRECT)
+                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                .body(EMPTY_REQUEST)
                     }
                 }
             }
@@ -308,10 +313,12 @@ class AuthController(
                         })
                     }
                     is Either.Left -> when (userOutbox.value) {
-                        is OutboxServicesError.CooldownNotExpired -> siren(StatusOutputModel(
+                        is OutboxServicesError.CooldownNotExpired -> siren(
+                            StatusOutputModel(
                                 "On cooldown",
                                 "You are on cooldown, try again in ${userOutbox.value.cooldown} seconds",
-                            )) {
+                            ),
+                        ) {
                             clazz("registerStudent")
                             action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
                                 numberField("schoolId")
@@ -334,26 +341,32 @@ class AuthController(
         return when (val userInfo = userServices.getUserByGithubId(githubId)) {
             is Result.Success -> {
                 if (userInfo.value.isCreated) {
-                    siren(StatusOutputModel(
-                        "You are now eligible to use the application.",
-                        "Return to home to authenticate yourself.",
-                    )) {
+                    siren(
+                        StatusOutputModel(
+                            "You are now eligible to use the application.",
+                            "Return to home to authenticate yourself.",
+                        ),
+                    ) {
                         clazz("status")
                         link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
                     }
                 } else {
                     when (position) {
-                        TEACHER_COOKIE_NAME -> siren(StatusOutputModel(
-                            "Needing approval.",
-                            "Wait for approval from other teachers.",
-                        )) {
+                        TEACHER_COOKIE_NAME -> siren(
+                            StatusOutputModel(
+                                "Needing approval.",
+                                "Wait for approval from other teachers.",
+                            ),
+                        ) {
                             clazz("status")
                             link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
                         }
-                        else -> siren(StatusOutputModel(
-                            "Needing action.",
-                            "Verify your email to proceed with the verification or register using your school id.",
-                        )) {
+                        else -> siren(
+                            StatusOutputModel(
+                                "Needing action.",
+                                "Verify your email to proceed with the verification or register using your school id.",
+                            ),
+                        ) {
                             clazz("status")
                             link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
                         }
@@ -440,7 +453,7 @@ class AuthController(
         val cookie = ResponseCookie.from(STATE_COOKIE_NAME, state)
             .path(STATE_COOKIE_PATH)
             .maxAge(HALF_HOUR)
-            //.domain(NGROK_DOMAIN)
+            // .domain(NGROK_DOMAIN)
             .httpOnly(true)
             .secure(true)
             .sameSite("None")
@@ -482,7 +495,7 @@ class AuthController(
         return ResponseCookie.from(POSITION_COOKIE_NAME, position)
             .path("/api")
             .maxAge(HALF_HOUR)
-            //.domain(NGROK_DOMAIN)
+            // .domain(NGROK_DOMAIN)
             .httpOnly(true)
             .secure(true)
             .sameSite("None")

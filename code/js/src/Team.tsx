@@ -7,7 +7,7 @@ import {List, ListItem, MenuItem, Select, TextField, Typography} from "@mui/mate
 import {SirenEntity} from "./siren/Siren";
 import {ErrorAlert} from "./ErrorAlert";
 import {AuthState, useLoggedIn} from "./Auth";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import {LeaveTeamBody} from "./domain/dto/RequestDtoProperties";
 import {FeedbackBody} from "./domain/dto/TeamDtoProperties";
@@ -29,6 +29,7 @@ export function ShowTeamFetch({
     const [serror, setError] = useState<ErrorMessageModel>(error);
     const [label, setLabel] = useState<string>("");
     const [description, setDescription] = useState<string>("");
+    const navigate = useNavigate();
     const user = useLoggedIn()
 
     const handleLeaveTeam = useCallback(async () => {
@@ -42,11 +43,14 @@ export function ShowTeamFetch({
     const handleSendFeedback = useCallback(async () => {
         if (label === "" || description === "") return
         const body = new FeedbackBody(label, description, teamId)
-        const result = await teamServices.sendFeedback(body);
+        const result = await teamServices.sendFeedback(courseId,classroomId,assignmentId,teamId,body)
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }
-    }, [setError, label, description]);
+        if (result instanceof SirenEntity) {
+            navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + teamId, {replace: true})
+        }
+    }, [setError, label, description,navigate]);
 
     if (!content) {
         return (
@@ -144,14 +148,18 @@ export function ShowTeamRequestsFetch({
         return await teamServices.teamRequests(courseId,classroomId,assignmentId,teamId);
     });
     const [serror, setError] = useState<ErrorMessageModel>(error);
+    const navigate = useNavigate();
     const user = useLoggedIn()
 
-    const handleChangeStatus = useCallback(async () => {
-        const result = await teamServices.changeRequestStatus();
+    const handleChangeStatus = useCallback(async (requestId:number) => {
+        const result = await teamServices.changeRequestStatus(courseId,classroomId,assignmentId,teamId,requestId);
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }
-    }, [setError]);
+        if (result instanceof SirenEntity) {
+            navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + teamId + "/requests", {replace: true})
+        }
+    }, [setError,navigate]);
 
     if (!content) {
         return (
@@ -186,7 +194,10 @@ export function ShowTeamRequestsFetch({
                         {"Join Team Requests"}
                         {content.properties.joinTeam.map((request) =>
                             <ListItem>
-                                {request.creator + " - " + request.state}
+                                {"User " + request.creator + " - " + request.state}
+                                {user === AuthState.Teacher && request.state == "Rejected" ? (
+                                    <Button onClick={() => handleChangeStatus(request.id)}>To pending</Button>
+                                ):null}
                             </ListItem>
                         )}
                     </List>
@@ -194,9 +205,9 @@ export function ShowTeamRequestsFetch({
                         {"Leave Team Requests"}
                         {content.properties.leaveTeam.map((request) =>
                             <ListItem>
-                                {request.creator + " - " + request.state}
-                                {user === AuthState.Teacher && request.state == "rejected" ? (
-                                    <Button onClick={handleChangeStatus}>To pending</Button>
+                                {"User " + request.creator + " - " + request.state}
+                                {user === AuthState.Teacher && request.state == "Rejected" ? (
+                                    <Button onClick={() => handleChangeStatus(request.id)}>To pending</Button>
                                 ):null}
                             </ListItem>
 
