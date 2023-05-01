@@ -1,4 +1,5 @@
 module.exports = {
+    entry: './src/react-components/index.tsx',
     mode: "development",
     resolve: {
         extensions: [".js", ".ts", ".tsx",".css"]

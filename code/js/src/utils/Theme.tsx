@@ -1,4 +1,4 @@
-import {createTheme} from "@mui/material";
+import { createTheme } from "@mui/material"
 
 
 export const mainTheme = createTheme({
@@ -10,4 +10,4 @@ export const mainTheme = createTheme({
             contrastText:'#403e3e'
         }
     },
-});
+})

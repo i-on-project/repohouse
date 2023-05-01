@@ -1,17 +1,16 @@
-import {SirenEntity} from "../../siren/Siren";
-import { Student, Teacher } from "../User";
+import { SirenEntity } from "../../http/Siren"
 
 export type StateDto = SirenEntity<StateDtoProperties>
 
 export interface StateDtoProperties {
-    user: Student | Teacher,
-    authenticated: string,
+    user: string,
+    authenticated: boolean,
 }
 
 export class StateDtoProperties {
     constructor(
-        user: Student | Teacher,
-        authenticated: string,
+        user: string,
+        authenticated: boolean,
     ) {
         this.user = user
         this.authenticated = authenticated
