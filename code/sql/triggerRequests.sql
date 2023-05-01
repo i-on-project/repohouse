@@ -15,11 +15,11 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
-CREATE or Replace trigger CreateTeacherTrigger
-    after update on pendingteacher
-    for each row execute procedure CreateTeacher();
+CREATE trigger CreateTeacherTrigger
+after update on pendingteacher
+for each row execute procedure CreateTeacher();
 
-CREATE OR REPLACE FUNCTION UpdateApplyRequets( )
+CREATE OR REPLACE FUNCTION UpdateApplyRequests( )
 RETURNS trigger
 AS $$
 declare
@@ -46,9 +46,9 @@ END
 $$ LANGUAGE plpgsql;
 
 
-CREATE or Replace trigger UpdateApplyRequetsTrigger
+CREATE trigger UpdateApplyRequestsTrigger
 after update on apply
-for each row execute procedure UpdateApplyRequets();
+for each row execute procedure UpdateApplyRequests();
 
 
 CREATE OR REPLACE FUNCTION DeleteTeachers()
@@ -75,7 +75,7 @@ begin
 END
 $$ LANGUAGE plpgsql;
 
-CREATE or Replace trigger DeleteTeachersTrigger
+CREATE trigger DeleteTeachersTrigger
 after delete on teacher
 for each row execute procedure DeleteTeachers();
 

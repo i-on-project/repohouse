@@ -81,7 +81,7 @@ class AuthController(
     /**
      * Teacher authentication with the respective scope.
      */
-    @GetMapping(Uris.AUTH_TEACHER_PATH)
+    @GetMapping(Uris.AUTH_TEACHER_PATH, produces = ["application/vnd.siren+json"])
     fun authTeacher(
         response: HttpServletResponse,
     ): ResponseEntity<*> {
@@ -97,7 +97,7 @@ class AuthController(
     /**
      * Student authentication with the respective scope.
      */
-    @GetMapping(Uris.AUTH_STUDENT_PATH)
+    @GetMapping(Uris.AUTH_STUDENT_PATH, produces = ["application/vnd.siren+json"])
     fun authStudent(
         response: HttpServletResponse,
     ): ResponseEntity<*> {
@@ -113,11 +113,14 @@ class AuthController(
     /**
      * Checks if user is authenticated.
      */
-    @GetMapping(Uris.AUTH_STATE_PATH)
+    @GetMapping(Uris.AUTH_STATE_PATH, produces = ["application/vnd.siren+json"])
     fun authState(
         user: User,
     ): ResponseEntity<SirenModel<AuthStateOutputModel>> {
-        return siren(AuthStateOutputModel(user, true)) {
+        return siren(AuthStateOutputModel(
+            if (user is Student) STUDENT_COOKIE_NAME else TEACHER_COOKIE_NAME,
+            true
+        )) {
             clazz("auth")
             link(rel = LinkRelation("self"), href = Uris.AUTH_STATE_PATH)
         }
@@ -128,12 +131,12 @@ class AuthController(
      * It fetches the access token and the user info.
      * Check if the user is created and verified, and computes accordingly.
      */
-    @GetMapping(Uris.CALLBACK_PATH, produces = ["application/vnd.siren+json"])
+    @GetMapping(Uris.CALLBACK_PATH)
     suspend fun callback(
         @RequestParam code: String,
         @RequestParam state: String,
-        @CookieValue userState: String,
         @CookieValue position: String,
+        @CookieValue userState: String,
         response: HttpServletResponse,
     ): ResponseEntity<*> {
         if (state != userState) return ResponseEntity
@@ -498,7 +501,7 @@ class AuthController(
             .maxAge(HALF_HOUR)
             .httpOnly(true)
             .secure(true)
-            .sameSite("None")
+            .sameSite("Strict")
             .build()
     }
 
