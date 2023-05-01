@@ -4,29 +4,18 @@ import { SirenEntity } from "../http/Siren"
 import { SystemServices } from "../services/SystemServices"
 import { Typography } from "@mui/material"
 import { Navigate } from "react-router-dom"
-import { AuthState, useLoggedIn } from "./auth/Auth"
-import { AuthServices } from "../services/AuthServices"
-import { useSetLogin } from "./auth/Auth"
+import { useLoggedIn } from "./auth/Auth"
 
 
 export function ShowHomeFetch({
-    authServices,
     systemServices,
 }: {
-    authServices: AuthServices
     systemServices: SystemServices
 }) {
 
     const loggedin = useLoggedIn()
-    const setLoggedIn = useSetLogin()
     const home = useAsync(async () => {
-        const home = await systemServices.home()
-        const state = await authServices.state()
-        if (state instanceof SirenEntity && state.properties.authenticated) {
-            if (state.properties.user === "Student") setLoggedIn(AuthState.Student) 
-            if (state.properties.user === "Teacher") setLoggedIn(AuthState.Teacher) 
-        }
-        return home
+        return await systemServices.home()
     })
     
     if(loggedin) {

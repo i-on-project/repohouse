@@ -1,13 +1,13 @@
-import * as React from "react";
-import { useAsync } from "../http/Fetch";
-import {useCallback, useState} from "react";
-import { ErrorMessageModel } from "../domain/response-models/Error";
-import { SirenEntity } from "../http/Siren";
-import {TextField, Typography} from "@mui/material";
-import {Button} from "react-bootstrap";
-import {Navigate, useLocation, useNavigate} from "react-router-dom";
-import {AuthServices} from "../services/AuthServices";
-import {ErrorAlert} from "./error/ErrorAlert";
+import * as React from "react"
+import { useAsync } from "../http/Fetch"
+import { useCallback, useState } from "react"
+import { ErrorMessageModel } from "../domain/response-models/Error"
+import { SirenEntity } from "../http/Siren"
+import { TextField, Typography } from "@mui/material"
+import { Button } from "react-bootstrap"
+import { Navigate, useLocation, useNavigate } from "react-router-dom"
+import { AuthServices } from "../services/AuthServices"
+import { Error } from "./error/Error"
 
 
 export function ShowCreateTeacherFetch({
@@ -16,10 +16,9 @@ export function ShowCreateTeacherFetch({
     authServices: AuthServices;
 }) {
     const content = useAsync(async () => {
-        return await authServices.getRegisterInfo();
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-    const navigate = useNavigate();
+        return await authServices.getRegisterInfo()
+    })
+    const navigate = useNavigate()
     
     const handleConfirmClick = useCallback((event:any) => {
         event.preventDefault()
@@ -39,11 +38,11 @@ export function ShowCreateTeacherFetch({
             >
                 ...loading...
             </Typography>
-        );
+        )
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+    if (content instanceof ErrorMessageModel) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
 
     return (
@@ -75,7 +74,7 @@ export function ShowCreateTeacherFetch({
                 </>
             ) : null}
         </div>
-    );
+    )
 }
 
 export function ShowCreateStudentFetch({
@@ -84,9 +83,8 @@ export function ShowCreateStudentFetch({
     authServices: AuthServices;
 }) {
     const content = useAsync(async () => {
-        return await authServices.getRegisterInfo();
+        return await authServices.getRegisterInfo()
     })
-    const [error, setError] = useState<ErrorMessageModel>(null)
     const navigate = useNavigate()
     const [schoolId, setSchoolId] = useState<number>(null)
 
@@ -108,11 +106,11 @@ export function ShowCreateStudentFetch({
             >
                 ...loading...
             </Typography>
-        );
+        )
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+    if (content instanceof ErrorMessageModel) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
 
     return (
@@ -144,21 +142,19 @@ export function ShowCreateStudentFetch({
                     <Button onClick={handleDeclineClick}> {"Decline"} </Button>
                 </>
             ) : null}
-            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
-    );
+    )
 }
 
 export function ShowCreateTeacherFetchPost({
     authServices,
 }: {
-    authServices: AuthServices;
+    authServices: AuthServices
 }) {
     const content = useAsync(async () => {
-        return await authServices.createTeacherPost();
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-
+        return await authServices.createTeacherPost()
+    })
+   
     if (!content) {
         return (
             <Typography
@@ -170,8 +166,8 @@ export function ShowCreateTeacherFetchPost({
         );
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+    if (content instanceof ErrorMessageModel) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
 
     return <Navigate to={"/auth/status"}/>
@@ -181,14 +177,13 @@ export function ShowCreateTeacherFetchPost({
 export function ShowCreateStudentFetchPost({
     authServices,
 }: {
-    authServices: AuthServices;
+    authServices: AuthServices
 }) {
     const location = useLocation()
     const content = useAsync(async () => {
         return await authServices.createStudentPost(location.state.schoolId);
     })
-    const [error, setError] = useState<ErrorMessageModel>(null)
-
+    
     if (!content) {
         return (
             <Typography
@@ -197,11 +192,11 @@ export function ShowCreateStudentFetchPost({
             >
                 ...loading...
             </Typography>
-        );
+        )
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content)
+    if (content instanceof ErrorMessageModel) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
 
     return <Navigate to={"/auth/verify"}/>

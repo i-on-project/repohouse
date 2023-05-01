@@ -1,26 +1,25 @@
-import * as React from "react";
-import { useAsync } from "../../http/Fetch";
-import {useState} from "react";
-import { ErrorMessageModel } from "../../domain/response-models/Error";
-import { SirenEntity } from "../../http/Siren";
-import { Typography } from "@mui/material";
-import {AuthServices} from "../../services/AuthServices";
-import {ErrorAlert} from "../error/ErrorAlert";
+import * as React from "react"
+import { useAsync } from "../../http/Fetch"
+import { ErrorMessageModel } from "../../domain/response-models/Error"
+import { SirenEntity } from "../../http/Siren"
+import { Typography } from "@mui/material"
+import { AuthServices } from "../../services/AuthServices"
+import { Error } from "../error/Error"
 
 export function ShowStatusFetch({
     authServices,
 }: {
-    authServices: AuthServices;
+    authServices: AuthServices
 }) {
+
+     const content = useAsync(async () => {
+        return await authServices.status()
+    })
+
     if (window.opener) {
         window.opener.postMessage({type:"Auth", data:'/auth/status'},'http://localhost:3000/')
         window.close()
     }
-
-    const content = useAsync(async () => {
-        return await authServices.status();
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
 
     if (!content) {
         return (
@@ -30,14 +29,12 @@ export function ShowStatusFetch({
             >
                 ...loading...
             </Typography>
-        );
+        )
     }
 
     if (content instanceof ErrorMessageModel) {
-        setError(content);
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
-
-
 
     return (
         <div
@@ -67,14 +64,6 @@ export function ShowStatusFetch({
                     </Typography>
                 </>
             ) : null}
-            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
-    );
-}
-
-
-export function ShowStatusCallbackFetch() {
-    window.opener.postMessage({type:"Auth", data:'http://localhost:3000/auth/status'},'http://localhost:3000/')
-    window.close()
-    return (<> </>)
+    )
 }

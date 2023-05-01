@@ -1,25 +1,12 @@
 import * as React from 'react'
-import {useCallback, useState} from 'react'
-import {AuthState, useLoggedIn, useSetLogin} from './auth/Auth'
-import {NavLink, Outlet, useNavigate} from "react-router-dom"
-import {
-    AppBar,
-    Avatar,
-    Box,
-    Button,
-    Container,
-    IconButton,
-    Menu,
-    MenuItem,
-    ThemeProvider,
-    Toolbar,
-    Tooltip,
-    Typography
-} from "@mui/material"
-import {AuthServices} from "../services/AuthServices";
-import MenuIcon from '@mui/icons-material/Menu';
-import LoginIcon from '@mui/icons-material/Login';
-import {mainTheme} from "../utils/Theme";
+import { useCallback, useState } from 'react'
+import { AuthState, useLoggedIn, useSetLogin } from './auth/Auth'
+import { NavLink, Outlet, useNavigate } from "react-router-dom"
+import { AppBar, Avatar, Box, Button, Container, IconButton, Menu, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography } from "@mui/material"
+import { AuthServices } from "../services/AuthServices"
+import MenuIcon from '@mui/icons-material/Menu'
+import LoginIcon from '@mui/icons-material/Login'
+import { mainTheme } from "../utils/Theme"
 
 
 export function NavBarShow({ authServices }: { authServices: AuthServices }) {
