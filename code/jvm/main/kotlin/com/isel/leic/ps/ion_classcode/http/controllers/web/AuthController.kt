@@ -48,7 +48,7 @@ import java.util.UUID
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org user:email repo"
-const val MOBILE_GITHUB_TEACHER_SCOPE = "read:org%20user:email%20repo"
+const val MOBILE_GITHUB_TEACHER_SCOPE = "admin:org user:email repo"
 const val GITHUB_STUDENT_SCOPE = "repo user:email"
 
 const val STUDENT_COOKIE_NAME = "Student"
@@ -61,8 +61,8 @@ const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
 
-// const val NGROK_DOMAIN = "947b-2001-818-e975-8500-5c24-94b1-29c4-34e2.ngrok-free.app"
-// const val NGROK_URI = "https://$NGROK_DOMAIN"
+val FRONTEND_NGROK_URI = System.getenv("FRONTEND_NGROK_KEY") ?: "http://localhost:3000"
+val BACKEND_NGROK_URI = System.getenv("BACKEND_NGROK_KEY") ?: "http://localhost:8080"
 
 /**
  * This controller is responsible for the authentication of the users.
@@ -117,10 +117,12 @@ class AuthController(
     fun authState(
         user: User,
     ): ResponseEntity<SirenModel<AuthStateOutputModel>> {
-        return siren(AuthStateOutputModel(
-            if (user is Student) STUDENT_COOKIE_NAME else TEACHER_COOKIE_NAME,
-            true
-        )) {
+        return siren(
+            AuthStateOutputModel(
+                if (user is Student) STUDENT_COOKIE_NAME else TEACHER_COOKIE_NAME,
+                true,
+            ),
+        ) {
             clazz("auth")
             link(rel = LinkRelation("self"), href = Uris.AUTH_STATE_PATH)
         }
@@ -142,7 +144,7 @@ class AuthController(
         if (state != userState) {
             return ResponseEntity
                 .status(Status.REDIRECT)
-                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/error/callback")
                 .body(EMPTY_REQUEST)
         }
         val accessToken = githubServices.fetchAccessToken(code)
@@ -156,7 +158,7 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/student")
+                                .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/menu/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
                         userInfo.value is Teacher && position == TEACHER_COOKIE_NAME -> {
@@ -164,14 +166,14 @@ class AuthController(
                                 is Result.Problem ->
                                     ResponseEntity
                                         .status(Status.REDIRECT)
-                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                        .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/error/callback")
                                         .body(EMPTY_REQUEST)
                                 is Result.Success -> {
                                     val cookie = generateSessionCookie(userInfo.value.token)
                                     ResponseEntity
                                         .status(Status.REDIRECT)
                                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "http://localhost:3000/menu/callback/teacher")
+                                        .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/menu/callback/teacher")
                                         .body(EMPTY_REQUEST)
                                 }
                             }
@@ -183,7 +185,7 @@ class AuthController(
                             response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
                             return ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/fail/callback")
+                                .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/fail/callback")
                                 .body(EMPTY_REQUEST)
                         }
                     }
@@ -193,14 +195,14 @@ class AuthController(
                         ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/status")
+                            .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/status")
                             .body(EMPTY_REQUEST)
                     } else {
                         val cookie = generateGithubIdCookie(userGithubInfo.id)
                         ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                            .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/verify")
+                            .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/verify")
                             .body(EMPTY_REQUEST)
                     }
                 }
@@ -225,13 +227,13 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/teacher")
+                                .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/create/callback/teacher")
                                 .body(EMPTY_REQUEST)
                         }
                         is Result.Problem ->
                             ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/error/callback")
                                 .body(EMPTY_REQUEST)
                     }
                 } else {
@@ -251,13 +253,13 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/create/callback/student")
+                                .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/create/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
                         is Result.Problem ->
                             ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "http://localhost:3000/auth/error/callback")
+                                .header(HttpHeaders.LOCATION, "$FRONTEND_NGROK_URI/auth/error/callback")
                                 .body(EMPTY_REQUEST)
                     }
                 }
@@ -442,7 +444,9 @@ class AuthController(
         val requestCookies = request.cookies
         requestCookies.forEach { cookie ->
             cookie.maxAge = 0
-            cookie.path = "/api"
+            cookie.secure = true
+            cookie.isHttpOnly = true
+            cookie.path = "/"
             response.addCookie(cookie)
         }
         return siren(null) {
@@ -456,7 +460,7 @@ class AuthController(
         val cookie = ResponseCookie.from(STATE_COOKIE_NAME, state)
             .path(STATE_COOKIE_PATH)
             .maxAge(HALF_HOUR)
-            // .domain(NGROK_DOMAIN)
+            .domain(".ngrok-free.app")
             .httpOnly(true)
             .secure(true)
             .sameSite("None")
@@ -472,6 +476,7 @@ class AuthController(
         return ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, AESEncrypt.encrypt(token))
             .httpOnly(true)
             .sameSite("Strict")
+            .domain(".ngrok-free.app")
             .secure(true)
             .maxAge(FULL_DAY)
             .path("/api")
@@ -485,6 +490,7 @@ class AuthController(
         return ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, "")
             .httpOnly(true)
             .sameSite("Strict")
+            .domain(".ngrok-free.app")
             .secure(true)
             .maxAge(0)
             .path("/api")
@@ -498,7 +504,7 @@ class AuthController(
         return ResponseCookie.from(POSITION_COOKIE_NAME, position)
             .path("/api")
             .maxAge(HALF_HOUR)
-            // .domain(NGROK_DOMAIN)
+            .domain(".ngrok-free.app")
             .httpOnly(true)
             .secure(true)
             .sameSite("None")
@@ -512,6 +518,7 @@ class AuthController(
         return ResponseCookie.from(GITHUB_ID_COOKIE_NAME, AESEncrypt.encrypt(gitHubId.toString()))
             .path("/api")
             .maxAge(HALF_HOUR)
+            .domain(".ngrok-free.app")
             .httpOnly(true)
             .secure(true)
             .sameSite("Strict")
@@ -525,6 +532,7 @@ class AuthController(
         return ResponseCookie.from(GITHUB_ID_COOKIE_NAME, "")
             .httpOnly(true)
             .sameSite("Strict")
+            .domain(".ngrok-free.app")
             .secure(true)
             .maxAge(0)
             .path("/api")

@@ -13,7 +13,7 @@ export function ShowStatusFetch({
     authServices: AuthServices;
 }) {
     if (window.opener) {
-        window.opener.postMessage({type:"Auth", data:'/auth/status'},'http://localhost:3000/')
+        window.opener.postMessage({type:"Auth", data:'/auth/status'},process.env.FRONTEND_NGROK_KEY)
         window.close()
     }
 
@@ -74,7 +74,7 @@ export function ShowStatusFetch({
 
 
 export function ShowStatusCallbackFetch() {
-    window.opener.postMessage({type:"Auth", data:'http://localhost:3000/auth/status'},'http://localhost:3000/')
+    window.opener.postMessage({type:"Auth", data:'/auth/status'},process.env.FRONTEND_NGROK_KEY)
     window.close()
     return (<> </>)
 }

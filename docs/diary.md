@@ -40,3 +40,8 @@
 - Remoção do 'Apply' dos requests, pois não existe um utilizador ainda para o fazer, mas sim um professor pendente
 - Implementação de ‘triggers’
 - localhost para 127.0.0.1 devido ao redirect da documetnação do github oauth
+
+## 2 Maio - Ricardo
+- Arranjar cookies com a utilização do ngrok
+- Opçao de domain com '.ngrok-free.app' para os cookies
+- Problema no logout, pois são feitos pedidos para o localhost e não para o ngrok

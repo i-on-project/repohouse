@@ -208,13 +208,13 @@ export function ShowCreateStudentFetchPost({
 }
 
 export function ShowCreateCallbackStudent() {
-    window.opener.postMessage({type:"Auth", data:'/auth/create/student'},'http://localhost:3000/')
+    window.opener.postMessage({type:"Auth", data:'/auth/create/student'},'https://324b-2001-818-e975-8500-174-d17d-e3f5-574f.ngrok-free.app')
     window.close()
     return (<> </>)
 }
 
 export function ShowCreateCallbackTeacher() {
-    window.opener.postMessage({type:"Auth", data:'/auth/create/teacher'},'http://localhost:3000/')
+    window.opener.postMessage({type:"Auth", data:'/auth/create/teacher'},'https://324b-2001-818-e975-8500-174-d17d-e3f5-574f.ngrok-free.app')
     window.close()
     return (<> </>)
 }

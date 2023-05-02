@@ -27,7 +27,8 @@
     "react-router-dom": "^6.10.0",
     "siren-js": "^0.2.4",
     "styled-components": "^5.3.6",
-    "uri-template": "^2.0.0"
+    "uri-template": "^2.0.0",
+    "webpack": "^5.81.0"
   },
   "scripts": {
     "start": "webpack serve"

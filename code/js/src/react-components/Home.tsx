@@ -21,7 +21,9 @@ export function ShowHomeFetch({
     const setLoggedIn = useSetLogin()
     const home = useAsync(async () => {
         const home = await systemServices.home()
+        console.log(home)
         const state = await authServices.state()
+        console.log(state)
         if (state instanceof SirenEntity && state.properties.authenticated) {
             if (state.properties.user === "Student") setLoggedIn(AuthState.Student) 
             if (state.properties.user === "Teacher") setLoggedIn(AuthState.Teacher) 

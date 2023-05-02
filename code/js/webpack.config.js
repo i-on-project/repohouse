@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
     entry: './src/react-components/index.tsx',
     mode: "development",
@@ -7,6 +9,7 @@ module.exports = {
     devServer: {
         port: process.env.PORT ? process.env.PORT : 3000,
         historyApiFallback: true,
+        allowedHosts: [".ngrok-free.app"],
         proxy: {
             '/api': {
                 target: 'http://localhost:8080',
@@ -14,6 +17,11 @@ module.exports = {
             }
         }
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            "process.env.FRONTEND_NGROK_KEY": JSON.stringify(process.env.FRONTEND_NGROK_KEY)
+        }),
+    ],
     module: {
         rules: [
             {

@@ -123,7 +123,7 @@ class SystemController {
         block.action(title = "createClassroom", href = Uris.CREATE_CLASSROOM_PATH, method = HttpMethod.POST, type = "application/json") {
             textField(name = "name")
         }
-        block.action(title = "createAssignment", href = Uris.CREATE_ASSIGMENT_PATH, method = HttpMethod.POST, type = "application/json") {
+        block.action(title = "createAssignment", href = Uris.CREATE_ASSIGNMENT_PATH, method = HttpMethod.POST, type = "application/json") {
             textField(name = "name")
         }
         block.action(title = "deleteAssignment", href = Uris.DELETE_ASSIGMENT_PATH, method = HttpMethod.DELETE, type = "application/json") {

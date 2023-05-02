@@ -19,7 +19,7 @@ export function ShowVerifyFetch({
 }) {
 
     if (window.opener) {
-        window.opener.postMessage({type:"Auth", data:'/auth/verify'},'http://localhost:3000/')
+        window.opener.postMessage({type:"Auth", data:'/auth/verify'},process.env.FRONTEND_NGROK_KEY)
         window.close()
     }
 

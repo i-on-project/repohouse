@@ -1,13 +1,16 @@
 package com.isel.leic.ps.ion_classcode.http
 
+import com.isel.leic.ps.ion_classcode.http.controllers.web.BACKEND_NGROK_URI
+
 const val GITHUB_BASE_URL = "https://github.com"
 const val GITHUB_API_BASE_URL = "https://api.github.com"
+
 val GITHUB_OAUTH_URI: (scope: String, state: String) -> String = { scope, state ->
-        "/login/oauth/authorize?" +
+    "/login/oauth/authorize?" +
         "client_id=${System.getenv("GITHUB_CLIENT_ID")}" +
         "&scope=$scope" +
-        "&state=$state" //+
-        //"&redirect_uri=$NGROK_URI/api/auth/callback"
+        "&state=$state" +
+        "&redirect_uri=$BACKEND_NGROK_URI/api/auth/callback"
 }
 
 const val GITHUB_USERINFO_URI = "/user"
