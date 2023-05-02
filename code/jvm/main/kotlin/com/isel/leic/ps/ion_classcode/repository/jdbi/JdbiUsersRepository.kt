@@ -278,7 +278,7 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
-    override fun getPendingUserByGithubId(githubId: Long): User? {
+    override fun getPendingTeacherByGithubId(githubId: Long): PendingTeacher? {
         return handle.createQuery(
             """
             SELECT  id,name,email,github_username,is_created,github_id,token,github_token FROM pendingteacher
@@ -289,8 +289,12 @@ class JdbiUsersRepository(
             .bind("github_id", githubId)
             .mapTo<PendingTeacher>()
             .firstOrNull()
-            ?: handle.createQuery(
-                """
+
+    }
+
+    override fun getPendingStudentByGithubId(githubId: Long): PendingStudent? {
+        return handle.createQuery(
+            """
             SELECT id,name,email,github_username,is_created,github_id,token FROM pendingstudent
             WHERE github_id = :github_id
             """,

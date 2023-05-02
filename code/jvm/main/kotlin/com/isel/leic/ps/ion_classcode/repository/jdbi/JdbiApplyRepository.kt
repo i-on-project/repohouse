@@ -87,7 +87,7 @@ class JdbiApplyRepository(
             .firstOrNull()
     }
 
-    override fun changeApplyRequestState(id: Int, state: String): Int {
+    override fun changeApplyRequestState(id: Int, state: String): Boolean {
         return handle.createUpdate(
             """
             UPDATE apply SET state = :state
@@ -96,6 +96,6 @@ class JdbiApplyRepository(
         )
             .bind("id", id)
             .bind("state", state)
-            .execute()
+            .execute() > 0
     }
 }

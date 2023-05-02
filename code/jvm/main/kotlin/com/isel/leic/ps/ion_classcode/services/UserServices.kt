@@ -1,4 +1,4 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.User
@@ -67,9 +67,9 @@ class UserServices(
     /**
      * Method to get a pending user by GitHub id
      */
-    fun getPendingUserByGithubId(githubId: Long): UserByGithubIdResult {
+    fun getPendingUserByGithubId(githubId: Long, position: String): UserByGithubIdResult {
         return transactionManager.run {
-            val user = it.usersRepository.getPendingUserByGithubId(githubId)
+            val user = if (position == "Teacher") it.usersRepository.getPendingTeacherByGithubId(githubId) else it.usersRepository.getPendingStudentByGithubId(githubId)
             if (user == null) {
                 Result.Problem(UserServicesError.UserNotFound)
             } else {

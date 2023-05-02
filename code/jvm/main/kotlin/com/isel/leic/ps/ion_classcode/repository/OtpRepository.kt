@@ -12,4 +12,5 @@ interface OtpRepository {
     fun getOtpRequest(userId: Int): Otp?
     fun addTryToOtpRequest(userId: Int, tries: Int): Boolean
     fun deleteOtpRequest(userId: Int)
+
 }

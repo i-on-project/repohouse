@@ -1,9 +1,8 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInput
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.services.EmailService
 import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.scheduling.annotation.Scheduled
@@ -71,7 +70,7 @@ class OutboxServices(
      * Method to check the otp
      */
     fun checkOtp(userId: Int, otp: Int): OutboxResponse {
-        if (userId <= 0 || otp <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
+        if (otp <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId = userId)
             if (cooldown != null) {

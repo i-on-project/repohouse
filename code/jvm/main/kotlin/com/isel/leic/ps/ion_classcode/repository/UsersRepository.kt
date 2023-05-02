@@ -31,7 +31,8 @@ interface UsersRepository {
     fun getUserByEmail(email: String): User?
     fun getUserByToken(token: String): User?
     fun getUserByGithubId(githubId: Long): User?
-    fun getPendingUserByGithubId(githubId: Long): User?
+    fun getPendingStudentByGithubId(githubId: Long): PendingStudent?
+    fun getPendingTeacherByGithubId(githubId: Long): PendingTeacher?
     fun getStudentSchoolId(id: Int): Int?
     fun updateUserStatus(id: Int)
     fun deleteStudent(id: Int)

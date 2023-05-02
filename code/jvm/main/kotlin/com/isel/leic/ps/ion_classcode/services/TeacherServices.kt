@@ -36,6 +36,7 @@ typealias TeacherOrgsResponse = Result<TeacherServicesError, List<GitHubOrgsMode
 sealed class TeacherServicesError {
     object CourseNotFound : TeacherServicesError()
     object TeacherNotFound : TeacherServicesError()
+    object RequestNotFound : TeacherServicesError()
     object InvalidData : TeacherServicesError()
     object GithubUserNameInUse : TeacherServicesError()
     object GithubIdInUse : TeacherServicesError()
@@ -56,7 +57,7 @@ class TeacherServices(
      */
     fun createTeacher(githubId: Long): TeacherCreationResult {
         return transactionManager.run {
-            val teacher = it.usersRepository.getPendingUserByGithubId(githubId) ?: Result.Problem(TeacherServicesError.TeacherNotFound)
+            val teacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: Result.Problem(TeacherServicesError.TeacherNotFound)
             if (teacher is PendingTeacher) {
                 if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) Result.Problem(
                     TeacherServicesError.GithubUserNameInUse
@@ -119,11 +120,13 @@ class TeacherServices(
     fun approveTeachers(teachers: TeachersPendingInputModel): TeachersApproveResponse {
         if (teachers.isNotValid()) return Result.Problem(TeacherServicesError.InvalidData)
         return transactionManager.run {
-            teachers.approved.map { teacherRequest ->
-                it.applyRequestRepository.changeApplyRequestState(teacherRequest, "Accepted")
+            teachers.approved.forEach { teacherRequest ->
+                val updated = it.applyRequestRepository.changeApplyRequestState(teacherRequest, "Accepted")
+                if (!updated) return@run Result.Problem(TeacherServicesError.RequestNotFound)
             }
-            teachers.rejected.map { teacherRequest ->
-                it.applyRequestRepository.changeApplyRequestState(teacherRequest, "Rejected")
+            teachers.rejected.forEach { teacherRequest ->
+                val updated = it.applyRequestRepository.changeApplyRequestState(teacherRequest, "Rejected")
+                if (!updated) return@run Result.Problem(TeacherServicesError.RequestNotFound)
             }
             Result.Success(getTeachersNeedingApproval(it))
         }
@@ -159,6 +162,7 @@ class TeacherServices(
         return when (error) {
             is TeacherServicesError.CourseNotFound -> Problem.courseNotFound
             is TeacherServicesError.TeacherNotFound -> Problem.userNotFound
+            is TeacherServicesError.RequestNotFound -> Problem.notFound
             is TeacherServicesError.InvalidData -> Problem.invalidInput
             is TeacherServicesError.TokenInUse -> Problem.internalError
             is TeacherServicesError.EmailInUse -> Problem.internalError
@@ -169,9 +173,9 @@ class TeacherServices(
     }
 
     suspend fun getTeacherOrgs(teacherId: Int, githubToken:String): TeacherOrgsResponse {
-       val orgs = githubServices.fetchTeacherOrgs(githubToken).map {GitHubOrgsModel(it.login,it.url.replace("api.github.com/orgs","github.com"),it.avatar_url) }
+        val orgs = githubServices.fetchTeacherOrgs(githubToken).map {GitHubOrgsModel(it.login,it.url.replace("api.github.com/orgs","github.com"),it.avatar_url) }
         return transactionManager.run {
-            it.usersRepository.getTeacher(teacherId) ?: Result.Problem(TeacherServicesError.TeacherNotFound)
+            it.usersRepository.getTeacher(teacherId) ?: Result.Problem(TeacherServicesError.InternalError)
             val teacherCourses = it.courseRepository.getAllUserCourses(teacherId)
             val orgsToAdd = orgs.filter { org ->
                 teacherCourses.none { teacherOrg ->

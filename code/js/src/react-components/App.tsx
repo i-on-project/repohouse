@@ -11,7 +11,6 @@ import { ShowAuthStudentFetch } from "./auth/AuthStudent"
 import { ShowMenuCallbackFetch, ShowMenuFetch } from "./Menu"
 import { ShowCourseCreateFetch, ShowCourseCreatePost, ShowCourseFetch } from "./Course"
 import { ShowTeacherApprovalFetch } from "./ApproveTeachers"
-import { ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentFetch, ShowCreateStudentFetchPost, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost} from "./Create"
 import { ShowStatusFetch } from "./auth/Status"
 import { ShowVerifyFetch } from "./auth/Verify"
 import { HandleAuthError, HandleAuthErrorCallback, HandleAuthFail, HandleAuthFailCallback } from './auth/AuthProblem'
@@ -20,6 +19,8 @@ import { ShowAssigmentTeamsFetch, ShowAssignmentFetch, ShowCreateAssignment } fr
 import { ShowCreateDelivery, ShowDeliveryFetch, ShowEditDelivery } from "./Delivery"
 import { ShowTeamFetch, ShowTeamRequestsFetch } from "./Team"
 import { Assignment } from "../domain/response-models/Assignment"
+import { ShowCreateCallbackStudent, ShowCreateStudentFetch, ShowCreateStudentFetchPost } from './auth/CreateStudent'
+import { ShowCreateCallbackTeacher, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost } from './auth/CreateTeacher'
 
 const router = createBrowserRouter([
     {
@@ -293,7 +294,7 @@ function Status() {
 function Verify() {
     return (
         <div>
-            <ShowVerifyFetch authServices={authServices} error={null}/>
+            <ShowVerifyFetch authServices={authServices}/>
         </div>
     )
 }
