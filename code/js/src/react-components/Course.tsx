@@ -10,33 +10,39 @@ import { CourseBody } from "../domain/dto/CourseDtoProperties"
 import { Button, Image } from "react-bootstrap"
 import { GitHubOrg } from "../domain/response-models/GitHubOrgs"
 import { AuthState, useLoggedIn } from "./auth/Auth"
+import { Error } from "./error/Error"
+
 
 export function ShowCourseFetch({
     courseServices, courseId
 }: {
-    courseServices: CourseServices;
-    courseId: number;
+    courseServices: CourseServices
+    courseId: number
 }) {
     const content = useAsync(async () => {
         return await courseServices.course({courseId: courseId})
     })
-    const [error, setError] = useState<ErrorMessageModel>(null)
+    const [error, setError] = useState(false)
     const navigate = useNavigate()
     const user = useLoggedIn()
 
     const handleArchiveButton = useCallback(async () => {
-        const result = await courseServices.archiveCourse(courseId);
+        const result = await courseServices.archiveCourse(courseId)
         if (result instanceof ErrorMessageModel) {
-            setError(result);
+            setError(true)
         }
         if (result instanceof SirenEntity) {
             navigate("/menu")
         }
-    }, [setError]);
+    }, [setError])
 
     const handleCreateClassroom = useCallback(async () => {
         navigate("/courses/" + courseId + "/classrooms/create");
-    }, [navigate]);
+    }, [navigate])
+
+    if (content instanceof ErrorMessageModel || error) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
+    }
 
     if (!content) {
         return (
@@ -49,8 +55,8 @@ export function ShowCourseFetch({
         );
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+    if (content instanceof ErrorMessageModel) {
+        setError(true)
     }
 
     return (
@@ -108,11 +114,15 @@ export function ShowCourseCreateFetch({
         return await courseServices.getTeacherOrgs()
     })
     const navigate = useNavigate()
-    const [error, setError] = useState<ErrorMessageModel>(null)
+    const [error, setError] = useState(true)
     
     const handleSubmit = useCallback((org: GitHubOrg) => {
         navigate("/courses/create", {state: {body: new CourseBody(org.login, org.url)} })
     }, [])
+
+    if (content instanceof ErrorMessageModel || error) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
+    }
 
     if (!content) {
         return (
@@ -125,8 +135,8 @@ export function ShowCourseCreateFetch({
         );
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content)
+    if (content instanceof ErrorMessageModel) {
+        setError(true)
     }
 
     return (
@@ -158,10 +168,14 @@ export function ShowCourseCreateFetch({
 
 export function ShowCourseCreatePost({ courseServices }: { courseServices: CourseServices }) {
     const location = useLocation()
-    const [error, setError] = useState<ErrorMessageModel>(null)
+    const [error, setError] = useState(false)
     const content = useAsync(async () => {
         return await courseServices.createCourse(location.state.body) 
     })
+
+    if (content instanceof ErrorMessageModel || error) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
+    }
 
     if (!content) {
         return (
@@ -169,8 +183,8 @@ export function ShowCourseCreatePost({ courseServices }: { courseServices: Cours
         )
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content)
+    if (content instanceof ErrorMessageModel) {
+        setError(true)
     }
 
     if (content instanceof SirenEntity) {

@@ -13,5 +13,5 @@ interface ApplyRepository {
     fun getApplyRequestById(id: Int): Apply?
     fun getApplyRequestsByUser(teacherId: Int): List<Apply>
     fun getPendingTeacherByApply(applyId: Int): PendingTeacher?
-    fun changeApplyRequestState(id: Int, state: String): Int
+    fun changeApplyRequestState(id: Int, state: String): Boolean
 }

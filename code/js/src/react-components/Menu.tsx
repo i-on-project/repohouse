@@ -6,9 +6,9 @@ import { SirenEntity } from "../http/Siren"
 import { Box, List, ListItem, Modal, TextField, Typography } from "@mui/material"
 import { MenuServices } from "../services/MenuServices"
 import { Link, useParams } from "react-router-dom"
-import { ErrorAlert } from "./error/ErrorAlert"
 import { AuthState, toState, useLoggedIn } from "./auth/Auth"
 import { Button } from "react-bootstrap"
+import { Error } from "./error/Error"
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -32,9 +32,9 @@ export function ShowMenuFetch({
     const content = useAsync(async () => {
         return await menuServices.menu()
     })
-    const [error, setError] = useState<ErrorMessageModel>(null)
     const [isOpened, setIsOpened] = useState(false)
     const [inviteCode, setInviteCode] = useState<string>('')
+    const [error, setError] = useState(false)
     const loggedIn = useLoggedIn()
 
     const handleChangeInviteCode = useCallback(async (value) => {
@@ -45,7 +45,7 @@ export function ShowMenuFetch({
         if (inviteCode === '') return
         const response = await menuServices.inviteLink(inviteCode)
         if (response instanceof ErrorMessageModel) {
-            setError(response)
+            setError(true)
         } else {
             setIsOpened(false)
         }
@@ -59,11 +59,11 @@ export function ShowMenuFetch({
             >
                 ...loading...
             </Typography>
-        );
+        )
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content)
+    if (content instanceof ErrorMessageModel || error) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
 
     return (
@@ -107,6 +107,12 @@ export function ShowMenuFetch({
                             </Button>
                         </Box>
                     </Modal>
+                    <Typography
+                        variant="h6"
+                        gutterBottom
+                    >
+                        {"Your Courses:"}
+                    </Typography>
                     <List>
                         {content.properties.courses.map( course => (
                             <ListItem key={course.id}>
@@ -125,12 +131,12 @@ export function ShowMenuFetch({
                     { loggedIn === AuthState.Teacher ? (
                         <>
                             <Link to={"/teacher/orgs"}> Create Course </Link>
+                            <br/>
                             <Link to={"/pending-teachers"}> Pending Teachers </Link>
                         </>
                     ) : null}
                 </>
             ) : null}
-            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
     )
 }

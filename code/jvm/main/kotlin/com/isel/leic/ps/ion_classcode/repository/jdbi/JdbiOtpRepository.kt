@@ -1,15 +1,11 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
 import com.isel.leic.ps.ion_classcode.domain.Otp
-import com.isel.leic.ps.ion_classcode.domain.Outbox
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInput
-import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.OtpRepository
-import com.isel.leic.ps.ion_classcode.repository.OutboxRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
-import java.time.Instant
 
 const val INTERVAL = "10 MINUTES"
 
@@ -54,7 +50,7 @@ class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
             """,
         )
             .bind("id", userId)
-            .bind("tries", numbTry)
+            .bind("numbTry", numbTry)
             .execute() > 0
     }
 

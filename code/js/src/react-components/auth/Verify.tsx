@@ -1,50 +1,41 @@
-import * as React from "react";
-import {useCallback, useState} from "react";
-import { ErrorMessageModel } from "../../domain/response-models/Error";
-import {TextField, Typography} from "@mui/material";
-import {Button} from "react-bootstrap";
-import {Navigate} from "react-router-dom";
-import {AuthServices} from "../../services/AuthServices";
-import {ErrorAlert} from "../error/ErrorAlert";
-import {OTPBody} from "../../domain/dto/PendingUserDtoProperties";
-import {AuthState, useSetLogin} from "./Auth";
-import {SirenEntity} from "../../http/Siren";
+import * as React from "react"
+import { useCallback, useState } from "react"
+import { ErrorMessageModel } from "../../domain/response-models/Error"
+import { TextField, Typography } from "@mui/material"
+import { Button } from "react-bootstrap"
+import { Navigate } from "react-router-dom"
+import { AuthServices } from "../../services/AuthServices"
+import { ErrorAlert } from "../error/ErrorAlert"
+import { OTPBody } from "../../domain/dto/PendingUserDtoProperties"
+import { SirenEntity } from "../../http/Siren"
 
 export function ShowVerifyFetch({
-  authServices,
-    error
+    authServices,
 }: {
-    authServices: AuthServices;
-    error: ErrorMessageModel;
+    authServices: AuthServices
 }) {
 
-    if (window.opener) {
-        window.opener.postMessage({type:"Auth", data:'/auth/verify'},process.env.FRONTEND_NGROK_KEY)
-        window.close()
-    }
-
-    const [otp, setOtp] = useState<number>(null);
-    const [serror, setError] = useState<ErrorMessageModel>(error);
-    const setLogin = useSetLogin();
+    const [otp, setOtp] = useState<number>(null)
+    const [serror, setError] = useState<ErrorMessageModel>(null)
     const [redirect,setRedirect] = useState(false)
 
     const handleSubmit = useCallback(async (event: any) => {
         event.preventDefault()
         if (otp != null && otp > 0) {
             const otpBody = new OTPBody(otp)
-            const res = await authServices.verify(otpBody);
+            const res = await authServices.verify(otpBody)
             if (res instanceof ErrorMessageModel) {
                 setError(res)
             }
             if (res instanceof SirenEntity) {
-                setLogin(AuthState.Student)
                 setRedirect(true)
             }
         }
-    },[otp,setError,setLogin,setRedirect])
+    },[otp,setError,setRedirect])
 
-    if (redirect){
-        return <Navigate to={"/menu"} replace={true}/>
+
+    if (redirect) {
+        return <Navigate to={"/auth/status"}/>
     }
 
     return (
@@ -64,5 +55,5 @@ export function ShowVerifyFetch({
             <Button onClick={handleSubmit}>Send</Button>
             <ErrorAlert error={serror} onClose={() => { setError(null) }}/>
         </div>
-    );
+    )
 }

@@ -15,7 +15,7 @@ export function ShowHomeFetch({
 
     const loggedin = useLoggedIn()
     const home = useAsync(async () => {
-        return await systemServices.home()
+        if (!loggedin) return await systemServices.home()
     })
     
     if(loggedin) {

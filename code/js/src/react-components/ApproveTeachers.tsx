@@ -1,14 +1,15 @@
-import * as React from "react";
-import { useAsync } from "../http/Fetch";
-import {useCallback, useState} from "react";
-import { ErrorMessageModel } from "../domain/response-models/Error";
-import { SirenEntity } from "../http/Siren";
-import {List, ListItem, Typography} from "@mui/material";
-import {MenuServices} from "../services/MenuServices";
-import {Button} from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { Checkbox } from '@mui/material';
-import {Check, Close, Remove} from "@mui/icons-material";
+import * as React from "react"
+import { useAsync } from "../http/Fetch"
+import { useCallback, useState } from "react"
+import { ErrorMessageModel } from "../domain/response-models/Error"
+import { SirenEntity } from "../http/Siren"
+import { List, ListItem, Typography } from "@mui/material"
+import { MenuServices } from "../services/MenuServices"
+import { Button } from "react-bootstrap"
+import { useNavigate } from "react-router-dom"
+import { Checkbox } from '@mui/material'
+import { Check, Close, Remove } from "@mui/icons-material"
+import { Error } from "./error/Error"
 
 export function ShowTeacherApprovalFetch({
     menuServices,
@@ -17,8 +18,8 @@ export function ShowTeacherApprovalFetch({
 }) {
     const content = useAsync(async () => {
         return await menuServices.getTeachersPendingApproval()
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null)
+    })
+    const [error, setError] = useState(false)
     const [teachersApproved, setTeachersApproved] = useState<number[]>([])
     const [teachersRejected, setTeachersRejected] = useState<number[]>([])
     const navigate = useNavigate()
@@ -50,12 +51,16 @@ export function ShowTeacherApprovalFetch({
         event.preventDefault()
         const r = await menuServices.approveTeacher(teachersApproved, teachersRejected)
         if (r instanceof ErrorMessageModel) {
-            setError(r)
+            setError(true)
         } else {
             navigate("/menu")
         }
     }, [teachersApproved, teachersRejected])
 
+    if (content instanceof ErrorMessageModel || error) {
+        return <Error title="Communication with the server has failed" detail="Please try again."/>
+    }
+    
     if (!content) {
         return (
             <Typography
@@ -65,10 +70,6 @@ export function ShowTeacherApprovalFetch({
                 ...loading...
             </Typography>
         );
-    }
-
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
     }
 
     return (
@@ -90,16 +91,22 @@ export function ShowTeacherApprovalFetch({
                     >
                         {"Approve, do Nothing or Reject"}
                     </Typography>
-                    <List>
-                        {content.properties.teachers.map(teacher=> (
-                            <ListItem
-                                key={teacher.id}
-                            >
-                                {teacher.name} - {teacher.email}
-                               <HandleTeachersCheckbox value={teacher.id} acceptHandler={handleApprove} rejectHandler={handleReject} nothingHandler={handleNothing}/>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <br/> 
+                    { content.properties.teachers.length !== 0 ?
+                        <List>
+                            {content.properties.teachers.map(teacher=> (
+                                <ListItem
+                                    key={teacher.id}
+                                >
+                                    {teacher.name} - {teacher.email}
+                                <HandleTeachersCheckbox value={teacher.id} acceptHandler={handleApprove} rejectHandler={handleReject} nothingHandler={handleNothing}/>
+                                </ListItem>
+                            ))}
+                        </List> :
+                        <Typography variant="h6">
+                            {"There are no pending requests"}
+                        </Typography>
+                    }
                     { teachersApproved.length || teachersRejected.length ? <Button onClick={handleSubmit}> Submit </Button> : null}
                 </>
             ) : null}

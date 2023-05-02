@@ -46,10 +46,10 @@ class StudentServices(
      * Method to create a user as a student
      */
     fun createStudent(githubId: Long, schoolId: Int): StudentCreationResult {
-        if (schoolId <= 0 || githubId <= 0) return Result.Problem(StudentServicesError.InvalidData)
+        if (schoolId <= 0) return Result.Problem(StudentServicesError.InvalidData)
         return transactionManager.run {
-            val student = it.usersRepository.getPendingUserByGithubId(githubId) ?: Result.Problem(StudentServicesError.StudentNotFound)
-            if (student is Student) {
+            val student = it.usersRepository.getPendingStudentByGithubId(githubId) ?: Result.Problem(StudentServicesError.StudentNotFound)
+            if (student is PendingStudent) {
                 if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) Result.Problem(
                     StudentServicesError.GithubUserNameInUse
                 )

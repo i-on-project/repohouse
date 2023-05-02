@@ -5,8 +5,7 @@ import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.http.*
 import com.isel.leic.ps.ion_classcode.http.controllers.web.*
 import com.isel.leic.ps.ion_classcode.http.model.output.*
-import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
-import com.isel.leic.ps.ion_classcode.http.services.UserServices
+import com.isel.leic.ps.ion_classcode.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.services.*

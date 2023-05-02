@@ -18,9 +18,9 @@ import com.isel.leic.ps.ion_classcode.http.model.output.RegisterOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.http.services.OutboxServices
-import com.isel.leic.ps.ion_classcode.http.services.OutboxServicesError
-import com.isel.leic.ps.ion_classcode.http.services.UserServices
+import com.isel.leic.ps.ion_classcode.services.OutboxServices
+import com.isel.leic.ps.ion_classcode.services.OutboxServicesError
+import com.isel.leic.ps.ion_classcode.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
@@ -270,9 +270,10 @@ class AuthController(
     @GetMapping(Uris.AUTH_REGISTER_PATH)
     fun getRegisterInfo(
         @CookieValue userGithubId: String,
+        @CookieValue position: String,
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
-        return when (val userInfo = userServices.getPendingUserByGithubId(githubId)) {
+        return when (val userInfo = userServices.getPendingUserByGithubId(githubId, position)) {
             is Result.Success -> siren(RegisterOutputModel(userInfo.value.name, userInfo.value.email, userInfo.value.githubUsername)) {
                 clazz("registerInfo")
                 link(rel = LinkRelation("self"), href = Uris.AUTH_REGISTER_PATH)
@@ -395,9 +396,6 @@ class AuthController(
         return when (val user = userServices.getUserByGithubId(githubId)) {
             is Result.Success -> when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
                 is Either.Right -> {
-                    val cookie = generateSessionCookie(user.value.token)
-                    response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-                    response.setHeader(HttpHeaders.SET_COOKIE, generateUserPosition(STUDENT_COOKIE_NAME).toString())
                     siren(StatusOutputModel("User verified.", "User verified successfully, you can navigate to menu.")) {
                         clazz("verifyStudent")
                         action(title = "verify", href = Uris.AUTH_REGISTER_VERIFICATION_PATH, method = HttpMethod.POST, type = "application/json", block = {

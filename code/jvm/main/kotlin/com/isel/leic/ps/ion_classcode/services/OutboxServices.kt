@@ -1,9 +1,8 @@
-package com.isel.leic.ps.ion_classcode.http.services
+package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInput
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
-import com.isel.leic.ps.ion_classcode.services.EmailService
 import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.scheduling.annotation.Scheduled
@@ -71,7 +70,7 @@ class OutboxServices(
      * Method to check the otp
      */
     fun checkOtp(userId: Int, otp: Int): OutboxResponse {
-        if (userId <= 0 || otp <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
+        if (otp <= 0) return Either.Left(value = OutboxServicesError.InvalidInput)
         return transactionManager.run {
             val cooldown = it.cooldownRepository.getCooldownRequest(userId = userId)
             if (cooldown != null) {
@@ -84,14 +83,17 @@ class OutboxServices(
                 return@run Either.Left(value = OutboxServicesError.OtpExpired)
             }
             if (otpRequest.otp == otp) {
+                println("1")
                 it.usersRepository.updateUserStatus(id = userId)
-                Either.Right(value = Unit)
+                return@run Either.Right(value = Unit)
             }
             if (otpRequest.tries == MAX_TRIES) {
+                println("2")
                 it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
-                Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = COOLDOWN_TIME))
-            }else{
-                while (!it.otpRepository.addTryToOtpRequest(userId = userId, numbTry = otpRequest.tries + 1)){
+                return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = COOLDOWN_TIME))
+            } else {
+                println("3")
+                while (!it.otpRepository.addTryToOtpRequest(userId = userId, numbTry = otpRequest.tries + 1)) {
                     val checkOtpRequest = it.otpRepository.getOtpRequest(userId= userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
                     if (checkOtpRequest.tries == MAX_TRIES) {
                         it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
