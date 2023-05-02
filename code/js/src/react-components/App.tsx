@@ -12,7 +12,7 @@ import { ShowMenuCallbackFetch, ShowMenuFetch } from "./Menu"
 import { ShowCourseCreateFetch, ShowCourseCreatePost, ShowCourseFetch } from "./Course"
 import { ShowTeacherApprovalFetch } from "./ApproveTeachers"
 import { ShowCreateCallbackStudent, ShowCreateCallbackTeacher, ShowCreateStudentFetch, ShowCreateStudentFetchPost, ShowCreateTeacherFetch, ShowCreateTeacherFetchPost} from "./Create"
-import { ShowStatusCallbackFetch, ShowStatusFetch } from "./auth/Status"
+import { ShowStatusFetch } from "./auth/Status"
 import { ShowVerifyFetch } from "./auth/Verify"
 import { HandleAuthError, HandleAuthErrorCallback, HandleAuthFail, HandleAuthFailCallback } from './auth/AuthProblem'
 import { ShowClassroomFetch,ShowCreateClassroom } from "./Classroom"
@@ -73,10 +73,6 @@ const router = createBrowserRouter([
             {
                 path: "/auth/status",
                 element: <Status/>
-            },
-            {
-                path: "/auth/status/callback",
-                element: <StatusCallback/>
             },
             {
                 path: "/auth/fail",
@@ -209,7 +205,7 @@ function NavBar() {
 function Home() {
     return (
         <div>
-            <ShowHomeFetch authServices={authServices} systemServices={systemServices}/>
+            <ShowHomeFetch systemServices={systemServices}/>
         </div>
     )
 }
@@ -282,14 +278,6 @@ function RegisterTeacher() {
     return (
         <div>
             <ShowCreateTeacherFetchPost authServices={authServices}/>
-        </div>
-    )
-}
-
-function StatusCallback() {
-    return (
-        <div>
-            <ShowStatusCallbackFetch/>
         </div>
     )
 }

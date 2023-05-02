@@ -30,7 +30,6 @@ export class NavigationRepository implements NavigationRepository {
     }
 
     async ensureLink(key: string, fetchLink: () => any): Promise<SirenLink> {
-        console.log(this.linkStorage)
         if (this.getLink(key) == null) {
             await fetchLink()
         }
@@ -38,7 +37,6 @@ export class NavigationRepository implements NavigationRepository {
     }
 
     async ensureAction(key: string, fetchAction:() => any): Promise<SirenAction> {
-        console.log(this.actionStorage)
         if (this.getAction(key) == null) {
             await fetchAction()
         }

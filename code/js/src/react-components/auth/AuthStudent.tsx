@@ -1,29 +1,28 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { useAsync } from "../../http/Fetch"
-import { ErrorMessageModel } from "../../domain/response-models/Error"
 import { SirenEntity } from "../../http/Siren"
 import { Typography } from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
-import { useNavigate } from "react-router-dom"
-import { ErrorAlert } from "../error/ErrorAlert"
+import { Navigate, useNavigate } from "react-router-dom"
 import { AuthState, useLoggedIn, useSetLogin } from "./Auth"
 
 export function ShowAuthStudentFetch({
     authServices,
 }: {
-    authServices: AuthServices;
+    authServices: AuthServices
 }) {
-    const content = useAsync(async () => {
-        return await authServices.authStudent();
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null);
-    const [windowRef, setWindowRef] = useState<Window>(null);
-    const [isOpen, setOpen] = useState<Boolean>(false);
-    const [data, setData] = useState<string>(null);
-    const navigate = useNavigate()
-    const setLogin = useSetLogin()
 
+    const [windowRef, setWindowRef] = useState<Window>(null)
+    const [isOpen, setOpen] = useState<Boolean>(false)
+    const [data, setData] = useState<string>(null)
+    const navigate = useNavigate()
+    const loggedin = useLoggedIn()
+    const setLogin = useSetLogin()
+    const content = useAsync(async () => {
+        if (!loggedin) return await authServices.authStudent()
+    })
+   
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
             const authWindow = window.open(content.properties.url, '')
@@ -49,6 +48,10 @@ export function ShowAuthStudentFetch({
         }
     }, [data, navigate])
 
+    if(loggedin) {
+        return <Navigate to="/menu"/>
+    }
+
     if (!content) {
         return (
             <Typography
@@ -60,10 +63,6 @@ export function ShowAuthStudentFetch({
         );
     }
 
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
-    }
-
     return (
         <div
             style={{
@@ -71,7 +70,6 @@ export function ShowAuthStudentFetch({
                 justifyContent: "space-evenly",
             }}
         >
-            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
-    );
+    )
 }

@@ -1,11 +1,9 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
-import { ErrorMessageModel } from "../../domain/response-models/Error"
 import { SirenEntity } from "../../http/Siren"
 import { Typography } from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
-import { ErrorAlert } from "../error/ErrorAlert"
-import { useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import { AuthState, useLoggedIn, useSetLogin } from "./Auth"
 import { useAsync } from "../../http/Fetch"
 
@@ -14,15 +12,16 @@ export function ShowAuthTeacherFetch({
 }: {
     authServices: AuthServices
 }) {
-    const content = useAsync(async () => {
-        return await authServices.authTeacher()
-    });
-    const [error, setError] = useState<ErrorMessageModel>(null)
+
     const [windowRef, setWindowRef] = useState<Window>(null)
     const [isOpen, setOpen] = useState<Boolean>(false)
     const [data, setData] = useState<string>(null)
+    const loggedin = useLoggedIn()
     const setLogin = useSetLogin()
     const navigate = useNavigate()
+    const content = useAsync(async () => {
+        if (!loggedin) return await authServices.authTeacher()
+    })
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
@@ -53,6 +52,10 @@ export function ShowAuthTeacherFetch({
         }
     }, [data, navigate])
 
+    if(loggedin) {
+        return <Navigate to="/menu"/>
+    }
+
     if (!content) {
         return (
             <Typography
@@ -61,11 +64,7 @@ export function ShowAuthTeacherFetch({
             >
                 ...loading...
             </Typography>
-        );
-    }
-
-    if (content instanceof ErrorMessageModel && !error) {
-        setError(content);
+        )
     }
 
     return (
@@ -75,7 +74,6 @@ export function ShowAuthTeacherFetch({
                 justifyContent: "space-evenly",
             }}
         >
-            <ErrorAlert error={error} onClose={() => { setError(null) }}/>
         </div>
-    );
+    )
 }

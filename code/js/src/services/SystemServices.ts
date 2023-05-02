@@ -9,7 +9,7 @@ import { CreditsDtoProperties } from "../domain/dto/CreditsDtoProperties"
 export class SystemServices {
 
     home = async () => {
-        const response = await fetchGet<HomeDtoProperties>("api/home")
+        const response = await fetchGet<HomeDtoProperties>("/api/home")
         if (response instanceof SirenEntity) {
             navigationRepository.addLinks(Hypermedia.systemLinkKeys, response.links)
             navigationRepository.addActions(Hypermedia.systemActionKeys, response.actions)
