@@ -19,7 +19,7 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            "process.env.FRONTEND_NGROK_KEY": JSON.stringify(process.env.FRONTEND_NGROK_KEY)
+            "process.env.NGROK_URI": JSON.stringify(process.env.NGROK_URI)
         }),
     ],
     module: {

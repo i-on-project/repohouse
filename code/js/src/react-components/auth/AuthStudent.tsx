@@ -33,7 +33,7 @@ export function ShowAuthStudentFetch({
 
     useEffect(() => {
         window.addEventListener('message', function(e) {
-            if(e.origin !== process.env.FRONTEND_NGROK_KEY)
+            if(e.origin !== process.env.NGROK_URI)
                 return;
             if (e.data.type === "Menu") {
                 setLogin(AuthState.Student)

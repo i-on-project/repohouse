@@ -17,7 +17,7 @@ export function ShowStatusFetch({
     })
 
     if (window.opener) {
-        window.opener.postMessage({type:"Auth", data:'/auth/status'},process.env.FRONTEND_NGROK_KEY)
+        window.opener.postMessage({type:"Auth", data:'/auth/status'},process.env.NGROK_URI)
         window.close()
     }
 

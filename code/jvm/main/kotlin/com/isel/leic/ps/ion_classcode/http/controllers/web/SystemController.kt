@@ -142,6 +142,6 @@ class SystemController {
             textField(name = "tagControl")
             timestampField(name = "dueDate")
         }
-        block.action(title="changeRequestStatus", href = Uris.TEAM_CHANGE_REQUEST_PATH, method = HttpMethod.POST, type = "application/json") {}
+        block.action(title = "changeRequestStatus", href = Uris.TEAM_CHANGE_REQUEST_PATH, method = HttpMethod.POST, type = "application/json") {}
     }
 }

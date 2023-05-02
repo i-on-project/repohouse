@@ -45,16 +45,16 @@ class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
             .firstOrNull()
     }
 
-    override fun addTryToOtpRequest(userId: Int, numbTry: Int): Boolean {
+    override fun addTryToOtpRequest(userId: Int, tries: Int): Boolean {
         return handle.createUpdate(
             """
             UPDATE Otp
             SET tries = tries + 1
-            WHERE user_id = :id and tries = :numbTry
+            WHERE user_id = :id and tries = :tries
             """,
         )
             .bind("id", userId)
-            .bind("tries", numbTry)
+            .bind("tries", tries)
             .execute() > 0
     }
 

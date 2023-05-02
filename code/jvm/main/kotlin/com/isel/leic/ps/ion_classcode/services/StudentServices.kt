@@ -30,7 +30,7 @@ sealed class StudentServicesError {
     object EmailInUse : StudentServicesError()
     object TokenInUse : StudentServicesError()
     object SchoolIdInUse : StudentServicesError()
-    object InternalError: StudentServicesError()
+    object InternalError : StudentServicesError()
 }
 
 /**
@@ -49,10 +49,12 @@ class StudentServices(
         if (schoolId <= 0 || githubId <= 0) return Result.Problem(StudentServicesError.InvalidData)
         return transactionManager.run {
             val student = it.usersRepository.getPendingUserByGithubId(githubId) ?: Result.Problem(StudentServicesError.StudentNotFound)
-            if (student is Student) {
-                if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) Result.Problem(
-                    StudentServicesError.GithubUserNameInUse
-                )
+            if (student is PendingStudent) {
+                if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) {
+                    Result.Problem(
+                        StudentServicesError.GithubUserNameInUse,
+                    )
+                }
                 if (it.usersRepository.checkIfEmailExists(student.email)) Result.Problem(StudentServicesError.EmailInUse)
                 if (it.usersRepository.checkIfGithubIdExists(student.githubId)) Result.Problem(StudentServicesError.GithubIdInUse)
                 if (it.usersRepository.checkIfTokenExists(student.token)) Result.Problem(StudentServicesError.TokenInUse)
@@ -65,7 +67,7 @@ class StudentServices(
                         githubId = student.githubId,
                         token = student.token,
                         schoolId = schoolId,
-                    )
+                    ),
                 )
                 if (studentRes == null) Result.Problem(StudentServicesError.InternalError) else Result.Success(studentRes)
             } else {
@@ -89,7 +91,7 @@ class StudentServices(
                     githubId = student.githubId,
                     token = hash,
                     schoolId = student.schoolId,
-                )
+                ),
             )
             Result.Success(studentRes)
         }

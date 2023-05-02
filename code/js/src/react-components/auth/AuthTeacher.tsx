@@ -25,7 +25,6 @@ export function ShowAuthTeacherFetch({
 
     useEffect(() => {
         if (content instanceof SirenEntity && !isOpen) {
-            console.log("Opening window")
             const authWindow = window.open(content.properties.url, '')
             setWindowRef(authWindow)
             setOpen(true)
@@ -34,7 +33,7 @@ export function ShowAuthTeacherFetch({
 
     useEffect(() => {
         window.addEventListener('message', function(e) {
-            if(e.origin !== process.env.FRONTEND_NGROK_KEY)
+            if(e.origin !== process.env.NGROK_URI)
                 return;
             if (e.data.type === "Menu") {
                 console.log(e)

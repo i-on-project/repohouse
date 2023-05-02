@@ -139,7 +139,7 @@ export function ShowMenuCallbackFetch() {
     const params = useParams()
     const state = toState(params.user)
     if (state !== undefined) {
-        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, 'https://324b-2001-818-e975-8500-174-d17d-e3f5-574f.ngrok-free.app')
+        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, process.env.NGROK_URI)
         window.close()
         return (<></>)
     }

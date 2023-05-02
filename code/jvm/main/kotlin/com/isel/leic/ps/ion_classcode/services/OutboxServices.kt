@@ -54,7 +54,7 @@ class OutboxServices(
             if (cooldown != null) {
                 return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
             }
-            val otpRequest = it.otpRepository.createOtpRequest(otp= OtpInput(userId = userId, otp = otp))
+            val otpRequest = it.otpRepository.createOtpRequest(otp = OtpInput(userId = userId, otp = otp))
             if (otpRequest == null) {
                 Either.Left(value = OutboxServicesError.ErrorCreatingRequest)
             }
@@ -77,7 +77,7 @@ class OutboxServices(
             if (cooldown != null) {
                 return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = cooldown))
             }
-            val otpRequest = it.otpRepository.getOtpRequest(userId= userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
+            var otpRequest = it.otpRepository.getOtpRequest(userId = userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
             if (otpRequest.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
                 it.outboxRepository.deleteOutboxRequest(userId = userId)
                 it.otpRepository.deleteOtpRequest(userId = userId)
@@ -85,20 +85,20 @@ class OutboxServices(
             }
             if (otpRequest.otp == otp) {
                 it.usersRepository.updateUserStatus(id = userId)
-                Either.Right(value = Unit)
+                return@run Either.Right(value = Unit)
             }
             if (otpRequest.tries == MAX_TRIES) {
                 it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
-                Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = COOLDOWN_TIME))
-            }else{
-                while (!it.otpRepository.addTryToOtpRequest(userId = userId, numbTry = otpRequest.tries + 1)){
-                    val checkOtpRequest = it.otpRepository.getOtpRequest(userId= userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
-                    if (checkOtpRequest.tries == MAX_TRIES) {
-                        it.cooldownRepository.createCooldownRequest(userId = userId, endTime = addTime())
-                        return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = COOLDOWN_TIME))
+                return@run Either.Left(value = OutboxServicesError.CooldownNotExpired(cooldown = COOLDOWN_TIME))
+            } else {
+                while (otpRequest.tries < MAX_TRIES) {
+                    val otpTry = it.otpRepository.addTryToOtpRequest(userId = userId, tries = otpRequest.tries + 1)
+                    if (otpTry) {
+                        break
                     }
+                    otpRequest = it.otpRepository.getOtpRequest(userId = userId) ?: return@run Either.Left(value = OutboxServicesError.OtpNotFound)
                 }
-                Either.Left(value = OutboxServicesError.OtpDifferent)
+                return@run Either.Left(value = OutboxServicesError.OtpDifferent)
             }
         }
     }
@@ -115,7 +115,7 @@ class OutboxServices(
                 return@run Either.Right(value = Unit)
             }
             if (outbox.sentAt.before((System.currentTimeMillis() + EMAIL_RESEND_TIME).toTimestamp())) {
-                   return@run Either.Left(value = OutboxServicesError.EmailNotSent)
+                return@run Either.Left(value = OutboxServicesError.EmailNotSent)
             }
             /** Changes state, so next verification can be sent */
             it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId, state = "Pending")
@@ -135,7 +135,7 @@ class OutboxServices(
                         if (emailService.sendVerificationEmail(
                                 name = user.name,
                                 email = user.email,
-                                otp = otpRequest.otp
+                                otp = otpRequest.otp,
                             ) is Result.Success
                         ) {
                             it.outboxRepository.updateOutboxStateRequest(userId = outbox.userId, state = "Sent")
