@@ -11,6 +11,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import {LeaveTeamBody} from "../domain/dto/RequestDtoProperties";
 import {FeedbackBody} from "../domain/dto/TeamDtoProperties";
+import { LoadingAnimation } from "./animation/Loading";
 
 export function ShowTeamFetch({
     teamServices,courseId,classroomId,assignmentId,teamId,error
@@ -53,14 +54,7 @@ export function ShowTeamFetch({
     }, [setError, label, description,navigate]);
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {
@@ -162,14 +156,7 @@ export function ShowTeamRequestsFetch({
     }, [setError,navigate]);
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {

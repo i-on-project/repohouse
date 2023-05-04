@@ -9,6 +9,7 @@ import { Link, useParams } from "react-router-dom"
 import { AuthState, toState, useLoggedIn } from "./auth/Auth"
 import { Button } from "react-bootstrap"
 import { Error } from "./error/Error"
+import { LoadingAnimation } from "./animation/Loading"
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -52,14 +53,7 @@ export function ShowMenuFetch({
     }, [inviteCode, setIsOpened, setError])
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        )
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel || error) {

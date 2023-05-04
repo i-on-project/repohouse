@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom"
 import { Checkbox } from '@mui/material'
 import { Check, Close, Remove } from "@mui/icons-material"
 import { Error } from "./error/Error"
+import { LoadingAnimation } from "./animation/Loading"
 
 export function ShowTeacherApprovalFetch({
     menuServices,
@@ -62,14 +63,7 @@ export function ShowTeacherApprovalFetch({
     }
     
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     return (

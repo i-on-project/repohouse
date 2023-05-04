@@ -10,6 +10,7 @@ import {AuthState, useLoggedIn} from "./auth/Auth";
 import {Button} from "react-bootstrap";
 import {ClassroomBody} from "../domain/dto/ClassroomDtoProperties";
 import {ErrorAlert} from "./error/ErrorAlert";
+import { LoadingAnimation } from "./animation/Loading";
 
 export function ShowClassroomFetch({
                                   classroomServices,courseId,classroomId
@@ -47,14 +48,7 @@ export function ShowClassroomFetch({
     }, [setError]);
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel && !error) {

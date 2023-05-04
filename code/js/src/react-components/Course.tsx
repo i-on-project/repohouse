@@ -11,6 +11,7 @@ import { Button, Image } from "react-bootstrap"
 import { GitHubOrg } from "../domain/response-models/GitHubOrgs"
 import { AuthState, useLoggedIn } from "./auth/Auth"
 import { Error } from "./error/Error"
+import { LoadingAnimation } from "./animation/Loading"
 
 
 export function ShowCourseFetch({
@@ -45,14 +46,7 @@ export function ShowCourseFetch({
     }
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {
@@ -125,14 +119,7 @@ export function ShowCourseCreateFetch({
     }
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {
@@ -178,9 +165,7 @@ export function ShowCourseCreatePost({ courseServices }: { courseServices: Cours
     }
 
     if (!content) {
-        return (
-            <p>...loading...</p>
-        )
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {

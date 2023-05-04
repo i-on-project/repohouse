@@ -6,6 +6,7 @@ import { SirenEntity } from "../http/Siren"
 import { SystemServices } from "../services/SystemServices"
 import { Typography } from "@mui/material"
 import { ErrorAlert } from "./error/ErrorAlert"
+import { LoadingAnimation } from "./animation/Loading"
 
 export function ShowCreditsFetch({
     systemServices,
@@ -18,14 +19,7 @@ export function ShowCreditsFetch({
     const [error, setError] = useState<ErrorMessageModel>(null)
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel && !error) {

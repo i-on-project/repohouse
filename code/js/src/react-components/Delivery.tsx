@@ -11,6 +11,7 @@ import {AuthState, useLoggedIn} from "./auth/Auth";
 import {DeliveryServices} from "../services/DeliveryServices";
 import {DeliveryBody} from "../domain/dto/DeliveryDtoProperties";
 import {DeliveryDomain} from "../domain/Delivery";
+import { LoadingAnimation } from "./animation/Loading";
 
 export function ShowDeliveryFetch({
                                   deliveryServices,courseId,classroomId,assignmentId,deliveryId
@@ -51,14 +52,7 @@ export function ShowDeliveryFetch({
     }, [setError]);
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel && !error) {

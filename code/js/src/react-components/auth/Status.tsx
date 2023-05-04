@@ -5,6 +5,7 @@ import { SirenEntity } from "../../http/Siren"
 import { Typography } from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
 import { Error } from "../error/Error"
+import { LoadingAnimation } from "../animation/Loading"
 
 export function ShowStatusFetch({
     authServices,
@@ -22,14 +23,7 @@ export function ShowStatusFetch({
     }
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        )
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {

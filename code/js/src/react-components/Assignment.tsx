@@ -16,6 +16,7 @@ import {
 } from "../domain/dto/AssignmentDtoProperties";
 import {CreateTeamBody, JoinTeamBody} from "../domain/dto/RequestDtoProperties";
 import {AssignmentDomain} from "../domain/Assignment";
+import { LoadingAnimation } from "./animation/Loading";
 
 export function ShowAssignmentFetch({
                                   assignmentServices,
@@ -64,14 +65,7 @@ function ShowStudentAssignmentFetch({
     const [error, setError] = useState<ErrorMessageModel>(null);
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel && !error) {
@@ -168,13 +162,13 @@ function ShowTeacherAssignmentFetch({
     assignmentServices,courseId,classroomId,assignmentId
 }: {
     assignmentServices: AssignmentServices;
-    courseId: number;
-    classroomId: number;
-    assignmentId: number;
+    courseId: number
+    classroomId: number
+    assignmentId: number
 }) {
     const content = useAsync(async () => {
         return await assignmentServices.assignment(courseId,classroomId,assignmentId) as SirenEntity<TeacherAssignmentDtoProperties>
-    });
+    })
     const [error, setError] = useState<ErrorMessageModel>(null);
     const navigate = useNavigate()
 
@@ -193,14 +187,7 @@ function ShowTeacherAssignmentFetch({
 
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel && !error) {
@@ -371,9 +358,7 @@ function ShowCreateAssignmentPost({
 
 
     if (!content) {
-        return (
-            <p>...loading...</p>
-        )
+        return <LoadingAnimation/>
     }
 
     if (serror){
@@ -439,9 +424,7 @@ export function ShowAssigmentTeamsFetch({
     },[setError])
 
     if (!content) {
-        return (
-            <p>...loading...</p>
-        )
+        return <LoadingAnimation/>
     }
 
     return(

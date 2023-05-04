@@ -1,11 +1,11 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { SirenEntity } from "../../http/Siren"
-import { Typography } from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
 import { Navigate, useNavigate } from "react-router-dom"
 import { AuthState, useLoggedIn, useSetLogin } from "./Auth"
 import { useAsync } from "../../http/Fetch"
+import { LoadingAnimation } from "../animation/Loading"
 
 export function ShowAuthTeacherFetch({
     authServices,
@@ -56,14 +56,7 @@ export function ShowAuthTeacherFetch({
     }
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        )
+        return <LoadingAnimation/>
     }
 
     return (

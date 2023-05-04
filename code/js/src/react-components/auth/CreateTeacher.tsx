@@ -8,6 +8,7 @@ import { Navigate, useNavigate } from "react-router-dom"
 import { AuthServices } from "../../services/AuthServices"
 import { Error } from "../error/Error"
 import { useAsync } from "../../http/Fetch"
+import { LoadingAnimation } from "../animation/Loading"
 
 
 export function ShowCreateTeacherFetch({
@@ -31,14 +32,7 @@ export function ShowCreateTeacherFetch({
     }, [navigate])
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        )
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {
@@ -87,14 +81,7 @@ export function ShowCreateTeacherFetchPost({
     })
    
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        );
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {

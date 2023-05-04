@@ -5,6 +5,7 @@ import { SystemServices } from "../services/SystemServices"
 import { Typography } from "@mui/material"
 import { Navigate } from "react-router-dom"
 import { useLoggedIn } from "./auth/Auth"
+import { LoadingAnimation } from "./animation/Loading"
 
 
 export function ShowHomeFetch({
@@ -23,14 +24,7 @@ export function ShowHomeFetch({
     }
 
     if (!home) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        )
+        return <LoadingAnimation/>
     }
 
     return (

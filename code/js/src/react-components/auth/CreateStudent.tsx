@@ -9,6 +9,7 @@ import { AuthServices } from "../../services/AuthServices"
 import { Error } from "../error/Error"
 import { useAsync } from "../../http/Fetch"
 import { ErrorAlertForm } from "../error/ErrorAlert"
+import { LoadingAnimation } from "../animation/Loading"
 
 
 
@@ -39,14 +40,7 @@ export function ShowCreateStudentFetch({
     }, [navigate])
 
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        )
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {
@@ -98,14 +92,7 @@ export function ShowCreateStudentFetchPost({
     })
     
     if (!content) {
-        return (
-            <Typography
-                variant="h6"
-                gutterBottom
-            >
-                ...loading...
-            </Typography>
-        )
+        return <LoadingAnimation/>
     }
 
     if (content instanceof ErrorMessageModel) {

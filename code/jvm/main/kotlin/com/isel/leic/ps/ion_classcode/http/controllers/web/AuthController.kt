@@ -16,17 +16,16 @@ import com.isel.leic.ps.ion_classcode.http.model.output.AuthStateOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.OAuthState
 import com.isel.leic.ps.ion_classcode.http.model.output.RegisterOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StatusOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.services.OutboxServices
-import com.isel.leic.ps.ion_classcode.services.OutboxServicesError
-import com.isel.leic.ps.ion_classcode.services.UserServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.SirenModel
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.services.GithubServices
+import com.isel.leic.ps.ion_classcode.services.OutboxServices
+import com.isel.leic.ps.ion_classcode.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.services.StudentServices
 import com.isel.leic.ps.ion_classcode.services.TeacherServices
+import com.isel.leic.ps.ion_classcode.services.UserServices
 import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
@@ -329,7 +328,7 @@ class AuthController(
                                 numberField("schoolId")
                             })
                         }
-                        else -> problemOtp(userOutbox.value)
+                        else -> outboxServices.problem(userOutbox.value)
                     }
                 }
             }
@@ -402,7 +401,7 @@ class AuthController(
                         })
                     }
                 }
-                is Either.Left -> problemOtp(checkOTP.value)
+                is Either.Left -> outboxServices.problem(checkOTP.value)
             }
             is Result.Problem -> userServices.problem(user.value)
         }
@@ -424,7 +423,7 @@ class AuthController(
                         action(title = "self", href = Uris.AUTH_RESEND_EMAIL_PATH, method = HttpMethod.POST, type = "application/json", block = {})
                     }
                 }
-                is Either.Left -> problemOtp(resendEmail.value)
+                is Either.Left -> outboxServices.problem(resendEmail.value)
             }
             is Result.Problem -> userServices.problem(user.value)
         }
@@ -533,21 +532,5 @@ class AuthController(
      */
     private fun generateRandomToken(): String {
         return UUID.randomUUID().toString()
-    }
-
-    /**
-     * Function to handle errors about the OTP.
-     */
-    private fun problemOtp(error: OutboxServicesError): ResponseEntity<ErrorMessageModel> {
-        return when (error) {
-            OutboxServicesError.OtpExpired -> Problem.gone
-            OutboxServicesError.OtpDifferent -> Problem.invalidInput
-            OutboxServicesError.OtpNotFound -> Problem.notFound
-            OutboxServicesError.UserNotFound -> Problem.notFound
-            OutboxServicesError.EmailNotSent -> Problem.internalError
-            OutboxServicesError.ErrorCreatingRequest -> Problem.internalError
-            OutboxServicesError.InvalidInput -> Problem.invalidInput
-            else -> Problem.cooldown((error as OutboxServicesError.CooldownNotExpired).cooldown)
-        }
     }
 }
