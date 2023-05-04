@@ -6,7 +6,7 @@ import { Typography } from "@mui/material"
 import { authServices } from ".."
 
 export function HandleAuthFailCallback() {
-    window.opener.postMessage({type:"Auth", data:'/auth/fail'}, "https://89ef-2001-818-e975-8500-174-d17d-e3f5-574f.ngrok-free.app")
+    window.opener.postMessage({type:"Auth", data:'/auth/fail'}, process.env.NGROK_URI)
     window.close()
     return (<> </>)
 }
@@ -32,7 +32,7 @@ export function HandleAuthFail() {
 }
 
 export function HandleAuthErrorCallback() {
-    window.opener.postMessage({type:"Auth", data:'/auth/error'},process.env.NGROK_URI)
+    window.opener.postMessage({type:"Auth", data:'/auth/error'}, process.env.NGROK_URI)
     window.close()
     return (<> </>)
 }

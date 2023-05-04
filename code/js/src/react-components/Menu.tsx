@@ -3,26 +3,29 @@ import { useAsync } from "../http/Fetch"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../domain/response-models/Error"
 import { SirenEntity } from "../http/Siren"
-import {Backdrop, Box, CircularProgress, List, ListItem, Modal, TextField, Typography } from "@mui/material"
+import {
+    Backdrop,
+    Box,
+    CircularProgress,
+    Grid,
+    List,
+    ListItem,
+    Modal,
+    TextField,
+    Typography,
+    Button,
+    IconButton,
+    Accordion, AccordionSummary, AccordionDetails
+} from "@mui/material"
 import { MenuServices } from "../services/MenuServices"
 import { Link, useParams } from "react-router-dom"
 import { AuthState, toState, useLoggedIn } from "./auth/Auth"
-import { Button } from "react-bootstrap"
 import { Error } from "./error/Error"
-import {homeBoxStyle} from "../utils/Style";
-
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-}
-
+import {homeBoxStyle, modalBoxStyle, modalButtonsBoxStyle, typographyStyle} from "../utils/Style";
+import {CourseDtoProperties} from "../domain/dto/CourseDtoProperties";
+import {mainTheme} from "../utils/Theme";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export function ShowMenuFetch({
     menuServices,
@@ -66,24 +69,19 @@ export function ShowMenuFetch({
     if (content instanceof ErrorMessageModel || error) {
         return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
-
     return (
         <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
-                    <Typography
-                        variant="h2"
-                    >
-                        {"Menu"}
-                    </Typography>
                    <Typography
                         variant="h6"
                         gutterBottom
+                        sx={typographyStyle}
                     >
                         {"Welcome " + content.properties.name}
                     </Typography>
                     { loggedIn === AuthState.Student ? (
-                        <Button onClick={() => setIsOpened(true)}>
+                        <Button sx={{mt:1,mb:2}} variant="contained" onClick={() => setIsOpened(true)}>
                             Invite Code
                         </Button>
                     ) : null}
@@ -91,39 +89,74 @@ export function ShowMenuFetch({
                         open={isOpened}
                         onClose={() => setIsOpened(false)}
                     >
-                        <Box sx={style}>
+                        <Box sx={modalBoxStyle}>
                             <TextField
                                 onChange={handleChangeInviteCode} value={inviteCode} id="inviteCode" label="InviteCode" variant="outlined"
                             />
-                            <Button onClick={handleSubmit}>
-                                Submit
-                            </Button>
-                            <Button onClick={() => setIsOpened(false)}>
-                                Close
-                            </Button>
+                            <Box sx={modalButtonsBoxStyle} >
+                                <Button variant="contained" onClick={handleSubmit}>
+                                    Submit
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setIsOpened(false)}
+                                >
+                                    Close
+                                </Button>
+                            </Box>
                         </Box>
                     </Modal>
-                    <Typography
-                        variant="h6"
-                        gutterBottom
-                    >
-                        {"Your Courses:"}
-                    </Typography>
-                    <List>
-                        {content.properties.courses.map( course => (
-                            <ListItem key={course.id}>
-                                <Link to={"/courses/" + course.id}>{course.name}</Link>
-                                <List>
-                                    Teachers:
-                                    {course.teacher.map( teacher => (
-                                        <ListItem key={teacher.id}>
-                                            {teacher.name}
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </ListItem>
-                        ))}
-                    </List>
+                    {content.properties.courses.length === 0 ?
+                        <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={typographyStyle}
+                        >
+                            {"You are not enrolled in any courses"}
+                        </Typography>
+                    :
+                        <Grid container
+                              columnSpacing={{xs:1, md:3}}
+                              rowSpacing={2}
+                              direction="row"
+                              alignItems="center"
+                              justifyContent="center"
+                        >
+                            {content.properties.courses.map( course => (
+                                <>
+                                    <Grid item xs={5} md={2.75}>
+                                        <CourseDetailsBox course={course} />
+                                    </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid><Grid item xs={5} md={2.75}>
+                                    <CourseDetailsBox course={course} />
+                                </Grid>
+                                </>
+                            ))}
+                        </Grid>
+                    }
                     { loggedIn === AuthState.Teacher ? (
                         <>
                             <Link to={"/teacher/orgs"}> Create Course </Link>
@@ -149,4 +182,81 @@ export function ShowMenuCallbackFetch() {
     return <>
         It seems that your server redirect URL is not setup correctly!
     </>
+}
+
+function CourseDetailsBox({course}: {course: CourseDtoProperties}) {
+
+    const handleGithubClick = useCallback(() => {
+        window.open(course.orgUrl, "_blank")
+    }, [course.orgUrl])
+
+    return (
+        <Box
+            sx={{
+                border: 1,
+                borderRadius: 1,
+                borderColor: 'grey.500',
+                p: 1,
+                display:"flex",
+                justifyContent:"center",
+                alignItems:"center",
+                flexDirection:"column",
+                backgroundColor: mainTheme.palette.background.paper,
+                '&:hover': {
+                    backgroundColor: mainTheme.palette.primary.dark,
+                    cursor: 'pointer',
+                },
+            }}
+        >
+            <Typography variant="h5">
+                {course.name}
+            </Typography>
+
+            <IconButton>
+                <GitHubIcon onClick={handleGithubClick}/>
+            </IconButton>
+
+            <Accordion
+                square={false}
+                sx={{
+                    display:"flex",
+                    justifyContent:"center",
+                    alignItems:"center",
+                    flexDirection:"column",
+                    boxShadow: "none",
+                    backgroundColor: mainTheme.palette.background.paper,
+                    '&:hover': {
+                        backgroundColor: mainTheme.palette.primary.dark,
+                        cursor: 'pointer',
+                    },
+                }}
+            >
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                >
+                    <Typography
+                        variant="subtitle1"
+                        sx={typographyStyle}
+                    >
+                        {"Teachers"}
+                    </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <List>
+                        {course.teacher.map( teacher => (
+                            <ListItem>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={typographyStyle}
+                                >
+                                    {teacher.name}
+                                </Typography>
+                            </ListItem>
+                        ))}
+                    </List>
+                </AccordionDetails>
+            </Accordion>
+        </Box>
+    )
+
 }

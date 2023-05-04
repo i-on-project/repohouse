@@ -17,11 +17,10 @@ export const homeBoxStyle = {
     justifyContent:"center",
     alignItems:"center",
     flexDirection:"column",
-    overflow: 'hidden',
-    whiteSpace: 'normal',
-    height: "87vh",
+    minHeight: "87vh",
+    maxWidth: "100%",
     backgroundColor: mainTheme.palette.background.default,
-    mt: 1,
+    mt: 10
 }
 
 
@@ -49,4 +48,33 @@ export const creditsBoxStyle2 = {
     overflow: 'hidden',
     whiteSpace: 'normal',
     mt:10
+}
+
+export const modalBoxStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    borderBackground: 'white',
+    boxShadow: 24,
+    p: 4,
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+    flexDirection:"column",
+    overflow: 'hidden',
+    whiteSpace: 'normal',
+    width: {xs:"70%", md:"25%"},
+    bgcolor: 'background.default',
+    border: '2px solid #000',
+    borderRadius: 1,
+}
+
+export const modalButtonsBoxStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    mt: 2,
+    gap: 2,
 }

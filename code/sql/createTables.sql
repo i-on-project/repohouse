@@ -233,3 +233,12 @@ CREATE TABLE OTP(
 
 
 COMMIT;
+
+insert into users (email, is_created, github_username, github_id, token, name)
+values ('demo@demo', true, 'demo', 1, 'demo', 'demo');
+insert into teacher (id, github_token) values (5, 'demo');
+insert into course (org_url, name) values ('demo', 'demo');
+insert into teacher_course (teacher, course) values (5, 1);
+insert into classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
+values ('demo', '2020-01-01 00:00:00', 'demo', false, 1, 5);
+insert into student_classroom (student, classroom) values (4, 1);
