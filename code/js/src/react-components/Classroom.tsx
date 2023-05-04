@@ -3,7 +3,7 @@ import {useCallback, useState} from "react";
 import {useAsync} from "../http/Fetch";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import {SirenEntity} from "../http/Siren";
-import {List, ListItem, TextField, Typography} from "@mui/material";
+import {Backdrop, CircularProgress, List, ListItem, TextField, Typography} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import {ClassroomServices} from "../services/ClassroomServices";
 import {AuthState, useLoggedIn} from "./auth/Auth";
@@ -48,12 +48,12 @@ export function ShowClassroomFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 

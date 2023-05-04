@@ -3,7 +3,7 @@ import { useAsync } from "../http/Fetch"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../domain/response-models/Error"
 import { SirenEntity } from "../http/Siren"
-import { List, ListItem, Typography, Card, CardActionArea, CardContent } from "@mui/material"
+import {List, ListItem, Typography, Card, CardActionArea, CardContent, CircularProgress, Backdrop} from "@mui/material"
 import { CourseServices } from "../services/CourseServices"
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom"
 import { CourseBody } from "../domain/dto/CourseDtoProperties"
@@ -46,12 +46,12 @@ export function ShowCourseFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 
@@ -126,12 +126,12 @@ export function ShowCourseCreateFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 
@@ -179,7 +179,12 @@ export function ShowCourseCreatePost({ courseServices }: { courseServices: Cours
 
     if (!content) {
         return (
-            <p>...loading...</p>
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
+            >
+                <CircularProgress color="primary" />
+            </Backdrop>
         )
     }
 

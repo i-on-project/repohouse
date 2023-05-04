@@ -7,7 +7,18 @@ export const mainTheme = createTheme({
             main: '#efd8cc',
             light: 'rgb(242, 223, 214)',
             dark: '#e0c1af',
-            contrastText:'#403e3e'
+            contrastText:'#403e3e',
+
+        },
+        background: {
+            default: 'rgba(255,255,255,0.97)',
+            paper: '#ffefe0',
         }
     },
+    typography: {
+        fontFamily: [
+            'Roboto',
+            'sans-serif',
+        ].join(','),
+    }
 })

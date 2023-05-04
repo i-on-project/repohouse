@@ -2,7 +2,7 @@ import * as React from "react"
 import { useAsync } from "../../http/Fetch"
 import { ErrorMessageModel } from "../../domain/response-models/Error"
 import { SirenEntity } from "../../http/Siren"
-import { Typography } from "@mui/material"
+import {Backdrop, CircularProgress, Typography} from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
 import { Error } from "../error/Error"
 
@@ -23,12 +23,12 @@ export function ShowStatusFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         )
     }
 

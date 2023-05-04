@@ -2,7 +2,7 @@ import * as React from "react"
 import { useEffect, useState } from "react"
 import { useAsync } from "../../http/Fetch"
 import { SirenEntity } from "../../http/Siren"
-import { Typography } from "@mui/material"
+import {Backdrop, CircularProgress, Typography} from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
 import { Navigate, useNavigate } from "react-router-dom"
 import { AuthState, useLoggedIn, useSetLogin } from "./Auth"
@@ -54,12 +54,12 @@ export function ShowAuthStudentFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 

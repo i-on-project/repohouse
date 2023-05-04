@@ -3,7 +3,7 @@ import {useCallback, useState} from "react";
 import {useAsync} from "../http/Fetch";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import {SirenEntity} from "../http/Siren";
-import {CardContent, TextField, Typography} from "@mui/material";
+import {Backdrop, CardContent, CircularProgress, TextField, Typography} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import {Button, Card} from "react-bootstrap";
 import {ErrorAlert} from "./error/ErrorAlert";
@@ -52,12 +52,12 @@ export function ShowDeliveryFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 

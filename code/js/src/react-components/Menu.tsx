@@ -3,12 +3,13 @@ import { useAsync } from "../http/Fetch"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../domain/response-models/Error"
 import { SirenEntity } from "../http/Siren"
-import { Box, List, ListItem, Modal, TextField, Typography } from "@mui/material"
+import {Backdrop, Box, CircularProgress, List, ListItem, Modal, TextField, Typography } from "@mui/material"
 import { MenuServices } from "../services/MenuServices"
 import { Link, useParams } from "react-router-dom"
 import { AuthState, toState, useLoggedIn } from "./auth/Auth"
 import { Button } from "react-bootstrap"
 import { Error } from "./error/Error"
+import {homeBoxStyle} from "../utils/Style";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -53,12 +54,12 @@ export function ShowMenuFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         )
     }
 
@@ -67,12 +68,7 @@ export function ShowMenuFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
@@ -137,7 +133,7 @@ export function ShowMenuFetch({
                     ) : null}
                 </>
             ) : null}
-        </div>
+        </Box>
     )
 }
 

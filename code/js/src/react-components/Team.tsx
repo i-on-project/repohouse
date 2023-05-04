@@ -3,7 +3,7 @@ import {TeamServices} from "../services/TeamServices";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import * as React from "react";
 import {useCallback, useState} from "react";
-import {List, ListItem, MenuItem, Select, TextField, Typography} from "@mui/material";
+import {Backdrop, CircularProgress, List, ListItem, MenuItem, Select, TextField, Typography} from "@mui/material";
 import {SirenEntity} from "../http/Siren";
 import {ErrorAlert} from "./error/ErrorAlert";
 import {AuthState, useLoggedIn} from "./auth/Auth";
@@ -54,12 +54,12 @@ export function ShowTeamFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 
@@ -163,12 +163,12 @@ export function ShowTeamRequestsFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 

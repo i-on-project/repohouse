@@ -8,7 +8,6 @@ import { AuthServices } from "../../services/AuthServices"
 import { ErrorAlert } from "../error/ErrorAlert"
 import { OTPBody } from "../../domain/dto/PendingUserDtoProperties"
 import { SirenEntity } from "../../http/Siren"
-import {AuthState} from "./Auth";
 
 export function ShowVerifyFetch({
     authServices,
