@@ -3,7 +3,7 @@ import { useAsync } from "../http/Fetch"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../domain/response-models/Error"
 import { SirenEntity } from "../http/Siren"
-import { List, ListItem, Typography } from "@mui/material"
+import {Backdrop, CircularProgress, List, ListItem, Typography} from "@mui/material"
 import { MenuServices } from "../services/MenuServices"
 import { Button } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
@@ -63,12 +63,12 @@ export function ShowTeacherApprovalFetch({
     
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 

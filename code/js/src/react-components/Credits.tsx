@@ -1,11 +1,15 @@
 import * as React from "react"
 import { useAsync } from "../http/Fetch"
-import { useState } from "react"
+import {useCallback, useState} from "react"
 import { ErrorMessageModel } from "../domain/response-models/Error"
 import { SirenEntity } from "../http/Siren"
 import { SystemServices } from "../services/SystemServices"
-import { Typography } from "@mui/material"
+import {Backdrop, Box, CircularProgress, Grid, IconButton, Typography} from "@mui/material"
 import { ErrorAlert } from "./error/ErrorAlert"
+import {creditsBoxStyle1, creditsBoxStyle2, homeBoxStyle, typographyStyle} from "../utils/Style"
+import {CreditsStudent, CreditsTeacher} from "../domain/dto/CreditsDtoProperties";
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 export function ShowCreditsFetch({
     systemServices,
@@ -19,12 +23,12 @@ export function ShowCreditsFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 
@@ -33,55 +37,89 @@ export function ShowCreditsFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
-                    <Typography
-                        variant="h2"
-                    >
-                        {"Credits"}
-                    </Typography>
-                    <Typography
-                        variant="h5"
-                    >
-                        {"Teacher"}
-                        <ul>
-                            <li>
-                                {content.properties.teacher.name}
-                            </li>
-                            <li>
-                                {content.properties.teacher.email}
-                            </li>
-                        </ul>
-                    </Typography>
-                    <Typography
-                        variant="h5"
-                    >
-                        {"Students"}
-                        <ul>
+                    <Box sx={creditsBoxStyle1}>
+                        <Typography variant="h4" sx={typographyStyle}>
+                            Students
+                        </Typography>
+                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
                             {content.properties.students.map((student) => (
-                                <li key={student.schoolNumber}>
-                                    {student.name}
-                                    <ul>
-                                        <li>
-                                            {student.email}
-                                        </li>
-                                        <li>
-                                            {"School_Id: " + student.schoolNumber}
-                                        </li>
-                                    </ul>
-                                </li>
+                                <Box gridColumn="span 4">
+                                    <Student student={student}/>
+                                </Box>
                             ))}
-                        </ul>
-                    </Typography>
+                        </Box>
+                    </Box>
+                    <Box sx={creditsBoxStyle2}>
+                        <Typography variant="h4" sx={typographyStyle}>
+                            Professor
+                        </Typography>
+                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
+                            <Box gridColumn="span 12">
+                                <Teacher teacher={content.properties.teacher}/>
+                            </Box>
+                        </Box>
+                    </Box>
+
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => { setError(null) }}/>
-        </div>
+        </Box>
     );
 }
+
+function Student ({ student }: { student: CreditsStudent }){
+
+    const handleEmailClick = useCallback(() => {
+        window.open(`mailto:${student.email}?subject=Contact - ClassCode`, '_blank')
+    }, [student.email])
+
+    const handleGithubClick = useCallback(() => {
+        window.open(student.githubLink, '_blank')
+    }, [student.githubLink])
+
+    return (
+        <Box>
+            <Typography variant="h6" sx={typographyStyle}>
+                {student.name}
+            </Typography>
+            <Typography variant="subtitle2" sx={typographyStyle}>
+                {student.schoolNumber}
+            </Typography>
+            <IconButton>
+                <EmailOutlinedIcon onClick={handleEmailClick}/>
+            </IconButton>
+            <IconButton>
+                <GitHubIcon onClick={handleGithubClick}/>
+            </IconButton>
+        </Box>
+    )
+}
+
+function Teacher ({ teacher }: { teacher: CreditsTeacher }){
+
+    const handleEmailClick = useCallback(() => {
+        window.open(`mailto:${teacher.email}?subject=Contact - ClassCode`, '_blank')
+    }, [teacher.email])
+
+    const handleGithubClick = useCallback(() => {
+        window.open(teacher.githubLink, '_blank')
+    }, [teacher.githubLink])
+
+    return (
+        <Box>
+            <Typography variant="h6" sx={typographyStyle}>
+                {teacher.name}
+            </Typography>
+            <IconButton>
+                <EmailOutlinedIcon onClick={handleEmailClick}/>
+            </IconButton>
+            <IconButton>
+                <GitHubIcon onClick={handleGithubClick}/>
+            </IconButton>
+        </Box>
+    )
+}
+

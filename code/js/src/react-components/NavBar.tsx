@@ -46,7 +46,7 @@ export function NavBarShow({ authServices }: { authServices: AuthServices }) {
     return (
         <>
             <ThemeProvider theme={mainTheme}>
-            <AppBar position="static">
+            <AppBar position="fixed" elevation={4}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         <Avatar alt="logo" src="/project-logo-icon.ico" sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />

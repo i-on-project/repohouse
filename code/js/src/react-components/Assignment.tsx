@@ -3,7 +3,16 @@ import {useCallback, useState} from "react";
 import {useAsync} from "../http/Fetch";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import {SirenEntity} from "../http/Siren";
-import {Box, ButtonGroup, CardActions, CardContent, TextField, Typography} from "@mui/material";
+import {
+    Backdrop,
+    Box,
+    ButtonGroup,
+    CardActions,
+    CardContent,
+    CircularProgress,
+    TextField,
+    Typography
+} from "@mui/material";
 import {Link, Navigate, useNavigate} from "react-router-dom";
 import {Button, Card} from "react-bootstrap";
 import {AssignmentServices} from "../services/AssignmentServices";
@@ -65,12 +74,12 @@ function ShowStudentAssignmentFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 
@@ -194,12 +203,12 @@ function ShowTeacherAssignmentFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         );
     }
 
@@ -372,7 +381,12 @@ function ShowCreateAssignmentPost({
 
     if (!content) {
         return (
-            <p>...loading...</p>
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
+            >
+                <CircularProgress color="primary" />
+            </Backdrop>
         )
     }
 
@@ -433,14 +447,19 @@ export function ShowAssigmentTeamsFetch({
             setError(response)
         }
         if (response instanceof SirenEntity) {
-            //TODO: Check this, maybe id is not the correct property
+            // TODO: Check this, maybe id is not the correct property
             navigate("/courses/" + courseId +"/classrooms/"+classroomId+"/assignments/"+assignment.id+"teams/"+response.properties.id, { replace: true })
         }
     },[setError])
 
     if (!content) {
         return (
-            <p>...loading...</p>
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
+            >
+                <CircularProgress color="primary" />
+            </Backdrop>
         )
     }
 

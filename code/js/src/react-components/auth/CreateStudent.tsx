@@ -2,7 +2,7 @@ import * as React from "react"
 import { useState, useCallback } from "react"
 import { ErrorMessageModel } from "../../domain/response-models/Error"
 import { SirenEntity } from "../../http/Siren"
-import { Typography, TextField } from "@mui/material"
+import {Typography, TextField, CircularProgress, Backdrop} from "@mui/material"
 import { Button } from "react-bootstrap"
 import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import { AuthServices } from "../../services/AuthServices"
@@ -40,12 +40,12 @@ export function ShowCreateStudentFetch({
 
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         )
     }
 
@@ -99,12 +99,12 @@ export function ShowCreateStudentFetchPost({
     
     if (!content) {
         return (
-            <Typography
-                variant="h6"
-                gutterBottom
+            <Backdrop
+                sx={{ color: 'primary', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
             >
-                ...loading...
-            </Typography>
+                <CircularProgress color="primary" />
+            </Backdrop>
         )
     }
 
