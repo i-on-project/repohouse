@@ -9,13 +9,14 @@ val ClassCodeMenuDtoType = SirenEntity.getType<ClassCodeMenuDeserialization>()
 data class ClassCodeMenuDeserialization (
     @JsonProperty("name") val name: String,
     @JsonProperty("email") val email: String,
-    @JsonProperty("courses") val avatarUrl: List<ClassCodeCoursesDeserialization>,
+    @JsonProperty("courses") val courses: List<ClassCodeCoursesDeserialization>,
 )
 
 data class ClassCodeCoursesDeserialization (
     @JsonProperty("id") val id: Int,
     @JsonProperty("orgUrl")val orgUrl: String,
     @JsonProperty("name")val name: String,
+    @JsonProperty("orgId")val orgId: Long,
     @JsonProperty("teacher")val teacher: List<TeacherDeserialization>
 )
 

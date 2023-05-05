@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import isel.ps.classcode.R
@@ -147,7 +145,7 @@ fun CourseCard(
         ) {
             Text(text = "${index + 1}-", style = MaterialTheme.typography.titleMedium)
             Image(
-                painter = rememberAsyncImagePainter(model = course.imageUrl),
+                painter = rememberAsyncImagePainter(model = "https://avatars.githubusercontent.com/u/${course.orgId}?s=200&v=4"),
                 contentDescription = stringResource(id = R.string.course_image),
                 modifier = Modifier
                     .size(50.dp)
@@ -177,7 +175,7 @@ fun ShowUserInfoPreview() {
 @Preview
 @Composable
 fun MenuScreenPreview() {
-    val list = List(3) { Course(id = it, name = "AED-$it",imageUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4") }
+    val list = List(3) { Course(id = it, name = "AED-$it", orgId = 59561360, orgUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4") }
 
     ClasscodeTheme() {
         MenuScreen(
@@ -196,14 +194,14 @@ fun MenuScreenPreview() {
 @Composable
 fun CourseCardPreview() {
     ClasscodeTheme() {
-        CourseCard(course = Course(id = 1, name = "AED",imageUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4"), index = 0)
+        CourseCard(course = Course(id = 1, name = "AED", orgId = 59561360, orgUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4"), index = 0)
     }
 }
 
 @Preview
 @Composable
 fun ShowListOfCoursesPreview() {
-    val list = List(10) { Course(id = it, name = "AED-$it",imageUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4") }
+    val list = List(10) { Course(id = it, name = "AED-$it", orgId = 59561360, orgUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4") }
     ClasscodeTheme {
         ShowListOfCourses(list = list)
     }

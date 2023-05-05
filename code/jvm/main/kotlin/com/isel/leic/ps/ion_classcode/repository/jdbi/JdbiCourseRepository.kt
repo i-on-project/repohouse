@@ -67,7 +67,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("teacher_id", course.teacherId)
             .mapTo<TeacherWithoutToken>()
             .first()
-        return Course(id, course.orgUrl, course.name, listOf(teacher))
+        return Course(id, course.orgUrl, course.name, course.orgId, listOf(teacher))
     }
 
     /**
@@ -92,7 +92,6 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("id", courseId)
             .execute()
     }
-
 
     /**
      * Method to leave a Course
@@ -198,7 +197,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     /**
      * Method to get all classrooms from a user in a Course
      */
-    override fun getCourseUserClassrooms(courseId: Int, userId: Int,student:Boolean): List<Classroom> {
+    override fun getCourseUserClassrooms(courseId: Int, userId: Int, student: Boolean): List<Classroom> {
         return if (student) {
             handle.createQuery(
                 """
@@ -212,7 +211,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
                 .mapTo<Classroom>()
                 .list()
         } else {
-             handle.createQuery(
+            handle.createQuery(
                 """
                     SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_link,classroom.is_archived,course_id FROM classroom
                     WHERE classroom.teacher_id = :user_id AND classroom.course_id = :course_id
@@ -231,7 +230,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getAllUserCourses(userId: Int): List<Course> {
         val dto = handle.createQuery(
             """
-            SELECT id, org_url, name, (
+            SELECT id, org_url, name, org_id, (
                 SELECT array(SELECT teacher FROM teacher_course WHERE course = Course.id) as teachers
                 ), is_archived FROM teacher_course JOIN course ON course.id = teacher_course.course
                 WHERE teacher_course.teacher = :teacher_id
@@ -253,14 +252,14 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
                     .mapTo<TeacherWithoutToken>()
                     .first()
             }
-            Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, isArchived = courseTemp.isArchived)
+            Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, orgId = courseTemp.orgId, isArchived = courseTemp.isArchived)
         }
     }
 
-    override fun getAllStudentCourses(studentId: Int):List<Course>{
+    override fun getAllStudentCourses(studentId: Int): List<Course> {
         val dto = handle.createQuery(
             """
-            SELECT distinct course.id, org_url, course.name, (
+            SELECT distinct course.id, org_url, course.name, org_id, (
                 SELECT array(SELECT teacher FROM teacher_course WHERE course = Course.id) as teachers
                 ), course.is_archived FROM student_classroom JOIN classroom ON classroom.id = student_classroom.classroom
                 JOIN course ON course.id = classroom.course_id
@@ -283,7 +282,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
                     .mapTo<TeacherWithoutToken>()
                     .first()
             }
-            Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, isArchived = courseTemp.isArchived)
+            Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, orgId = courseTemp.orgId, isArchived = courseTemp.isArchived)
         }
     }
 
@@ -298,7 +297,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             JOIN classroom on student_classroom.classroom = classroom.id
             JOIN course on classroom.course_id = course.id
             WHERE course.id = :course_id
-            """
+            """,
         )
             .bind("course_id", courseId)
             .mapTo<Student>()
@@ -333,7 +332,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
                 .mapTo<TeacherWithoutToken>()
                 .first()
         }
-        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, orgId = dto.orgId, isArchived = dto.isArchived)
     }
 
     /**
@@ -353,7 +352,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .mapTo<CourseDTO>()
             .firstOrNull() ?: return null
         val teachers = getCourseTeachers(courseId = dto.id)
-        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, orgId = dto.orgId, isArchived = dto.isArchived)
     }
 
     /**
@@ -373,7 +372,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .mapTo<CourseDTO>()
             .firstOrNull() ?: return null
         val teachers = getCourseTeachers(courseId = dto.id)
-        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, orgId = dto.orgId, isArchived = dto.isArchived)
     }
 
     /**
@@ -393,7 +392,6 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .mapTo<Int>()
             .firstOrNull() != null
 
-
     /**
      * Method to get a Course by is id
      */
@@ -411,6 +409,6 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .mapTo<CourseDTO>()
             .first()
         val teachers = getCourseTeachers(courseId = dto.id)
-        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)
+        return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, orgId = dto.orgId, isArchived = dto.isArchived)
     }
 }

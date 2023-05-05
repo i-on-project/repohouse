@@ -1,6 +1,6 @@
 package isel.ps.classcode
 
-val API_HOME = "https://e8dc-95-95-191-117.ngrok-free.app"
+val API_HOME = "https://7bd2-95-95-191-117.ngrok-free.app"
 
 val CLASSCODE_BASE_URL = "$API_HOME/api/mobile"
 

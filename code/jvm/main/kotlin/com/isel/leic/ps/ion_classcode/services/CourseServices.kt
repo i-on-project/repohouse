@@ -54,6 +54,7 @@ class CourseServices(
                 id = course.id,
                 orgUrl = course.orgUrl,
                 name = course.name,
+                orgId = course.orgId,
                 teachers = course.teachers,
                 isArchived = course.isArchived,
                 students = students,
@@ -75,7 +76,7 @@ class CourseServices(
             } else if (it.courseRepository.checkIfCourseNameExists(courseInfo.name)) {
                 Result.Problem(CourseServicesError.CourseNameAlreadyExists)
             }
-            val id = it.courseRepository.createCourse(CourseInput(courseInfo.orgUrl, courseInfo.name, teacherId)).id
+            val id = it.courseRepository.createCourse(CourseInput(courseInfo.orgUrl, courseInfo.name, courseInfo.orgId, teacherId)).id
             val course = it.courseRepository.addTeacherToCourse(teacherId, id)
             Result.Success(course)
         }

@@ -56,7 +56,7 @@ class MenuController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val courses = userServices.getAllUserCourses(user.id)) {
-            is Result.Success -> siren(MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
+            is Result.Success -> siren(MenuTeacherOutputModel(user.name, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.orgId, it.teachers) })) {
                 clazz("menu")
                 link(rel = LinkRelation("self"), href = Uris.MENU_PATH, needAuthentication = true)
             }
@@ -74,7 +74,7 @@ class MenuController(
         val studentSchoolId = studentServices.getStudentSchoolId(user.id)
         if (studentSchoolId is Result.Problem) return studentServices.problem(studentSchoolId.value)
         return when (val courses = userServices.getAllUserCourses(user.id)) {
-            is Result.Success -> siren(MenuStudentOutputModel(user.name, (studentSchoolId as Result.Success).value, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
+            is Result.Success -> siren(MenuStudentOutputModel(user.name, (studentSchoolId as Result.Success).value, user.email, courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.orgId, it.teachers) })) {
                 clazz("menu")
                 link(rel = LinkRelation("self"), href = Uris.MENU_PATH, needAuthentication = true)
             }

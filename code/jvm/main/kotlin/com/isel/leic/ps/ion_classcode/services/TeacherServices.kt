@@ -172,7 +172,7 @@ class TeacherServices(
         }
     }
 
-    suspend fun getTeacherOrgs(teacherId: Int, githubToken:String): TeacherOrgsResponse {
+    suspend fun getTeacherOrgs(teacherId: Int, githubToken: String): TeacherOrgsResponse {
         val orgs = githubServices.fetchTeacherOrgs(githubToken).map {GitHubOrgsModel(it.login,it.url.replace("api.github.com/orgs","github.com"),it.avatar_url) }
         return transactionManager.run {
             it.usersRepository.getTeacher(teacherId) ?: Result.Problem(TeacherServicesError.InternalError)

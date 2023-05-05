@@ -5,6 +5,7 @@ import isel.ps.classcode.CLASSCODE_MENU_URL
 import isel.ps.classcode.GITHUB_API_BASE_URL
 import isel.ps.classcode.GITHUB_USERINFO_URI
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
+import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.UserInfo
 import isel.ps.classcode.domain.deserialization.ClassCodeMenuDto
 import isel.ps.classcode.domain.deserialization.ClassCodeMenuDtoType
@@ -43,7 +44,7 @@ class RealMenuServices(private val sessionStore: SessionStore, private val objec
         }
     }
 
-    override suspend fun getCourses(): Either<HandleClassCodeResponseError, Unit> {
+    override suspend fun getCourses(): Either<HandleClassCodeResponseError, List<Course>> {
         val cookie = sessionStore.getSessionCookie()
         val request = Request.Builder()
             .url(CLASSCODE_MENU_URL)
@@ -54,7 +55,7 @@ class RealMenuServices(private val sessionStore: SessionStore, private val objec
         }
         return when (result) {
             is Either.Right -> {
-                Either.Right(Unit)
+                Either.Right(value = result.value.properties.courses.map { Course(classCodeCoursesDeserialization = it) })
             }
             is Either.Left -> Either.Left(value = result.value)
         }

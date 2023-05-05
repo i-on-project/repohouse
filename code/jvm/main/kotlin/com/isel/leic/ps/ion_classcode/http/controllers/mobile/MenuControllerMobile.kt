@@ -25,7 +25,7 @@ class MenuControllerMobile(
         user: User,
     ): ResponseEntity<*> {
         return when (val courses = userServices.getAllUserCourses(userId = user.id)) {
-            is Result.Success -> siren(MenuTeacherOutputModel(name = user.name, email = user.email, courses = courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.teachers) })) {
+            is Result.Success -> siren(MenuTeacherOutputModel(name = user.name, email = user.email, courses = courses.value.map { CourseOutputModel(it.id, it.orgUrl, it.name, it.orgId, it.teachers) })) {
                 clazz(value = "menu")
                 link(rel = LinkRelation(value = "self"), href = Uris.MENU_PATH, needAuthentication = true)
             }

@@ -10,8 +10,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class LocalCourseDto(
     val id: Int,
-    val imageUrl: String,
+    val orgUrl: String,
+    val orgId: Long,
     val name: String,
 ) : Parcelable {
-    fun toCourseDto(): Course = Course(id = id, name = name, imageUrl = imageUrl)
+    fun toCourseDto(): Course = Course(id = id, name = name, orgId = orgId,orgUrl = orgUrl)
 }

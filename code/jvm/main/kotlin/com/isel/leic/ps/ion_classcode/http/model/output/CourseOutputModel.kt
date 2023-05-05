@@ -2,7 +2,6 @@ package com.isel.leic.ps.ion_classcode.http.model.output
 
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
-import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.TeacherWithoutToken
 
 /**
@@ -12,6 +11,7 @@ data class CourseOutputModel(
     val id: Int,
     val orgUrl: String,
     val name: String,
+    val orgId: Long,
     val teacher: List<TeacherWithoutToken>,
 ) : OutputModel
 

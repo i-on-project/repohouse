@@ -8,6 +8,7 @@ data class Course(
     val id: Int,
     val orgUrl: String,
     val name: String,
+    val orgId: Long,
     val teachers: List<TeacherWithoutToken>,
     val isArchived: Boolean = false
 )
@@ -19,6 +20,7 @@ data class CourseWithClassrooms(
     val id: Int,
     val orgUrl: String,
     val name: String,
+    val orgId: Long,
     val teachers: List<TeacherWithoutToken>,
     val isArchived: Boolean = false,
     val students: List<Student> = emptyList(),

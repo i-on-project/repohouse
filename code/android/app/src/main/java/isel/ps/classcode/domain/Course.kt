@@ -1,5 +1,6 @@
 package isel.ps.classcode.domain
 
+import isel.ps.classcode.domain.deserialization.ClassCodeCoursesDeserialization
 import isel.ps.classcode.domain.dto.LocalCourseDto
 
 /**
@@ -7,8 +8,15 @@ import isel.ps.classcode.domain.dto.LocalCourseDto
  */
 data class Course(
     val id: Int,
-    val imageUrl: String,
+    val orgUrl: String,
+    val orgId: Long,
     val name: String,
 ) {
-    fun toLocalCourseDto(): LocalCourseDto = LocalCourseDto(id = id, name = name, imageUrl = imageUrl)
+    constructor(classCodeCoursesDeserialization: ClassCodeCoursesDeserialization) : this(
+        id = classCodeCoursesDeserialization.id,
+        orgUrl = classCodeCoursesDeserialization.orgUrl,
+        orgId = classCodeCoursesDeserialization.orgId,
+        name = classCodeCoursesDeserialization.name
+    )
+    fun toLocalCourseDto(): LocalCourseDto = LocalCourseDto(id = id, name = name, orgUrl = orgUrl, orgId = orgId)
 }
