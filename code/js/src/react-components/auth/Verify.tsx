@@ -1,13 +1,14 @@
 import * as React from "react"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../../domain/response-models/Error"
-import { TextField, Typography } from "@mui/material"
+import {Box, TextField, Typography } from "@mui/material"
 import { Button } from "react-bootstrap"
 import { Navigate } from "react-router-dom"
 import { AuthServices } from "../../services/AuthServices"
 import { ErrorAlert } from "../error/ErrorAlert"
 import { OTPBody } from "../../domain/dto/PendingUserDtoProperties"
 import { SirenEntity } from "../../http/Siren"
+import {homeBoxStyle, typographyStyle} from "../../utils/Style";
 
 export function ShowVerifyFetch({
     authServices,
@@ -44,22 +45,19 @@ export function ShowVerifyFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             <Typography
                 variant="h6"
                 gutterBottom
+                sx={typographyStyle}
             >
                 Verify
             </Typography>
             <TextField label={"OTP"} required type={"number"} onChange={(event) => setOtp(Number(event.target.value))}/>
+            // TODO: add resend button
             <Button onClick={handleSubmit}>Send</Button>
             <ErrorAlert error={serror} onClose={() => { setError(null) }}/>
-        </div>
+        </Box>
     )
 }
 

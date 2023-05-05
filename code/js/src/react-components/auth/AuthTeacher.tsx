@@ -1,11 +1,12 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { SirenEntity } from "../../http/Siren"
-import {Backdrop, CircularProgress, Typography} from "@mui/material"
+import {Backdrop, Box, CircularProgress, Typography} from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
 import { Navigate, useNavigate } from "react-router-dom"
-import { AuthState, useLoggedIn, useSetLogin } from "./Auth"
+import {AuthState, useLoggedIn, useSetGithubId, useSetLogin, useSetUserId} from "./Auth"
 import { useAsync } from "../../http/Fetch"
+import { homeBoxStyle } from "../../utils/Style"
 
 export function ShowAuthTeacherFetch({
     authServices,
@@ -18,6 +19,8 @@ export function ShowAuthTeacherFetch({
     const [data, setData] = useState<string>(null)
     const loggedin = useLoggedIn()
     const setLogin = useSetLogin()
+    const setGithubId = useSetGithubId()
+    const setUserId = useSetUserId()
     const navigate = useNavigate()
     const content = useAsync(async () => {
         if (!loggedin) return await authServices.authTeacher()
@@ -36,10 +39,9 @@ export function ShowAuthTeacherFetch({
             if(e.origin !== process.env.NGROK_URI)
                 return;
             if (e.data.type === "Menu") {
-                console.log(e)
-               setLogin(AuthState.Teacher)
-            }else {
-                return
+                setGithubId(e.data.state.githubId)
+                setUserId(e.data.state.userId)
+                setLogin(AuthState.Teacher)
             }
             setData(e.data.data)
         }, false);
@@ -66,13 +68,5 @@ export function ShowAuthTeacherFetch({
         )
     }
 
-    return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
-        </div>
-    )
+    return <Box sx={homeBoxStyle}/>
 }

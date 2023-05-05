@@ -3,14 +3,26 @@ import {TeamServices} from "../services/TeamServices";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import * as React from "react";
 import {useCallback, useState} from "react";
-import {Backdrop, CircularProgress, List, ListItem, MenuItem, Select, TextField, Typography} from "@mui/material";
+import {
+    Backdrop,
+    Box,
+    CircularProgress,
+    Grid,
+    List,
+    ListItem,
+    MenuItem,
+    Select,
+    TextField,
+    Typography
+} from "@mui/material";
 import {SirenEntity} from "../http/Siren";
 import {ErrorAlert} from "./error/ErrorAlert";
-import {AuthState, useLoggedIn} from "./auth/Auth";
+import {AuthState, useLoggedIn, useUserId} from "./auth/Auth";
 import {Link, useNavigate} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import {LeaveTeamBody} from "../domain/dto/RequestDtoProperties";
 import {FeedbackBody} from "../domain/dto/TeamDtoProperties";
+import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../utils/Style";
 
 export function ShowTeamFetch({
     teamServices,courseId,classroomId,assignmentId,teamId,error
@@ -31,6 +43,7 @@ export function ShowTeamFetch({
     const [description, setDescription] = useState<string>("");
     const navigate = useNavigate();
     const user = useLoggedIn()
+    const userId = useUserId()
 
     const handleLeaveTeam = useCallback(async () => {
         const body = new LeaveTeamBody(teamId, null)
@@ -68,69 +81,128 @@ export function ShowTeamFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
                         variant="h2"
+                        sx={typographyStyle}
                     >
                         {"Team " + content.properties.team.name}
                     </Typography>
-                    <List>
-                        {content.properties.students.map((student) =>
-                            <ListItem>
-                                {student.name + " - " + student.schoolId}
-                            </ListItem>
-                        )}
-                    </List>
-                    <List>
-                        {content.properties.repos.map((repo) =>
-                            <ListItem>
-                                <a href={repo.url} target="_blank" rel="noreferrer">
-                                    {repo.name}
-                                </a>
-                            </ListItem>
-                        )}
-                    </List>
-                    <List>
-                        {content.properties.feedbacks.map((feedback) =>
-                            <ListItem>
-                                {feedback.label + " - " + feedback.description}
-                            </ListItem>
-                        )}
-                    </List>
-                    {user === AuthState.Teacher ? (
-                        <>
-                            <Select
-                                onChange={(event) => setLabel(event.target.value as string)}
+                    {content.properties.repos.length == 0 ?
+                        <Typography
+                            variant="h5"
+                            sx={typographyStyle}
+                        >
+                            No repo available
+                        </Typography>
+                    :
+                        <List>
+                            {content.properties.repos.map((repo) =>
+                                    <ListItem>
+                                        <a href={repo.url} target="_blank" rel="noreferrer">
+                                            {repo.name}
+                                        </a>
+                                    </ListItem>
+                            )}
+                        </List>
+                    }
+                    <Box sx={alignHorizontalyBoxStyle}>
+                        <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + content.properties.team.id + "/requests"}> Requests History </Link>
+                        {user === AuthState.Student  && content.properties.students.find(student => student.id === userId) ? (
+                            <Button onClick={handleLeaveTeam}>Leave Team</Button>
+                        ): null}
+                    </Box>
+                    <Grid
+                        container
+                        direction="row"
+                        justifyContent="center"
+                        alignItems="center"
+                    >
+                        <Grid item xs={10} md={5}>
+                            <List>
+                                {content.properties.students.map((student) =>
+                                    <ListItem>
+                                        <Typography
+                                            variant="h5"
+                                            sx={typographyStyle}
+                                        >
+                                            {student.name + " - " + student.schoolId}
+                                        </Typography>
+                                    </ListItem>
+                                )}
+                            </List>
+                        </Grid>
+                        <Grid item xs={10} md={5}>
+                            <List
+                               sx={{
+                                    borderRadius: 1,
+                                    maxHeight: 500,
+                                    position: 'relative',
+                                    overflow: 'auto',
+                                    justifyContent:"center",
+                                    alignItems:"center",
+                                    flexDirection:"column",
+                                    "&::-webkit-scrollbar": {
+                                        width: 5,
+                                    },
+                                    "&::-webkit-scrollbar-track": {
+                                        boxShadow: `inset 0 0 6px rgba(0, 0, 0, 0.3)`,
+                                    },
+                                    "&::-webkit-scrollbar-thumb": {
+                                        backgroundColor: "darkgrey",
+                                        outline: `1px solid slategrey`,
+                                    }
+                               }}
                             >
-                                <MenuItem  value="info">Info</MenuItem >
-                                <MenuItem  value="test1">Test1</MenuItem >
-                                <MenuItem  value="amor">Amor</MenuItem >
-                            </Select>
-                            <TextField
-                                id="description"
-                                label="Description"
-                                multiline
-                                maxRows={4}
-                                onChange={(event) => setDescription(event.target.value)}
-                            />
+                                {content.properties.feedbacks.map((feedback) =>
+                                    <ListItem>
+                                        <Typography
+                                            variant="h5"
+                                            sx={typographyStyle}
+                                        >
+                                            {feedback.label + " - " + feedback.description}
+                                        </Typography>
+                                    </ListItem>
+                                )}
+                            </List>
+                        </Grid>
+                    </Grid>
+                    {user === AuthState.Teacher ? (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Box sx={alignHorizontalyBoxStyle}>
+                                <Select
+                                    id="label"
+                                    label="Label"
+                                    onChange={(event) => setLabel(event.target.value as string)}
+                                >
+                                    <MenuItem  value="info">Info</MenuItem >
+                                    <MenuItem  value="test1">Test1</MenuItem >
+                                    <MenuItem  value="amor">Amor</MenuItem >
+                                </Select>
+                                <TextField
+                                    id="description"
+                                    label="Description"
+                                    multiline
+                                    maxRows={4}
+                                    onChange={(event) => setDescription(event.target.value)}
+                                />
+                            </Box>
                             <Button onClick={handleSendFeedback}>Send Feedback</Button>
-                        </>
-                    ): null}
-                    <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + content.properties.team.id + "/requests"}> Requests History </Link>
-                    {user === AuthState.Student ? (
-                        <Button onClick={handleLeaveTeam}>Leave Team</Button>
+                        </Box>
                     ): null}
                 </>
             ) : null}
             <ErrorAlert error={serror} onClose={() => setError(null)}/>
-        </div>
+        </Box>
     );
 }
 
@@ -177,43 +249,63 @@ export function ShowTeamRequestsFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
                         variant="h2"
+                        sx={typographyStyle}
                     >
                         {"Team Requests"}
                     </Typography>
-                    <List>
-                        {"Join Team Requests"}
-                        {content.properties.joinTeam.map((request) =>
-                            <ListItem>
-                                {request.creator + " - " + request.state}
-                            </ListItem>
-                        )}
-                    </List>
-                    <List>
-                        {"Leave Team Requests"}
-                        {content.properties.leaveTeam.map((request) =>
-                            <ListItem>
-                                {"User " + request.creator + " - " + request.state}
-                                {user === AuthState.Teacher && request.state == "Rejected" ? (
-                                    <Button onClick={() => handleChangeStatus(request.id)}>To pending</Button>
-                                ):null}
-                            </ListItem>
+                    <Grid
+                        container
+                        direction="row"
+                        justifyContent="center"
+                        alignItems="center"
+                    >
+                        <Grid item xs={10} md={5}>
+                            <Typography
+                                variant="h5"
+                                sx={typographyStyle}
+                            >
+                                Join Team Requests
+                            </Typography>
+                            <List>
+                                {content.properties.joinTeam.map((request) =>
+                                    <ListItem>
+                                        {request.creator + " - " + request.state}
+                                        {user === AuthState.Teacher && request.state == "Rejected" ? (
+                                            <Button onClick={() => handleChangeStatus(request.id)}>To pending</Button>
+                                        ):null}
+                                    </ListItem>
+                                )}
+                            </List>
+                        </Grid>
+                        <Grid item xs={10} md={5}>
+                            <Typography
+                                variant="h5"
+                                sx={typographyStyle}
+                            >
+                                Leave Team Requests
+                            </Typography>
+                            <List>
+                                {content.properties.leaveTeam.map((request) =>
+                                    <ListItem>
+                                        {"User " + request.creator + " - " + request.state}
+                                        {user === AuthState.Teacher && request.state == "Rejected" ? (
+                                            <Button onClick={() => handleChangeStatus(request.id)}>To pending</Button>
+                                        ):null}
+                                    </ListItem>
 
-                        )}
-                    </List>
+                                )}
+                            </List>
+                        </Grid>
+                    </Grid>
                 </>
             ) : null}
             <ErrorAlert error={serror} onClose={() => setError(null)}/>
-        </div>
+        </Box>
     );
 }
 

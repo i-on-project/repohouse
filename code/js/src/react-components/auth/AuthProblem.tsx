@@ -2,8 +2,9 @@ import * as React from "react"
 import { useCallback } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useSetLogin } from "./Auth"
-import { Typography } from "@mui/material"
+import {Box, Typography } from "@mui/material"
 import { authServices } from ".."
+import {homeBoxStyle, typographyStyle} from "../../utils/Style";
 
 export function HandleAuthFailCallback() {
     window.opener.postMessage({type:"Auth", data:'/auth/fail'}, process.env.NGROK_URI)
@@ -47,12 +48,15 @@ export function HandleAuthError() {
         navigate("/")
     }, [navigate, setLoggedin])
 
-   return <>
-        <Typography
-            variant="h6"
-            gutterBottom
-        >
-            An error has happened. Please try again at <NavLink to={"/"}  onClick={handleLogout} className="navbar-brand" > Home </NavLink>
-        </Typography>
-   </>
+   return (
+        <Box sx={homeBoxStyle}>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={typographyStyle}
+            >
+                An error has happened. Please try again at <NavLink to={"/"}  onClick={handleLogout} className="navbar-brand" > Home </NavLink>
+            </Typography>
+        </Box>
+   )
 }

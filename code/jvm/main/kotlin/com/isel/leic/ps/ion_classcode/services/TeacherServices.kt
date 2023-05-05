@@ -2,8 +2,8 @@ package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.PendingTeacher
 import com.isel.leic.ps.ion_classcode.domain.Teacher
-import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.domain.input.ApplyInput
+import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
 import com.isel.leic.ps.ion_classcode.http.model.input.TeachersPendingInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeacherPending
@@ -29,7 +29,6 @@ typealias TeachersGetGithubTokenResponse = Result<TeacherServicesError, String>
 typealias UpdateTeacherGithubTokenResult = Result<TeacherServicesError, Unit>
 typealias TeacherOrgsResponse = Result<TeacherServicesError, List<GitHubOrgsModel>>
 
-
 /**
  * Error codes for the services
  */
@@ -42,7 +41,7 @@ sealed class TeacherServicesError {
     object GithubIdInUse : TeacherServicesError()
     object EmailInUse : TeacherServicesError()
     object TokenInUse : TeacherServicesError()
-    object InternalError: TeacherServicesError()
+    object InternalError : TeacherServicesError()
 }
 
 @Component
@@ -59,9 +58,11 @@ class TeacherServices(
         return transactionManager.run {
             val teacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: Result.Problem(TeacherServicesError.TeacherNotFound)
             if (teacher is PendingTeacher) {
-                if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) Result.Problem(
-                    TeacherServicesError.GithubUserNameInUse
-                )
+                if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) {
+                    Result.Problem(
+                        TeacherServicesError.GithubUserNameInUse,
+                    )
+                }
                 if (it.usersRepository.checkIfEmailExists(teacher.email)) Result.Problem(TeacherServicesError.EmailInUse)
                 if (it.usersRepository.checkIfGithubIdExists(teacher.githubId)) Result.Problem(TeacherServicesError.GithubIdInUse)
                 if (it.usersRepository.checkIfTokenExists(teacher.token)) Result.Problem(TeacherServicesError.TokenInUse)
@@ -73,7 +74,7 @@ class TeacherServices(
                         githubId = teacher.githubId,
                         token = teacher.token,
                         githubToken = teacher.githubToken,
-                    )
+                    ),
                 )
                 if (teacherRes == null) Result.Problem(TeacherServicesError.InternalError) else Result.Success(teacherRes)
             } else {
@@ -91,7 +92,7 @@ class TeacherServices(
         val githubToken = AESEncrypt.encrypt(teacher.githubToken)
         return transactionManager.run {
             val teacherRes = it.usersRepository.createPendingTeacher(
-               TeacherInput(
+                TeacherInput(
                     name = teacher.name,
                     email = teacher.email,
                     githubUsername = teacher.githubUsername,
@@ -100,7 +101,7 @@ class TeacherServices(
                     githubToken = githubToken,
                 ),
             )
-            it.applyRequestRepository.createApplyRequest(ApplyInput( teacherRes.id))
+            it.applyRequestRepository.createApplyRequest(ApplyInput(teacherRes.id))
             Result.Success(teacherRes)
         }
     }
@@ -172,8 +173,8 @@ class TeacherServices(
         }
     }
 
-    suspend fun getTeacherOrgs(teacherId: Int, githubToken:String): TeacherOrgsResponse {
-        val orgs = githubServices.fetchTeacherOrgs(githubToken).map {GitHubOrgsModel(it.login,it.url.replace("api.github.com/orgs","github.com"),it.avatar_url) }
+    suspend fun getTeacherOrgs(teacherId: Int, githubToken: String): TeacherOrgsResponse {
+        val orgs = githubServices.fetchTeacherOrgs(githubToken).map { GitHubOrgsModel(it.login, it.url.replace("api.github.com/orgs", "github.com"), it.avatar_url) }
         return transactionManager.run {
             it.usersRepository.getTeacher(teacherId) ?: Result.Problem(TeacherServicesError.InternalError)
             val teacherCourses = it.courseRepository.getAllUserCourses(teacherId)
@@ -196,7 +197,7 @@ class TeacherServices(
                 id = teacher.id,
                 name = teacher.name,
                 email = teacher.email,
-                applyRequestId = apply.id
+                applyRequestId = apply.id,
             )
         }
     }

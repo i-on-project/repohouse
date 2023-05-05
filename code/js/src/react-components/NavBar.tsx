@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useCallback, useState } from 'react'
-import { AuthState, useLoggedIn, useSetLogin } from './auth/Auth'
+import {AuthState, useGithubId, useLoggedIn, useSetLogin} from './auth/Auth'
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
 import { AppBar, Avatar, Box, Button, Container, IconButton, Menu, MenuItem, ThemeProvider, Toolbar, Tooltip, Typography } from "@mui/material"
 import { AuthServices } from "../services/AuthServices"
@@ -13,6 +13,7 @@ export function NavBarShow({ authServices }: { authServices: AuthServices }) {
     const navigate = useNavigate()
     const loggedin = useLoggedIn()
     const setLoggedin = useSetLogin()
+    const githubId = useGithubId()
 
     const handleLogout = useCallback(async() => {
         await authServices.logout()
@@ -152,7 +153,7 @@ export function NavBarShow({ authServices }: { authServices: AuthServices }) {
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    {loggedin ? <Avatar alt="UserLogo" src="/static/images/avatar/2.jpg" />
+                                    {loggedin ? <Avatar alt="UserLogo" src={"https://avatars.githubusercontent.com/u/" + githubId}/>
                                         : <LoginIcon/>
                                     }
                                 </IconButton>

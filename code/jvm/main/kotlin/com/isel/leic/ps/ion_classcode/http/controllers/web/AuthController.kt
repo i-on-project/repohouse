@@ -30,7 +30,6 @@ import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
-import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
@@ -119,6 +118,8 @@ class AuthController(
             AuthStateOutputModel(
                 if (user is Student) STUDENT_COOKIE_NAME else TEACHER_COOKIE_NAME,
                 true,
+                user.githubId,
+                user.id,
             ),
         ) {
             clazz("auth")
@@ -156,7 +157,7 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "$NGROK_URI/menu/callback/student")
+                                .header(HttpHeaders.LOCATION, "$NGROK_URI/menu/callback/student?githubId=${userInfo.value.githubId}&userId=${userInfo.value.id}")
                                 .body(EMPTY_REQUEST)
                         }
                         userInfo.value is Teacher && position == TEACHER_COOKIE_NAME -> {
@@ -171,7 +172,7 @@ class AuthController(
                                     ResponseEntity
                                         .status(Status.REDIRECT)
                                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "$NGROK_URI/menu/callback/teacher")
+                                        .header(HttpHeaders.LOCATION, "$NGROK_URI/menu/callback/teacher?githubId=${userInfo.value.githubId}&userId=${userInfo.value.id}")
                                         .body(EMPTY_REQUEST)
                                 }
                             }
@@ -305,6 +306,7 @@ class AuthController(
         @CookieValue position: String,
         @RequestBody input: SchoolIdInputModel,
     ): ResponseEntity<*> {
+        // TODO : Change student email with the school email
         if (position != STUDENT_COOKIE_NAME) return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val student = studentServices.createStudent(githubId, input.schoolId)) {
@@ -434,15 +436,10 @@ class AuthController(
      */
     @PostMapping(Uris.LOGOUT)
     fun logout(
-        request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<*> {
-        val requestCookies = request.cookies
-        requestCookies.forEach { cookie ->
-            cookie.maxAge = 0
-            cookie.secure = true
-            response.addCookie(cookie)
-        }
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteSessionCookie().toString())
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteGithubIdCookie().toString())
         return siren(null) {
             clazz("logout")
             action(title = "logout", href = Uris.LOGOUT, method = HttpMethod.POST, type = "application/json", block = {})
