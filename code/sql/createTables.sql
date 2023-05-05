@@ -11,6 +11,11 @@ CREATE TABLE Users(
     name text not null
 );
 
+CREATE TABLE AccessToken(
+    github_id bigint unique not null,
+    access_token text not null
+);
+
 CREATE TABLE PendingTeacher(
       id serial primary key,
       email text check (email like '%@%') not null,

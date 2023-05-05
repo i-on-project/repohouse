@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
+import com.isel.leic.ps.ion_classcode.domain.Tokens
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Component
  * Alias for the response of the services
  */
 typealias UserAuthenticationResult = Result<UserServicesError, User>
+typealias StoreAccessTokenResult = Result<UserServicesError, Unit>
 typealias UserByGithubIdResult = Result<UserServicesError, User>
 typealias UserCoursesResponse = Result<UserServicesError, List<Course>>
+typealias GetAccessTokenResult = Result<UserServicesError, Tokens>
 
 /**
  * Error codes for the services
@@ -46,6 +49,30 @@ class UserServices(
                 Result.Problem(UserServicesError.UserNotAuthenticated)
             } else {
                 Result.Success(user)
+            }
+        }
+    }
+
+    /**
+     * Method to store the access token encrypted
+     */
+    fun storeAccessTokenEncrypted(token: String, githubId: Long): StoreAccessTokenResult {
+        if (token.isEmpty()) return Result.Problem(value = UserServicesError.InvalidToken)
+        return transactionManager.run {
+            it.usersRepository.storeAccessTokenEncrypted(token = token, githubId = githubId)
+            Result.Success(value = Unit)
+        }
+    }
+
+    fun getTokens(githubId: Long): GetAccessTokenResult {
+        return transactionManager.run {
+            val accessToken = it.usersRepository.getAccessTokenEncrypted(githubId = githubId)
+            val user = it.usersRepository.getUserByGithubId(githubId = githubId) ?: return@run Result.Problem(value = UserServicesError.UserNotFound)
+            if (accessToken == null) {
+                Result.Problem(value = UserServicesError.InternalError)
+            } else {
+                it.usersRepository.deleteAccessTokenEncrypted(githubId = githubId)
+                Result.Success(value = Tokens(accessToken = accessToken, classCodeToken = user.token))
             }
         }
     }

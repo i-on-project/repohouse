@@ -5,10 +5,14 @@ import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleRedirectClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 
+class FakeLoginServices: LoginServices {
 
-/**
- * Represents the services that can be used on the login
- */
-interface LoginServices {
-    suspend fun getTheTokens(code: String, githubId: String): Either<HandleClassCodeResponseError, Unit>
+    override suspend fun getTheTokens(
+        code: String,
+        githubId: String
+    ): Either<HandleClassCodeResponseError, Unit> {
+        return Either.Right(Unit)
+    }
+
+
 }

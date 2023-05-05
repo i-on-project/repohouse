@@ -186,7 +186,7 @@ class JdbiUsersRepository(
         val id = handle.createUpdate(
             """
             INSERT INTO pendingteacher (email, github_username, github_id, token, name,github_token,created_at)
-            VALUES (:email, :github_username, :github_id, :token, :name,:github_token,now())
+            VALUES (:email, :github_username, :github_id, :token, :name,:github_token, now())
             RETURNING id
             """,
         )
@@ -321,6 +321,60 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
+    override fun storeAccessTokenEncrypted(token: String, githubId: Long) {
+        val query = handle.createQuery(
+            """
+            SELECT access_token FROM accesstoken
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo<String>()
+            .firstOrNull()
+        if (query != null) {
+            handle.createUpdate(
+                """
+                UPDATE accesstoken SET access_token = :access_token
+                WHERE github_id = :github_id
+                """,
+            )
+                .bind("access_token", token)
+                .bind("github_id", githubId)
+                .execute()
+        } else {
+            handle.createUpdate(
+                """
+            INSERT INTO accesstoken (github_id, access_token)
+            VALUES (:github_id, :access_token)
+            """,
+            )
+                .bind("access_token", token)
+                .bind("github_id", githubId)
+                .execute()
+        }
+    }
+
+    override fun getAccessTokenEncrypted(githubId: Long): String? {
+        return handle.createQuery(
+            """
+            SELECT access_token FROM accesstoken
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo<String>()
+            .firstOrNull()
+    }
+    override fun deleteAccessTokenEncrypted(githubId: Long) {
+        handle.createUpdate(
+            """
+            delete FROM accesstoken
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .execute()
+    }
     /**
      * Method to get a studen by is school id
      */

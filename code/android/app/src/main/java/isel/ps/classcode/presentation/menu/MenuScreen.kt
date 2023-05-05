@@ -1,5 +1,6 @@
 package isel.ps.classcode.presentation.menu
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import isel.ps.classcode.R
@@ -66,7 +69,7 @@ fun MenuScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it.calculateTopPadding())
+                .padding(top = it.calculateTopPadding() + 8.dp, start = 32.dp, end = 32.dp, bottom = it.calculateBottomPadding())
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
             if (userInfo != null) {
@@ -74,6 +77,7 @@ fun MenuScreen(
             } else {
                 LoadingAnimationCircle()
             }
+            Spacer(modifier = Modifier.size(16.dp))
             if (courses != null) {
                 ShowListOfCourses(list = courses, onCourseSelected = onCourseSelected)
             } else {
@@ -90,7 +94,9 @@ fun ShowUserInfo(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(8.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
     ) {
         val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
         AvatarImage(avatarUrl = userInfo.avatarUrl)
@@ -102,13 +108,12 @@ fun ShowUserInfo(
 @Composable
 fun ShowListOfCourses(modifier: Modifier = Modifier, list: List<Course>, onCourseSelected: (Course) -> Unit = {  }) {
     LazyColumn(
-        contentPadding = PaddingValues(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
     ) {
         items(list.size) { index ->
-            CourseCard(course = list[index], onCourseSelected = onCourseSelected)
+            CourseCard(index = index, course = list[index], onCourseSelected = onCourseSelected)
         }
     }
 }
@@ -118,6 +123,7 @@ fun ShowListOfCourses(modifier: Modifier = Modifier, list: List<Course>, onCours
 fun CourseCard(
     modifier: Modifier = Modifier,
     course: Course,
+    index: Int,
     onCourseSelected: (Course) -> Unit = { }
 )
 {
@@ -126,6 +132,8 @@ fun CourseCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant),
+        elevation = CardDefaults.cardElevation(8.dp),
         shape = MaterialTheme.shapes.medium,
         onClick = { onCourseSelected(course) }
     )
@@ -137,6 +145,7 @@ fun CourseCard(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
+            Text(text = "${index + 1}-", style = MaterialTheme.typography.titleMedium)
             Image(
                 painter = rememberAsyncImagePainter(model = course.imageUrl),
                 contentDescription = stringResource(id = R.string.course_image),
@@ -168,7 +177,7 @@ fun ShowUserInfoPreview() {
 @Preview
 @Composable
 fun MenuScreenPreview() {
-    val list = List(10) { Course(id = it, name = "AED-$it",imageUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4") }
+    val list = List(3) { Course(id = it, name = "AED-$it",imageUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4") }
 
     ClasscodeTheme() {
         MenuScreen(
@@ -188,7 +197,7 @@ fun MenuScreenPreview() {
 @Composable
 fun CourseCardPreview() {
     ClasscodeTheme() {
-        CourseCard(course = Course(id = 1, name = "AED",imageUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4"))
+        CourseCard(course = Course(id = 1, name = "AED",imageUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4"), index = 0)
     }
 }
 

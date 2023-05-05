@@ -1,15 +1,13 @@
 package isel.ps.classcode.http
 
 import com.fasterxml.jackson.core.exc.StreamReadException
+import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.domain.CallBackResponse
-import isel.ps.classcode.domain.deserialization.ProblemJsonDeserialization
 import isel.ps.classcode.domain.deserialization.GithubErrorDeserialization
-import isel.ps.classcode.domain.deserialization.LoginResponseDeserialization
+import isel.ps.classcode.domain.deserialization.ProblemJsonDeserialization
 import isel.ps.classcode.http.hypermedia.SirenEntity
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
-import isel.ps.classcode.http.utils.HandleRedirectClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 import okhttp3.Call
 import okhttp3.Callback
@@ -67,11 +65,11 @@ inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper
  * Handle the response from the ClassCode API.
  */
 
-inline fun <reified R : Any, reified T> handleSirenResponseClassCode(response: Response, jsonMapper: ObjectMapper): Either<HandleClassCodeResponseError, R> {
+inline fun <reified R : Any> handleSirenResponseClassCode(response: Response, type: JavaType, jsonMapper: ObjectMapper): Either<HandleClassCodeResponseError, R> {
     val body = response.body?.string()
     return if (response.isSuccessful) {
         try {
-            Either.Right(value = jsonMapper.readValue(body, SirenEntity.getType<T>()))
+            Either.Right(value = jsonMapper.readValue(body, type))
         } catch (e: StreamReadException) {
             Either.Left(value = HandleClassCodeResponseError.FailDeserialize(error = "Failed to deserialize response body: $body"))
         }
@@ -88,21 +86,5 @@ inline fun <reified R : Any, reified T> handleSirenResponseClassCode(response: R
         } catch (e: StreamReadException) {
             Either.Left(value = HandleClassCodeResponseError.FailDeserialize(error = "Failed to deserialize error response body: $body"))
         }
-    }
-}
-
-fun handleCallbackResponseClassCode(response: Response, jsonMapper: ObjectMapper): Either<HandleRedirectClassCodeResponseError, CallBackResponse> {
-    val cookie = response.headers["Set-Cookie"]
-    val location = response.headers["Location"] ?: return Either.Left(value = HandleRedirectClassCodeResponseError.FailToGetTheLocation(error = "Failed to get the header Location"))
-    return if (cookie != null) {
-        val body = response.body?.string()
-        try {
-            val content = jsonMapper.readValue(body, LoginResponseDeserialization::class.java)
-            Either.Right(value = CallBackResponse(loginResponse = content, cookie = cookie, deepLink = location))
-        } catch (e: StreamReadException) {
-            Either.Left(value = HandleRedirectClassCodeResponseError.FailDeserialize(error = "Failed to deserialize response body: $body"))
-        }
-    } else {
-        Either.Left(value = HandleRedirectClassCodeResponseError.FailFromClasscode(error = CallBackResponse(deepLink = location)))
     }
 }

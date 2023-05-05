@@ -9,7 +9,6 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.domain.dto.LocalCourseDto
 import isel.ps.classcode.presentation.course.CourseActivity
 import isel.ps.classcode.presentation.credits.CreditsActivity
 import isel.ps.classcode.presentation.menu.services.MenuServices
@@ -45,10 +44,13 @@ class MenuActivity : ComponentActivity() {
                 MenuScreen(
                     userInfo = vm.userInfo,
                     courses = vm.courses,
-                    onBackRequest = { vm.logout() },
+                    onBackRequest = {
+                        vm.logout()
+                        finish()
+                    },
                     onCreditsRequested = { CreditsActivity.navigate(origin = this) },
                     onCourseSelected = { course ->
-                        CourseActivity.navigate(origin = this, course = LocalCourseDto(id = course.id, name = course.name, imageUrl = course.imageUrl))
+                        CourseActivity.navigate(origin = this, course = course.toLocalCourseDto())
                     }
                 )
             }

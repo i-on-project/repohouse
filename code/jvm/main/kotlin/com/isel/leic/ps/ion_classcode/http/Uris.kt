@@ -119,5 +119,6 @@ object Uris {
 
     const val MOBILE_API = "/api/mobile"
     const val MOBILE_AUTH_PATH = "$MOBILE_API/auth"
-    const val MOBILE_CALLBACK_PATH = "$MOBILE_AUTH_PATH/callback"
+    const val MOBILE_GET_ACCESS_TOKEN_PATH = "$MOBILE_API/token"
+    const val MOBILE_CALLBACK_PATH = "/api/auth/callback/mobile"
 }

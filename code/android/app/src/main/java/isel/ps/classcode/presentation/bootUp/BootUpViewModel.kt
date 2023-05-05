@@ -14,6 +14,6 @@ class BootUpViewModel(private val sessionStore: SessionStore) : ViewModel() {
         get() = _tokenExists
     fun checkIfTokenExists() =
         viewModelScope.launch {
-            _tokenExists = sessionStore.checkIfTokenExists()
+            _tokenExists = sessionStore.checkIfGithubTokenExists()
         }
 }

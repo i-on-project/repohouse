@@ -5,10 +5,20 @@
     <string name="failed_url_open">Failed to open URL</string>
     <string name="arrow_back_text">Arrow back text</string>
     <string name="menu_top_page">Menu</string>
+    <string name="course_top_page">Course</string>
+    <string name="classroom_top_page">Classroom</string>
     <string name="user_avatar">User avatar</string>
     <string name="course_image">Course image</string>
     <string name="credits_icon">Credits icon</string>
+    <string name="archived_icon">Archived icon</string>
+    <string name="filter_icon">Filter icon</string>
+    <string name="checked_icon">checked icon</string>
     <string name="logout_icon">Logout icon</string>
     <string name="logout">Logout</string>
+    <string name="dropdown_menu_item_normal">Normal</string>
+    <string name="dropdown_menu_item_archived">Archived</string>
+    <string name="dropdown_menu_item_unarchived">Unarchived</string>
+    <string name="dropdown_menu_item_created">Created</string>
+    <string name="dropdown_menu_item_not_created">Unarchived</string>
 
 </resources>

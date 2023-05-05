@@ -5,5 +5,5 @@ import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 
 interface CourseServices {
-    suspend fun getCourse(courseId: Int): Either<HandleClassCodeResponseError, List<Classroom>>
+    suspend fun getClassrooms(courseId: Int): Either<HandleClassCodeResponseError, List<Classroom>>
 }

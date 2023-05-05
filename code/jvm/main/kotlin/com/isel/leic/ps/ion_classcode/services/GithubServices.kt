@@ -27,7 +27,7 @@ class GithubServices(
     /**
      * Method to fetch the user access token from GitHub.
      */
-    suspend fun fetchAccessToken(code: String, isMobile: Boolean = false): ClientToken {
+    suspend fun fetchAccessToken(code: String, isMobile: Boolean = true): ClientToken {
         val githubAccessTokenUri = if (isMobile) MOBILE_GITHUB_ACCESS_TOKEN_URI(code) else GITHUB_ACCESS_TOKEN_URI(code)
         val request = Request.Builder().url("$GITHUB_BASE_URL$githubAccessTokenUri")
             .addHeader("Accept", "application/json")

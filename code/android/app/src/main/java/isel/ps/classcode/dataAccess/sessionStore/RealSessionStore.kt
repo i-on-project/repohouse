@@ -38,7 +38,7 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
         }
     }
 
-    override suspend fun storeClassCodeToken(token: String) {
+    override suspend fun storeClassCodeSessionCookie(token: String) {
         val encryptedToken = cryptoManager.encrypt(data = token)
         dataStore.edit { preferences ->
             preferences[classCodeTokenKey] = encryptedToken.data
@@ -80,9 +80,15 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
             ).data
         }
 
-    override suspend fun checkIfTokenExists(): Boolean {
+    override suspend fun checkIfGithubTokenExists(): Boolean {
         return dataStore.data.map { preferences ->
             preferences.contains(githubTokenKey) // Use a default value if the entry doesn't exist
+        }.first()
+    }
+
+    override suspend fun checkIfClassCodeTokenExists(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences.contains(classCodeTokenKey) // Use a default value if the entry doesn't exist
         }.first()
     }
 }
