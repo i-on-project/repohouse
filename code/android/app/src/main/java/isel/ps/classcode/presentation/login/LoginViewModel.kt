@@ -18,7 +18,7 @@ class LoginViewModel(private val loginServices: LoginServices) : ViewModel() {
     fun getAccessToken(code: String, githubId: String) = viewModelScope.launch {
         val res = loginServices.getTheTokens(code = code, githubId = githubId)
         if (res is Either.Right) {
-            val x = 0
+            _finished = true
         }
         // TODO(): Handle error
     }

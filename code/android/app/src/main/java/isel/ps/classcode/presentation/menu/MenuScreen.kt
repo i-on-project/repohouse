@@ -170,7 +170,7 @@ fun AvatarImagePreview() {
 @Composable
 fun ShowUserInfoPreview() {
     ClasscodeTheme() {
-        ShowUserInfo(userInfo = UserInfo(login = "test", id = 123L,name = "Test", email = "email", avatarUrl = "https://avatars.githubusercontent.com/u/73882045?v=4" ))
+        ShowUserInfo(userInfo = UserInfo(login = "test", id = 123L,name = "Test", avatarUrl = "https://avatars.githubusercontent.com/u/73882045?v=4" ))
     }
 }
 
@@ -186,7 +186,6 @@ fun MenuScreenPreview() {
                 login = "test",
                 id = 123L,
                 name = "Test",
-                email = "email",
                 avatarUrl = "https://avatars.githubusercontent.com/u/73882045?v=4"
             )
         )

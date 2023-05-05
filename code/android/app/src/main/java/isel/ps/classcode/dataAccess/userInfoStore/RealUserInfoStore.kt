@@ -23,7 +23,6 @@ class RealUserInfoStore(context: Context): UserInfoStore {
     companion object {
         val login = stringPreferencesKey("login")
         val id = longPreferencesKey("id")
-        val email = stringPreferencesKey("email")
         val name = stringPreferencesKey("name")
         val avatarUrl = stringPreferencesKey("avatar_url")
     }
@@ -34,7 +33,6 @@ class RealUserInfoStore(context: Context): UserInfoStore {
         dataStore.edit { preferences ->
             preferences[login] = userInfo.login
             preferences[id] = userInfo.id
-            preferences[email] = userInfo.email
             preferences[name] = userInfo.name
             preferences[avatarUrl] = userInfo.avatarUrl
         }
@@ -51,9 +49,8 @@ class RealUserInfoStore(context: Context): UserInfoStore {
         }.map { preferences ->
             val login = preferences[login] ?: ""
             val id = preferences[id] ?: -1L
-            val email = preferences[email] ?: ""
             val name = preferences[name] ?: ""
             val avatarUrl = preferences[avatarUrl] ?: ""
-            UserInfo(login = login, id = id, email = email, name = name, avatarUrl = avatarUrl)
+            UserInfo(login = login, id = id, name = name, avatarUrl = avatarUrl)
         }
 }

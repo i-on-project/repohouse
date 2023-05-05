@@ -3,7 +3,6 @@ package isel.ps.classcode.presentation.login.services
 import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.CLASSCODE_TOKEN_URL
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
-import isel.ps.classcode.domain.deserialization.ClassCodeAuthDeserialization
 import isel.ps.classcode.domain.deserialization.ClassCodeAuthDto
 import isel.ps.classcode.domain.deserialization.ClassCodeAuthDtoType
 import isel.ps.classcode.http.handleSirenResponseClassCode

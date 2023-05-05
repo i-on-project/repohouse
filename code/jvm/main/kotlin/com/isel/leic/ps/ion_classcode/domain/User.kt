@@ -66,3 +66,12 @@ data class PendingTeacher(
     override val isCreated: Boolean = false,
     val githubToken: String
 ) : User()
+
+data class TeacherWithoutToken(
+    val name: String,
+    val email: String,
+    val id: Int,
+    val githubUsername: String,
+    val githubId: Long,
+    val isCreated: Boolean,
+)

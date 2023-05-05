@@ -1,13 +1,16 @@
 package isel.ps.classcode.presentation.menu.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import isel.ps.classcode.CLASSCODE_MENU_URL
 import isel.ps.classcode.GITHUB_API_BASE_URL
 import isel.ps.classcode.GITHUB_USERINFO_URI
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
-import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.UserInfo
+import isel.ps.classcode.domain.deserialization.ClassCodeMenuDto
+import isel.ps.classcode.domain.deserialization.ClassCodeMenuDtoType
 import isel.ps.classcode.domain.deserialization.UserInfoDeserialization
 import isel.ps.classcode.http.handleResponseGitHub
+import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
@@ -40,8 +43,21 @@ class RealMenuServices(private val sessionStore: SessionStore, private val objec
         }
     }
 
-    override suspend fun getCourses(): Either<HandleClassCodeResponseError, List<Course>> {
-        TODO("Not yet implemented")
+    override suspend fun getCourses(): Either<HandleClassCodeResponseError, Unit> {
+        val cookie = sessionStore.getSessionCookie()
+        val request = Request.Builder()
+            .url(CLASSCODE_MENU_URL)
+            .addHeader("Cookie", cookie.first())
+            .build()
+        val result = request.send(httpClient) { response ->
+            handleSirenResponseClassCode<ClassCodeMenuDto>(response = response, type = ClassCodeMenuDtoType, jsonMapper = objectMapper)
+        }
+        return when (result) {
+            is Either.Right -> {
+                Either.Right(Unit)
+            }
+            is Either.Left -> Either.Left(value = result.value)
+        }
     }
 
     override fun logout() {

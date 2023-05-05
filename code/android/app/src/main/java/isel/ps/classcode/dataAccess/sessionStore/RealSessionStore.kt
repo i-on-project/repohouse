@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import isel.ps.classcode.dataAccess.CryptoManager
 import isel.ps.classcode.dataAccess.DecryptionSecret
+import isel.ps.classcode.dataAccess.TypeOfData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -23,7 +24,7 @@ import java.io.IOException
 class RealSessionStore(private val cryptoManager: CryptoManager, context: Context): SessionStore {
     companion object {
         val githubTokenKey = stringPreferencesKey("github_token")
-        val classCodeTokenKey = stringPreferencesKey("classCode_token")
+        val classCodeCookieKey = stringPreferencesKey("classCode_cookie")
         val githubIv = stringPreferencesKey("github_iv")
         val classCodeIv = stringPreferencesKey("classCode_iv")
     }
@@ -31,7 +32,7 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
     private val dataStore = context.dataStore
 
     override suspend fun storeGithubToken(token: String) {
-        val encryptedToken = cryptoManager.encrypt(data = token)
+        val encryptedToken = cryptoManager.encrypt(data = token, typeOfData = TypeOfData.GITHUB_TOKEN)
         dataStore.edit { preferences ->
             preferences[githubTokenKey] = encryptedToken.data
             preferences[githubIv] = encryptedToken.iv
@@ -39,9 +40,9 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
     }
 
     override suspend fun storeClassCodeSessionCookie(token: String) {
-        val encryptedToken = cryptoManager.encrypt(data = token)
+        val encryptedToken = cryptoManager.encrypt(data = token, TypeOfData.CLASSCODE_COOKIE)
         dataStore.edit { preferences ->
-            preferences[classCodeTokenKey] = encryptedToken.data
+            preferences[classCodeCookieKey] = encryptedToken.data
             preferences[classCodeIv] = encryptedToken.iv
         }
     }
@@ -59,11 +60,11 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
             cryptoManager.decrypt(decryptionSecret = DecryptionSecret(
                 iv = iv,
                 data = encryptedData
-            )
+            ), typeOfData = TypeOfData.GITHUB_TOKEN
             ).data
         }
 
-    override fun getClassCodeToken(): Flow<String> =
+    override fun getSessionCookie(): Flow<String> =
         dataStore.data.catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
@@ -72,11 +73,11 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
             }
         }.map { preferences ->
             val iv = preferences[classCodeIv] ?: ""
-            val encryptedData = preferences[classCodeTokenKey] ?: ""
+            val encryptedData = preferences[classCodeCookieKey] ?: ""
             cryptoManager.decrypt(decryptionSecret = DecryptionSecret(
                 iv = iv,
                 data = encryptedData
-            )
+            ), typeOfData = TypeOfData.CLASSCODE_COOKIE
             ).data
         }
 
@@ -88,7 +89,7 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
 
     override suspend fun checkIfClassCodeTokenExists(): Boolean {
         return dataStore.data.map { preferences ->
-            preferences.contains(classCodeTokenKey) // Use a default value if the entry doesn't exist
+            preferences.contains(classCodeCookieKey) // Use a default value if the entry doesn't exist
         }.first()
     }
 }

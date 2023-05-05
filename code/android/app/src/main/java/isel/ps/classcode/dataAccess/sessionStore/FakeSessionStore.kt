@@ -19,7 +19,7 @@ class FakeSessionStore(alreadyLoggedIn: Boolean): SessionStore {
         return flowOf(token)
     }
 
-    override fun getClassCodeToken(): Flow<String> {
+    override fun getSessionCookie(): Flow<String> {
         val token = classCodeTokenStorage ?: ""
         return flowOf(token)
     }

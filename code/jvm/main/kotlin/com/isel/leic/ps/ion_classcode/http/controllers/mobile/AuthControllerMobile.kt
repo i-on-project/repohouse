@@ -17,6 +17,7 @@ import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
 import okhttp3.internal.EMPTY_REQUEST
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
@@ -93,6 +94,7 @@ class AuthControllerMobile(
         }
         val accessToken = githubServices.fetchAccessToken(code = code, isMobile = false)
         val userGithubInfo = githubServices.fetchUserInfo(accessToken = accessToken.access_token)
+        logger.info("User info: $userGithubInfo")
         return when (val userInfo = userServices.getUserByGithubId(githubId = userGithubInfo.id)) {
             is Result.Success -> {
                 if (userInfo.value.isCreated) {
@@ -139,7 +141,9 @@ class AuthControllerMobile(
         }
     }
 
-
+    companion object {
+        private val logger = LoggerFactory.getLogger(AuthControllerMobile::class.java)
+    }
 }
 
 // TODO("Didn´t use the other generate user state because of possible merge conflicts. Then change to use the same")

@@ -31,7 +31,7 @@ class MenuViewModel(private val menuServices: MenuServices) : ViewModel() {
     fun getCourses() = viewModelScope.launch {
         val courses = menuServices.getCourses()
         if(courses is Either.Right) {
-            _courses = courses.value
+
         }
         // TODO(): Handle error
     }
