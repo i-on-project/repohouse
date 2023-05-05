@@ -18,7 +18,7 @@ class CourseViewModel(private val courseServices: CourseServices) : ViewModel() 
 
     fun getClassrooms(courseId: Int) {
         viewModelScope.launch {
-            val classrooms = courseServices.getCourse(courseId = courseId)
+            val classrooms = courseServices.getClassrooms(courseId = courseId)
             if (classrooms is Either.Right) {
                 _classrooms = classrooms.value
             }

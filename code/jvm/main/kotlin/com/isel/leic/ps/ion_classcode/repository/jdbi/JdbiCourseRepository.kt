@@ -1,9 +1,6 @@
 package com.isel.leic.ps.ion_classcode.repository.jdbi
 
-import com.isel.leic.ps.ion_classcode.domain.Classroom
-import com.isel.leic.ps.ion_classcode.domain.Course
-import com.isel.leic.ps.ion_classcode.domain.Student
-import com.isel.leic.ps.ion_classcode.domain.Teacher
+import com.isel.leic.ps.ion_classcode.domain.*
 import com.isel.leic.ps.ion_classcode.domain.dto.CourseDTO
 import com.isel.leic.ps.ion_classcode.domain.input.CourseInput
 import com.isel.leic.ps.ion_classcode.repository.CourseRepository
@@ -63,12 +60,12 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .first()
         val teacher = handle.createQuery(
             """
-                SELECT u.name, u.email, t.id, u.github_username, u.github_id, u.token, u.is_created FROM Teacher as t JOIN users u on t.id = u.id
+                SELECT u.name, u.email, t.id, u.github_username, u.github_id, u.is_created FROM Teacher as t JOIN users u on t.id = u.id
                 WHERE t.id = :teacher_id
             """,
         )
             .bind("teacher_id", course.teacherId)
-            .mapTo<Teacher>()
+            .mapTo<TeacherWithoutToken>()
             .first()
         return Course(id, course.orgUrl, course.name, listOf(teacher))
     }
@@ -159,7 +156,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     /**
      * Method to get all teachers from a Course
      */
-    override fun getCourseTeachers(courseId: Int): List<Teacher> {
+    override fun getCourseTeachers(courseId: Int): List<TeacherWithoutToken> {
         val teachersIds = handle.createQuery(
             """
             SELECT teacher FROM teacher_course
@@ -172,13 +169,13 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return teachersIds.map { id ->
             handle.createQuery(
                 """
-                SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+                SELECT users.name, email, Users.id, github_username, github_id, is_created FROM Teacher
                 JOIN users on teacher.id = users.id
                 WHERE teacher.id = :teacher_id
                 """,
             )
                 .bind("teacher_id", id)
-                .mapTo<Teacher>()
+                .mapTo<TeacherWithoutToken>()
                 .first()
         }
     }
@@ -247,13 +244,13 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             val teachers = courseTemp.teachers.map { teacherId ->
                 handle.createQuery(
                     """
-                    SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+                    SELECT users.name, email, Users.id, github_username, github_id, is_created FROM Teacher
                     JOIN users on teacher.id = users.id
                     WHERE teacher.id = :teacher_id
                     """,
                 )
                     .bind("teacher_id", teacherId)
-                    .mapTo<Teacher>()
+                    .mapTo<TeacherWithoutToken>()
                     .first()
             }
             Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, isArchived = courseTemp.isArchived)
@@ -277,13 +274,13 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             val teachers = courseTemp.teachers.map { teacherId ->
                 handle.createQuery(
                     """
-                    SELECT users.name, email, Users.id, github_username, github_id, is_created, github_token,token FROM Teacher
+                    SELECT users.name, email, Users.id, github_username, github_id, is_created FROM Teacher
                     JOIN users on teacher.id = users.id
                     WHERE teacher.id = :teacher_id
                     """,
                 )
                     .bind("teacher_id", teacherId)
-                    .mapTo<Teacher>()
+                    .mapTo<TeacherWithoutToken>()
                     .first()
             }
             Course(id = courseTemp.id, orgUrl = courseTemp.orgUrl, name = courseTemp.name, teachers = teachers, isArchived = courseTemp.isArchived)
@@ -327,13 +324,13 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         val teachers = dto.teachers.map { teacherId ->
             handle.createQuery(
                 """
-                SELECT u.name, email, u.id, github_username, github_id, is_created, github_token,token FROM Teacher as t
+                SELECT u.name, email, u.id, github_username, github_id, is_created FROM Teacher as t
                 JOIN users as u on t.id = u.id
                 WHERE t.id = :teacher_id
                 """,
             )
                 .bind("teacher_id", teacherId)
-                .mapTo<Teacher>()
+                .mapTo<TeacherWithoutToken>()
                 .first()
         }
         return Course(id = dto.id, orgUrl = dto.orgUrl, name = dto.name, teachers = teachers, isArchived = dto.isArchived)

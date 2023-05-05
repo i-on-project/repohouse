@@ -28,7 +28,7 @@ data class UserInfoDeserialization(
     @JsonProperty("company") val company: String?,
     @JsonProperty("blog") val blog: String?,
     @JsonProperty("location") val location: String?,
-    @JsonProperty("email") val email: String,
+    @JsonProperty("email") val email: String?,
     @JsonProperty("hireable") val hireable: Boolean?,
     @JsonProperty("bio") val bio: String?,
     @JsonProperty("twitter_username") val twitterUsername: String?,

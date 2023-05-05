@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.dto.LocalCourseDto
+import isel.ps.classcode.presentation.classroom.ClassroomActivity
 import isel.ps.classcode.presentation.course.services.CourseServices
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
@@ -47,13 +48,13 @@ class CourseActivity: ComponentActivity() {
         setContent {
             ClasscodeTheme {
                 if (course != null) {
-                    ClassroomScreen(
+                    CourseScreen(
                         course = course,
                         onBackRequest = { finish() },
-                        onClassroomSelected = { classroomId ->
-
+                        onClassroomSelected = { classroom ->
+                            ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto())
                         },
-                        classrooms = vm.classrooms
+                        classrooms = vm.classrooms,
                     )
                 }
                 else {
@@ -71,11 +72,7 @@ class CourseActivity: ComponentActivity() {
                 intent.getParcelableExtra(COURSE_EXTRA, LocalCourseDto::class.java)
             else
                 intent.getParcelableExtra(COURSE_EXTRA)
-        return if (courseExtra != null) Course(
-            id = courseExtra.id,
-            imageUrl = courseExtra.imageUrl,
-            name = courseExtra.name
-        ) else null
+        return courseExtra?.toCourseDto()
     }
 
 }

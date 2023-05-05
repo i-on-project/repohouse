@@ -3,6 +3,7 @@ package com.isel.leic.ps.ion_classcode.http.model.output
 import com.isel.leic.ps.ion_classcode.domain.Classroom
 import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.Teacher
+import com.isel.leic.ps.ion_classcode.domain.TeacherWithoutToken
 
 /**
  * Represents a Course Output Model.
@@ -11,7 +12,7 @@ data class CourseOutputModel(
     val id: Int,
     val orgUrl: String,
     val name: String,
-    val teacher: List<Teacher>,
+    val teacher: List<TeacherWithoutToken>,
 ) : OutputModel
 
 /**
@@ -21,7 +22,7 @@ data class CourseWithClassroomOutputModel(
     val id: Int,
     val orgUrl: String,
     val name: String,
-    val teacher: List<Teacher>,
+    val teacher: List<TeacherWithoutToken>,
     val isArchived: Boolean,
     val classrooms: List<Classroom>,
 ) : OutputModel

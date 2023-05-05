@@ -13,6 +13,14 @@ val GITHUB_OAUTH_URI: (scope: String, state: String) -> String = { scope, state 
         "&redirect_uri=$NGROK_URI/api/auth/callback"
 }
 
+val MOBILE_GITHUB_OAUTH_URI: (scope: String, state: String) -> String = { scope, state ->
+    "/login/oauth/authorize?" +
+            "client_id=${System.getenv("GITHUB_CLIENT_ID")}" +
+            "&scope=$scope" +
+            "&state=$state" +
+            "&redirect_uri=$NGROK_URI/api/auth/callback/mobile"
+}
+
 const val GITHUB_USERINFO_URI = "/user"
 const val GITHUB_USERMAILS_URI = "$GITHUB_USERINFO_URI/emails"
 

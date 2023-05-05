@@ -8,7 +8,7 @@ import isel.ps.classcode.presentation.utils.Either
 import okhttp3.OkHttpClient
 
 class RealCourseServices(private val sessionStore: SessionStore, private val objectMapper: ObjectMapper, private val httpClient: OkHttpClient) : CourseServices {
-    override suspend fun getCourse(courseId: Int): Either<HandleClassCodeResponseError, List<Classroom>> {
+    override suspend fun getClassrooms(courseId: Int): Either<HandleClassCodeResponseError, List<Classroom>> {
         TODO("Not yet implemented")
     }
 }

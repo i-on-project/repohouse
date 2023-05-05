@@ -186,7 +186,7 @@ class JdbiUsersRepository(
         val id = handle.createUpdate(
             """
             INSERT INTO pendingteacher (email, github_username, github_id, token, name,github_token,created_at)
-            VALUES (:email, :github_username, :github_id, :token, :name,:github_token,now())
+            VALUES (:email, :github_username, :github_id, :token, :name,:github_token, now())
             RETURNING id
             """,
         )
@@ -289,7 +289,6 @@ class JdbiUsersRepository(
             .bind("github_id", githubId)
             .mapTo<PendingTeacher>()
             .firstOrNull()
-
     }
 
     override fun getPendingStudentByGithubId(githubId: Long): PendingStudent? {
@@ -298,10 +297,10 @@ class JdbiUsersRepository(
             SELECT id,name,email,github_username,is_created,github_id,token FROM pendingstudent
             WHERE github_id = :github_id
             """,
-            )
-                .bind("github_id", githubId)
-                .mapTo<PendingStudent>()
-                .firstOrNull()
+        )
+            .bind("github_id", githubId)
+            .mapTo<PendingStudent>()
+            .firstOrNull()
     }
 
     /**
@@ -319,6 +318,57 @@ class JdbiUsersRepository(
             .firstOrNull() ?: return null
 
         return helper(handle = handle, id = id)
+    }
+
+    /**
+     * Method to store the access token. If already exists don´t do anything
+     */
+
+    override fun storeAccessTokenEncrypted(token: String, githubId: Long) {
+        handle.createQuery(
+            """
+            SELECT access_token FROM accesstoken
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo<String>()
+            .firstOrNull()
+            ?: handle.createUpdate(
+                """
+            INSERT INTO accesstoken (github_id, access_token)
+            VALUES (:github_id, :access_token)
+            """,
+            )
+                .bind("access_token", token)
+                .bind("github_id", githubId)
+                .execute()
+    }
+
+    /**
+     * Get the encrypted token associated with the github id
+     */
+
+    override fun getAccessTokenEncrypted(githubId: Long): String? {
+        return handle.createQuery(
+            """
+            SELECT access_token FROM accesstoken
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .mapTo<String>()
+            .firstOrNull()
+    }
+    override fun deleteAccessTokenEncrypted(githubId: Long) {
+        handle.createUpdate(
+            """
+            delete FROM accesstoken
+            WHERE github_id = :github_id
+            """,
+        )
+            .bind("github_id", githubId)
+            .execute()
     }
 
     /**

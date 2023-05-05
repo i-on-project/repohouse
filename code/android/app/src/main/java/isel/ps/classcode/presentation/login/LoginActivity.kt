@@ -9,9 +9,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import isel.ps.classcode.CLASSCODE_AUTH_URL
 import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.R
 import isel.ps.classcode.TAG
@@ -47,13 +47,9 @@ class LoginActivity : ComponentActivity() {
             ClasscodeTheme {
                 LoginScreen(
                     loginHandler = {
-                        vm.auth()
+                        sendToClassscodeToStartOauthScheme()
                     },
                 )
-                val requestInfo = vm.requestInfo
-                if (requestInfo != null) {
-                    openGitHubLoginPage(url = requestInfo.url)
-                }
                 if (vm.finished) {
                     MenuActivity.navigate(origin = this)
                 }
@@ -61,21 +57,24 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        val uri = intent?.data
-
+    override fun onResume() {
+        super.onResume()
+        val code = intent?.data?.getQueryParameter("code")
+        val githubId = intent?.data?.getQueryParameter("github_id")
+        if (code != null && githubId != null) {
+            vm.getAccessToken(code, githubId)
+        }
     }
 
-    private fun openGitHubLoginPage(url: String) {
+
+
+    private fun sendToClassscodeToStartOauthScheme() {
         try {
-            val uri = Uri.parse(url)
-            val builder = CustomTabsIntent.Builder()
-            val intent = builder.build().intent.apply {
-                putExtra("com.google.android.apps.chrome.EXTRA_OPEN_NEW_INCOGNITO_TAB", true)
+            val uri = Uri.parse(CLASSCODE_AUTH_URL)
+            val customIntent = CustomTabsIntent.Builder().build().intent.apply {
                 data = uri
             }
-            startActivity(intent)
+            startActivity(customIntent)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open URL", e)
             Toast
