@@ -289,7 +289,6 @@ class JdbiUsersRepository(
             .bind("github_id", githubId)
             .mapTo<PendingTeacher>()
             .firstOrNull()
-
     }
 
     override fun getPendingStudentByGithubId(githubId: Long): PendingStudent? {
@@ -298,10 +297,10 @@ class JdbiUsersRepository(
             SELECT id,name,email,github_username,is_created,github_id,token FROM pendingstudent
             WHERE github_id = :github_id
             """,
-            )
-                .bind("github_id", githubId)
-                .mapTo<PendingStudent>()
-                .firstOrNull()
+        )
+            .bind("github_id", githubId)
+            .mapTo<PendingStudent>()
+            .firstOrNull()
     }
 
     /**
@@ -321,8 +320,12 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
+    /**
+     * Method to store the access token. If already exists don´t do anything
+     */
+
     override fun storeAccessTokenEncrypted(token: String, githubId: Long) {
-        val query = handle.createQuery(
+        handle.createQuery(
             """
             SELECT access_token FROM accesstoken
             WHERE github_id = :github_id
@@ -331,18 +334,7 @@ class JdbiUsersRepository(
             .bind("github_id", githubId)
             .mapTo<String>()
             .firstOrNull()
-        if (query != null) {
-            handle.createUpdate(
-                """
-                UPDATE accesstoken SET access_token = :access_token
-                WHERE github_id = :github_id
-                """,
-            )
-                .bind("access_token", token)
-                .bind("github_id", githubId)
-                .execute()
-        } else {
-            handle.createUpdate(
+            ?: handle.createUpdate(
                 """
             INSERT INTO accesstoken (github_id, access_token)
             VALUES (:github_id, :access_token)
@@ -351,8 +343,11 @@ class JdbiUsersRepository(
                 .bind("access_token", token)
                 .bind("github_id", githubId)
                 .execute()
-        }
     }
+
+    /**
+     * Get the encrypted token associated with the github id
+     */
 
     override fun getAccessTokenEncrypted(githubId: Long): String? {
         return handle.createQuery(
@@ -375,6 +370,7 @@ class JdbiUsersRepository(
             .bind("github_id", githubId)
             .execute()
     }
+
     /**
      * Method to get a studen by is school id
      */

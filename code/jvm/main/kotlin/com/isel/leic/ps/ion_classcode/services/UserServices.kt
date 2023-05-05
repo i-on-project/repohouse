@@ -65,6 +65,10 @@ class UserServices(
         }
     }
 
+    /**
+     * Method to get the access token encrypted and the classcode user token
+     */
+
     fun getTokens(githubId: Long): GetAccessTokenResult {
         return transactionManager.run {
             val accessToken = it.usersRepository.getAccessTokenEncrypted(githubId = githubId)
