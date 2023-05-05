@@ -3,14 +3,37 @@ import { useAsync } from "../http/Fetch"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../domain/response-models/Error"
 import { SirenEntity } from "../http/Siren"
-import {List, ListItem, Typography, Card, CardActionArea, CardContent, CircularProgress, Backdrop} from "@mui/material"
+import {
+    List,
+    ListItem,
+    Typography,
+    Card,
+    CardActionArea,
+    CardContent,
+    CircularProgress,
+    Backdrop,
+    Box, IconButton, Accordion, AccordionSummary, AccordionDetails, Grid, Button, ListItemAvatar, ListItemText, Avatar
+} from "@mui/material"
 import { CourseServices } from "../services/CourseServices"
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom"
-import { CourseBody } from "../domain/dto/CourseDtoProperties"
-import { Button, Image } from "react-bootstrap"
+import { Navigate, useLocation, useNavigate } from "react-router-dom"
+import {CourseBody} from "../domain/dto/CourseDtoProperties"
+import { Image } from "react-bootstrap"
 import { GitHubOrg } from "../domain/response-models/GitHubOrgs"
 import { AuthState, useLoggedIn } from "./auth/Auth"
 import { Error } from "./error/Error"
+import {
+    accordionStyle,
+    alignHorizontalyBoxStyle,
+    cardBoxStyle,
+    cardBoxStyle2,
+    homeBoxStyle,
+    typographyStyle
+} from "../utils/Style";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import { ClassroomDtoProperties } from "../domain/dto/ClassroomDtoProperties"
+import { Teacher } from "../domain/User"
+import {mainTheme} from "../utils/Theme";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 
 export function ShowCourseFetch({
@@ -23,6 +46,7 @@ export function ShowCourseFetch({
         return await courseServices.course({courseId: courseId})
     })
     const [error, setError] = useState(false)
+    const [isOpened, setIsOpened] = useState(false)
     const navigate = useNavigate()
     const user = useLoggedIn()
 
@@ -35,6 +59,11 @@ export function ShowCourseFetch({
             navigate("/menu")
         }
     }, [setError])
+
+
+    const handleGithubClick = useCallback((url) => {
+        window.open(url, "_blank")
+    }, [])
 
     const handleCreateClassroom = useCallback(async () => {
         navigate("/courses/" + courseId + "/classrooms/create");
@@ -60,47 +89,53 @@ export function ShowCourseFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
-                    <Typography
-                        variant="h2"
-                    >
-                        {content.properties.name}
-                    </Typography>
-                    <List>
-                        {"Teachers"}
-                        {content.properties.teacher.map( teacher => (
-                            <ListItem key={teacher.id}>
-                                {teacher.name}
-                            </ListItem>
-                        ))}
-                    </List>
-                    <a href={content.properties.orgUrl} target={"_blank"}>GitHub Page</a>
-                    <List>
-                        {content.properties.classrooms.map( classroom => (
-                            <ListItem key={classroom.id}>
-
-                                <Link to={"/courses/"+ courseId + "/classrooms/" + classroom.id}>
-                                    {classroom.name}
-                                </Link>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <Box sx={alignHorizontalyBoxStyle}>
+                        <Typography
+                            variant="h2"
+                            sx={typographyStyle}
+                        >
+                            {content.properties.name}
+                        </Typography>
+                        <IconButton>
+                            <GitHubIcon onClick={() => handleGithubClick(content.properties.orgUrl)}/>
+                        </IconButton>
+                    </Box>
+                     <TeachersDetailBox teachers={content.properties.teacher}/>
+                    {content.properties.classrooms.length === 0 ?
+                        <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={typographyStyle}
+                        >
+                            {"You are not enrolled in any classroom"}
+                        </Typography>
+                        :
+                        <Grid container
+                              columnSpacing={{xs:1, md:3}}
+                              rowSpacing={2}
+                              direction="row"
+                              alignItems="center"
+                              justifyContent="center"
+                        >
+                            {content.properties.classrooms.map( classroom => (
+                                <Grid item xs={5} md={2.75}>
+                                    <ClassroomDetailsBox classroom={classroom} courseId={courseId}/>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    }
                     { user == AuthState.Teacher  && !content.properties.isArchived ? (
-                        <>
-                            <Button onClick={handleCreateClassroom}>Create Classroom</Button>
-                            <Button onClick={handleArchiveButton}>Archive</Button>
-                        </>
+                        <Box sx={alignHorizontalyBoxStyle}>
+                            <Button variant="contained" onClick={handleCreateClassroom}>Create Classroom</Button>
+                            <Button variant="contained" onClick={handleArchiveButton}>Archive</Button>
+                        </Box>
                     ) : null}
                 </>
             ) : null}
-        </div>
+        </Box>
     );
 }
 
@@ -113,8 +148,9 @@ export function ShowCourseCreateFetch({
     const content = useAsync(async () => {
         return await courseServices.getTeacherOrgs()
     })
+
     const navigate = useNavigate()
-    const [error, setError] = useState(true)
+    const [error, setError] = useState(false)
     
     const handleSubmit = useCallback((org: GitHubOrg) => {
         navigate("/courses/create", {state: {body: new CourseBody(org.login, org.url)} })
@@ -140,29 +176,33 @@ export function ShowCourseCreateFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
-                        variant="h2"
+                        variant="h5"
+                        sx={typographyStyle}
                     >
-                        {"Create Course"}
+                        {"Select an GitHub Organization"}
                     </Typography>
-                    <Typography
-                        variant="h4"
+                    <Button variant="contained" onClick={() => navigate(-1)}>Back</Button>
+                    <Grid
+                        container
+                        columnSpacing={{xs:1, md:3}}
+                        rowSpacing={2}
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="center"
                     >
-                        {"Select an Organization:"}
-                    </Typography>
-                    {content.properties.orgs.map(org => <OrgsDetailsBox org={org} onClick={handleSubmit}/>)}
-                    <Button onClick={() => navigate(-1)}>Back</Button>
+                        {content.properties.orgs.map(org =>
+                            <Grid item xs={5} md={2.75}>
+                                <OrgsDetailsBox org={org} onClick={handleSubmit}/>
+                            </Grid>
+                        )}
+                    </Grid>
                 </>
             ) : null}
-        </div>
+        </Box>
     )
 }
 
@@ -199,23 +239,112 @@ export function ShowCourseCreatePost({ courseServices }: { courseServices: Cours
 
 
 function OrgsDetailsBox({ org, onClick } : { org: GitHubOrg, onClick: (org: GitHubOrg) => void }) {
+
+    const handleGithubClick = useCallback((url) => {
+        window.open(url, "_blank")
+    }, [])
+
     return (
-        <>
-            <Card variant="outlined">
-                <CardActionArea onClick={(event: any) => {
-                    event.preventDefault()
-                    onClick(org)
-                }}>
-                    <CardContent>
-                        <Typography variant="body2">
-                            <Image src={org.avatar_url} style={{maxWidth:"15%", maxHeight:"15%"}}/>
-                            <br/>
-                            {org.login}
-                        </Typography>
-                    </CardContent>
-                </CardActionArea>
-                <a href={org.url} target="_blank" rel="noopener noreferrer">Open on Github</a>
-            </Card>
-        </>
+        <Box
+            sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                height: "100%",
+                border: "1px solid black",
+                borderRadius: 1,
+                backgroundColor: mainTheme.palette.primary.main,
+                '&:hover': {
+                    backgroundColor: mainTheme.palette.primary.dark,
+                    cursor: "pointer"
+                }
+            }}
+            mt={2}
+             onClick={() => onClick(org)}
+        >
+            <Typography variant="body2" sx={typographyStyle}>
+                {org.login}
+            </Typography>
+            <Image src={org.avatar_url} style={{maxWidth:"15%", maxHeight:"15%",marginBottom:"6px"}}/>
+        </Box>
+    )
+}
+
+
+function ClassroomDetailsBox({classroom,courseId}: {classroom: ClassroomDtoProperties,courseId:number}) {
+    const navigate = useNavigate()
+
+    const handleCourseClick = useCallback(() => {
+        navigate("/courses/"+ courseId + "/classrooms/" + classroom.id)
+    }, [courseId,classroom.id,navigate])
+
+    return (
+        <Box
+            sx={
+                classroom.isArchived ?
+                    cardBoxStyle2 :
+                    cardBoxStyle
+            }
+            onClick={handleCourseClick}
+        >
+            <Typography variant="h5" sx={typographyStyle}>
+                {classroom.name}
+            </Typography>
+            <Typography variant="subtitle2" sx={typographyStyle}>
+                {"Last Updated: "+ new Date(classroom.lastSync).toLocaleString(
+                    "en-GB",
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                    }
+                )}
+            </Typography>
+        </Box>
+    )
+}
+
+function TeachersDetailBox({teachers}: {teachers: Teacher[]}) {
+
+    return (
+        <Accordion
+            square={false}
+            sx={accordionStyle}
+        >
+            <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+            >
+                <Typography
+                    variant="subtitle1"
+                    sx={typographyStyle}
+                >
+                    {"Teachers"}
+                </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+                <List
+                    sx={{
+                        maxHeight: 200,
+                        position: 'relative',
+                        overflow: 'auto'
+                    }}
+                >
+                    {teachers.map( teacher => (
+                        <ListItem key={teacher.id}>
+                            <ListItemAvatar>
+                                <Avatar src={"https://avatars.githubusercontent.com/u/" + teacher.githubId}/>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={teacher.name}
+                                secondary={teacher.email}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+            </AccordionDetails>
+        </Accordion>
     )
 }

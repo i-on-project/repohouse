@@ -3,13 +3,14 @@ import { useAsync } from "../http/Fetch"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../domain/response-models/Error"
 import { SirenEntity } from "../http/Siren"
-import {Backdrop, CircularProgress, List, ListItem, Typography} from "@mui/material"
+import {Backdrop, Box, CircularProgress, List, ListItem, Typography} from "@mui/material"
 import { MenuServices } from "../services/MenuServices"
 import { Button } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { Checkbox } from '@mui/material'
 import { Check, Close, Remove } from "@mui/icons-material"
 import { Error } from "./error/Error"
+import {homeBoxStyle, typographyStyle} from "../utils/Style";
 
 export function ShowTeacherApprovalFetch({
     menuServices,
@@ -73,44 +74,42 @@ export function ShowTeacherApprovalFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
                         variant="h2"
+                        sx={typographyStyle}
                     >
                         {"Teachers Apply Requests"}
                     </Typography>
                     <Typography
                         variant="h4"
+                        sx={typographyStyle}
                     >
                         {"Approve, do Nothing or Reject"}
                     </Typography>
-                    <br/> 
                     { content.properties.teachers.length !== 0 ?
                         <List>
                             {content.properties.teachers.map(teacher=> (
                                 <ListItem
                                     key={teacher.id}
                                 >
-                                    {teacher.name} - {teacher.email}
+                                    <Typography variant="inherit" sx={typographyStyle}>
+                                        {teacher.name + " (" + teacher.email +")"}
+                                    </Typography>
                                 <HandleTeachersCheckbox value={teacher.id} acceptHandler={handleApprove} rejectHandler={handleReject} nothingHandler={handleNothing}/>
                                 </ListItem>
                             ))}
                         </List> :
-                        <Typography variant="h6">
+                        <Typography variant="h6" sx={typographyStyle}>
                             {"There are no pending requests"}
                         </Typography>
                     }
                     { teachersApproved.length || teachersRejected.length ? <Button onClick={handleSubmit}> Submit </Button> : null}
                 </>
             ) : null}
-        </div>
+        </Box>
     );
 }
 

@@ -188,9 +188,9 @@ const router = createBrowserRouter([
     ]}
 ])
 
-export function App({ authState }: { authState: AuthState }) {
+export function App({ authState,githubId,userId }: { authState: AuthState,githubId:number,userId:number}) {
     return (
-        <AuthnContainer authState={authState}>
+        <AuthnContainer authState={authState} githubId={githubId} userId={userId}>
             <RouterProvider router={router}/>
         </AuthnContainer>
     )

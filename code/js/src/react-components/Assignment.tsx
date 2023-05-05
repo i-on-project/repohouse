@@ -9,12 +9,13 @@ import {
     ButtonGroup,
     CardActions,
     CardContent,
-    CircularProgress,
+    CircularProgress, Grid,
     TextField,
-    Typography
+    Button,
+    Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemAvatar, Avatar, ListItemText
 } from "@mui/material";
 import {Link, Navigate, useNavigate} from "react-router-dom";
-import {Button, Card} from "react-bootstrap";
+import {Card} from "react-bootstrap";
 import {AssignmentServices} from "../services/AssignmentServices";
 import {ErrorAlert} from "./error/ErrorAlert";
 import {AuthState, useLoggedIn} from "./auth/Auth";
@@ -25,6 +26,9 @@ import {
 } from "../domain/dto/AssignmentDtoProperties";
 import {CreateTeamBody, JoinTeamBody} from "../domain/dto/RequestDtoProperties";
 import {AssignmentDomain} from "../domain/Assignment";
+import {accordionStyle, alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../utils/Style";
+import {mainTheme} from "../utils/Theme";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export function ShowAssignmentFetch({
                                   assignmentServices,
@@ -70,6 +74,7 @@ function ShowStudentAssignmentFetch({
     const content = useAsync(async () => {
         return await assignmentServices.assignment(courseId,classroomId,assignmentId) as SirenEntity<StudentAssignmentDtoProperties >
     });
+    const navigate = useNavigate();
     const [error, setError] = useState<ErrorMessageModel>(null);
 
     if (!content) {
@@ -89,87 +94,115 @@ function ShowStudentAssignmentFetch({
 
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
                         variant="h2"
+                        sx={typographyStyle}
                     >
                         {content.properties.assignment.title}
                     </Typography>
                     <Typography
-                        variant="h4"
+                        variant="h6"
+                        sx={typographyStyle}
                     >
                         {content.properties.assignment.description}
                     </Typography>
-                    {content.properties.deliveries.map((delivery, index) => (
-                        <Card>
-                            <CardContent>
-                                <Typography
-                                    variant="h6"
-                                >
-                                    {"Delivery #" + index}
-                                </Typography>
-                                <Typography
-                                    variant="h6"
-                                >
-                                    {delivery.tagControl + " -  " + new Date(delivery.dueDate).toLocaleString(
-                                        "en-GB",
-                                        {
-                                            month: "long",
-                                            day: "2-digit",
-                                            year: "numeric",
-                                        }
-                                    )}
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + delivery.id}>
-                                    More Info
-                                </Link>
-                            </CardActions>
-                        </Card>
-                    ))}
                     {content.properties.team ? (
-                        <Card>
-                            <CardContent>
+                            <Box
+                                sx={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center","&:hover":{cursor:"pointer"}}}
+                                onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/" + content.properties.team.id)}
+                            >
                                 <Typography
-                                    variant="h6"
-                                    >
+                                    variant="subtitle1"
+                                    sx={typographyStyle}
+                                >
                                     {content.properties.team.name}
                                 </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/" + content.properties.team.id}>
-                                    More Info
-                                </Link>
-                            </CardActions>
-                        </Card>
+                            </Box>
                     ) : (
-                        <Card>
-                            <CardContent>
-                                <Typography
-                                    variant="h6"
-                                >
-                                    {"No team assigned - Please Join or Create one"}
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/"} state={{assignment:content.properties.assignment}}>
-                                    Join or Create Team
-                                </Link>
-                            </CardActions>
-                        </Card>
+
+                        <Box
+                            sx={alignHorizontalyBoxStyle}
+                            mb={1}
+                            m={1}
+                        >
+                            <Typography
+                                variant="subtitle2"
+                                sx={typographyStyle}
+                            >
+                                {"No team assigned - Please Join or Create one"}
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                size="small"
+                                onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/teams/",{state:{assignment:content.properties.assignment}})}
+                            >
+                                Join or Create Team
+                            </Button>
+                        </Box>
                     )}
+                    <Grid
+                        container
+                        spacing={0}
+                        direction="row"
+                        alignItems="flex-start"
+                        justifyContent="center"
+                    >
+                            {content.properties.deliveries.map((delivery, index) => (
+                                <Grid item xs={12} md={5}>
+                                    <Card
+                                        key={index}
+                                        onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + delivery.id)}
+                                    >
+                                        <CardContent
+                                            sx={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                border: "1px solid black",
+                                                borderRadius: "5px",
+                                                maxWidth:{xs:"30%",md:"75%"},
+                                                margin:"auto",
+                                                mb:2,
+                                                backgroundColor: mainTheme.palette.secondary.light,
+                                                '&:hover': {
+                                                    backgroundColor: mainTheme.palette.secondary.main,
+                                                    cursor: "pointer"
+                                                }
+                                            }}
+
+                                        >
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={typographyStyle}
+                                            >
+                                                {"Delivery #" + (index + 1)}
+                                            </Typography>
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={typographyStyle}
+                                            >
+                                                {delivery.tagControl + " -  " + new Date(delivery.dueDate).toLocaleString(
+                                                    "en-GB",
+                                                    {
+                                                        month: "long",
+                                                        day: "2-digit",
+                                                        year: "numeric",
+                                                    }
+                                                )}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => setError(null)}/>
-        </div>
+        </Box>
     )
 }
 
@@ -219,44 +252,57 @@ function ShowTeacherAssignmentFetch({
 
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ?(
                 <>
                     <Typography
                         variant="h2"
+                        sx={typographyStyle}
                     >
                         {content.properties.assignment.title}
                     </Typography>
                     <Typography
-                        variant="h4"
+                        variant="h5"
+                        sx={typographyStyle}
                     >
                         {content.properties.assignment.description}
                     </Typography>
+                    <Box sx={alignHorizontalyBoxStyle}>
+                        <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/create"}>Create Delivery</Link>
+                        {content.properties.deliveries.length == 0 ? (
+                            <Button onClick={handleDeleteAssigment}>Delete Assigment</Button>
+                        ) : null}
+                    </Box>
                     {content.properties.deliveries.map((delivery,index) => (
-                        <Card>
-                            <CardContent>
+                        <Box
+                            onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/" + delivery.id)}
+                            sx={{
+                                display:"flex",
+                                flexDirection:"column",
+                                alignItems:"center",
+                                justifyContent:"center",
+                                border:"1px solid black",
+                                borderRadius:"5px",
+                                backgroundColor: mainTheme.palette.secondary.light,
+                                '&:hover': {
+                                    backgroundColor: mainTheme.palette.secondary.main,
+                                    cursor: "pointer"
+                                    }
+                            }}
+                        >
                                 <Typography
                                     variant="h6"
+                                    sx={typographyStyle}
                                 >
                                     {"Delivery #" + index }
                                 </Typography>
                                 <Typography
                                     variant="h6"
+                                    sx={typographyStyle}
                                 >
                                     {delivery.tagControl + " -  " + delivery.dueDate}
                                 </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/" + delivery.id}>
-                                    More Info
-                                </Link>
-                            </CardActions>
-                        </Card>
+                        </Box>
                     ))}
                     {content.properties.teams.map((team) => (
                         <Card>
@@ -274,15 +320,10 @@ function ShowTeacherAssignmentFetch({
                             </CardActions>
                         </Card>
                     ))}
-                    <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/create"}>Create Delivery</Link>
-                    {content.properties.deliveries.length == 0 ? (
-                        <Button onClick={handleDeleteAssigment}>Delete Assigment</Button>
-                    ) : null}
-
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => setError(null)}/>
-        </div>
+        </Box>
     )
 }
 
@@ -331,36 +372,36 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
     const minElemsPerGroup = 1
 
     return(
-        <>
-            <Typography variant="h3" component="h1" gutterBottom>
+        <Box sx={homeBoxStyle}>
+            <Typography variant="h3" component="h1" gutterBottom sx={typographyStyle}>
                 Create Gamemode
             </Typography>
 
-            <TextField onChange={handleTitleChange} value={title} id="title" label="Title" variant="outlined" required/>
+            <TextField onChange={handleTitleChange} value={title} id="title" label="Title" variant="outlined" required sx={{margin:"6px"}}/>
             <TextField onChange={handleDescriptionChange} value={description} id="description" label="Description" variant="outlined" required/>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 1, m: 1, bgcolor: 'background.paper' }}>
+            <Box sx={alignHorizontalyBoxStyle}>
                 <ButtonGroup variant="contained" aria-label="outlined primary button group">
                     <Button onClick={() => decreaseValue(minNumbGroups,numbGroups, setNumbGroups)}>-</Button>
                     <Button>{numbGroups}</Button>
                     <Button onClick={() => increaseValue( numbGroups, setNumbGroups)}>+</Button>
                 </ButtonGroup>
-                <Typography variant="h6" component="h1" gutterBottom>
+                <Typography variant="h6" component="h1" gutterBottom  sx={typographyStyle}>
                     Number of Groups
                 </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 1, m: 1, bgcolor: 'background.paper' }}>
+            <Box sx={alignHorizontalyBoxStyle}>
                 <ButtonGroup variant="contained" aria-label="outlined primary button group">
                     <Button onClick={() => decreaseValue(minElemsPerGroup,numbElemPerGroup, setNumbElemPerGroup)}>-</Button>
                     <Button>{numbElemPerGroup}</Button>
                     <Button onClick={() => increaseValue(numbElemPerGroup, setNumbElemPerGroup)}>+</Button>
                 </ButtonGroup>
-                <Typography variant="h6" component="h1" gutterBottom>
+                <Typography variant="h6" component="h1" gutterBottom sx={typographyStyle}>
                     Number of Elements per Group
                 </Typography>
             </Box>
-            <Button onClick={handleSubmit}>Create</Button>
+            <Button variant="contained" onClick={handleSubmit}>Create</Button>
             <ErrorAlert error={serror} onClose={() => { setError(null) }}/>
-        </>
+        </Box>
     )
 }
 
@@ -464,56 +505,90 @@ export function ShowAssigmentTeamsFetch({
     }
 
     return(
-        <>
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ?(
                 <>
                 <Typography variant="h3" component="h1" gutterBottom>
                     {assignment.title}
                 </Typography>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Join a Team
-                </Typography>
-                {content.properties.teams.map((team) => (
-                    <Card>
-                        <CardContent>
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="center"
+                    alignItems="center"
+                >
+                    <Grid item md={5} xs={10}>
+                    <Typography variant="h4" component="h1" gutterBottom sx={typographyStyle}>
+                        Join a Team
+                    </Typography>
+                    {content.properties.teams.map((team) => (
+                        <Box sx={alignHorizontalyBoxStyle}>
                             <Typography
                                 variant="h6"
+                                sx={typographyStyle}
                             >
                                 {team.team.name}
                             </Typography>
-                            <Typography
-                                variant="h6"
+                            <Accordion
+                                square={false}
+                                sx={accordionStyle}
                             >
-                                {team.students.map((student) => (
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                >
                                     <Typography
-                                        variant="h6"
+                                        variant="subtitle2"
+                                        sx={typographyStyle}
                                     >
-                                        {student.name}
+                                        Elements
                                     </Typography>
-                                ))}
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <List
+                                        sx={{
+                                            maxHeight: 200,
+                                            position: 'relative',
+                                            overflow: 'auto'
+                                        }}
+                                    >
+                                        {team.students.map((student) => (
+                                            <ListItem>
+                                                <Typography
+                                                    variant="subtitle2"
+                                                    sx={typographyStyle}
+                                                >
+                                                    {student.name}
+                                                </Typography>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </AccordionDetails>
+                            </Accordion>
+                            <Button variant="contained" onClick={handleJoinTeam} value={team.team.id} disabled={team.students.length >= assignment.maxElemsPerGroup}>Join</Button>
+                        </Box>
+                    ))}
+                    </Grid>
+                    <Grid item md={1} xs={3}>
+                        <Typography variant="h4" sx={typographyStyle}>
+                            Or
+                        </Typography>
+                    </Grid>
+                    <Grid item md={5} xs={10}>
+                        <Typography variant="h4" sx={typographyStyle}>
+                            Create a Team
+                        </Typography>
+                        {content.properties.teams.length < assignment.maxNumberGroups ? (
+                           <Button variant="contained" onClick={handleCreateTeam}>Create</Button>
+                        ): (
+                            <Typography variant="h6" sx={typographyStyle}>
+                                You can't create a team, max number of teams reached
                             </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button onClick={handleJoinTeam} value={team.team.id} disabled={team.students.length >= assignment.maxElemsPerGroup}>Join</Button>
-                        </CardActions>
-                    </Card>
-                ))}
-                    Or
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Create a Team
-                </Typography>
-                {content.properties.teams.length < assignment.maxNumberGroups ? (
-                    <>
-                        <Button onClick={handleCreateTeam}>Create</Button>
-                    </>
-                ): (
-                    <Typography variant="h6" component="h1" gutterBottom>
-                        You can't create a team, max number of teams reached
-                    </Typography>
-                )}
+                        )}
+                    </Grid>
+                </Grid>
                 </>
             ):null}
             <ErrorAlert error={serror} onClose={() => setError(null)}/>
-        </>
+        </Box>
     )
 }

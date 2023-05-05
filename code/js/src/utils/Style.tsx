@@ -70,11 +70,62 @@ export const modalBoxStyle = {
     borderRadius: 1,
 }
 
-export const modalButtonsBoxStyle = {
+export const alignHorizontalyBoxStyle = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
     mt: 2,
     gap: 2,
+}
+
+export const cardBoxStyle = {
+    border: 1,
+    borderRadius: 1,
+    borderColor: 'grey.500',
+    p: 2,
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+    flexDirection:"column",
+    backgroundColor: mainTheme.palette.background.paper,
+    '&:hover': {
+        backgroundColor: mainTheme.palette.primary.dark,
+        cursor: 'pointer',
+    },
+}
+
+export const cardBoxStyle2 = {
+    border: 1,
+    borderRadius: 1,
+    borderColor: 'grey.500',
+    p: 1,
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+    flexDirection:"column",
+    backgroundColor: mainTheme.palette.secondary.main,
+    '&:hover': {
+        backgroundColor: mainTheme.palette.secondary.dark,
+        cursor: 'pointer',
+    },
+}
+
+export const accordionStyle = {
+    display:"flex",
+        justifyContent:"center",
+        alignItems:"center",
+        flexDirection:"column",
+        boxShadow: "none",
+        backgroundColor: mainTheme.palette.background.paper,
+        '&:hover': {
+        backgroundColor: mainTheme.palette.primary.dark,
+            cursor: 'pointer',
+    },
+    borderRadius: 1,
+        border: 1,
+        borderColor: mainTheme.palette.primary.dark,
+        borderStyle: "solid",
+        mb: 4,
+        maxWidth: {xs:"50%",md:"25%"}
 }

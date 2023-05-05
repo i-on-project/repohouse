@@ -239,3 +239,11 @@ CREATE TABLE OTP(
 
 
 COMMIT;
+
+insert into team (name, is_created, assignment) values ('Team 1', true, 1);
+insert into request (creator, state) values (2, 'Accepted');
+insert into request (creator, state) values (2, 'Rejected');
+insert into request (creator, state) values (2, 'Pending');
+insert into jointeam (id, team_id, assigment_id) values (2, 1, 1);
+insert into jointeam (id, team_id, assigment_id) values (3, 1, 1);
+insert into leaveteam (id, team_id) values (4, 1);

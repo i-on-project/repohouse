@@ -2,13 +2,14 @@ import * as React from "react"
 import { useState, useCallback } from "react"
 import { ErrorMessageModel } from "../../domain/response-models/Error"
 import { SirenEntity } from "../../http/Siren"
-import {Typography, TextField, CircularProgress, Backdrop} from "@mui/material"
+import {Typography, TextField, CircularProgress, Backdrop, Box} from "@mui/material"
 import { Button } from "react-bootstrap"
 import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import { AuthServices } from "../../services/AuthServices"
 import { Error } from "../error/Error"
 import { useAsync } from "../../http/Fetch"
 import { ErrorAlertForm } from "../error/ErrorAlert"
+import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../../utils/Style";
 
 
 
@@ -54,36 +55,36 @@ export function ShowCreateStudentFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
                         variant="h2"
+                        sx={typographyStyle}
                     >
                         {content.properties.name}
                     </Typography>
                     <Typography
                         variant="h5"
+                        sx={typographyStyle}
                     >
                         {content.properties.email}
                     </Typography>
                     <Typography
                         variant="h6"
+                        sx={typographyStyle}
                     >
                         {content.properties.GitHubUsername}
                     </Typography>
                     <TextField label={"SchoolId"} required={true} type={"number"} onChange={(event) => setSchoolId(Number(event.target.value))}/>
-                    <Button onClick={handleConfirmClick}> {"Confirm"} </Button>
-                    <Button onClick={handleDeclineClick}> {"Decline"} </Button>
+                    <Box sx={alignHorizontalyBoxStyle}>
+                        <Button onClick={handleConfirmClick}> {"Confirm"} </Button>
+                        <Button onClick={handleDeclineClick}> {"Decline"} </Button>
+                    </Box>
                     { error ? <ErrorAlertForm title="Please fill the form above." detail="Your school ID must not be empty." onClose={ () => setError(false) }/> : null }
                 </>
             ) : null}
-        </div>
+        </Box>
     )
 }
 

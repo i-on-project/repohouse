@@ -8,24 +8,18 @@ import {
     Box,
     CircularProgress,
     Grid,
-    List,
-    ListItem,
     Modal,
     TextField,
     Typography,
     Button,
-    IconButton,
-    Accordion, AccordionSummary, AccordionDetails
+    Avatar
 } from "@mui/material"
 import { MenuServices } from "../services/MenuServices"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { AuthState, toState, useLoggedIn } from "./auth/Auth"
 import { Error } from "./error/Error"
-import {homeBoxStyle, modalBoxStyle, modalButtonsBoxStyle, typographyStyle} from "../utils/Style";
+import {cardBoxStyle, homeBoxStyle, modalBoxStyle, alignHorizontalyBoxStyle, typographyStyle} from "../utils/Style";
 import {CourseDtoProperties} from "../domain/dto/CourseDtoProperties";
-import {mainTheme} from "../utils/Theme";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export function ShowMenuFetch({
     menuServices,
@@ -81,7 +75,7 @@ export function ShowMenuFetch({
                         {"Welcome " + content.properties.name}
                     </Typography>
                     { loggedIn === AuthState.Student ? (
-                        <Button sx={{mt:1,mb:2}} variant="contained" onClick={() => setIsOpened(true)}>
+                        <Button sx={{mt:1,mb:2,}} variant="contained" onClick={() => setIsOpened(true)}>
                             Invite Code
                         </Button>
                     ) : null}
@@ -93,7 +87,7 @@ export function ShowMenuFetch({
                             <TextField
                                 onChange={handleChangeInviteCode} value={inviteCode} id="inviteCode" label="InviteCode" variant="outlined"
                             />
-                            <Box sx={modalButtonsBoxStyle} >
+                            <Box sx={alignHorizontalyBoxStyle} >
                                 <Button variant="contained" onClick={handleSubmit}>
                                     Submit
                                 </Button>
@@ -123,46 +117,17 @@ export function ShowMenuFetch({
                               justifyContent="center"
                         >
                             {content.properties.courses.map( course => (
-                                <>
-                                    <Grid item xs={5} md={2.75}>
-                                        <CourseDetailsBox course={course} />
-                                    </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
-                                    <CourseDetailsBox course={course} />
-                                </Grid><Grid item xs={5} md={2.75}>
+                                <Grid item xs={5} md={2.75}>
                                     <CourseDetailsBox course={course} />
                                 </Grid>
-                                </>
                             ))}
                         </Grid>
                     }
                     { loggedIn === AuthState.Teacher ? (
-                        <>
+                        <Box sx={alignHorizontalyBoxStyle}>
                             <Link to={"/teacher/orgs"}> Create Course </Link>
-                            <br/>
                             <Link to={"/pending-teachers"}> Pending Teachers </Link>
-                        </>
+                        </Box>
                     ) : null}
                 </>
             ) : null}
@@ -172,91 +137,47 @@ export function ShowMenuFetch({
 
 export function ShowMenuCallbackFetch() {
     const params = useParams()
+    const [searchParams] = useSearchParams()
     const state = toState(params.user)
-    if (state !== undefined) {
-        window.opener.postMessage({type:"Menu", data:'/menu', state: state}, process.env.NGROK_URI)
+    const githubId = searchParams.get('githubId')
+    const userId = searchParams.get('userId')
+    if (state !== undefined && githubId !== undefined && userId !== undefined) {
+        window.opener.postMessage({type:"Menu", data:'/menu', state: {auth:state,githubId:githubId,userId:userId}}, process.env.NGROK_URI)
         window.close()
         return (<></>)
     }
    
-    return <>
-        It seems that your server redirect URL is not setup correctly!
-    </>
+    return (
+        <Box sx={homeBoxStyle}>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={typographyStyle}
+            >
+                It seems that your server redirect URL is not setup correctly!
+            </Typography>
+        </Box>
+    )
 }
 
 function CourseDetailsBox({course}: {course: CourseDtoProperties}) {
+    const navigate = useNavigate()
 
-    const handleGithubClick = useCallback(() => {
-        window.open(course.orgUrl, "_blank")
-    }, [course.orgUrl])
+    const handleCourseClick = useCallback(() => {
+        navigate("/courses/" + course.id)
+    }, [course.id, navigate])
 
     return (
         <Box
-            sx={{
-                border: 1,
-                borderRadius: 1,
-                borderColor: 'grey.500',
-                p: 1,
-                display:"flex",
-                justifyContent:"center",
-                alignItems:"center",
-                flexDirection:"column",
-                backgroundColor: mainTheme.palette.background.paper,
-                '&:hover': {
-                    backgroundColor: mainTheme.palette.primary.dark,
-                    cursor: 'pointer',
-                },
-            }}
+            sx={cardBoxStyle}
+            onClick={handleCourseClick}
         >
-            <Typography variant="h5">
-                {course.name}
-            </Typography>
-
-            <IconButton>
-                <GitHubIcon onClick={handleGithubClick}/>
-            </IconButton>
-
-            <Accordion
-                square={false}
-                sx={{
-                    display:"flex",
-                    justifyContent:"center",
-                    alignItems:"center",
-                    flexDirection:"column",
-                    boxShadow: "none",
-                    backgroundColor: mainTheme.palette.background.paper,
-                    '&:hover': {
-                        backgroundColor: mainTheme.palette.primary.dark,
-                        cursor: 'pointer',
-                    },
-                }}
-            >
-                <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                >
-                    <Typography
-                        variant="subtitle1"
-                        sx={typographyStyle}
-                    >
-                        {"Teachers"}
-                    </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <List>
-                        {course.teacher.map( teacher => (
-                            <ListItem>
-                                <Typography
-                                    variant="subtitle2"
-                                    sx={typographyStyle}
-                                >
-                                    {teacher.name}
-                                </Typography>
-                            </ListItem>
-                        ))}
-                    </List>
-                </AccordionDetails>
-            </Accordion>
+            <Box sx={alignHorizontalyBoxStyle} mb={2}>
+                <Avatar/>
+                <Typography variant="h5" sx={typographyStyle}>
+                    {course.name}
+                </Typography>
+            </Box>
         </Box>
     )
-
 }

@@ -2,12 +2,13 @@ import * as React from "react"
 import { useCallback } from "react"
 import { ErrorMessageModel } from "../../domain/response-models/Error"
 import { SirenEntity } from "../../http/Siren"
-import {Backdrop, CircularProgress, Typography} from "@mui/material"
+import {Backdrop, Box, CircularProgress, Typography} from "@mui/material"
 import { Button } from "react-bootstrap"
 import { Navigate, useNavigate } from "react-router-dom"
 import { AuthServices } from "../../services/AuthServices"
 import { Error } from "../error/Error"
 import { useAsync } from "../../http/Fetch"
+import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../../utils/Style";
 
 
 export function ShowCreateTeacherFetch({
@@ -46,34 +47,34 @@ export function ShowCreateTeacherFetch({
     }
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
                         variant="h2"
+                        sx={typographyStyle}
                     >
                         {content.properties.name}
                     </Typography>
                     <Typography
                         variant="h5"
+                        sx={typographyStyle}
                     >
                         {content.properties.email}
                     </Typography>
                     <Typography
                         variant="h6"
+                        sx={typographyStyle}
                     >
                         {content.properties.GitHubUsername}
                     </Typography>
-                    <Button onClick={handleConfirmClick}> {"Confirm"} </Button>
-                    <Button onClick={handleDeclineClick}> {"Decline"} </Button>
+                    <Box sx={alignHorizontalyBoxStyle}>
+                        <Button onClick={handleConfirmClick}> {"Confirm"} </Button>
+                        <Button onClick={handleDeclineClick}> {"Decline"} </Button>
+                    </Box>
                 </>
             ) : null}
-        </div>
+        </Box>
     )
 }
 

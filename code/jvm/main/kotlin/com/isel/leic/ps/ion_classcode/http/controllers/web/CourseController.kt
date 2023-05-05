@@ -10,15 +10,13 @@ import com.isel.leic.ps.ion_classcode.http.model.output.CourseArchivedResult
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseDeletedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.CourseWithClassroomOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ion_classcode.http.model.output.GitHubOrgsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.services.CourseServices
-import com.isel.leic.ps.ion_classcode.services.GithubServices
-import com.isel.leic.ps.ion_classcode.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
+import com.isel.leic.ps.ion_classcode.services.CourseServices
+import com.isel.leic.ps.ion_classcode.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
@@ -36,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class CourseController(
     private val courseServices: CourseServices,
-    private val teacherServices: TeacherServices
+    private val teacherServices: TeacherServices,
 ) {
 
     /**
@@ -52,7 +50,7 @@ class CourseController(
         return when (val token = teacherServices.getTeacherGithubToken(user.id)) {
             is Result.Problem -> teacherServices.problem(token.value)
             is Result.Success -> {
-                when (val orgs = teacherServices.getTeacherOrgs(user.id,token.value)){
+                when (val orgs = teacherServices.getTeacherOrgs(user.id, token.value)) {
                     is Result.Problem -> teacherServices.problem(orgs.value)
                     is Result.Success -> siren(GitHubOrgsOutputModel(orgs.value)) {
                         clazz("orgs")
@@ -116,11 +114,13 @@ class CourseController(
         if (user !is Student) return Problem.unauthorized
         return when (val request = courseServices.leaveCourse(courseId, user.id)) {
             is Result.Problem -> courseServices.problem(request.value)
-            is Result.Success -> siren(RequestOutputModel(
-                Status.CREATED,
-                request.value.id,
-                "Request to leave course created, waiting for teacher approval",
-            )) {
+            is Result.Success -> siren(
+                RequestOutputModel(
+                    Status.CREATED,
+                    request.value.id,
+                    "Request to leave course created, waiting for teacher approval",
+                ),
+            ) {
                 clazz("course")
                 action(title = "leaveCourse", href = Uris.leaveCourse(courseId), method = HttpMethod.PUT, type = "application/json", block = {})
             }
@@ -141,16 +141,18 @@ class CourseController(
             is Result.Problem -> courseServices.problem(archive.value)
             is Result.Success ->
                 if (archive.value is CourseArchivedResult.CourseArchived) {
-                    when (val course = courseServices.getCourseById(courseId, user.id,false)) {
+                    when (val course = courseServices.getCourseById(courseId, user.id, false)) {
                         is Result.Problem -> courseServices.problem(course.value)
-                        is Result.Success -> siren(CourseWithClassroomOutputModel(
+                        is Result.Success -> siren(
+                            CourseWithClassroomOutputModel(
                                 course.value.id,
                                 course.value.orgUrl,
                                 course.value.name,
                                 course.value.teachers,
                                 course.value.isArchived,
                                 course.value.classrooms,
-                        )) {
+                            ),
+                        ) {
                             clazz("course")
                             action(title = "archiveCourse", href = Uris.courseUri(courseId), method = HttpMethod.PUT, type = "application/json", block = {})
                         }

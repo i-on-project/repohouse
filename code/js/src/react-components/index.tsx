@@ -25,15 +25,19 @@ export const teamServices = new TeamServices()
 
 async function launch() {
     let authState = AuthState.None
+    let githubId = null
+    let userId = null
     await systemServices.home()
     const state = await authServices.state()
     if (state instanceof SirenEntity && state.properties.authenticated) {
         if (state.properties.user === "Student") authState = AuthState.Student
         if (state.properties.user === "Teacher") authState = AuthState.Teacher
+        githubId = state.properties.githubId
+        userId = state.properties.userId
     }
     const root = createRoot(document.getElementById("the-div"))
     root.render(
-        <App authState={authState}/>
+        <App authState={authState} githubId={githubId} userId={userId}/>
     )
 }
 

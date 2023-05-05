@@ -3,13 +3,14 @@ import {useCallback, useState} from "react";
 import {useAsync} from "../http/Fetch";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import {SirenEntity} from "../http/Siren";
-import {Backdrop, CircularProgress, List, ListItem, TextField, Typography} from "@mui/material";
+import {Backdrop, Box, Button,CircularProgress, Grid, List, ListItem, ListSubheader, TextField, Typography} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
 import {ClassroomServices} from "../services/ClassroomServices";
 import {AuthState, useLoggedIn} from "./auth/Auth";
-import {Button} from "react-bootstrap";
 import {ClassroomBody} from "../domain/dto/ClassroomDtoProperties";
 import {ErrorAlert} from "./error/ErrorAlert";
+import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../utils/Style";
+import {mainTheme} from "../utils/Theme";
 
 export function ShowClassroomFetch({
                                   classroomServices,courseId,classroomId
@@ -63,22 +64,20 @@ export function ShowClassroomFetch({
 
 
     return (
-        <div
-            style={{
-                alignItems: "center",
-                justifyContent: "space-evenly",
-            }}
-        >
+        <Box sx={homeBoxStyle}>
             {content instanceof SirenEntity ? (
                 <>
                     <Typography
                         variant="h2"
+                        gutterBottom
+                        sx={typographyStyle}
                     >
                         {content.properties.name}
                     </Typography>
                     <Typography
-                        variant="h6"
+                        variant="subtitle2"
                         gutterBottom
+                        sx={typographyStyle}
                     >
                         {"Last Sync Time: " + new Date(content.properties.lastSync).toLocaleString(
                             "en-GB",
@@ -91,24 +90,8 @@ export function ShowClassroomFetch({
                             }
                         )}
                     </Typography>
-                    <List>
-                        {content.properties.assignments.map( assigment => (
-                            <ListItem key={assigment.id}>
-                                <Link to={"/courses/" + courseId  + "/classrooms/" + assigment.classroomId  + "/assignments/" + assigment.id}>
-                                    {assigment.title + " - " + assigment.description}
-                                </Link>
-                            </ListItem>
-                        ))}
-                    </List>
-                    <List>
-                        {content.properties.students.map( student => (
-                            <ListItem key={student.id}>
-                                {student.name + " - " + student.schoolId}
-                            </ListItem>
-                        ))}
-                    </List>
                     { user == AuthState.Teacher ? (
-                        <>
+                        <Box sx={alignHorizontalyBoxStyle}>
                             { !content.properties.isArchived ? (
                                 <>
                                     <Button onClick={handleCreateAssigment}>Create Assigment</Button>
@@ -116,12 +99,109 @@ export function ShowClassroomFetch({
                                 </>
                             ):null}
                             <Button onClick={handleLocalCopy}>Local Copy</Button>
-                        </>
+                        </Box>
                     ):null}
+                    <Grid
+                        container
+                        spacing={1}
+                        direction="row"
+                        justifyContent="center"
+                        alignItems="center"
+                    >
+                        <Grid item xs={7} md={2}>
+                            <List
+                                subheader={
+                                    <ListSubheader
+                                        sx={{
+                                            borderRadius: 1
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="h6"
+                                            gutterBottom
+                                            sx={typographyStyle}
+                                        >
+                                            Assignments
+                                        </Typography>
+                                    </ListSubheader>
+                                }
+                                sx={{
+                                    maxHeight: 500,
+                                    position: 'relative',
+                                    overflow: 'auto',
+                                    justifyContent:"center",
+                                    alignItems:"center",
+                                    flexDirection:"column",
+                                    "&::-webkit-scrollbar": {
+                                        width: 5,
+                                    },
+                                    "&::-webkit-scrollbar-track": {
+                                        boxShadow: `inset 0 0 6px rgba(0, 0, 0, 0.3)`,
+                                    },
+                                    "&::-webkit-scrollbar-thumb": {
+                                        backgroundColor: "darkgrey",
+                                        outline: `1px solid slategrey`,
+                                    },
+                                }}
+                            >
+                                {content.properties.assignments.map( assigment => (
+                                    <ListItem key={assigment.id}>
+                                        <Link to={"/courses/" + courseId  + "/classrooms/" + assigment.classroomId  + "/assignments/" + assigment.id}>
+                                            {assigment.title + " - " + assigment.description}
+                                        </Link>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Grid>
+                        <Grid item xs={7} md={2} >
+                        <List
+                            subheader={
+                                <ListSubheader
+                                    sx={{
+                                        borderRadius: 1,
+
+                                    }}
+                                >
+                                    <Typography
+                                        variant="h6"
+                                        gutterBottom
+                                        sx={typographyStyle}
+                                    >
+                                        Students
+                                    </Typography>
+                                </ListSubheader>
+                            }
+                            sx={{
+                                maxHeight: 500,
+                                position: 'relative',
+                                overflow: 'auto',
+                                justifyContent:"center",
+                                alignItems:"center",
+                                flexDirection:"column",
+                                "&::-webkit-scrollbar": {
+                                    width: 5,
+                                },
+                                "&::-webkit-scrollbar-track": {
+                                    boxShadow: `inset 0 0 6px rgba(0, 0, 0, 0.3)`,
+                                },
+                                "&::-webkit-scrollbar-thumb": {
+                                    backgroundColor: "darkgrey",
+                                    outline: `1px solid slategrey`,
+                                },
+                            }}
+                        >
+                            {content.properties.students.map( student => (
+                                <ListItem key={student.id}>
+                                    {student.name + " - " + student.schoolId}
+                                </ListItem>
+                            ))}
+                        </List>
+                        </Grid>
+                    </Grid>
                 </>
             ) : null}
             <ErrorAlert error={error} onClose={() => setError(null)}/>
-        </div>
+        </Box>
     );
 }
 
@@ -151,14 +231,17 @@ export function ShowCreateClassroom({
 
 
     return (
-        <div>
+        <Box sx={homeBoxStyle}>
             <TextField
                 label="Classroom Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                sx={{
+                    margin:"8px",
+                }}
             />
-            <Button onClick={handleCreateClassroom}>Create Classroom</Button>
-            <ErrorAlert error={error} onClose={() => setError(null)}/>;
-        </div>
+            <Button variant="contained" onClick={handleCreateClassroom}>Create Classroom</Button>
+            <ErrorAlert error={error} onClose={() => setError(null)}/>
+        </Box>
     )
 }

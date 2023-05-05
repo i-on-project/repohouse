@@ -16,7 +16,9 @@ export class CourseServices {
 
     getTeacherOrgs = async () => {
         const link = await navigationRepository.ensureLink(Hypermedia.ORGS_KEY, systemServices.home)
-        return await fetchGet<GitHubOrgsDtoProperties>(link.href)
+        const  resp = await fetchGet<GitHubOrgsDtoProperties>(link.href)
+        console.log(resp)
+        return resp
     }
 
     createCourse = async (course: CourseBody) => {

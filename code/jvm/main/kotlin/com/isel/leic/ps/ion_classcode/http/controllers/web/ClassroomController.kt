@@ -11,9 +11,9 @@ import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedOrDelet
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ion_classcode.http.model.output.ClassroomOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
-import com.isel.leic.ps.ion_classcode.services.ClassroomServices
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
+import com.isel.leic.ps.ion_classcode.services.ClassroomServices
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpHeaders
@@ -47,14 +47,16 @@ class ClassroomController(
     ): ResponseEntity<*> {
         return when (val classroom = classroomServices.getClassroom(classroomId)) {
             is Result.Problem -> classroomServices.problem(classroom.value)
-            is Result.Success -> siren(ClassroomOutputModel(
-                id = classroom.value.id,
-                name = classroom.value.name,
-                isArchived = classroom.value.isArchived,
-                lastSync = classroom.value.lastSync,
-                assignments = classroom.value.assignments,
-                students = classroom.value.students
-            )) {
+            is Result.Success -> siren(
+                ClassroomOutputModel(
+                    id = classroom.value.id,
+                    name = classroom.value.name,
+                    isArchived = classroom.value.isArchived,
+                    lastSync = classroom.value.lastSync,
+                    assignments = classroom.value.assignments,
+                    students = classroom.value.students,
+                ),
+            ) {
                 clazz("classroom")
                 link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, classroomId), needAuthentication = true)
             }
@@ -73,20 +75,21 @@ class ClassroomController(
         if (user !is Teacher) return Problem.notTeacher
         return when (val classroom = classroomServices.createClassroom(ClassroomInput(classroomInfo.name, courseId, user.id))) {
             is Result.Problem -> classroomServices.problem(classroom.value)
-            is Result.Success -> siren(ClassroomOutputModel(
+            is Result.Success -> siren(
+                ClassroomOutputModel(
                     id = classroom.value.id,
                     name = classroom.value.name,
                     isArchived = classroom.value.isArchived,
                     lastSync = classroom.value.lastSync,
                     assignments = classroom.value.assignments,
-                    students = classroom.value.students
-                )) {
-                    clazz("classroom")
-                    link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, classroom.value.id), needAuthentication = true)
-                }
+                    students = classroom.value.students,
+                ),
+            ) {
+                clazz("classroom")
+                link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, classroom.value.id), needAuthentication = true)
+            }
         }
     }
-
 
     /**
      * Archive a classroom
@@ -105,12 +108,12 @@ class ClassroomController(
                 if (archive.value is ClassroomArchivedResult.ClassroomArchived) {
                     when (val classroom = classroomServices.getClassroom(classroomId)) {
                         is Result.Problem -> classroomServices.problem(classroom.value)
-                        is Result.Success -> siren(ClassroomArchivedOrDeletedOutputModel(classroomId,  archived=true, deleted = false)) {
+                        is Result.Success -> siren(ClassroomArchivedOrDeletedOutputModel(classroomId, archived = true, deleted = false)) {
                             clazz("classroom")
                         }
                     }
                 } else {
-                    siren(ClassroomArchivedOrDeletedOutputModel(classroomId, archived= false, deleted = true)) {
+                    siren(ClassroomArchivedOrDeletedOutputModel(classroomId, archived = false, deleted = true)) {
                         clazz("classroom")
                     }
                 }
@@ -131,14 +134,16 @@ class ClassroomController(
         if (user !is Teacher) return Problem.notTeacher
         return when (val classroom = classroomServices.editClassroom(classroomId, classroomInfo)) {
             is Result.Problem -> classroomServices.problem(classroom.value)
-            is Result.Success -> siren(ClassroomOutputModel(
-                id = classroom.value.id,
-                name = classroom.value.name,
-                isArchived = classroom.value.isArchived,
-                lastSync = classroom.value.lastSync,
-                assignments = classroom.value.assignments,
-                students = classroom.value.students
-            )) {
+            is Result.Success -> siren(
+                ClassroomOutputModel(
+                    id = classroom.value.id,
+                    name = classroom.value.name,
+                    isArchived = classroom.value.isArchived,
+                    lastSync = classroom.value.lastSync,
+                    assignments = classroom.value.assignments,
+                    students = classroom.value.students,
+                ),
+            ) {
                 clazz("classroom")
                 action(title = "editClassroom", href = Uris.editClassroomUri(courseId, classroomId), method = HttpMethod.PUT, type = "application/json", block = {
                     textField("name")
@@ -154,19 +159,21 @@ class ClassroomController(
     fun inviteLink(
         user: User,
         @PathVariable courseId: Int,
-        @PathVariable inviteLink: String
+        @PathVariable inviteLink: String,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
         return when (val enter = classroomServices.enterClassroomWithInvite(inviteLink, user.id)) {
             is Result.Problem -> classroomServices.problem(enter.value)
-            is Result.Success -> siren(ClassroomOutputModel(
-                id = enter.value.id,
-                name = enter.value.name,
-                isArchived = enter.value.isArchived,
-                lastSync = enter.value.lastSync,
-                assignments = enter.value.assignments,
-                students = enter.value.students
-            )) {
+            is Result.Success -> siren(
+                ClassroomOutputModel(
+                    id = enter.value.id,
+                    name = enter.value.name,
+                    isArchived = enter.value.isArchived,
+                    lastSync = enter.value.lastSync,
+                    assignments = enter.value.assignments,
+                    students = enter.value.students,
+                ),
+            ) {
                 clazz("classroom")
                 link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, enter.value.id), needAuthentication = true)
             }
@@ -187,14 +194,16 @@ class ClassroomController(
             is Result.Problem -> classroomServices.problem(sync.value)
             is Result.Success -> when (val classroom = classroomServices.getClassroom(classroomId)) {
                 is Result.Problem -> classroomServices.problem(classroom.value)
-                is Result.Success -> siren(ClassroomOutputModel(
-                    id = classroom.value.id,
-                    name = classroom.value.name,
-                    isArchived = classroom.value.isArchived,
-                    lastSync = classroom.value.lastSync,
-                    assignments = classroom.value.assignments,
-                    students = classroom.value.students
-                )) {
+                is Result.Success -> siren(
+                    ClassroomOutputModel(
+                        id = classroom.value.id,
+                        name = classroom.value.name,
+                        isArchived = classroom.value.isArchived,
+                        lastSync = classroom.value.lastSync,
+                        assignments = classroom.value.assignments,
+                        students = classroom.value.students,
+                    ),
+                ) {
                     clazz("classroom")
                     action(title = "syncClassroom", href = Uris.syncClassroomUri(courseId, classroomId), method = HttpMethod.PUT, type = "application/json", block = {})
                 }
@@ -215,7 +224,8 @@ class ClassroomController(
         if (user !is Teacher) return Problem.notTeacher
         return when (val localCopy = classroomServices.localCopy(classroomId, "C:\\Users\\ricar\\OneDrive\\Documentos")) {
             is Result.Problem -> classroomServices.problem(localCopy.value)
-            is Result.Success -> ResponseEntity
+            is Result.Success ->
+                ResponseEntity
                     .ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${localCopy.value.fileName}\"")
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
