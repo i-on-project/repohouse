@@ -310,7 +310,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getCourse(courseId: Int): Course? {
         val dto = handle.createQuery(
             """
-            SELECT c.id, c.org_url, c.name, (
+            SELECT c.id, c.org_url, c.name, c.org_id, (
             SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
             ), is_archived
             FROM course AS c
@@ -341,7 +341,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getCourseByOrg(orgUrl: String): Course? {
         val dto = handle.createQuery(
             """
-                SELECT c.id, c.org_url, c.name, (
+                SELECT c.id, c.org_url, c.name, c.org_id, (
                 SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
                 ), is_archived
                 FROM course AS c
@@ -361,7 +361,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     override fun getCourseByName(name: String): Course? {
         val dto = handle.createQuery(
             """
-                SELECT c.id, c.org_url, c.name, (
+                SELECT c.id, c.org_url, c.name, c.org_id,(
                 SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
                 ), is_archived
                 FROM course AS c
@@ -398,7 +398,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     private fun getTheCourse(courseId: Int): Course {
         val dto = handle.createQuery(
             """
-                SELECT c.id, c.org_url, c.name, (
+                SELECT c.id, c.org_url, c.name, c.org_id,(
                 SELECT array(SELECT teacher FROM teacher_course WHERE course = c.id) as teachers
                 ), is_archived
                 FROM course AS c

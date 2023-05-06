@@ -122,4 +122,6 @@ object Uris {
     const val MOBILE_AUTH_PATH = "$MOBILE_API/auth"
     const val MOBILE_GET_ACCESS_TOKEN_PATH = "$MOBILE_API/token"
     const val MOBILE_MENU_PATH = "$MOBILE_API/menu"
+    const val MOBILE_COURSES_PATH = "$MOBILE_API/courses"
+    const val MOBILE_COURSE_PATH = "$MOBILE_COURSES_PATH/{courseId}"
 }

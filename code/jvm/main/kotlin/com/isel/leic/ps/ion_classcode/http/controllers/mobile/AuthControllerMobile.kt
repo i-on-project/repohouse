@@ -92,7 +92,7 @@ class AuthControllerMobile(
                 .header(HttpHeaders.LOCATION, "classcode://callback/error")
                 .body(EMPTY_REQUEST)
         }
-        val accessToken = githubServices.fetchAccessToken(code = code, isMobile = false)
+        val accessToken = githubServices.fetchAccessToken(code = code)
         val userGithubInfo = githubServices.fetchUserInfo(accessToken = accessToken.access_token)
         logger.info("User info: $userGithubInfo")
         return when (val userInfo = userServices.getUserByGithubId(githubId = userGithubInfo.id)) {

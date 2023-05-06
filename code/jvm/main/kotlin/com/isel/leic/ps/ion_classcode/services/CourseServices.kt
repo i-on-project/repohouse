@@ -44,22 +44,24 @@ class CourseServices(
     /**
      * Method that gets a course
      */
-    fun getCourseById(courseId: Int, userId: Int,student:Boolean): CourseResponse {
+    fun getCourseById(courseId: Int, userId: Int, student: Boolean): CourseResponse {
         return transactionManager.run {
             if (it.usersRepository.getUserById(userId) == null) Result.Problem(CourseServicesError.InternalError)
             val course = it.courseRepository.getCourse(courseId) ?: return@run Result.Problem(CourseServicesError.CourseNotFound)
-            val classrooms = it.courseRepository.getCourseUserClassrooms(courseId, userId,student)
+            val classrooms = it.courseRepository.getCourseUserClassrooms(courseId, userId, student)
             val students = it.courseRepository.getStudentInCourse(courseId)
-            Result.Success(CourseWithClassrooms(
-                id = course.id,
-                orgUrl = course.orgUrl,
-                name = course.name,
-                orgId = course.orgId,
-                teachers = course.teachers,
-                isArchived = course.isArchived,
-                students = students,
-                classrooms = classrooms
-            ))
+            Result.Success(
+                CourseWithClassrooms(
+                    id = course.id,
+                    orgUrl = course.orgUrl,
+                    name = course.name,
+                    orgId = course.orgId,
+                    teachers = course.teachers,
+                    isArchived = course.isArchived,
+                    students = students,
+                    classrooms = classrooms,
+                ),
+            )
         }
     }
 

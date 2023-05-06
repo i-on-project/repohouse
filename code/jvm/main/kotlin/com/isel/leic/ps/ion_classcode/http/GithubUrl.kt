@@ -15,10 +15,10 @@ val GITHUB_OAUTH_URI: (scope: String, state: String) -> String = { scope, state 
 
 val MOBILE_GITHUB_OAUTH_URI: (scope: String, state: String) -> String = { scope, state ->
     "/login/oauth/authorize?" +
-            "client_id=${System.getenv("GITHUB_CLIENT_ID")}" +
-            "&scope=$scope" +
-            "&state=$state" +
-            "&redirect_uri=$NGROK_URI/api/auth/callback/mobile"
+        "client_id=${System.getenv("GITHUB_CLIENT_ID")}" +
+        "&scope=$scope" +
+        "&state=$state" +
+        "&redirect_uri=$NGROK_URI/api/auth/callback/mobile"
 }
 
 const val GITHUB_USERINFO_URI = "/user"
@@ -28,13 +28,6 @@ val GITHUB_ACCESS_TOKEN_URI: (code: String) -> String = { code ->
     "/login/oauth/access_token?" +
         "client_id=" + System.getenv("GITHUB_CLIENT_ID") +
         "&client_secret=" + System.getenv("GITHUB_CLIENT_SECRET") +
-        "&code=" + code
-}
-
-val MOBILE_GITHUB_ACCESS_TOKEN_URI: (code: String) -> String = { code ->
-    "/login/oauth/access_token?" +
-        "client_id=" + System.getenv("GITHUB_ANDROID_CLIENT_ID") +
-        "&client_secret=" + System.getenv("GITHUB_ANDROID_CLIENT_SECRET") +
         "&code=" + code
 }
 

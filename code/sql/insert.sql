@@ -1,12 +1,6 @@
 SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 BEGIN TRANSACTION;
 
-insert into users(id, email, is_created, github_username, github_id, token, name)
-values (69, 'jdiogo2302@gmail.com', true, 'JoaoMagalhaes23', '73882045', 'token1234', 'Joao Magalhaes');
-insert into teacher(id, github_token)
-values (69, 'token1234');
-delete from accesstoken
-where github_id = '73882045';
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
 VALUES (1, 'test@alunos.isel.pt', false, 'test123', 12345, 'token', 'teacher1');
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
@@ -54,12 +48,12 @@ INSERT INTO pendingteacher(id, email, is_created, github_username, github_id, to
 VALUES (5, 'test4@alunos.isel.pt', false, 'test1240', 2227, 'token15', 'student16', 'githubToken1', '2023-01-01 00:00:00');
 
 
-INSERT INTO course (id, org_url, name)
-VALUES (1, 'https://daw.isel.pt', 'DAW');
-INSERT INTO course (id, org_url, name)
-VALUES (2, 'https://daw1.isel.pt', 'DAW2');
-INSERT INTO course (id, org_url, name)
-VALUES (3, 'https://daw3.isel.pt', 'DAW3');
+INSERT INTO course (id, org_url, name, org_id)
+VALUES (1, 'https://daw.isel.pt', 'DAW', 10852760);
+INSERT INTO course (id, org_url, name, org_id)
+VALUES (2, 'https://daw1.isel.pt', 'PDM', 6817318);
+INSERT INTO course (id, org_url, name, org_id)
+VALUES (3, 'https://daw3.isel.pt', 'Ion', );
 
 INSERT INTO teacher_course (teacher, course)
 VALUES (1, 1);
@@ -71,12 +65,6 @@ INSERT INTO teacher_course (teacher, course)
 VALUES (1, 2);
 INSERT INTO teacher_course (teacher, course)
 VALUES (2, 2);
-INSERT INTO teacher_course (teacher, course)
-VALUES (69, 1);
-INSERT INTO teacher_course (teacher, course)
-VALUES (69, 2);
-INSERT INTO teacher_course (teacher, course)
-VALUES (69, 3);
 
 INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
 VALUES (1, 'DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/a/123', false, 1, 1);

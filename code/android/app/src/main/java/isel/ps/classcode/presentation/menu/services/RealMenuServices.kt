@@ -55,7 +55,7 @@ class RealMenuServices(private val sessionStore: SessionStore, private val objec
         }
         return when (result) {
             is Either.Right -> {
-                Either.Right(value = result.value.properties.courses.map { Course(classCodeCoursesDeserialization = it) })
+                Either.Right(value = result.value.properties.courses.map { Course(classCodeCourseWithoutClassroomsDeserialization = it) })
             }
             is Either.Left -> Either.Left(value = result.value)
         }
