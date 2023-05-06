@@ -16,8 +16,8 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
     /**
      * Method to create a Delivery
      */
-    override fun createDelivery(delivery: DeliveryInput): Int {
-        return handle.createUpdate(
+    override fun createDelivery(delivery: DeliveryInput): Delivery {
+        val id = handle.createUpdate(
             """
                 INSERT INTO DELIVERY (assignment_id, DUE_DATE, TAG_CONTROL) 
                 VALUES (:assigmentId, :dueDate, :tagControl)
@@ -30,6 +30,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Delivery(id, delivery.dueDate, delivery.tagControl, delivery.assignmentId)
     }
 
 

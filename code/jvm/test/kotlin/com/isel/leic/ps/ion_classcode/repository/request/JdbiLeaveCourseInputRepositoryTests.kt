@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class JdbiLeaveCourseInputRepositoryTests {
+
     @Test
     fun `createLeaveCourseRequest should create a new leaveCourse request`() = testWithHandleAndRollback { handle ->
         val leaveCourseReq = JdbiLeaveCourseRequestRepository(handle = handle)
-        val request = LeaveCourseInput(courseId = 1, creator = 3)
-        leaveCourseReq.createLeaveCourseRequest(request = request)
+        val request = LeaveCourseInput(courseId = 1)
+        leaveCourseReq.createLeaveCourseRequest(request = request, creator = 3)
     }
 
     @Test

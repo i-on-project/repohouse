@@ -16,7 +16,7 @@ class JdbiJoinTeamRequestRepository(
     /**
      * Method to create a Join Team Request
      */
-    override fun createJoinTeamRequest(request: JoinTeamInput,creator:Int): Int {
+    override fun createJoinTeamRequest(request: JoinTeamInput,creator:Int): JoinTeam {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite,state)
@@ -30,7 +30,7 @@ class JdbiJoinTeamRequestRepository(
             .mapTo<Int>()
             .first()
 
-        return handle.createUpdate(
+        handle.createUpdate(
             """
             INSERT INTO jointeam (id, team_id, assigment_id)
             VALUES (:id, :teamId, :assigmentId)
@@ -42,6 +42,7 @@ class JdbiJoinTeamRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return JoinTeam(id, creator, teamId = request.teamId)
     }
 
     /**

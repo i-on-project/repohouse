@@ -13,14 +13,15 @@ import java.time.Instant
  * Implementation of the Outbox methods
  */
 class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
+
     /**
      * Method to create an Outbox
      */
-    override fun createOutboxRequest(outbox: OutboxInput): Int? {
-        return handle.createUpdate(
+    override fun createOutboxRequest(outbox: OutboxInput): Outbox {
+        handle.createUpdate(
             """
-            INSERT INTO Outbox (user_id, status)
-            VALUES (:user_id,:status)
+            INSERT INTO Outbox (user_id, status, sent_at)
+            VALUES (:user_id,:status,CURRENT_TIMESTAMP)
             RETURNING user_id
             """,
         )
@@ -28,7 +29,8 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             .bind("status", "Pending")
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
-            .firstOrNull()
+            .first()
+        return Outbox(outbox.userId, "Pending", Timestamp(System.currentTimeMillis()))
     }
 
     /**
@@ -63,8 +65,8 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
     /**
      * Method to update a Outbox state
      */
-    override fun updateOutboxStateRequest(userId: Int,state:String): Boolean {
-        return handle.createUpdate(
+    override fun updateOutboxStateRequest(userId: Int, state:String) {
+        handle.createUpdate(
             """
             UPDATE Outbox
             SET status = :state
@@ -73,14 +75,14 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
         )
             .bind("state",state)
             .bind("id", userId)
-            .execute() == 1
+            .execute()
     }
 
     /**
      * Method to update an Outbox send time
      */
-    override fun updateOutboxSentTimeRequest(userId: Int): Boolean {
-        return handle.createUpdate(
+    override fun updateOutboxSentTimeRequest(userId: Int) {
+        handle.createUpdate(
             """
             UPDATE Outbox
             SET sent_at = :sent_at
@@ -89,20 +91,20 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
         )
             .bind("sent_at",Timestamp.from(Instant.now()))
             .bind("id", userId)
-            .execute() == 1
+            .execute()
     }
 
     /**
      * Method to delete an Outbox
      */
-    override fun deleteOutboxRequest(userId: Int): Boolean {
-        return handle.createUpdate(
+    override fun deleteOutboxRequest(userId: Int) {
+        handle.createUpdate(
             """
             DELETE FROM Outbox
             WHERE user_id = :id
             """,
         )
             .bind("id", userId)
-            .execute() == 1
+            .execute()
     }
 }

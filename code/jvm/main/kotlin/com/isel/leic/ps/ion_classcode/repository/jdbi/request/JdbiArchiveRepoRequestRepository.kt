@@ -16,7 +16,7 @@ class JdbiArchiveRepoRequestRepository(
     /**
      * Method to create an Archive Repo Request
      */
-    override fun createArchiveRepoRequest(request: ArchiveRepoInput,creator:Int): Int {
+    override fun createArchiveRepoRequest(request: ArchiveRepoInput,creator:Int): ArchiveRepo {
         val requestId = handle.createUpdate(
             """
            INSERT INTO request (creator, composite, state)
@@ -30,7 +30,7 @@ class JdbiArchiveRepoRequestRepository(
             .mapTo<Int>()
             .first()
 
-        return handle.createUpdate(
+        val id = handle.createUpdate(
             """
            INSERT INTO archiverepo (id, repo_id)
            VALUES (:id, :repo_id)
@@ -42,6 +42,8 @@ class JdbiArchiveRepoRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+
+        return ArchiveRepo(id, creator, "Pending", request.composite, request.repoId)
     }
 
     /**

@@ -1,10 +1,10 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { SirenEntity } from "../../http/Siren"
-import {Backdrop, Box, CircularProgress, Typography} from "@mui/material"
+import { Backdrop, Box, CircularProgress } from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
 import { Navigate, useNavigate } from "react-router-dom"
-import {AuthState, useLoggedIn, useSetGithubId, useSetLogin, useSetUserId} from "./Auth"
+import { AuthState, useLoggedIn, useSetGithubId, useSetLogin, useSetUserId } from "./Auth"
 import { useAsync } from "../../http/Fetch"
 import { homeBoxStyle } from "../../utils/Style"
 

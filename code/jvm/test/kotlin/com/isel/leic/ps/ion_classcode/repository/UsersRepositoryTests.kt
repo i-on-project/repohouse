@@ -10,12 +10,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class UsersRepositoryTests {
+
     @Test
     fun `can check if email is already in use`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val email = "test@alunos.isel.pt"
         val res = userRepo.checkIfEmailExists(email = email)
         assert(res)
+    }
+
+    @Test
+    fun `can check if email is not already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val email = "fail@alunos.isel.pt"
+        val res = userRepo.checkIfEmailExists(email = email)
+        assert(!res)
     }
 
     @Test
@@ -27,11 +36,27 @@ class UsersRepositoryTests {
     }
 
     @Test
+    fun `can check if github id is not already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val githubId = 445566L
+        val res = userRepo.checkIfGithubIdExists(githubId = githubId)
+        assert(!res)
+    }
+
+    @Test
     fun `can check if github username is already in use`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val githubUsername = "test123"
         val res = userRepo.checkIfGithubUsernameExists(githubUsername = githubUsername)
         assert(res)
+    }
+
+    @Test
+    fun `can check if github username is not already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val githubUsername = "fail"
+        val res = userRepo.checkIfGithubUsernameExists(githubUsername = githubUsername)
+        assert(!res)
     }
 
     @Test
@@ -43,11 +68,27 @@ class UsersRepositoryTests {
     }
 
     @Test
+    fun `can check if token is not already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val token = "fail"
+        val res = userRepo.checkIfTokenExists(token = token)
+        assert(!res)
+    }
+
+    @Test
     fun `can check if github token is already in use`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val githubToken = "token"
         val res = userRepo.checkIfGithubTokenExists(githubToken = githubToken)
         assert(res)
+    }
+
+    @Test
+    fun `can check if github token is not already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val githubToken = "fail"
+        val res = userRepo.checkIfGithubTokenExists(githubToken = githubToken)
+        assert(!res)
     }
 
     @Test
@@ -59,6 +100,14 @@ class UsersRepositoryTests {
     }
 
     @Test
+    fun `can check if schoolId is not already in use`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val schoolId = 48309
+        val res = userRepo.checkIfSchoolIdExists(schoolId = schoolId)
+        assert(!res)
+    }
+
+    @Test
     fun `can create a pending student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         userRepo.createStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
@@ -67,22 +116,44 @@ class UsersRepositoryTests {
     @Test
     fun `can get a pending user`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val pendingUser = userRepo.getPendingUserByGithubId(githubId = 2222)
+        val pendingUser = userRepo.getPendingStudentByGithubId(githubId = 2222)
         assert(pendingUser != null && pendingUser.email == "test2@alunos.isel.pt")
     }
 
     @Test
-    fun `delete pending users`() = testWithHandleAndRollback { handle ->
+    fun `can not get a pending user`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val pendingUser = userRepo.getPendingStudentByGithubId(githubId = 1234)
+        assert(pendingUser == null )
+    }
+
+    @Test
+    fun `can get a pending teacher`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val pendingUser = userRepo.getPendingTeacherByGithubId(githubId = 2227)
+        assert(pendingUser != null && pendingUser.email == "test4@alunos.isel.pt")
+    }
+
+    @Test
+    fun `can not get a pending teacher`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val pendingUser = userRepo.getPendingTeacherByGithubId(githubId = 1234)
+        assert(pendingUser == null)
+    }
+
+    @Test
+    fun `can delete pending users`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         userRepo.deletePendingUsers()
-        val pendingUser = userRepo.getPendingUserByGithubId(githubId = 2227)
-        assert(pendingUser == null)
+        val pendingStudent = userRepo.getPendingStudentByGithubId(githubId = 2222)
+        val pendingTeacher = userRepo.getPendingTeacherByGithubId(githubId = 2227)
+        assert(pendingStudent == null && pendingTeacher == null)
     }
 
     @Test
     fun `can create a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        userRepo.createStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
+        userRepo.createStudent(student = StudentInput(name = "test1245", email = "test8@alunos.isel.pt", githubUsername = "test1a23", token = "token8", githubId = 124345))
     }
 
     @Test
@@ -118,8 +189,8 @@ class UsersRepositoryTests {
     fun `can get a student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val id = 3
-        val teacher = userRepo.getUserById(userId = id) ?: fail("Teacher not found")
-        assert(teacher is Student)
+        val student = userRepo.getUserById(userId = id) ?: fail("Student not found")
+        assert(student is Student)
     }
 
     @Test
@@ -178,7 +249,7 @@ class UsersRepositoryTests {
     }
 
     @Test
-    fun `can create a user and retrieve by token it`() = testWithHandleAndRollback { handle ->
+    fun `can get a user by token`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val token = "token2"
         val user = userRepo.getUserByToken(token = token) ?: fail("User not found")
@@ -186,44 +257,24 @@ class UsersRepositoryTests {
     }
 
     @Test
-    fun `can eliminate a student`() = testWithHandleAndRollback { handle ->
+    fun `can get github token of a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id = 8
-        userRepo.deleteStudent(id = id)
-        val student = userRepo.getUserById(userId = id)
-        assert(student == null)
+        val token = userRepo.getTeacherGithubToken(id = 1) ?: fail("User not found")
+        assert(token == "token")
     }
 
     @Test
-    fun `cannot eliminate a student`() = testWithHandleAndRollback { handle ->
+    fun `can not get github token of a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id = 3
-        try {
-            userRepo.deleteStudent(id = id)
-            fail("Should not be able to delete a student")
-        } catch (e: Exception) {
-            assert(true)
-        }
+        val token = userRepo.getTeacherGithubToken(id = 1)
+        assert(token == null)
     }
 
     @Test
-    fun `can eliminate a teacher`() = testWithHandleAndRollback { handle ->
+    fun `update teacher github token`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val id = 7
-        userRepo.deleteTeacher(id = id)
-        val teacher = userRepo.getUserById(userId = id)
-        assert(teacher == null)
-    }
-
-    @Test
-    fun `cannot eliminate a teacher`() = testWithHandleAndRollback { handle ->
-        val userRepo = JdbiUsersRepository(handle = handle)
-        val id = 1
-        try {
-            userRepo.deleteTeacher(id = id)
-            fail("Should not be able to delete a student")
-        } catch (e: Exception) {
-            assert(true)
-        }
+        userRepo.updateTeacherGithubToken(id = 1, token = "test")
+        val token = userRepo.getTeacherGithubToken(id = 1)
+        assert(token == "test")
     }
 }

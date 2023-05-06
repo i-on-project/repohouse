@@ -13,8 +13,9 @@ const val INTERVAL = "10 MINUTES"
  * Implementation of the Otp methods
  */
 class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
-    override fun createOtpRequest(otp: OtpInput): Int? {
-        return handle.createUpdate(
+
+    override fun createOtpRequest(otp: OtpInput): Otp {
+        handle.createUpdate(
             """
             INSERT INTO Otp (user_id, otp, expired_at,tries)
             VALUES (:user_id,:otp,:expired_at,0)
@@ -26,7 +27,8 @@ class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
             .bind("expired_at", toTimestamp())
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
-            .firstOrNull()
+            .first()
+        return Otp(otp.userId, otp.otp, toTimestamp(), 0)
     }
 
     override fun getOtpRequest(userId: Int): Otp? {
@@ -78,5 +80,4 @@ class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
             .mapTo<Timestamp>()
             .first()
     }
-
 }

@@ -9,12 +9,15 @@ import java.sql.Timestamp
 import java.time.Instant
 
 class TagRepositoryTests {
+
     @Test
     fun `can create a tag`() = testWithHandleAndRollback { handle ->
         val tagRepo = JdbiTagRepository(handle = handle)
         val deliveryId = 2
         val repoId = 2
-        tagRepo.createTag(tag = TagInput(name = "name", isDelivered = false, tagDate = Timestamp.from(Instant.now()), deliveryId = deliveryId, repoId = repoId))
+        val created = tagRepo.createTag(tag = TagInput(name = "name", isDelivered = false, tagDate = Timestamp.from(Instant.now()), deliveryId = deliveryId, repoId = repoId))
+        val tag = tagRepo.getTagById(tagId = created.id)
+        assert(tag != null)
     }
 
     @Test

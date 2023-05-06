@@ -12,11 +12,11 @@ VALUES (4, 'test3@alunos.isel.pt', false, 'test12345', 1234152, 'token3', 'stude
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
 VALUES (5, 'test4@alunos.isel.pt', false, 'test12345a', 12341527, 'token4', 'student3');
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
-VALUES (6, 'test7@alunos.isel.pt', false, 'test123as', 1234187, 'token7', 'teacher3');
+VALUES (6, 'test5@alunos.isel.pt', false, 'test123as', 1234187, 'token5', 'teacher3');
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
-VALUES (7, 'test8@alunos.isel.pt', false, 'test1aa23as', 12341837, 'token8', 'teacher4');
+VALUES (7, 'test6@alunos.isel.pt', false, 'test1aa23as', 12341837, 'token6', 'teacher4');
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
-VALUES (8, 'test9@alunos.isel.pt', false, 'test1aas', 123418378, 'token9', 'student3');
+VALUES (8, 'test7@alunos.isel.pt', false, 'test1aas', 123418378, 'token7', 'student3');
 
 
 INSERT INTO teacher (id, github_token)
@@ -53,7 +53,7 @@ VALUES (1, 'https://daw.isel.pt', 'DAW', 10852760);
 INSERT INTO course (id, org_url, name, org_id)
 VALUES (2, 'https://daw1.isel.pt', 'PDM', 6817318);
 INSERT INTO course (id, org_url, name, org_id)
-VALUES (3, 'https://daw3.isel.pt', 'Ion', );
+VALUES (3, 'https://daw3.isel.pt', 'Ion', 6764445);
 
 INSERT INTO teacher_course (teacher, course)
 VALUES (1, 1);
@@ -65,6 +65,7 @@ INSERT INTO teacher_course (teacher, course)
 VALUES (1, 2);
 INSERT INTO teacher_course (teacher, course)
 VALUES (2, 2);
+
 
 INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
 VALUES (1, 'DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/a/123', false, 1, 1);
@@ -90,6 +91,15 @@ INSERT INTO team (id, name, is_created, assignment)
 VALUES (3, 'team3', false, 1);
 INSERT INTO team (id, name, is_created, assignment)
 VALUES (4, 'team4', false, 4);
+
+INSERT INTO student_classroom (student, classroom)
+VALUES (3, 1);
+INSERT INTO student_classroom (student, classroom)
+VALUES (3, 2);
+INSERT INTO student_classroom (student, classroom)
+VALUES (4, 1);
+INSERT INTO student_classroom (student, classroom)
+VALUES (4, 3);
 
 INSERT INTO student_team (student, team)
 VALUES (4, 1);
@@ -223,25 +233,30 @@ VALUES (19);
 INSERT INTO composite(id)
 VALUES (20);
 
-INSERT INTO request(creator, composite, state)
-VALUES (4, 17, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 18, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 18, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 19, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 20, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 17, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 20, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 20, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 15, 'Pending');
-INSERT INTO request(creator, composite, state)
-VALUES (4, 16, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (23, 4, 17, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (24, 4, 18, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (25, 4, 18, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (26, 4, 19, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (27, 4, 20, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (28, 4, 17, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (29, 4, 20, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (30, 4, 20, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (31, 4, 15, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (32, 4, 16, 'Pending');
+
+INSERT INTO otp(user_id, otp, expired_at, tries)
+VALUES (4, 123456, NOW() + INTERVAL '1 day', 0);
+INSERT INTO otp(user_id, otp, expired_at, tries)
+VALUES (5, 123456, NOW() + INTERVAL '1 day', 0);
 
 COMMIT TRANSACTION;

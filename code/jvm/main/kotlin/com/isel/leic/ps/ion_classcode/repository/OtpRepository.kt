@@ -8,7 +8,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.OtpInput
  */
 interface OtpRepository {
 
-    fun createOtpRequest(otp: OtpInput): Int?
+    fun createOtpRequest(otp: OtpInput): Otp
     fun getOtpRequest(userId: Int): Otp?
     fun addTryToOtpRequest(userId: Int, tries: Int): Boolean
     fun deleteOtpRequest(userId: Int)

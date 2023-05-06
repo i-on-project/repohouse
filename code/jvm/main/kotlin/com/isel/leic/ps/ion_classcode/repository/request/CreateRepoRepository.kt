@@ -8,7 +8,7 @@ import com.isel.leic.ps.ion_classcode.domain.requests.CreateRepo
  * Repository functions for Create Repo Repository
  */
 interface CreateRepoRepository {
-    fun createCreateRepoRequest(request: CreateRepoInput,creator:Int): Int
+    fun createCreateRepoRequest(request: CreateRepoInput,creator:Int): CreateRepo
     fun getCreateRepoRequests(): List<CreateRepo>
     fun getCreateRepoRequestById(id: Int): CreateRepo?
     fun getCreateRepoRequestsByUser(userId: Int): List<CreateRepo>

@@ -16,7 +16,7 @@ class JdbiCreateRepoRequestRepository(
     /**
      * Method to create a Create Repo Request
      */
-    override fun createCreateRepoRequest(request: CreateRepoInput,creator:Int): Int {
+    override fun createCreateRepoRequest(request: CreateRepoInput, creator:Int): CreateRepo {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)
@@ -30,7 +30,7 @@ class JdbiCreateRepoRequestRepository(
             .mapTo<Int>()
             .first()
 
-        return handle.createUpdate(
+        handle.createUpdate(
             """
             INSERT INTO createrepo (id, team_id)
             VALUES (:id, :teamId)
@@ -41,6 +41,7 @@ class JdbiCreateRepoRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return CreateRepo(id, request.teamId, creator)
     }
 
     /**

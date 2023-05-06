@@ -8,15 +8,17 @@ import com.isel.leic.ps.ion_classcode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
+import java.sql.Timestamp
 
 /**
  * Implementation of the Classroom methods
  */
 class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository {
+
     /**
      * Method to create a Classroom
      */
-    override fun createClassroom(classroom: ClassroomInput, inviteLink: String): Classroom? {
+    override fun createClassroom(classroom: ClassroomInput, inviteLink: String): Classroom {
         val id = handle.createUpdate(
             """
             INSERT INTO Classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
@@ -31,8 +33,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        if (id < 0) return null
-        return getClassroomById(id)
+        return Classroom(id, classroom.name, Timestamp(System.currentTimeMillis()), inviteLink, false, classroom.courseId)
     }
 
     /**
@@ -49,23 +50,6 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .bind("name", classroomUpdate.name)
             .bind("id", classroomId)
             .execute()
-    }
-
-    /**
-     * Method to enter a Course
-     */
-    override fun enterClassroom(classroomId: Int, studentId: Int):Classroom {
-        handle.createUpdate(
-            """
-            INSERT INTO student_classroom (student,classroom)
-            VALUES (:student_id,:classroom_id)
-            """,
-        )
-            .bind("student_id", studentId)
-            .bind("classroom_id", classroomId)
-            .execute()
-
-        return getClassroomById(classroomId = classroomId)!!
     }
 
     /**
@@ -220,6 +204,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .mapTo<String>()
             .list()
     }
+
     override fun getAllCourseClassrooms(courseId: Int): List<Classroom> {
         return handle.createQuery(
             """

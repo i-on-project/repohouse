@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class JdbiRequestRepositoryTestsInterface {
+
     @Test
     fun `createRequest should create a new request`() = testWithHandleAndRollback { handle ->
         val requestRep = JdbiRequestRepository(handle = handle)
-        val request = RequestInput(creator = 1)
-        requestRep.createRequest(request = request)
+        val request = RequestInput()
+        requestRep.createRequest(request = request, creator = 1)
     }
 
     @Test

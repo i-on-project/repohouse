@@ -8,7 +8,7 @@ import com.isel.leic.ps.ion_classcode.domain.PendingTeacher
  * Repository functions for the Apply Request Model
  */
 interface ApplyRepository {
-    fun createApplyRequest(request: ApplyInput): Int
+    fun createApplyRequest(request: ApplyInput): Apply
     fun getApplyRequests(): List<Apply>
     fun getApplyRequestById(id: Int): Apply?
     fun getApplyRequestsByUser(teacherId: Int): List<Apply>

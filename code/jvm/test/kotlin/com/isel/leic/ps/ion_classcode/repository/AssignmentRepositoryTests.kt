@@ -7,19 +7,20 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class AssignmentRepositoryTests {
+
     @Test
     fun `can create a assignment`() = testWithHandleAndRollback { handle ->
         val assignmentRepo = JdbiAssignmentRepository(handle = handle)
         val classroomId = 1
-        assignmentRepo.createAssignment(
-            assignment = AssignmentInput(
+        val created = assignmentRepo.createAssignment(assignment = AssignmentInput(
                 classroomId = classroomId,
                 maxElemsPerGroup = 10,
                 maxNumberGroups = 10,
-                description = "aaaa",
+                description = "aaa",
                 title = "aaa",
-            ),
-        )
+            ))
+        val assignment = assignmentRepo.getAssignmentById(assignmentId = created.id)
+        assert(assignment != null)
     }
 
     @Test
@@ -29,6 +30,14 @@ class AssignmentRepositoryTests {
         val title = "title"
         val assignment = assignmentRepo.getAssignmentById(assignmentId = assignmentId) ?: fail("Assignment not found")
         assert(assignment.title == title)
+    }
+
+    @Test
+    fun `can not get a assignment`() = testWithHandleAndRollback { handle ->
+        val assignmentRepo = JdbiAssignmentRepository(handle = handle)
+        val assignmentId = 5
+        val assignment = assignmentRepo.getAssignmentById(assignmentId = assignmentId)
+        assert(assignment == null)
     }
 
     @Test
@@ -96,7 +105,7 @@ class AssignmentRepositoryTests {
     fun `can get all the assignments for a classroom`() = testWithHandleAndRollback { handle ->
         val assignmentRepo = JdbiAssignmentRepository(handle = handle)
         val classroomId = 1
-        val assignments = assignmentRepo.getAssignmentsByClassroom(classroomId = classroomId)
+        val assignments = assignmentRepo.getClassroomAssignments(classroomId = classroomId)
         assert(assignments.size == 3)
     }
 }

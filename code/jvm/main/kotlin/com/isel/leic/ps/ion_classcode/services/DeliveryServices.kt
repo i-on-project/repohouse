@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.services
 
+import com.isel.leic.ps.ion_classcode.domain.Delivery
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
 import com.isel.leic.ps.ion_classcode.domain.input.TagInput
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component
  * Alias for the response of the services
  */
 typealias DeliveryResponse = Result<DeliveryServicesError, DeliveryModel>
-typealias DeliveryCreatedResponse = Result<DeliveryServicesError, Int>
+typealias DeliveryCreatedResponse = Result<DeliveryServicesError, Delivery>
 typealias DeliveryDeletedResponse = Result<DeliveryServicesError, Boolean>
 typealias DeliveryUpdateResponse = Result<DeliveryServicesError, Boolean>
 typealias DeliverySyncResponse = Result<DeliveryServicesError, Boolean>
@@ -98,7 +99,6 @@ class DeliveryServices(
             val delivery = it.deliveryRepository.getDeliveryById(deliveryId = deliveryId) ?: return@run Result.Problem(value = DeliveryServicesError.DeliveryNotFound)
             val isArchived = checkIfArchived(assignmentId = delivery.assignmentId)
             if (isArchived is Result.Problem) return@run isArchived
-            val x = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId).isNotEmpty()
             if (it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId).isNotEmpty()) Result.Problem(value = DeliveryServicesError.DeliveryWithTeams)
             it.deliveryRepository.deleteDelivery(deliveryId = deliveryId)
             Result.Success(true)

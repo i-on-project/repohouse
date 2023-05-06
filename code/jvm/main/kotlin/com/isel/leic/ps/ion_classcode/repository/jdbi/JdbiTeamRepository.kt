@@ -11,14 +11,15 @@ import org.jdbi.v3.core.kotlin.mapTo
  * Implementation of the Team methods
  */
 class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
+
     /**
      * Method to create a Team
      */
-    override fun createTeam(team: TeamInput): Int {
-        return handle.createUpdate(
+    override fun createTeam(team: TeamInput): Team {
+        val id = handle.createUpdate(
             """
             INSERT INTO team (assignment, name, is_created)
-            VALUES (:assignmentId, :name,false)
+            VALUES (:assignmentId, :name, false)
             RETURNING id
             """,
         )
@@ -27,6 +28,7 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Team(id, team.name, false, team.assignmentId)
     }
 
     /**

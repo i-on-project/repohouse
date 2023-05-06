@@ -11,11 +11,14 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class DeliveryRepositoryTests {
+
     @Test
     fun `can create delivery`() = testWithHandleAndRollback { handle ->
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
         val assignmentId = 1
-        deliveryRepository.createDelivery(delivery = DeliveryInput(assignmentId = assignmentId, dueDate = Timestamp.from(Instant.now()), tagControl = "tag"))
+        val created = deliveryRepository.createDelivery(delivery = DeliveryInput(assignmentId = assignmentId, dueDate = Timestamp.from(Instant.now()), tagControl = "tag"))
+        val delivery = deliveryRepository.getDeliveryById(deliveryId = created.id)
+        assert(delivery != null)
     }
 
     @Test
@@ -23,12 +26,13 @@ class DeliveryRepositoryTests {
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
         val deliveryId = 3
         deliveryRepository.deleteDelivery(deliveryId = deliveryId)
+        val delivery = deliveryRepository.getDeliveryById(deliveryId = deliveryId)
+        assert(delivery == null)
     }
 
     @Test
     fun `can get delivery`() = testWithHandleAndRollback { handle ->
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
-        val assignmentId = 1
         val deliveryId = 1
         val tagControl = "tag"
         val delivery = deliveryRepository.getDeliveryById(deliveryId = deliveryId) ?: fail("Delivery not found")
@@ -67,15 +71,7 @@ class DeliveryRepositoryTests {
     }
 
     @Test
-    fun `can get teams a delivery`() = testWithHandleAndRollback { handle ->
-        val deliveryRepository = JdbiDeliveryRepository(handle = handle)
-        val deliveryId = 1
-        val teams = deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
-        assert(teams.size == 2)
-    }
-
-    @Test
-    fun `can get teams that have already delivered`() = testWithHandleAndRollback { handle ->
+    fun `can get teams of a delivery`() = testWithHandleAndRollback { handle ->
         val deliveryRepository = JdbiDeliveryRepository(handle = handle)
         val deliveryId = 1
         val teams = deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)

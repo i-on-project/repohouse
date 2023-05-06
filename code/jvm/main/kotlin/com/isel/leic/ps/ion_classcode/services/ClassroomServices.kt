@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import java.io.File
-import java.util.*
 
 /**
  * Alias for the response of the services
@@ -56,7 +55,7 @@ class ClassroomServices(
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {
                 null -> Result.Problem(ClassroomServicesError.ClassroomNotFound)
                 else -> {
-                    val assignments = it.assignmentRepository.getAssignmentsByClassroom(classroomId)
+                    val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
                     val students = it.classroomRepository.getStudentsByClassroom(classroomId)
                     Result.Success(ClassroomModel(
                         id = classroom.id,
@@ -84,8 +83,7 @@ class ClassroomServices(
                 return@run Result.Problem(ClassroomServicesError.NameAlreadyExists)
             }
             val classroom = it.classroomRepository.createClassroom(classroomInput, inviteLink)
-            if (classroom == null) return@run Result.Problem(ClassroomServicesError.InternalError)
-            else  return@run Result.Success(ClassroomModel(
+            return@run Result.Success(ClassroomModel(
                 id = classroom.id,
                 name = classroom.name,
                 isArchived = classroom.isArchived,
@@ -106,7 +104,7 @@ class ClassroomServices(
                 null -> Result.Problem(ClassroomServicesError.ClassroomNotFound)
                 else -> {
                     if (classroom.isArchived) Result.Success(ClassroomArchivedResult.ClassroomArchived)
-                    val assignments = it.assignmentRepository.getAssignmentsByClassroom(classroomId)
+                    val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
                     if (assignments.isEmpty()) {
                         it.classroomRepository.deleteClassroom(classroomId)
                         Result.Success(ClassroomArchivedResult.ClassroomDeleted)
@@ -130,7 +128,7 @@ class ClassroomServices(
                 else -> {
                     if (classroom.isArchived) Result.Problem(ClassroomServicesError.ClassroomArchived)
                     it.classroomRepository.updateClassroomName(classroomId, classroomUpdateInput)
-                    val assignments = it.assignmentRepository.getAssignmentsByClassroom(classroomId)
+                    val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
                     val students = it.classroomRepository.getStudentsByClassroom(classroomId)
                     Result.Success(ClassroomModel(
                         id = classroom.id,
@@ -160,7 +158,7 @@ class ClassroomServices(
                         ClassroomServicesError.AlreadyInClassroom
                     )
                     it.classroomRepository.addStudentToClassroom(classroom.id, studentId)
-                    val assignments = it.assignmentRepository.getAssignmentsByClassroom(classroom.id)
+                    val assignments = it.assignmentRepository.getClassroomAssignments(classroom.id)
                     val students = it.classroomRepository.getStudentsByClassroom(classroom.id)
                     Result.Success(ClassroomModel(
                         id = classroom.id,
@@ -183,7 +181,7 @@ class ClassroomServices(
         val coroutines = mutableListOf<Job>()
 
         transactionManager.run {
-            val assignments = it.assignmentRepository.getAssignmentsByClassroom(classroomId)
+            val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
             assignments.forEach { assigment ->
                 val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assigment.id)
                 deliveries.forEach { delivery ->
@@ -207,7 +205,7 @@ class ClassroomServices(
         transactionManager.run {
             val classroom = it.classroomRepository.getClassroomById(classroomId)
                 ?: return@run Result.Problem(ClassroomServicesError.ClassroomNotFound)
-            it.assignmentRepository.getAssignmentsByClassroom(classroomId).forEach { assigment ->
+            it.assignmentRepository.getClassroomAssignments(classroomId).forEach { assigment ->
                 it.deliveryRepository.getDeliveriesByAssignment(assigment.id).forEach { delivery ->
                     it.deliveryRepository.getTeamsByDelivery(delivery.id).forEach { team ->
                         it.repoRepository.getReposByTeam(team.id).forEach { repo ->

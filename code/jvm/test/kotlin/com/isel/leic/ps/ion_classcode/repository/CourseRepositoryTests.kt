@@ -12,22 +12,40 @@ class CourseRepositoryTests {
     fun `can check if a course name already exists`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
         val name = "DAW"
-        val res = courseRepo.checkIfCourseNameExists(name = name) ?: fail("Should be able to get a course")
+        val res = courseRepo.checkIfCourseNameExists(name = name)
         assert(res)
+    }
+
+    @Test
+    fun `can check if a course name does not exist`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val name = "LSD"
+        val res = courseRepo.checkIfCourseNameExists(name = name)
+        assert(!res)
     }
 
     @Test
     fun `can check if a course org url already exists`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
         val orgUrl = "https://daw.isel.pt"
-        val res = courseRepo.checkIfOrgUrlExists(orgUrl = orgUrl) ?: fail("Should be able to get a course")
+        val res = courseRepo.checkIfOrgUrlExists(orgUrl = orgUrl)
         assert(res)
+    }
+
+    @Test
+    fun `can check if a course org url does not exist`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val orgUrl = "https://lsd.isel.pt"
+        val res = courseRepo.checkIfOrgUrlExists(orgUrl = orgUrl)
+        assert(!res)
     }
 
     @Test
     fun `can create a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
-        courseRepo.createCourse(course = CourseInput(orgUrl = "https://pdm.isel.pt", name = "PDM", teacherId = 2))
+        val created = courseRepo.createCourse(course = CourseInput(orgUrl = "https://pdm.isel.pt", name = "PDM", teacherId = 2, orgId = 123456))
+        val course = courseRepo.getCourse(courseId = created.id)
+        assert(course != null)
     }
 
     @Test
@@ -60,6 +78,8 @@ class CourseRepositoryTests {
         val courseRepo = JdbiCourseRepository(handle = handle)
         val courseId = 3
         courseRepo.deleteCourse(courseId = courseId)
+        val course = courseRepo.getCourse(courseId = courseId)
+        assert(course == null)
     }
 
     @Test
@@ -72,27 +92,6 @@ class CourseRepositoryTests {
         } catch (e: Exception) {
             assert(true)
         }
-    }
-
-    @Test
-    fun `can put a student in a course`() = testWithHandleAndRollback { handle ->
-        val courseRepo = JdbiCourseRepository(handle = handle)
-        val courseId = 3
-        courseRepo.enterCourse(courseId = courseId, studentId = 4)
-        courseRepo.enterCourse(courseId = courseId, studentId = 5)
-        val studentsInCourse = courseRepo.getStudentInCourse(courseId = courseId)
-        assert(studentsInCourse.size == 2)
-    }
-
-    @Test
-    fun `can delete a student from a course`() = testWithHandleAndRollback { handle ->
-        val courseRepo = JdbiCourseRepository(handle = handle)
-        val courseId = 3
-        courseRepo.enterCourse(courseId = courseId, studentId = 4)
-        courseRepo.enterCourse(courseId = courseId, studentId = 5)
-        courseRepo.leaveCourse(courseId = courseId, studentId = 4)
-        val studentsInCourse = courseRepo.getStudentInCourse(courseId = courseId)
-        assert(studentsInCourse.size == 1)
     }
 
     @Test
@@ -170,5 +169,21 @@ class CourseRepositoryTests {
         courseRepo.archiveCourse(courseId = courseId)
         val course = courseRepo.getCourse(courseId = courseId) ?: fail("Should be able to get a course")
         assert(course.isArchived)
+    }
+
+    @Test
+    fun `get student course classrooms`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val courseId = 1
+        val classrooms = courseRepo.getCourseUserClassrooms(courseId = courseId, userId = 3, true)
+        assert(classrooms.size == 2)
+    }
+
+    @Test
+    fun `get teacher course classrooms`() = testWithHandleAndRollback { handle ->
+        val courseRepo = JdbiCourseRepository(handle = handle)
+        val courseId = 1
+        val classrooms = courseRepo.getCourseUserClassrooms(courseId = courseId, userId = 1, false)
+        assert(classrooms.size == 1)
     }
 }

@@ -13,7 +13,7 @@ class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
     /**
      * Method to create a Cooldown
      */
-    override fun createCooldownRequest(userId: Int, endTime: Timestamp): Int? {
+    override fun createCooldownRequest(userId: Int, endTime: Timestamp): Int {
         return handle.createUpdate(
             """
             INSERT INTO Cooldown (user_id, end_date)
@@ -25,13 +25,13 @@ class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
             .bind("end_date", endTime)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
-            .firstOrNull()
+            .first()
     }
 
     /**
      * Method to get a Cooldown by is id
      */
-    override fun getCooldownRequest(userId: Int): Int? {
+    override fun getCooldownRequestRemainingTime(userId: Int): Int? {
         val endDate = handle.createQuery(
             """
             SELECT end_date FROM Cooldown
@@ -50,14 +50,14 @@ class JdbiCooldownRepository(private val handle: Handle) : CooldownRepository {
     /**
      * Method to delete a Cooldown
      */
-    override fun deleteCooldownRequest(userId: Int): Boolean {
-        return handle.createUpdate(
+    override fun deleteCooldownRequest(userId: Int) {
+        handle.createUpdate(
             """
             DELETE FROM Cooldown
             WHERE user_id = :user_id
             """,
         )
             .bind("user_id", userId)
-            .execute() == 1
+            .execute()
     }
 }

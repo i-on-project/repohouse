@@ -7,11 +7,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class FeedbackRepositoryTests {
+
     @Test
     fun `can create a feedback`() = testWithHandleAndRollback { handle ->
         val feedbackRepo = JdbiFeedbackRepository(handle = handle)
         val teamId = 1
-        feedbackRepo.createFeedback(feedback = FeedbackInput(description = "description", label = "label", teamId = teamId))
+        val created = feedbackRepo.createFeedback(feedback = FeedbackInput(description = "description", label = "label", teamId = teamId))
+        val feedback = feedbackRepo.getFeedbackById(feedbackId = created.id)
+        assert(feedback != null)
     }
 
     @Test

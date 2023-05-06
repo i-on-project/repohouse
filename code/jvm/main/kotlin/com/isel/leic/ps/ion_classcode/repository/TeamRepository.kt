@@ -8,7 +8,7 @@ import com.isel.leic.ps.ion_classcode.domain.input.TeamInput
  * Repository functions for Team Repository
  */
 interface TeamRepository {
-    fun createTeam(team: TeamInput): Int
+    fun createTeam(team: TeamInput): Team
     fun updateTeamStatus(id: Int, status: Boolean)
     fun getTeamById(id: Int): Team?
     fun getStudentsFromTeam(teamId: Int): List<Student>

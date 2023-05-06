@@ -10,11 +10,12 @@ import org.jdbi.v3.core.kotlin.mapTo
  * Implementation of the Repo methods
  */
 class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
+
     /**
      * Method to create a Repo
      */
-    override fun createRepo(repo: RepoInput): Int {
-        return handle.createUpdate(
+    override fun createRepo(repo: RepoInput): Repo {
+        val id = handle.createUpdate(
             """
                 INSERT INTO REPO (name,url,team_id,is_created) 
                 VALUES (:name, :url, :teamId, false)
@@ -27,6 +28,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Repo(id, repo.url ?: "", repo.name , false)
     }
 
     /**

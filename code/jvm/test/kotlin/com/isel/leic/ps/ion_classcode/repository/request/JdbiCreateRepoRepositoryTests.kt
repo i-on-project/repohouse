@@ -10,8 +10,8 @@ class JdbiCreateRepoRepositoryTests {
     @Test
     fun `createCreateRepoRequest should create a new createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
-        val request = CreateRepoInput(creator = 3, teamId = 1)
-        createRepoReq.createCreateRepoRequest(request = request)
+        val request = CreateRepoInput(teamId = 1)
+        createRepoReq.createCreateRepoRequest(request = request, creator = 3)
     }
 
     @Test

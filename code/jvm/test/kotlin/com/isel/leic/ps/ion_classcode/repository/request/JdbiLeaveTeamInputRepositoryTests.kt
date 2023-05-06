@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class JdbiLeaveTeamInputRepositoryTests {
+
     @Test
     fun `createLeaveTeamRequest should create a new leaveTeam request`() = testWithHandleAndRollback { handle ->
         val leaveTeamReq = JdbiLeaveTeamRequestRepository(handle = handle)
-        val request = LeaveTeamInput(teamId = 1, creator = 3)
-        leaveTeamReq.createLeaveTeamRequest(request = request)
+        val request = LeaveTeamInput(teamId = 1)
+        leaveTeamReq.createLeaveTeamRequest(request = request, creator = 3)
     }
 
     @Test

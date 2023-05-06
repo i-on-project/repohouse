@@ -41,7 +41,7 @@ class OutboxServicesTests {
                         on { getUserById(userId = 1) } doReturn Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 1, schoolId = null)
                     }
                     val mockedCooldownRepository = mock<CooldownRepository> {
-                        on { getCooldownRequest(userId = 1) } doReturn 1
+                        on { getCooldownRequestRemainingTime(userId = 1) } doReturn 1
                         on { createCooldownRequest(userId = 2, endTime = Timestamp(System.currentTimeMillis() + 500000)) } doReturn 1
                     }
                     on { outboxRepository } doReturn mockedOutboxRepository

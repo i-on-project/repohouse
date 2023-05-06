@@ -91,7 +91,7 @@ class TeamController(
         if (user !is Student) return Problem.notStudent
         return when (val join = teamService.joinTeamRequest(joinTeamInfo, user.id)) {
             is Result.Problem -> problem(join.value)
-            is Result.Success -> siren(RequestCreatedOutputModel(join.value, true)) {
+            is Result.Success -> siren(RequestCreatedOutputModel(join.value.id, true)) {
                 clazz("joinTeam")
             }
         }
@@ -112,7 +112,7 @@ class TeamController(
         if (user !is Student) return Problem.notStudent
         return when (val create = teamService.createTeamRequest(createTeamInfo, user.id, assignmentId, classroomId)) {
             is Result.Problem -> problem(create.value)
-            is Result.Success -> siren(RequestCreatedOutputModel(create.value, true)) {
+            is Result.Success -> siren(RequestCreatedOutputModel(create.value.id, true)) {
                 clazz("createTeam")
             }
         }
@@ -176,7 +176,7 @@ class TeamController(
         if (user !is Student) return Problem.notStudent
         return when (val exit = teamService.leaveTeamRequest(leaveTeamInfo, user.id)) {
             is Result.Problem -> problem(exit.value)
-            is Result.Success -> siren(RequestCreatedOutputModel(exit.value, true)) {
+            is Result.Success -> siren(RequestCreatedOutputModel(exit.value.id, true)) {
                 clazz("leaveTeam")
             }
         }
@@ -197,7 +197,7 @@ class TeamController(
         if (user !is Teacher) return Problem.notTeacher
         return when (val feedback = teamService.postFeedback(feedbackInfo, classroomId)) {
             is Result.Problem -> problem(feedback.value)
-            is Result.Success -> siren(FeedbackOutputModel(feedback.value, true)) {
+            is Result.Success -> siren(FeedbackOutputModel(feedback.value.id, true)) {
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
             }
         }

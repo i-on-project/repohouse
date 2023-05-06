@@ -9,7 +9,7 @@ import java.sql.Timestamp
  * Repository functions for Delivery Repository
  */
 interface DeliveryRepository {
-    fun createDelivery(delivery: DeliveryInput): Int //
+    fun createDelivery(delivery: DeliveryInput): Delivery //
     fun deleteDelivery(deliveryId: Int)
     fun getDeliveryById(deliveryId: Int): Delivery? //
     fun getDeliveriesByAssignment(assignmentId: Int): List<Delivery> //

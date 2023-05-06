@@ -12,12 +12,12 @@ class JdbiCompositeRequestRepositoryTests {
     fun `createCompositeRequest should create a new composite request`() = testWithHandleAndRollback { handle ->
         val compositeRep = JdbiCompositeRequestRepository(handle = handle)
         val requestRepo = JdbiRequestRepository(handle = handle)
-        val request = CompositeInput(requests = listOf(1, 2), creator = 1)
-        val id = compositeRep.createCompositeRequest(request = request)
+        val request = CompositeInput(requests = listOf(1, 2), composite = null)
+        val composite = compositeRep.createCompositeRequest(request = request, creator = 1)
         val r = requestRepo.getRequestById(id = 1) ?: fail("Request not found")
         val r1 = requestRepo.getRequestById(id = 2) ?: fail("Request not found")
-        assert(id == r.composite)
-        assert(id == r1.composite)
+        assert(composite.id == r.composite)
+        assert(composite.id == r1.composite)
     }
 
     @Test

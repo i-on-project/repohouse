@@ -17,7 +17,7 @@ class JdbiCompositeRequestRepository(
     /**
      * Method to create a Composite Request
      */
-    override fun createCompositeRequest(request: CompositeInput, creator: Int): Int {
+    override fun createCompositeRequest(request: CompositeInput, creator: Int): Composite {
         val requestId = handle.createUpdate(
             """
         INSERT INTO request (creator, composite, state)
@@ -55,7 +55,7 @@ class JdbiCompositeRequestRepository(
                 .bind("compositeId", compositeId)
                 .execute()
         }
-        return compositeId
+        return Composite(compositeId, creator, requests = request.requests)
     }
 
     /**

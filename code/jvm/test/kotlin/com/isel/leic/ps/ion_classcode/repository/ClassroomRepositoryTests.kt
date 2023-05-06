@@ -8,10 +8,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class ClassroomRepositoryTests {
+
     @Test
     fun `can create classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
-        classroomRepo.createClassroom(classroom = ClassroomInput(name = "Classroom 1", courseId = 1, teacherId = 1), inviteLink = "linking link")
+        val created = classroomRepo.createClassroom(classroom = ClassroomInput(name = "Classroom 1", courseId = 1, teacherId = 1), inviteLink = "linking link")
+        val classroom = classroomRepo.getClassroomById(classroomId = created.id)
+        assert(classroom != null)
     }
 
     @Test
@@ -24,10 +27,20 @@ class ClassroomRepositoryTests {
     }
 
     @Test
+    fun `can not get the classroom by id`() = testWithHandleAndRollback { handle ->
+        val classroomRepo = JdbiClassroomRepository(handle = handle)
+        val classroomId = 4
+        val classroom = classroomRepo.getClassroomById(classroomId = classroomId)
+        assert(classroom == null)
+    }
+
+    @Test
     fun `can delete classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
         val classroomId = 3
         classroomRepo.deleteClassroom(classroomId = classroomId)
+        val classroom = classroomRepo.getClassroomById(classroomId = classroomId)
+        assert(classroom == null)
     }
 
     @Test
@@ -43,26 +56,18 @@ class ClassroomRepositoryTests {
     }
 
     @Test
-    fun `can get the classroom assignments`() = testWithHandleAndRollback { handle ->
-        val classroomRepo = JdbiClassroomRepository(handle = handle)
-        val classroomId = 1
-        val classroom = classroomRepo.getClassroomById(classroomId = classroomId)
-        assert(classroom != null)
-    }
-
-    @Test
     fun `can update the classroom name`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
         val classroomId = 1
         val newName = "New Name"
         val classroomUpdate = ClassroomUpdateInputModel(name = newName)
         classroomRepo.updateClassroomName(classroomId = classroomId, classroomUpdate = classroomUpdate)
-        val classroom = classroomRepo.getClassroomById(classroomId = classroomId) ?: fail("Classroom not found")
-        assert(classroom.name == newName)
+        val classroom = classroomRepo.getClassroomById(classroomId = classroomId)
+        assert(classroom != null && classroom.name == newName)
     }
 
     @Test
-    fun `can get the assignments the classroom`() = testWithHandleAndRollback { handle ->
+    fun `can get the assignments of a classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
         val classroomId = 1
         val assignments = classroomRepo.getAssignmentsOfAClassroom(classroomId = classroomId)
@@ -79,7 +84,7 @@ class ClassroomRepositoryTests {
     }
 
     @Test
-    fun `can get witch classroom from a course the student is in`() = testWithHandleAndRollback { handle ->
+    fun `can get which classroom from a course the student is in`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
         val courseId = 1
         val studentId = 3
@@ -125,5 +130,13 @@ class ClassroomRepositoryTests {
         val classroomRepo = JdbiClassroomRepository(handle = handle)
         val inviteLinks = classroomRepo.getAllInviteLinks()
         assert(inviteLinks.size == 3)
+    }
+
+    @Test
+    fun `can get all classrooms of a course`() = testWithHandleAndRollback { handle ->
+        val classroomRepo = JdbiClassroomRepository(handle = handle)
+        val courseId = 1
+        val classrooms = classroomRepo.getAllCourseClassrooms(courseId = courseId)
+        assert(classrooms.size == 2)
     }
 }

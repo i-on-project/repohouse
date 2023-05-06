@@ -11,6 +11,7 @@ import java.sql.Timestamp
  * Implementation of the Assigment methods
  */
 class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepository {
+
     override fun createAssignment(assignment: AssignmentInput): Assignment {
         val id = handle.createUpdate(
             """
@@ -47,7 +48,7 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
     /**
      * Method to get an Assigment by a classroom
      */
-    override fun getAssignmentsByClassroom(classroomId: Int): List<Assignment> {
+    override fun getClassroomAssignments(classroomId: Int): List<Assignment> {
         return handle.createQuery(
             """
                 SELECT * FROM assignment WHERE classroom_id = :classroomId

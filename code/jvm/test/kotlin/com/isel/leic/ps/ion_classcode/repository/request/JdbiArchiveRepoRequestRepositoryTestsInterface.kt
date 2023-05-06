@@ -7,11 +7,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class JdbiArchiveRepoRequestRepositoryTestsInterface {
+
     @Test
     fun `createArchiveRepoRequest should create a new archiveRepo request`() = testWithHandleAndRollback { handle ->
         val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
-        val request = ArchiveRepoInput(repoId = 1, creator = 3)
-        archiveReq.createArchiveRepoRequest(request = request)
+        val request = ArchiveRepoInput(repoId = 1, composite = null)
+        val created = archiveReq.createArchiveRepoRequest(request = request, creator = 3)
+        val archive = archiveReq.getArchiveRepoRequestById(id = created.id)
+        assert(archive != null)
     }
 
     @Test

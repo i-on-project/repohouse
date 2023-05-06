@@ -479,43 +479,6 @@ class JdbiUsersRepository(
     }
 
     /**
-     * Method to delete a student
-     */
-    override fun deleteStudent(id: Int) {
-        handle.createUpdate(
-            """
-            DELETE FROM student
-            WHERE id = :id
-            """,
-        )
-            .bind("id", id)
-            .execute()
-
-        handle.createUpdate(
-            """
-            DELETE FROM users
-            WHERE id = :id
-            """,
-        )
-            .bind("id", id)
-            .execute()
-    }
-
-    /**
-     * Method to delete a teacher
-     */
-    override fun deleteTeacher(id: Int) {
-        handle.createUpdate(
-            """
-            DELETE FROM teacher
-            WHERE id = :id
-            """,
-        )
-            .bind("id", id)
-            .execute()
-    }
-
-    /**
      * Method to get a teacher GitHub token
      */
     override fun getTeacherGithubToken(id: Int): String? {

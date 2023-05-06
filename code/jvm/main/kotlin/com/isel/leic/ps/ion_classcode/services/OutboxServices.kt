@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ion_classcode.services
 
+import com.isel.leic.ps.ion_classcode.domain.Outbox
 import com.isel.leic.ps.ion_classcode.domain.input.OtpInput
 import com.isel.leic.ps.ion_classcode.domain.input.OutboxInput
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
@@ -15,7 +16,8 @@ import java.sql.Timestamp
 /**
  * Alias for the response of the services
  */
-typealias OutboxResponse = Either<OutboxServicesError, Unit>
+typealias OutboxResponse = Either<OutboxServicesError, Outbox>
+typealias UpdateOutboxResponse = Either<OutboxServicesError, Unit>
 
 const val EMAIL_RESEND_TIME = 300000 // 5-minutes cooldown
 const val MAX_TRIES = 3
@@ -53,21 +55,21 @@ class OutboxServices(
         if (userId <= 0) return Either.Left(OutboxServicesError.InternalError)
         val otp = createRandomOtp()
         return transactionManager.run {
-            val cooldown = it.cooldownRepository.getCooldownRequest(userId)
+            val cooldown = it.cooldownRepository.getCooldownRequestRemainingTime(userId)
             if (cooldown != null) return@run Either.Left(OutboxServicesError.CooldownNotExpired(cooldown))
-            it.otpRepository.createOtpRequest(OtpInput(userId, otp)) ?: return@run Either.Left(OutboxServicesError.ErrorCreatingRequest)
+            it.otpRepository.createOtpRequest(OtpInput(userId, otp))
             val outbox = it.outboxRepository.createOutboxRequest(OutboxInput(userId))
-            return@run if (outbox == null) Either.Left(OutboxServicesError.ErrorCreatingRequest) else Either.Right(Unit)
+            Either.Right(outbox)
         }
     }
 
     /**
      * Method to check the otp
      */
-    fun checkOtp(userId: Int, otp: Int): OutboxResponse {
+    fun checkOtp(userId: Int, otp: Int): UpdateOutboxResponse {
         if (otp <= 0) return Either.Left(OutboxServicesError.InvalidInput)
         return transactionManager.run {
-            val cooldown = it.cooldownRepository.getCooldownRequest(userId)
+            val cooldown = it.cooldownRepository.getCooldownRequestRemainingTime(userId)
             if (cooldown != null) return@run Either.Left(OutboxServicesError.CooldownNotExpired(cooldown))
             var otpRequest = it.otpRepository.getOtpRequest(userId) ?: return@run Either.Left(OutboxServicesError.OtpNotFound)
             if (otpRequest.expiredAt.before(System.currentTimeMillis().toTimestamp())) {
@@ -96,7 +98,7 @@ class OutboxServices(
     /**
      * Method to resend the email
      */
-    fun resendEmail(userId: Int): OutboxResponse {
+    fun resendEmail(userId: Int): UpdateOutboxResponse {
         if (userId <= 0) return Either.Left(OutboxServicesError.InternalError)
         return transactionManager.run {
             val outbox = it.outboxRepository.getOutboxRequest(userId) ?: return@run Either.Left(OutboxServicesError.OtpNotFound)

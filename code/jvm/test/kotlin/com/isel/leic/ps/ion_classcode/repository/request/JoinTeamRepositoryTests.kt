@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class JoinTeamRepositoryTests {
+
     @Test
     fun `createJoinTeamRequest should create a new joinTeam request`() = testWithHandleAndRollback { handle ->
         val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
-        val request = JoinTeamInput(teamId = 1, creator = 3, assignmentId = 1)
-        joinTeamReq.createJoinTeamRequest(request = request)
+        val request = JoinTeamInput(teamId = 1, assignmentId = 1)
+        joinTeamReq.createJoinTeamRequest(request = request, creator = 3,)
     }
 
     @Test

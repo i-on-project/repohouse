@@ -10,11 +10,12 @@ import org.jdbi.v3.core.kotlin.mapTo
  * Implementation of the Tag methods
  */
 class JdbiTagRepository(private val handle: Handle) : TagRepository {
+
     /**
      * Method to create a Tag
      */
-    override fun createTag(tag: TagInput): Int {
-        return handle.createUpdate(
+    override fun createTag(tag: TagInput): Tags {
+        val id = handle.createUpdate(
             """
                 INSERT INTO tags (name, is_delivered, tag_date, delivery_id,repo_id) 
                 VALUES (:name, :is_delivered, :tag_date, :delivery_id,:repoId)
@@ -29,6 +30,7 @@ class JdbiTagRepository(private val handle: Handle) : TagRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Tags(id, tag.name, tag.isDelivered, tag.tagDate, tag.deliveryId, tag.repoId)
     }
 
     /**

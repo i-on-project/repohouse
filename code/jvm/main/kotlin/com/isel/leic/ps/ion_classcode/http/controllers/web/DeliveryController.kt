@@ -76,10 +76,10 @@ class DeliveryController(
         if (user !is Teacher) return Problem.notTeacher
         return when (val deliveryId = deliveryServices.createDelivery(deliveryInfo, user.id)) {
             is Result.Problem -> problem(deliveryId.value)
-            is Result.Success -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId.value)) {
+            is Result.Success -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId.value.id)) {
                 is Result.Problem -> problem(delivery.value)
                 is Result.Success -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
-                    link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId.value), rel = LinkRelation("self"), needAuthentication = true)
+                    link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId.value.id), rel = LinkRelation("self"), needAuthentication = true)
                 }
             }
         }

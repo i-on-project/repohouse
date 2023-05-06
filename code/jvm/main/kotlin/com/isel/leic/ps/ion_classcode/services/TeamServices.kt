@@ -1,11 +1,15 @@
 package com.isel.leic.ps.ion_classcode.services
 
+import com.isel.leic.ps.ion_classcode.domain.Feedback
 import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ion_classcode.domain.requests.CreateTeam
+import com.isel.leic.ps.ion_classcode.domain.requests.JoinTeam
+import com.isel.leic.ps.ion_classcode.domain.requests.LeaveTeam
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsModel
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
@@ -18,11 +22,11 @@ import org.springframework.stereotype.Component
 typealias TeamResponse = Result<TeamServicesError, TeamModel>
 typealias TeamsResponse = Result<TeamServicesError, List<TeamModel>>
 typealias TeamRequestsResponse = Result<TeamServicesError, TeamRequestsModel>
-typealias TeamCreateRequestResponse = Result<TeamServicesError, Int>
-typealias TeamLeaveRequestResponse = Result<TeamServicesError, Int>
-typealias TeamJoinRequestResponse = Result<TeamServicesError, Int>
+typealias TeamCreateRequestResponse = Result<TeamServicesError, CreateTeam>
+typealias TeamLeaveRequestResponse = Result<TeamServicesError, LeaveTeam>
+typealias TeamJoinRequestResponse = Result<TeamServicesError, JoinTeam>
 typealias TeamUpdateRequestResponse = Result<TeamServicesError, Boolean>
-typealias TeamFeedbackResponse = Result<TeamServicesError, Int>
+typealias TeamFeedbackResponse = Result<TeamServicesError, Feedback>
 
 /**
  * Error codes for the services
@@ -94,16 +98,16 @@ class TeamServices(
                 ?: return@run Result.Problem(value = TeamServicesError.ClassroomNotFound)
             if (classroom.isArchived) return@run Result.Problem(value = TeamServicesError.ClassroomArchived)
 
-            val teamId = it.createTeamRepository.createCreateTeamRequest(request = createTeamInfo, creator = creator)
+            val team = it.createTeamRepository.createCreateTeamRequest(request = createTeamInfo, creator = creator)
             // Join all requests in one composite request
             val composite = it.compositeRepository.createCompositeRequest(
-                CompositeInput(requests = listOf(teamId)),
+                CompositeInput(requests = listOf(team.id)),
                 creator = creator,
             )
-            it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(assignmentId = assignmentId, teamId = teamId, composite = composite), creator = creator)
-            it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(teamId = teamId, composite = composite), creator = creator)
+            it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(assignmentId = assignmentId, teamId = team.id, composite = composite.id), creator = creator)
+            it.createRepoRepository.createCreateRepoRequest(CreateRepoInput(teamId = team.id, composite = composite.id), creator = creator)
 
-            Result.Success(value = teamId)
+            Result.Success(value = team)
         }
     }
 

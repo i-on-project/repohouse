@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class OutboxRepositoryTests {
+
     @Test
     fun `can create an outbox`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
-        outboxRepo.createOutboxRequest(outbox = OutboxInput(userId = 2, otp = 123))
+        val created = outboxRepo.createOutboxRequest(outbox = OutboxInput(userId = 2))
+        val outbox = outboxRepo.getOutboxRequest(userId = created.userId)
+        assert(outbox != null)
     }
 
     @Test
@@ -24,28 +27,34 @@ class OutboxRepositoryTests {
     fun `can get a request`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
         val userId = 3
-        val otp = 123456
-        val request = outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
-        assert(request.otp == otp)
+        outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
     }
 
     @Test
-    fun `can update a request`() = testWithHandleAndRollback { handle ->
+    fun `can update a request status`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
         val userId = 3
         val status = "Sent"
-        val result = outboxRepo.updateOutboxStateRequest(userId = userId)
-        assert(result)
+        outboxRepo.updateOutboxStateRequest(userId = userId, state =status)
         val request = outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
         assert(request.status == status)
+    }
+
+    @Test
+    fun `can update a request sent time`() = testWithHandleAndRollback { handle ->
+        val outboxRepo = JdbiOutboxRepository(handle = handle)
+        val userId = 3
+        val request = outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
+        outboxRepo.updateOutboxSentTimeRequest(userId = userId)
+        val outbox = outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
+        assert(request.sentAt != outbox.sentAt)
     }
 
     @Test
     fun `can delete a request`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
         val userId = 3
-        val result = outboxRepo.deleteOutboxRequest(userId = userId)
-        assert(result)
+        outboxRepo.deleteOutboxRequest(userId = userId)
         val request = outboxRepo.getOutboxRequest(userId = userId)
         assert(request == null)
     }

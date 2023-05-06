@@ -38,7 +38,7 @@ class AssignmentServiceTests {
             override fun <R> run(block: (Transaction) -> R): R {
                 val mockedTransaction = mock<Transaction> {
                     val mockedAssignmentRepository = mock<AssignmentRepository> {
-                        on { getAssignmentsByClassroom(classroomId = 2) } doReturn listOf(ClassroomServiceTests.assignment)
+                        on { getClassroomAssignments(classroomId = 2) } doReturn listOf(ClassroomServiceTests.assignment)
                         on {
                             createAssignment(assignment = AssignmentInput(classroomId = 1, description = "description", title = "title", maxNumberGroups = 2, maxElemsPerGroup = 2))
                         } doReturn Assignment(id = 1, classroomId = 1, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description", title = "title")

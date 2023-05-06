@@ -10,11 +10,12 @@ import org.jdbi.v3.core.kotlin.mapTo
  * Implementation of the Feedback methods
  */
 class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
+
     /**
      * Method to create a Feedback
      */
-    override fun createFeedback(feedback: FeedbackInput): Int {
-        return handle.createUpdate(
+    override fun createFeedback(feedback: FeedbackInput): Feedback {
+        val id = handle.createUpdate(
             """
                 INSERT INTO FEEDBACK (description,label,team_id) 
                 VALUES (:description, :label, :teamId)
@@ -27,6 +28,7 @@ class JdbiFeedbackRepository(private val handle: Handle) : FeedbackRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Feedback(id ,feedback.description, feedback.label, feedback.teamId)
     }
 
     /**

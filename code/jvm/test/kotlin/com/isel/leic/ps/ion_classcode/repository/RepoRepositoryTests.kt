@@ -7,11 +7,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class RepoRepositoryTests {
+
     @Test
     fun `can create a repo`() = testWithHandleAndRollback { handle ->
         val repoRepo = JdbiRepoRepository(handle = handle)
         val teamId = 1
-        repoRepo.createRepo(repo = RepoInput(name = "name", url = "status", teamId = teamId))
+        val created = repoRepo.createRepo(repo = RepoInput(name = "name", url = "status", teamId = teamId))
+        val repo = repoRepo.getRepoById(repoId = created.id)
+        assert(repo != null)
     }
 
     @Test
@@ -24,7 +27,7 @@ class RepoRepositoryTests {
     }
 
     @Test
-    fun `can update repo description`() = testWithHandleAndRollback { handle ->
+    fun `can update repo status`() = testWithHandleAndRollback { handle ->
         val repoRepo = JdbiRepoRepository(handle = handle)
         val repoId = 1
         repoRepo.updateRepoStatus(repoId = repoId, status = true)

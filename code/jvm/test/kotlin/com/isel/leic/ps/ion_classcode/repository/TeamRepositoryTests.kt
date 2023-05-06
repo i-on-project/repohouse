@@ -7,11 +7,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class TeamRepositoryTests {
+
     @Test
     fun `can create a team`() = testWithHandleAndRollback { handle ->
         val teamRepo = JdbiTeamRepository(handle = handle)
         val assignmentId = 1
-        teamRepo.createTeam(team = TeamInput(name = "test12", assignmentId = assignmentId, isCreated = false))
+        val created = teamRepo.createTeam(team = TeamInput(name = "test12", assignmentId = assignmentId, isCreated = false))
+        val team = teamRepo.getTeamById(id = created.id)
+        assert(team != null)
     }
 
     @Test
@@ -46,6 +49,8 @@ class TeamRepositoryTests {
         val teamId = 2
         val studentId = 5
         teamRepo.enterTeam(teamId = teamId, studentId = studentId)
+        val students = teamRepo.getStudentsFromTeam(teamId = teamId)
+        assert(students.any { it.id == studentId })
     }
 
     @Test
@@ -71,6 +76,8 @@ class TeamRepositoryTests {
         val teamRepo = JdbiTeamRepository(handle = handle)
         val teamId = 3
         teamRepo.deleteTeam(teamId = teamId)
+        val team = teamRepo.getTeamById(id = teamId)
+        assert(team == null)
     }
 
     @Test
@@ -83,5 +90,13 @@ class TeamRepositoryTests {
         } catch (e: Exception) {
             assert(true)
         }
+    }
+
+    @Test
+    fun `can get students of a team`() = testWithHandleAndRollback { handle ->
+        val teamRepo = JdbiTeamRepository(handle = handle)
+        val teamId = 1
+        val students = teamRepo.getStudentsFromTeam(teamId = teamId)
+        assert(students.size == 2)
     }
 }

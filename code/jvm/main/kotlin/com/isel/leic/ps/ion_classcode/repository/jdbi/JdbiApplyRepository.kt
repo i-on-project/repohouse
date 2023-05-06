@@ -17,8 +17,8 @@ class JdbiApplyRepository(
     /**
      * Method to create an Apply Request
      */
-    override fun createApplyRequest(request: ApplyInput): Int {
-        return handle.createUpdate(
+    override fun createApplyRequest(request: ApplyInput): Apply {
+        val id = handle.createUpdate(
             """
             INSERT INTO apply (pending_teacher_id, state) 
             VALUES (:pendingTeacherId, 'Pending')
@@ -29,6 +29,7 @@ class JdbiApplyRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
+        return Apply(id, request.pendingTeacherId, "Pending")
     }
 
     /**

@@ -63,8 +63,8 @@ class ClassroomServiceTests {
                         on { addStudentToClassroom(classroomId = 1, studentId = 4) } doAnswer {}
                     }
                     val mockedAssignmentRepository = mock<AssignmentRepository> {
-                        on { getAssignmentsByClassroom(classroomId = 1) } doReturn listOf(assignment)
-                        on { getAssignmentsByClassroom(classroomId = 2) } doReturn listOf(assignment)
+                        on { getClassroomAssignments(classroomId = 1) } doReturn listOf(assignment)
+                        on { getClassroomAssignments(classroomId = 2) } doReturn listOf(assignment)
                     }
                     on { classroomRepository } doReturn mockedClassroomRepository
                     on { assignmentRepository } doReturn mockedAssignmentRepository
