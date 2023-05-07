@@ -30,6 +30,7 @@ typealias ClassroomLocalCopyResponse = Result<ClassroomServicesError, LocalCopy>
  */
 sealed class ClassroomServicesError {
     object ClassroomNotFound : ClassroomServicesError()
+    object CourseNotFound : ClassroomServicesError()
     object ClassroomArchived : ClassroomServicesError()
     object AlreadyInClassroom : ClassroomServicesError()
     object NameAlreadyExists : ClassroomServicesError()
@@ -76,6 +77,8 @@ class ClassroomServices(
     fun createClassroom(classroomInput: ClassroomInput): ClassroomCreateResponse {
         if (classroomInput.isNotValid()) return Result.Problem(ClassroomServicesError.InvalidInput)
         return transactionManager.run {
+            it.usersRepository.getTeacher(classroomInput.teacherId) ?: return@run Result.Problem(ClassroomServicesError.InternalError)
+            it.courseRepository.getCourse(classroomInput.courseId) ?: return@run Result.Problem(ClassroomServicesError.CourseNotFound)
             val otherInviteLinks = it.classroomRepository.getAllInviteLinks()
             val inviteLink = generateRandomInviteLink(otherInviteLinks)
             val otherClassroomNames = it.classroomRepository.getAllCourseClassrooms(classroomInput.courseId).map { classroom -> classroom.name }
@@ -149,6 +152,7 @@ class ClassroomServices(
     fun enterClassroomWithInvite(inviteLink: String, studentId: Int): ClassroomEnterResponse {
         if (inviteLink.isBlank()) return Result.Problem(ClassroomServicesError.InviteLinkNotFound)
         return transactionManager.run {
+            it.usersRepository.getStudent(studentId) ?: return@run Result.Problem(ClassroomServicesError.InternalError)
             when (val classroom = it.classroomRepository.getClassroomByInviteLink(inviteLink)) {
                 null -> Result.Problem(ClassroomServicesError.InviteLinkNotFound)
                 else -> {
@@ -243,6 +247,7 @@ class ClassroomServices(
             ClassroomServicesError.InvalidInput -> Problem.invalidInput
             ClassroomServicesError.InviteLinkNotFound -> Problem.notFound
             ClassroomServicesError.InternalError -> Problem.internalError
+            ClassroomServicesError.CourseNotFound -> Problem.notFound
             ClassroomServicesError.NameAlreadyExists -> Problem.alreadyExists
         }
     }

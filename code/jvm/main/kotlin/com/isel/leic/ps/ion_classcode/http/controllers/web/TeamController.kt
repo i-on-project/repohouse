@@ -14,12 +14,10 @@ import com.isel.leic.ps.ion_classcode.http.model.output.RequestCreatedOutputMode
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeamsOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.services.TeamServices
-import com.isel.leic.ps.ion_classcode.services.TeamServicesError
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -49,7 +47,7 @@ class TeamController(
         @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
         return when (val team = teamService.getTeamInfo(teamId)) {
-            is Result.Problem -> problem(team.value)
+            is Result.Problem -> teamService.problem(team.value)
             is Result.Success -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repos, team.value.feedbacks)) {
                 clazz("team")
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
@@ -68,7 +66,7 @@ class TeamController(
         @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
         return when (val team = teamService.getTeamsInfoByAssignment(assignmentId)) {
-            is Result.Problem -> problem(team.value)
+            is Result.Problem -> teamService.problem(team.value)
             is Result.Success -> siren(TeamsOutputModel(team.value)) {
                 clazz("teams")
                 link(href = Uris.TEAMS_PATH, rel = LinkRelation("self"), needAuthentication = true)
@@ -90,7 +88,7 @@ class TeamController(
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
         return when (val join = teamService.joinTeamRequest(joinTeamInfo, user.id)) {
-            is Result.Problem -> problem(join.value)
+            is Result.Problem -> teamService.problem(join.value)
             is Result.Success -> siren(RequestCreatedOutputModel(join.value.id, true)) {
                 clazz("joinTeam")
             }
@@ -111,7 +109,7 @@ class TeamController(
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
         return when (val create = teamService.createTeamRequest(createTeamInfo, user.id, assignmentId, classroomId)) {
-            is Result.Problem -> problem(create.value)
+            is Result.Problem -> teamService.problem(create.value)
             is Result.Success -> siren(RequestCreatedOutputModel(create.value.id, true)) {
                 clazz("createTeam")
             }
@@ -130,7 +128,7 @@ class TeamController(
         @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
         return when (val requests = teamService.getTeamsRequests(teamId)) {
-            is Result.Problem -> problem(requests.value)
+            is Result.Problem -> teamService.problem(requests.value)
             is Result.Success -> siren(TeamRequestsOutputModel(requests.value.joinTeam, requests.value.leaveTeam)) {
                 clazz("requests")
                 link(href = Uris.teamRequestsUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
@@ -152,7 +150,7 @@ class TeamController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val change = teamService.updateTeamRequestStatus(requestId, teamId, classroomId)) {
-            is Result.Problem -> problem(change.value)
+            is Result.Problem -> teamService.problem(change.value)
             is Result.Success -> siren(RequestChangeStatusOutputModel(requestId, change.value)) {
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
                 link(href = Uris.teamRequestsUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("requestsHistory"), needAuthentication = true)
@@ -175,7 +173,7 @@ class TeamController(
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
         return when (val exit = teamService.leaveTeamRequest(leaveTeamInfo, user.id)) {
-            is Result.Problem -> problem(exit.value)
+            is Result.Problem -> teamService.problem(exit.value)
             is Result.Success -> siren(RequestCreatedOutputModel(exit.value.id, true)) {
                 clazz("leaveTeam")
             }
@@ -196,25 +194,10 @@ class TeamController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val feedback = teamService.postFeedback(feedbackInfo, classroomId)) {
-            is Result.Problem -> problem(feedback.value)
+            is Result.Problem -> teamService.problem(feedback.value)
             is Result.Success -> siren(FeedbackOutputModel(feedback.value.id, true)) {
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
             }
-        }
-    }
-
-    /**
-     * Function to handle the errors
-     */
-    private fun problem(error: TeamServicesError): ResponseEntity<ErrorMessageModel> {
-        return when (error) {
-            is TeamServicesError.TeamNotFound -> Problem.notFound
-            is TeamServicesError.RequestNotRejected -> Problem.invalidOperation
-            is TeamServicesError.RequestNotFound -> Problem.notFound
-            is TeamServicesError.ClassroomArchived -> Problem.invalidOperation
-            is TeamServicesError.ClassroomNotFound -> Problem.notFound
-            is TeamServicesError.AssignmentNotFound -> Problem.notFound
-            is TeamServicesError.InvalidData -> Problem.invalidInput
         }
     }
 }

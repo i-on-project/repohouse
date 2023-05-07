@@ -71,7 +71,7 @@ class CourseServices(
     fun createCourse(courseInfo: CourseInputModel, teacherId: Int): CourseCreatedResponse {
         if (courseInfo.isNotValid()) return Result.Problem(CourseServicesError.InvalidInput)
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(teacherId) == null) Result.Problem(CourseServicesError.NotTeacher)
+            if (it.usersRepository.getTeacher(teacherId) == null) Result.Problem(CourseServicesError.InternalError)
             val courseByOrg = it.courseRepository.getCourseByOrg(courseInfo.orgUrl)
             if (courseByOrg != null) {
                 Result.Success(it.courseRepository.addTeacherToCourse(teacherId, courseByOrg.id))

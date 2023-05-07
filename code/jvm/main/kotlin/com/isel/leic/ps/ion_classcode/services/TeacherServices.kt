@@ -58,14 +58,6 @@ class TeacherServices(
         return transactionManager.run {
             val teacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: Result.Problem(TeacherServicesError.TeacherNotFound)
             if (teacher is PendingTeacher) {
-                if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) {
-                    Result.Problem(
-                        TeacherServicesError.GithubUserNameInUse,
-                    )
-                }
-                if (it.usersRepository.checkIfEmailExists(teacher.email)) Result.Problem(TeacherServicesError.EmailInUse)
-                if (it.usersRepository.checkIfGithubIdExists(teacher.githubId)) Result.Problem(TeacherServicesError.GithubIdInUse)
-                if (it.usersRepository.checkIfTokenExists(teacher.token)) Result.Problem(TeacherServicesError.TokenInUse)
                 val teacherRes = it.usersRepository.createTeacher(
                     TeacherInput(
                         name = teacher.name,
@@ -91,6 +83,11 @@ class TeacherServices(
         val hash = tokenHash.getTokenHash(teacher.token)
         val githubToken = AESEncrypt.encrypt(teacher.githubToken)
         return transactionManager.run {
+            if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) Result.Problem(TeacherServicesError.GithubUserNameInUse)
+            if (it.usersRepository.checkIfEmailExists(teacher.email)) Result.Problem(TeacherServicesError.EmailInUse)
+            if (it.usersRepository.checkIfGithubIdExists(teacher.githubId)) Result.Problem(TeacherServicesError.GithubIdInUse)
+            if (it.usersRepository.checkIfTokenExists(teacher.token)) Result.Problem(TeacherServicesError.TokenInUse)
+            if (it.usersRepository.checkIfGithubTokenExists(teacher.githubToken)) Result.Problem(TeacherServicesError.TokenInUse)
             val teacherRes = it.usersRepository.createPendingTeacher(
                 TeacherInput(
                     name = teacher.name,

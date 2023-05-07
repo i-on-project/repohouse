@@ -2,7 +2,6 @@ package com.isel.leic.ps.ion_classcode.http.controllers.mobile
 
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.Uris
-import com.isel.leic.ps.ion_classcode.http.model.output.TeacherAssignmentModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeacherAssignmentOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
@@ -30,7 +29,7 @@ class AssigmentControllerMobile(
         return when (val assignment = assigmentService.getTeacherAssignmentInfo(assignmentId = assignmentId)) {
             is Result.Problem -> problem(error = assignment.value)
             is Result.Success -> {
-                assignment.value as TeacherAssignmentModel
+                assignment.value
                 siren(
                     value = TeacherAssignmentOutputModel(
                         assignment = assignment.value.assignment,
@@ -75,6 +74,7 @@ class AssigmentControllerMobile(
             AssignmentServicesError.AssignmentNotDeleted -> Problem.methodNotAllowed
             AssignmentServicesError.ClassroomArchived -> Problem.invalidOperation
             AssignmentServicesError.ClassroomNotFound -> Problem.notFound
+            AssignmentServicesError.InternalError -> Problem.internalError
         }
     }
 }

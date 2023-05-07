@@ -79,7 +79,7 @@ class GithubServices(
             .addHeader("Accept", "application/json")
             .build()
 
-        return okHttp.makeCallToList<GitHubOrgsModel>(orgsRequest)
+        return okHttp.makeCallToList(orgsRequest)
     }
 
     /**

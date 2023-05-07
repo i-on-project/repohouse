@@ -12,7 +12,7 @@ class ApplyRepositoryTests {
     @Test
     fun `createApplyRequest should create a new apply request`() = testWithHandleAndRollback { handle ->
         val applyReq = JdbiApplyRepository(handle = handle)
-        val request = ApplyInput(pendingTeacherId = 3)
+        val request = ApplyInput(pendingTeacherId = 4)
         val created = applyReq.createApplyRequest(request = request)
         val apply = applyReq.getApplyRequestById(id = created.id)
         assert(apply != null)

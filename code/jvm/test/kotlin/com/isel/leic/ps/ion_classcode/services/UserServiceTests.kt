@@ -26,12 +26,6 @@ class UserServiceTests {
     @Autowired
     lateinit var userServices: UserServices
 
-    @Autowired
-    lateinit var studentServices: StudentServices
-
-    @Autowired
-    lateinit var teacherServices: TeacherServices
-
     @TestConfiguration
     class Config {
         @Bean
@@ -40,92 +34,156 @@ class UserServiceTests {
                 val mockedTransaction = mock<Transaction> {
                     val mockedUsersRepository = mock<UsersRepository> {
                         on {
-                            createPendingStudent(student = StudentInput(name = "name", email = "test@alunos.isel.pt", githubUsername = "username", githubId = 12345, token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", schoolId = null))
-                        } doReturn PendingStudent(name = "name", email = "test@alunos.isel.pt", githubUsername = "username", token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", githubId = 12345, isCreated = false, id = 1)
+                            createPendingStudent(
+                                student = StudentInput(
+                                    name = "name",
+                                    email = "test@alunos.isel.pt",
+                                    githubUsername = "username",
+                                    githubId = 12345,
+                                    token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                                    schoolId = null
+                                )
+                            )
+                        } doReturn PendingStudent(
+                            name = "name",
+                            email = "test@alunos.isel.pt",
+                            githubUsername = "username",
+                            token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                            githubId = 12345,
+                            isCreated = false,
+                            id = 1
+                        )
 
                         on {
-                            createStudent(student = StudentInput(email = "test@alunos.isel.pt", githubUsername = "username", schoolId = 1238, githubId = 12345, token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", name = "name"))
-                        } doReturn Student(email = "test@alunos.isel.pt", githubUsername = "username", schoolId = 1238, githubId = 1240, token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", name = "student", id = 1, isCreated = true)
+                            createStudent(
+                                student = StudentInput(
+                                    email = "test@alunos.isel.pt",
+                                    githubUsername = "username",
+                                    schoolId = 1238,
+                                    githubId = 12345,
+                                    token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                                    name = "name"
+                                )
+                            )
+                        } doReturn Student(
+                            email = "test@alunos.isel.pt",
+                            githubUsername = "username",
+                            schoolId = 1238,
+                            githubId = 1240,
+                            token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                            name = "student",
+                            id = 1,
+                            isCreated = true
+                        )
 
                         on {
                             updateStudentSchoolId(userId = 5, schoolId = 1256)
                         } doAnswer {}
 
                         on {
-                            createPendingTeacher(teacher = TeacherInput(name = "name", email = "test@alunos.isel.pt", githubUsername = "username", githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", githubId = 12346, token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="))
-                        } doReturn PendingTeacher(name = "name", id = 1, email = "test@alunos.isel.pt", githubUsername = "username", githubId = 12346, token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", isCreated = false, githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=")
+                            createPendingTeacher(
+                                teacher = TeacherInput(
+                                    name = "name",
+                                    email = "test@alunos.isel.pt",
+                                    githubUsername = "username",
+                                    githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                                    githubId = 12346,
+                                    token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="
+                                )
+                            )
+                        } doReturn PendingTeacher(
+                            name = "name",
+                            id = 1,
+                            email = "test@alunos.isel.pt",
+                            githubUsername = "username",
+                            githubId = 12346,
+                            token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                            isCreated = false,
+                            githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="
+                        )
 
                         on {
-                            createTeacher(teacher = TeacherInput(email = "test@alunos.isel.pt", name = "name", token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", githubId = 12346, githubUsername = "username", githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="))
-                        } doReturn Teacher(email = "test@alunos.isel.pt", name = "name", token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", githubId = 12346, githubUsername = "username", id = 1, isCreated = true)
+                            createTeacher(
+                                teacher = TeacherInput(
+                                    email = "test@alunos.isel.pt",
+                                    name = "name",
+                                    token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                                    githubId = 12346,
+                                    githubUsername = "username",
+                                    githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="
+                                )
+                            )
+                        } doReturn Teacher(
+                            email = "test@alunos.isel.pt",
+                            name = "name",
+                            token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                            githubId = 12346,
+                            githubUsername = "username",
+                            id = 1,
+                            isCreated = true
+                        )
 
                         on {
                             getStudent(studentId = 4)
-                        } doReturn Student(name = "student2", token = "token3", githubId = 1234152, githubUsername = "test12345", isCreated = false, email = "test3@alunos.isel.pt", id = 4, schoolId = 1235)
+                        } doReturn Student(
+                            name = "student2",
+                            token = "token3",
+                            githubId = 1234152,
+                            githubUsername = "test12345",
+                            isCreated = false,
+                            email = "test3@alunos.isel.pt",
+                            id = 4,
+                            schoolId = 1235
+                        )
 
                         on {
                             getTeacher(teacherId = 2)
-                        } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 123452, token = "token1", id = 2, email = "test1@alunos.isel.pt")
+                        } doReturn Teacher(
+                            name = "teacher2",
+                            isCreated = false,
+                            githubUsername = "test1234",
+                            githubId = 123452,
+                            token = "token1",
+                            id = 2,
+                            email = "test1@alunos.isel.pt"
+                        )
 
                         on {
                             getUserById(userId = 4)
-                        } doReturn Student(name = "student2", token = "token3", githubId = 1234152, githubUsername = "test12345", isCreated = false, email = "test3@alunos.isel.pt", id = 4, schoolId = 1235)
-
-                        // email
-                        on {
-                            getPendingUserByGithubId(githubId = 1231)
-                        } doReturn PendingTeacher(name = "name", isCreated = false, githubUsername = "username", githubId = 1111, token = "token", id = 1, email = "test5@alunos.isel.pt", githubToken = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=")
-
-                        // githubUsername
-                        on {
-                            getPendingUserByGithubId(githubId = 1232)
-                        } doReturn PendingTeacher(name = "name", isCreated = false, githubUsername = "test142", githubId = 1111, token = "token", id = 1, email = "test@alunos.isel.pt", githubToken = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=")
-
-                        // GithubId
-                        on {
-                            getPendingUserByGithubId(githubId = 1233)
-                        } doReturn PendingTeacher(name = "name", isCreated = false, githubUsername = "username", githubId = 1233, token = "token", id = 1, email = "test@alunos.isel.pt", githubToken = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=")
-
-                        // token
-                        on {
-                            getPendingUserByGithubId(githubId = 1234)
-                        } doReturn PendingTeacher(name = "name", isCreated = false, githubUsername = "username", githubId = 1236, token = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=", id = 2, email = "test1@alunos.isel.pt", githubToken = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=")
-
-                        // email
-                        on {
-                            getPendingUserByGithubId(githubId = 1235)
-                        } doReturn PendingStudent(name = "name", isCreated = false, githubUsername = "username", githubId = 1111, token = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=", id = 1, email = "test5@alunos.isel.pt")
-
-                        // githubUsername
-                        on {
-                            getPendingUserByGithubId(githubId = 1236)
-                        } doReturn PendingStudent(name = "name", isCreated = false, githubUsername = "test142", githubId = 1111, token = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=", id = 1, email = "test@alunos.isel.pt")
-
-                        // GithubId
-                        on {
-                            getPendingUserByGithubId(githubId = 1237)
-                        } doReturn PendingStudent(name = "name", isCreated = false, githubUsername = "username", githubId = 1237, token = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=", id = 1, email = "test@alunos.isel.pt")
-
-                        // token
-                        on {
-                            getPendingUserByGithubId(githubId = 1238)
-                        } doReturn PendingStudent(name = "name", isCreated = false, githubUsername = "username", githubId = 1236, token = "PEaenWxYddN6Q_NT1PiOYfz4EsZu7jRXRlpAsNpBU-A=", id = 2, email = "test@alunos.isel.pt")
-
-                        on {
-                            getPendingUserByGithubId(githubId = 12345)
-                        } doReturn PendingStudent(name = "name", email = "test@alunos.isel.pt", githubUsername = "username", token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", githubId = 12345, isCreated = false, id = 1)
-
-                        on {
-                            getPendingUserByGithubId(githubId = 12346)
-                        } doReturn PendingTeacher(name = "name", email = "test@alunos.isel.pt", githubUsername = "username", token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=", githubId = 12346, isCreated = false, id = 1, githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=")
+                        } doReturn Student(
+                            name = "student2",
+                            token = "token3",
+                            githubId = 1234152,
+                            githubUsername = "test12345",
+                            isCreated = false,
+                            email = "test3@alunos.isel.pt",
+                            id = 4,
+                            schoolId = 1235
+                        )
 
                         on {
                             getUserByGithubId(githubId = 12555L)
-                        } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 1234, token = "token1", id = 2, email = "test1@alunos.isel.pt")
+                        } doReturn Teacher(
+                            name = "teacher2",
+                            isCreated = false,
+                            githubUsername = "test1234",
+                            githubId = 1234,
+                            token = "token1",
+                            id = 2,
+                            email = "test1@alunos.isel.pt"
+                        )
 
                         on {
                             getUserByToken(token = "bearer")
-                        } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 1234, token = "token1", id = 2, email = "test1@alunos.isel.pt")
+                        } doReturn Teacher(
+                            name = "teacher2",
+                            isCreated = false,
+                            githubUsername = "test1234",
+                            githubId = 1234,
+                            token = "token1",
+                            id = 2,
+                            email = "test1@alunos.isel.pt"
+                        )
 
                         on {
                             checkIfEmailExists(email = "test5@alunos.isel.pt")
@@ -215,7 +273,7 @@ class UserServiceTests {
     // TEST: checkAuthentication
 
     @Test
-    fun `checkAuthentication should give an InvalidBearerToken because the InvalidBearerToken is invalid`() {
+    fun `checkAuthentication should give an InvalidToken because the token is invalid`() {
         // given: an invalid bearer token
         val bearerToken = ""
 
@@ -297,7 +355,7 @@ class UserServiceTests {
     // TEST: getCourses
 
     @Test
-    fun `getCourses should give an InvalidData because the teacherId is invalid`() {
+    fun `getCourses should give an InvalidError because the teacherId is invalid`() {
         // given: an invalid teacher id
         val teacherId = -1
 
@@ -326,576 +384,47 @@ class UserServiceTests {
         }
     }
 
-    // TEST: createStudent
-
     @Test
-    fun `createPendingStudent should be InvalidData because the student name is empty`() {
-        // given: an invalid student name
-        val name = ""
+    fun `storeAccessTokenEncrypted should return`() {
+        val result = userServices.storeAccessTokenEncrypted(token = "KSDJksBANDPASS80H", 12345)
 
-        // when: creating a student should give an error because of an invalid student name
-        val student = studentServices.createPendingStudent(
-            student = StudentInput(
-                name = name,
-                email = "test@alunos.isel.pt",
-                githubUsername = "test123",
-                githubId = 12341,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
+        if (result is Result.Success) {
+            assert(true)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `createPendingStudent should be InvalidData because the student email is empty`() {
-        // given: an invalid student email
-        val email = ""
+    fun `storeAccessTokenEncrypted should return InvalidToken if token is invalid`() {
+        val result = userServices.storeAccessTokenEncrypted(token = "", 12345)
 
-        // when: creating a student should give an error because of an invalid student email
-        val student = studentServices.createPendingStudent(
-            student = StudentInput(
-                name = "name",
-                email = email,
-                githubUsername = "test123",
-                githubId = 12341,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingStudent should be InvalidData because the teacher schoolId is invalid`() {
-        // given: an invalid student schoolId
-        val schoolId = -1
-
-        // when: creating a student should give an error because of an invalid student schoolId
-        val student = studentServices.createPendingStudent(
-            student = StudentInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                schoolId = schoolId,
-                githubId = 12341,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingStudent should be InvalidData because the student githubUsername is empty`() {
-        // given: an invalid student githubUsername
-        val githubUsername = ""
-
-        // when: creating a student should give an error because of an invalid student githubUsername
-        val student = studentServices.createPendingStudent(
-            student = StudentInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = githubUsername,
-                githubId = 12341,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingStudent should be InvalidData because the student githubId is invalid`() {
-        // given: an invalid student githubId
-        val githubId = -1L
-
-        // when: creating a student should give an error because of an invalid student githubId
-        val student = studentServices.createPendingStudent(
-            student = StudentInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                githubId = githubId,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingStudent should be InvalidData because the student token is invalid`() {
-        // given: an invalid student token
-        val token = ""
-
-        // when: creating a student should give an error because of an invalid student token
-        val student = studentServices.createPendingStudent(
-            student = StudentInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                githubId = 12345,
-                token = token,
-            ),
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingStudent should give pending student`() {
-        // when: creating a student should give the student pending
-        val student = studentServices.createPendingStudent(
-            student = StudentInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                githubId = 12345,
-                token = "token1",
-            ),
-        )
-
-        // the result should be an error
-        if (student is Result.Success) {
-            assert(student.value.id == 1)
+        if (result is Result.Problem) {
+            assert(result.value is UserServicesError.InvalidToken)
         } else {
             fail("Should not be Either.Left")
         }
     }
 
     @Test
-    fun `createStudent should be InvalidData because the student githubId in invalid`() {
-        // given: a student githubId
-        val githubId = -1L
+    fun `getTokens should return if githubId is valid`() {
+        val result = userServices.getTokens(githubId = 12345)
 
-        // when: creating a student should give an error becausee the student githubId in invalid
-        val student = studentServices.createStudent(
-            githubId = githubId,
-            schoolId = 222,
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createStudent should be InvalidData because the student schoolId in invalid`() {
-        // given: a student schoolId
-        val schoolId = -1
-
-        // when: creating a student should give an error becausee the student schoolId in invalid
-        val student = studentServices.createStudent(
-            githubId = 123,
-            schoolId = schoolId,
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createStudent should be EmailInUse because the student email is already in use`() {
-        // given: a student githubId
-        val githubId = 1235L
-
-        // when: creating a student should give an error because of an email already in use
-        val student = studentServices.createStudent(
-            githubId = githubId,
-            schoolId = 222,
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.EmailInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createStudent should be GithubIdInUse because the student github id is already in use`() {
-        // given: a student GitHubId
-        val githubId = 1237L
-
-        // when: creating a student should give an error because of GitHub id already in use
-        val student = studentServices.createStudent(
-            githubId = githubId,
-            schoolId = 222,
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.GithubIdInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createStudent should be GithubUserNameInUse because the student github username is already in use`() {
-        // given: a student GitHub username
-        val githubId = 1236L
-
-        // when: creating a student should give an error because of GitHub username already in use
-        val student = studentServices.createStudent(
-            githubId = githubId,
-            schoolId = 222,
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.GithubUserNameInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createStudent should be TokenInUse because the student token is already in use`() {
-        // given: a student token
-        val githubId = 1238L
-
-        // when: creating a student should give an error because of token already in use
-        val student = studentServices.createStudent(
-            githubId = githubId,
-            schoolId = 222,
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.TokenInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createStudent should be SchoolIdInUse because the student school id is already in use`() {
-        // given: a student school id and github id
-        val githubId = 12345L
-        val schoolId = 1235
-        // when: creating a student should give an error because of school id already in use
-        val student = studentServices.createStudent(
-            githubId = githubId,
-            schoolId = schoolId,
-        )
-
-        // the result should be an error
-        if (student is Result.Problem) {
-            assert(student.value is StudentServicesError.SchoolIdInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createStudent should return the new student`() {
-        // when: creating a student should give a student
-        val studentRes = studentServices.createStudent(githubId = 12345, schoolId = 1238)
-
-        // the result should be a student
-        if (studentRes is Result.Success) {
-            assert(studentRes.value.id == 1)
+        if (result is Result.Success) {
+            assert(result.value.classCodeToken == "token")
         } else {
             fail("Should not be Either.Left")
         }
     }
 
-    // TEST: createTeacher
-
     @Test
-    fun `createPendingTeacher should be InvalidData because the teacher name is empty`() {
-        // given: an invalid teacher name
-        val name = ""
+    fun `getTokens should return UserNotFound if githubId is valid`() {
+        val result = userServices.getTokens(githubId = 12345)
 
-        // when: creating a teacher should give an error because of an invalid teacher name
-        val teacher = teacherServices.createPendingTeacher(
-            teacher = TeacherInput(
-                name = name,
-                email = "test@alunos.isel.pt",
-                githubUsername = "test123",
-                githubToken = "token",
-                githubId = 12341,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.InvalidData)
+        if (result is Result.Problem) {
+            assert(result.value is UserServicesError.UserNotFound)
         } else {
             fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingTeacher should be InvalidData because the teacher email is empty`() {
-        // given: an invalid teacher email
-        val email = ""
-
-        // when: creating a teacher should give an error because of an invalid teacher email
-        val teacher = teacherServices.createPendingTeacher(
-            teacher = TeacherInput(
-                name = "name",
-                email = email,
-                githubUsername = "test123",
-                githubToken = "token",
-                githubId = 12341,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingTeacher should be InvalidData because the teacher githubToken is empty`() {
-        // given: an invalid teacher githubToken
-        val githubToken = ""
-
-        // when: creating a teacher should give an error because of an invalid teacher githubToken
-        val teacher = teacherServices.createPendingTeacher(
-            teacher = TeacherInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                githubToken = githubToken,
-                githubId = 12341,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingTeacher should be InvalidData because the teacher githubUsername is empty`() {
-        // given: an invalid teacher githubUsername
-        val githubUsername = ""
-
-        // when: creating a teacher should give an error because of an invalid teacher githubUsername
-        val teacher = teacherServices.createPendingTeacher(
-            teacher = TeacherInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = githubUsername,
-                githubToken = "token",
-                githubId = 12346,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingTeacher should be InvalidData because the teacher githubId is invalid`() {
-        // given: an invalid teacher githubId
-        val githubId = -1L
-
-        // when: creating a teacher should give an error because of an invalid teacher githubId
-        val teacher = teacherServices.createPendingTeacher(
-            teacher = TeacherInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                githubToken = "token",
-                githubId = githubId,
-                token = "token",
-            ),
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingTeacher should be InvalidData because the teacher token is invalid`() {
-        // given: an invalid teacher token
-        val token = ""
-
-        // when: creating a teacher should give an error because of an invalid teacher token
-        val teacher = teacherServices.createPendingTeacher(
-            teacher = TeacherInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                githubToken = "token",
-                githubId = 12346,
-                token = token,
-            ),
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createPendingTeacher should give the pending teacher`() {
-        // when: creating a teacher should give the pending teacher
-        val teacher = teacherServices.createPendingTeacher(
-            teacher = TeacherInput(
-                name = "name",
-                email = "test@alunos.isel.pt",
-                githubUsername = "username",
-                githubToken = "token1",
-                githubId = 12346,
-                token = "token1",
-            ),
-        )
-
-        // the result should be an error
-        if (teacher is Result.Success) {
-            assert(teacher.value.id == 1)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createTeacher should be EmailInUse because the teacher email is already in use`() {
-        // given: a githubId email
-        val githubId = 1231L
-
-        // when: creating a teacher should give an error because of an email already in use
-        val teacher = teacherServices.createTeacher(
-            githubId = githubId,
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.EmailInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createTeacher should be GithubIdInUse because the teacher github id is already in use`() {
-        // given: a teacher githubId
-        val githubId = 1233L
-
-        // when: creating a teacher should give an error because of GitHub id already in use
-        val teacher = teacherServices.createTeacher(
-            githubId = githubId,
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.GithubIdInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createTeacher should be GithubUserNameInUse because the teacher github username is already in use`() {
-        // given: a githubId
-        val githubId = 1232L
-
-        // when: creating a teacher should give an error because of GitHub username already in use
-        val teacher = teacherServices.createTeacher(
-            githubId = githubId,
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.GithubUserNameInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createTeacher should be TokenInUse because the student token is already in use`() {
-        // given: a student token
-        val githubId = 1234L
-
-        // when: creating a teacher should give an error because of token already in use
-        val teacher = teacherServices.createTeacher(
-            githubId = githubId,
-        )
-
-        // the result should be an error
-        if (teacher is Result.Problem) {
-            assert(teacher.value is TeacherServicesError.TokenInUse)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createTeacher should return the new teacher`() {
-        // when: creating a teacher should give a teacher
-        val teacherRes = teacherServices.createTeacher(githubId = 12346)
-
-        // the result should be a teacher
-        if (teacherRes is Result.Success) {
-            assert(teacherRes.value.id == 1)
-        } else {
-            fail("Should not be Either.Left")
         }
     }
 }

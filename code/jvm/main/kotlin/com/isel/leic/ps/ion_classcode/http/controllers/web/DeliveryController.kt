@@ -6,12 +6,10 @@ import com.isel.leic.ps.ion_classcode.domain.input.DeliveryInput
 import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryDeleteOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.services.DeliveryServices
-import com.isel.leic.ps.ion_classcode.services.DeliveryServicesError
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
@@ -43,7 +41,7 @@ class DeliveryController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         return when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
-            is Result.Problem -> problem(delivery.value)
+            is Result.Problem -> deliveryServices.problem(delivery.value)
             is Result.Success -> siren(DeliveryOutputModel(delivery = delivery.value.delivery, teamsDelivered = delivery.value.teamsDelivered, teamsNotDelivered = delivery.value.teamsNotDelivered)) {
                 link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId), rel = LinkRelation("self"), needAuthentication = true)
                 if (user is Teacher) {
@@ -75,9 +73,9 @@ class DeliveryController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val deliveryId = deliveryServices.createDelivery(deliveryInfo, user.id)) {
-            is Result.Problem -> problem(deliveryId.value)
+            is Result.Problem -> deliveryServices.problem(deliveryId.value)
             is Result.Success -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId.value.id)) {
-                is Result.Problem -> problem(delivery.value)
+                is Result.Problem -> deliveryServices.problem(delivery.value)
                 is Result.Success -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId.value.id), rel = LinkRelation("self"), needAuthentication = true)
                 }
@@ -98,7 +96,7 @@ class DeliveryController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val delivery = deliveryServices.deleteDelivery(deliveryId, user.id)) {
-            is Result.Problem -> problem(delivery.value)
+            is Result.Problem -> deliveryServices.problem(delivery.value)
             is Result.Success -> siren(DeliveryDeleteOutputModel(deliveryId, delivery.value)) {
                 clazz("delivery-deleted")
                 link(href = Uris.deliveriesUri(courseId, classroomId, assignmentId), rel = LinkRelation("self"), needAuthentication = true)
@@ -120,9 +118,9 @@ class DeliveryController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val updateDelivery = deliveryServices.updateDelivery(deliveryId, deliveryInfo, user.id)) {
-            is Result.Problem -> problem(updateDelivery.value)
+            is Result.Problem -> deliveryServices.problem(updateDelivery.value)
             is Result.Success -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
-                is Result.Problem -> problem(delivery.value)
+                is Result.Problem -> deliveryServices.problem(delivery.value)
                 is Result.Success -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId), rel = LinkRelation("self"), needAuthentication = true)
                 }
@@ -143,29 +141,13 @@ class DeliveryController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val syncDelivery = deliveryServices.syncDelivery(deliveryId, user.id, courseId)) {
-            is Result.Problem -> problem(syncDelivery.value)
+            is Result.Problem -> deliveryServices.problem(syncDelivery.value)
             is Result.Success -> when (val delivery = deliveryServices.getDeliveryInfo(deliveryId)) {
-                is Result.Problem -> problem(delivery.value)
+                is Result.Problem -> deliveryServices.problem(delivery.value)
                 is Result.Success -> siren(DeliveryOutputModel(delivery.value.delivery, delivery.value.teamsDelivered, delivery.value.teamsNotDelivered)) {
                     link(href = Uris.deliveryUri(courseId, classroomId, assignmentId, deliveryId), rel = LinkRelation("self"), needAuthentication = true)
                 }
             }
-        }
-    }
-
-    /**
-     * Function to handle the errors
-     */
-    private fun problem(error: DeliveryServicesError): ResponseEntity<ErrorMessageModel> {
-        return when (error) {
-            DeliveryServicesError.DeliveryNotFound -> Problem.notFound
-            DeliveryServicesError.InvalidInput -> Problem.invalidInput
-            DeliveryServicesError.NotTeacher -> Problem.notTeacher
-            DeliveryServicesError.DeliveryWithTeams -> Problem.invalidOperation
-            DeliveryServicesError.CourseNotFound -> Problem.notFound
-            DeliveryServicesError.AssignmentNotFound -> Problem.notFound
-            DeliveryServicesError.ClassroomArchived -> Problem.invalidOperation
-            DeliveryServicesError.ClassroomNotFound -> Problem.notFound
         }
     }
 }

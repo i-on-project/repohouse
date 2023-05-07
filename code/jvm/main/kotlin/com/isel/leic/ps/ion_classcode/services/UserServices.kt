@@ -1,6 +1,7 @@
 package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Course
+import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.Tokens
 import com.isel.leic.ps.ion_classcode.domain.User
 import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
@@ -28,6 +29,7 @@ sealed class UserServicesError {
     object UserNotAuthenticated : UserServicesError()
     object InvalidToken : UserServicesError()
     object InternalError : UserServicesError()
+    object NotTeacher : UserServicesError()
 }
 
 /**
@@ -57,10 +59,12 @@ class UserServices(
      * Method to store the access token encrypted
      */
     fun storeAccessTokenEncrypted(token: String, githubId: Long): StoreAccessTokenResult {
-        if (token.isEmpty()) return Result.Problem(value = UserServicesError.InvalidToken)
+        if (token.isEmpty()) return Result.Problem(UserServicesError.InvalidToken)
         return transactionManager.run {
-            it.usersRepository.storeAccessTokenEncrypted(token = token, githubId = githubId)
-            Result.Success(value = Unit)
+            val user = it.usersRepository.getUserByGithubId(githubId)
+            if (user !is Teacher) return@run Result.Problem(UserServicesError.InternalError)
+            it.usersRepository.storeAccessTokenEncrypted(token, githubId)
+            Result.Success(Unit)
         }
     }
 
@@ -70,13 +74,14 @@ class UserServices(
 
     fun getTokens(githubId: Long): GetAccessTokenResult {
         return transactionManager.run {
-            val accessToken = it.usersRepository.getAccessTokenEncrypted(githubId = githubId)
-            val user = it.usersRepository.getUserByGithubId(githubId = githubId) ?: return@run Result.Problem(value = UserServicesError.UserNotFound)
+            val user = it.usersRepository.getUserByGithubId(githubId) ?: return@run Result.Problem(UserServicesError.UserNotFound)
+            if (user !is Teacher) return@run Result.Problem(UserServicesError.NotTeacher)
+            val accessToken = it.usersRepository.getAccessTokenEncrypted(githubId)
             if (accessToken == null) {
-                Result.Problem(value = UserServicesError.InternalError)
+                Result.Problem(UserServicesError.InternalError)
             } else {
-                it.usersRepository.deleteAccessTokenEncrypted(githubId = githubId)
-                Result.Success(value = Tokens(accessToken = accessToken, classCodeToken = user.token))
+                it.usersRepository.deleteAccessTokenEncrypted(githubId)
+                Result.Success(Tokens(accessToken, user.token))
             }
         }
     }
@@ -139,6 +144,7 @@ class UserServices(
             UserServicesError.UserNotFound -> Problem.notFound
             UserServicesError.UserNotAuthenticated -> Problem.unauthenticated
             UserServicesError.InvalidToken -> Problem.unauthenticated
+            UserServicesError.NotTeacher -> Problem.notTeacher
             UserServicesError.InternalError -> Problem.internalError
         }
     }

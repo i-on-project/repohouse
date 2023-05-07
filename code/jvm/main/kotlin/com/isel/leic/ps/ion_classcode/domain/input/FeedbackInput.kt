@@ -8,5 +8,5 @@ data class FeedbackInput(
     val label: String,
     val teamId: Int,
 ) {
-    fun isNotValid() = description.isBlank() || label.isBlank() || teamId <= 0
+    fun isNotValid() = description.isBlank() || label.isBlank()
 }

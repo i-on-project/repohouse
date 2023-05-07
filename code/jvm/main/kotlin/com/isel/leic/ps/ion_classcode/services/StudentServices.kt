@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component
 typealias StudentCreationResult = Result<StudentServicesError, Student>
 typealias PendingStudentCreationResult = Result<StudentServicesError, PendingStudent>
 typealias StudentSchoolIdResponse = Result<StudentServicesError, Int>
-typealias StudentSchoolIdUpdateResponse = Result<StudentServicesError, Boolean>
 
 /**
  * Error codes for the services
@@ -50,14 +49,6 @@ class StudentServices(
         return transactionManager.run {
             val student = it.usersRepository.getPendingStudentByGithubId(githubId) ?: Result.Problem(StudentServicesError.StudentNotFound)
             if (student is PendingStudent) {
-                if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) {
-                    Result.Problem(
-                        StudentServicesError.GithubUserNameInUse,
-                    )
-                }
-                if (it.usersRepository.checkIfEmailExists(student.email)) Result.Problem(StudentServicesError.EmailInUse)
-                if (it.usersRepository.checkIfGithubIdExists(student.githubId)) Result.Problem(StudentServicesError.GithubIdInUse)
-                if (it.usersRepository.checkIfTokenExists(student.token)) Result.Problem(StudentServicesError.TokenInUse)
                 if (it.usersRepository.checkIfSchoolIdExists(schoolId)) Result.Problem(StudentServicesError.SchoolIdInUse)
                 val studentRes = it.usersRepository.createStudent(
                     StudentInput(
@@ -82,6 +73,10 @@ class StudentServices(
     fun createPendingStudent(student: StudentInput): PendingStudentCreationResult {
         if (student.isNotValid()) return Result.Problem(StudentServicesError.InternalError)
         return transactionManager.run {
+            if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) Result.Problem(StudentServicesError.GithubUserNameInUse)
+            if (it.usersRepository.checkIfEmailExists(student.email)) Result.Problem(StudentServicesError.EmailInUse)
+            if (it.usersRepository.checkIfGithubIdExists(student.githubId)) Result.Problem(StudentServicesError.GithubIdInUse)
+            if (it.usersRepository.checkIfTokenExists(student.token)) Result.Problem(StudentServicesError.TokenInUse)
             val hash = tokenHash.getTokenHash(student.token)
             val studentRes = it.usersRepository.createPendingStudent(
                 StudentInput(
@@ -101,25 +96,13 @@ class StudentServices(
      * Method to get the school id of a student
      */
     fun getStudentSchoolId(studentId: Int): StudentSchoolIdResponse {
-        if (studentId <= 0) return Result.Problem(value = StudentServicesError.InvalidData)
         return transactionManager.run {
-            val schoolId = it.usersRepository.getStudentSchoolId(id = studentId)
+            val schoolId = it.usersRepository.getStudentSchoolId(studentId)
             if (schoolId != null) {
-                Result.Success(value = schoolId)
+                Result.Success(schoolId)
             } else {
-                Result.Problem(value = StudentServicesError.StudentNotFound)
+                Result.Problem(StudentServicesError.InternalError)
             }
-        }
-    }
-
-    /**
-     * Method to update the school id of a student
-     */
-    fun updateStudent(userId: Int, schoolId: Int): StudentSchoolIdUpdateResponse {
-        if (userId <= 0 || schoolId <= 0) return Result.Problem(value = StudentServicesError.InvalidData)
-        return transactionManager.run {
-            it.usersRepository.updateStudentSchoolId(userId = userId, schoolId = schoolId)
-            Result.Success(value = true)
         }
     }
 

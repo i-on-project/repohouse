@@ -8,11 +8,6 @@ data class LeaveTeamInput(
     override val composite: Int? = null,
 ) : RequestInputInterface {
     fun isNotValid(): Boolean {
-        val cond = teamId <= 0 || composite != null && composite <= 0
-        return if (composite == null) {
-            cond
-        } else {
-            cond || composite > 1
-        }
+        return composite != null && composite <= 0
     }
 }

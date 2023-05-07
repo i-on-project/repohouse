@@ -141,7 +141,7 @@ class ClassroomServiceTests {
     }
 
     @Test
-    fun `createClassroom should give an InvalidInput because the course id invalid`() {
+    fun `createClassroom should give an CourseNotFound because the course id invalid`() {
         // given: an invalid course id
         val courseId = -1
 
@@ -151,14 +151,14 @@ class ClassroomServiceTests {
         )
 
         if (classroom is Result.Problem) {
-            assert(classroom.value is ClassroomServicesError.InvalidInput)
+            assert(classroom.value is ClassroomServicesError.CourseNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `createClassroom should give an InvalidInput because the teacher id invalid`() {
+    fun `createClassroom should give an InternalError because the teacher id invalid`() {
         // given: an invalid teacher id
         val teacherId = -1
 
@@ -168,7 +168,7 @@ class ClassroomServiceTests {
         )
 
         if (classroom is Result.Problem) {
-            assert(classroom.value is ClassroomServicesError.InvalidInput)
+            assert(classroom.value is ClassroomServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -176,7 +176,6 @@ class ClassroomServiceTests {
 
     @Test
     fun `createClassroom should give a classroom id`() {
-        // when: getting an error because the classroom id is not in database
         val classroom = classroomServices.createClassroom(classroomInput = ClassroomInput(name = "name", courseId = 1, teacherId = 1))
 
         if (classroom is Result.Success) {

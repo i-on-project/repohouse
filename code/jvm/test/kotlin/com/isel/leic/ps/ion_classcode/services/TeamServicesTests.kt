@@ -2,6 +2,7 @@ package com.isel.leic.ps.ion_classcode.services
 
 import com.isel.leic.ps.ion_classcode.domain.Assignment
 import com.isel.leic.ps.ion_classcode.domain.Classroom
+import com.isel.leic.ps.ion_classcode.domain.Feedback
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Team
 import com.isel.leic.ps.ion_classcode.domain.input.FeedbackInput
@@ -10,6 +11,11 @@ import com.isel.leic.ps.ion_classcode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ion_classcode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ion_classcode.domain.requests.Composite
+import com.isel.leic.ps.ion_classcode.domain.requests.CreateRepo
+import com.isel.leic.ps.ion_classcode.domain.requests.CreateTeam
+import com.isel.leic.ps.ion_classcode.domain.requests.JoinTeam
+import com.isel.leic.ps.ion_classcode.domain.requests.LeaveTeam
 import com.isel.leic.ps.ion_classcode.domain.requests.Request
 import com.isel.leic.ps.ion_classcode.repository.AssignmentRepository
 import com.isel.leic.ps.ion_classcode.repository.ClassroomRepository
@@ -38,6 +44,7 @@ import java.time.Instant
 
 @SpringBootTest
 class TeamServicesTests {
+
     @Autowired
     lateinit var teamServices: TeamServices
 
@@ -57,7 +64,7 @@ class TeamServicesTests {
 
                     val mockedFeedbackRepository = mock<FeedbackRepository> {
                         on { getFeedbacksByTeam(teamId = 1) } doReturn listOf()
-                        on { createFeedback(feedback = FeedbackInput(description = "description", label = "label", teamId = 1)) } doReturn 1
+                        on { createFeedback(feedback = FeedbackInput(description = "description", label = "label", teamId = 1)) } doReturn Feedback(id = 1, description = "description", label = "label", teamId = 1)
                     }
 
                     val mockedClassroomRepository = mock<ClassroomRepository> {
@@ -66,21 +73,21 @@ class TeamServicesTests {
                     }
 
                     val mockedCompositeRepository = mock<CompositeRepository> {
-                        on { createCompositeRequest(request = CompositeInput(requests = listOf(1), creator = 1)) } doReturn 1
+                        on { createCompositeRequest(request = CompositeInput(requests = listOf(1)), creator = 1) } doReturn Composite(id = 1, creator = 1, requests = listOf(1))
                     }
 
                     val mockedCreateTeamRepository = mock<CreateTeamRepository> {
-                        on { createCreateTeamRequest(request = CreateTeamInput(creator = 1)) } doReturn 1
-                        on { createCreateTeamRequest(request = CreateTeamInput(creator = 2)) } doReturn 2
+                        on { createCreateTeamRequest(request = CreateTeamInput(), creator = 1) } doReturn CreateTeam(id = 1, creator = 1)
+                        on { createCreateTeamRequest(request = CreateTeamInput(), creator = 2) } doReturn CreateTeam(id = 2, creator = 2)
                     }
 
                     val mockedJoinTeamRepoRepository = mock<JoinTeamRepository> {
-                        on { createJoinTeamRequest(request = JoinTeamInput(assignmentId = 2, teamId = 1, creator = 1)) } doReturn 1
+                        on { createJoinTeamRequest(request = JoinTeamInput(assignmentId = 2, teamId = 1), creator = 1) } doReturn JoinTeam(id = 1, creator = 1, teamId = 1)
                         on { getJoinTeamRequests() } doReturn listOf()
                     }
 
                     val mockedLeaveTeamRepository = mock<LeaveTeamRepository> {
-                        on { createLeaveTeamRequest(request = LeaveTeamInput(teamId = 1, creator = 1)) } doReturn 1
+                        on { createLeaveTeamRequest(request = LeaveTeamInput(teamId = 1), creator = 1) } doReturn LeaveTeam(id = 1, creator = 1, teamId = 1)
                         on { getLeaveTeamRequests() } doReturn listOf()
                     }
 
@@ -96,7 +103,7 @@ class TeamServicesTests {
                     }
 
                     val mockedCreateRepoRepository = mock<CreateRepoRepository> {
-                        on { createCreateRepoRequest(request = CreateRepoInput(teamId = 1, creator = 2)) } doReturn 1
+                        on { createCreateRepoRequest(request = CreateRepoInput(teamId = 1), creator = 2) } doReturn CreateRepo(id = 1, creator = 2, teamId = 1)
                     }
                     on { teamRepository } doReturn mockedTeamRepository
                     on { repoRepository } doReturn mockedRepoRepository
@@ -118,7 +125,7 @@ class TeamServicesTests {
     // TEST: getTeamInfo
 
     @Test
-    fun `getTeamInfo should give an InvalidData because the teamId is invalid`() {
+    fun `getTeamInfo should give an TeamNotFound because the teamId is invalid`() {
         // given: an invalid team id
         val teamId = -1
 
@@ -126,7 +133,7 @@ class TeamServicesTests {
         val team = teamServices.getTeamInfo(teamId = teamId)
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -165,22 +172,22 @@ class TeamServicesTests {
     // TEST: createTeamRequest
 
     @Test
-    fun `createTeamRequest should give an InvalidData because the creator is invalid`() {
+    fun `createTeamRequest should give an InternalError because the creator is invalid`() {
         // given: an invalid creator
         val creator = -1
 
         // when: getting an error because of an invalid creator
         val team = teamServices.createTeamRequest(
             createTeamInfo = CreateTeamInput(
-                creator = creator,
                 composite = null,
             ),
+            creator = creator,
             assignmentId = 1,
             classroomId = 1,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -194,11 +201,11 @@ class TeamServicesTests {
         // when: getting an error because of an invalid composite
         val team = teamServices.createTeamRequest(
             createTeamInfo = CreateTeamInput(
-                creator = 1,
                 composite = composite,
             ),
             assignmentId = 1,
             classroomId = 1,
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -216,11 +223,11 @@ class TeamServicesTests {
         // when: getting an error because of an invalid assignment id
         val team = teamServices.createTeamRequest(
             createTeamInfo = CreateTeamInput(
-                creator = 1,
                 composite = 1,
             ),
             assignmentId = assignmentId,
             classroomId = 1,
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -231,22 +238,22 @@ class TeamServicesTests {
     }
 
     @Test
-    fun `createTeamRequest should give an InvalidData because the classroomId is invalid`() {
+    fun `createTeamRequest should give an ClassroomNotFound because the classroomId is invalid`() {
         // given: an invalid classroom id
         val classroomId = -1
 
         // when: getting an error because of an invalid classroom id
         val team = teamServices.createTeamRequest(
             createTeamInfo = CreateTeamInput(
-                creator = 1,
                 composite = 1,
             ),
             assignmentId = 1,
             classroomId = classroomId,
+            creator = 1,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -260,11 +267,11 @@ class TeamServicesTests {
         // when: getting an error because the classroom id is not in database
         val team = teamServices.createTeamRequest(
             createTeamInfo = CreateTeamInput(
-                creator = 1,
                 composite = 1,
             ),
             assignmentId = 1,
             classroomId = classroomId,
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -282,11 +289,11 @@ class TeamServicesTests {
         // when: getting an error because the classroom id is archived
         val team = teamServices.createTeamRequest(
             createTeamInfo = CreateTeamInput(
-                creator = 2,
                 composite = null,
             ),
             assignmentId = 1,
             classroomId = classroomId,
+            creator = 2,
         )
 
         if (team is Result.Problem) {
@@ -301,15 +308,15 @@ class TeamServicesTests {
         // when: getting an error because the team was not create
         val team = teamServices.createTeamRequest(
             createTeamInfo = CreateTeamInput(
-                creator = 2,
                 composite = null,
             ),
             assignmentId = 1,
             classroomId = 2,
+            creator = 2,
         )
 
         if (team is Result.Success) {
-            assert(team.value == 2)
+            assert(team.value.id == 2)
         } else {
             fail("Should not be Either.Left")
         }
@@ -318,21 +325,21 @@ class TeamServicesTests {
     // TEST: leaveTeamRequest
 
     @Test
-    fun `leaveTeamRequest should give an InvalidData because the creator is invalid`() {
+    fun `leaveTeamRequest should give an InternalError because the creator is invalid`() {
         // given: an invalid creator
         val creator = -1
 
         // when: getting an error because of a creator
         val team = teamServices.leaveTeamRequest(
             leaveInfo = LeaveTeamInput(
-                creator = creator,
                 composite = null,
                 teamId = 1,
             ),
+            creator = creator,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -346,10 +353,10 @@ class TeamServicesTests {
         // when: getting an error because of a composite creator
         val team = teamServices.leaveTeamRequest(
             leaveInfo = LeaveTeamInput(
-                creator = 1,
                 composite = composite,
                 teamId = 1,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -367,14 +374,14 @@ class TeamServicesTests {
         // when: getting an error because of a composite creator
         val team = teamServices.leaveTeamRequest(
             leaveInfo = LeaveTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = teamId,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -388,10 +395,10 @@ class TeamServicesTests {
         // when: getting an error because the teamId is not in database
         val team = teamServices.leaveTeamRequest(
             leaveInfo = LeaveTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = teamId,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -406,14 +413,14 @@ class TeamServicesTests {
         // when: getting an error because the teamId is not in database
         val team = teamServices.leaveTeamRequest(
             leaveInfo = LeaveTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = 1,
             ),
+            creator = 1,
         )
 
         if (team is Result.Success) {
-            assert(team.value == 1)
+            assert(team.value.id == 1)
         } else {
             fail("Should not be Either.Left")
         }
@@ -422,66 +429,66 @@ class TeamServicesTests {
     // TEST: joinTeamRequest
 
     @Test
-    fun `joinTeamRequest should give an InvalidData because the assignmentId is invalid`() {
+    fun `joinTeamRequest should give an AssignmentNotFound because the assignmentId is invalid`() {
         // given: an invalid assignment id
         val assignmentId = -1
 
         // when: getting an error because of an assignment id
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `joinTeamRequest should give an InvalidData because the teamId is invalid`() {
+    fun `joinTeamRequest should give an TeamNotFound because the teamId is invalid`() {
         // given: an invalid team id
         val teamId = -1
 
         // when: getting an error because of an team id
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = teamId,
                 assignmentId = 1,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `joinTeamRequest should give an InvalidData because the creator is invalid`() {
+    fun `joinTeamRequest should give an InternalError because the creator is invalid`() {
         // given: an invalid creator
         val creator = -1
 
         // when: getting an error because of a creator
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = creator,
                 composite = null,
                 teamId = 1,
                 assignmentId = 1,
             ),
+            creator = creator,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -495,11 +502,11 @@ class TeamServicesTests {
         // when: getting an error because of an assignment id is not in db
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -517,15 +524,15 @@ class TeamServicesTests {
         // when: getting an error because of an classroom id is not in database
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.ClassroomNotFound)
+            assert(team.value is TeamServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -536,14 +543,14 @@ class TeamServicesTests {
         // given: a valid assignment id
         val assignmentId = 1
 
-        // when: getting an error because of an classroom the classroom is archived
+        // when: getting an error because of a classroom the classroom is archived
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -561,11 +568,11 @@ class TeamServicesTests {
         // when: getting an error because of a classroom the team was not found
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = teamId,
                 assignmentId = 2,
             ),
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -583,15 +590,15 @@ class TeamServicesTests {
         // when: getting an error because of a classroom the team was not found
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
-                creator = 1,
                 composite = null,
                 teamId = teamId,
                 assignmentId = 2,
             ),
+            creator = 1,
         )
 
         if (team is Result.Success) {
-            assert(team.value == 1)
+            assert(team.value.id == 1)
         } else {
             fail("Should not be Either.Left")
         }
@@ -600,7 +607,7 @@ class TeamServicesTests {
     // TEST: updateTeamRequestStatus
 
     @Test
-    fun `updateTeamRequestStatus should give an InvalidData because the requestId is invalid`() {
+    fun `updateTeamRequestStatus should give an RequestNotFound because the requestId is invalid`() {
         // given: an invalid request id
         val requestId = -1
 
@@ -612,14 +619,14 @@ class TeamServicesTests {
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.RequestNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `updateTeamRequestStatus should give an InvalidData because the teamId is invalid`() {
+    fun `updateTeamRequestStatus should give an TeamNotFound because the teamId is invalid`() {
         // given: an invalid team id
         val teamId = -1
 
@@ -631,14 +638,14 @@ class TeamServicesTests {
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `updateTeamRequestStatus should give an InvalidData because the classroomId is invalid`() {
+    fun `updateTeamRequestStatus should give an ClassroomNotFound because the classroomId is invalid`() {
         // given: an invalid classroom id
         val classroomId = -1
 
@@ -650,7 +657,7 @@ class TeamServicesTests {
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -771,7 +778,7 @@ class TeamServicesTests {
     // TEST: postFeedback
 
     @Test
-    fun `postFeedback should give an InvalidData because the teamId is invalid`() {
+    fun `postFeedback should give a TeamNotFound because the teamId is invalid`() {
         // given: an invalid team id
         val teamId = -1
 
@@ -786,7 +793,7 @@ class TeamServicesTests {
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -837,7 +844,7 @@ class TeamServicesTests {
     }
 
     @Test
-    fun `postFeedback should give an InvalidData because the classroomId is invalid`() {
+    fun `postFeedback should give an ClassroomNotFound because the classroomId is invalid`() {
         // given: an invalid classroom id
         val classroomId = -1
 
@@ -852,7 +859,7 @@ class TeamServicesTests {
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -937,7 +944,7 @@ class TeamServicesTests {
         )
 
         if (team is Result.Success) {
-            assert(team.value == 1)
+            assert(team.value.id == 1)
         } else {
             fail("Should not be Either.Left")
         }
@@ -946,7 +953,7 @@ class TeamServicesTests {
     // TEST: getTeamRequests
 
     @Test
-    fun `getTeamsRequests should give an InvalidData because the teamId is invalid`() {
+    fun `getTeamsRequests should give a TeamNotFound because the teamId is invalid`() {
         // given: an invalid team id
         val teamId = -1
 
@@ -956,14 +963,14 @@ class TeamServicesTests {
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.TeamNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `getTeamsRequests should give an TeamNotFound because the teamId is not in the database`() {
+    fun `getTeamsRequests should give a TeamNotFound because the teamId is not in the database`() {
         // given: an invalid team id
         val teamId = 3
 

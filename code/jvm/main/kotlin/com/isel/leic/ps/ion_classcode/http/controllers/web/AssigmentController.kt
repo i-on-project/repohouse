@@ -7,16 +7,12 @@ import com.isel.leic.ps.ion_classcode.http.Uris
 import com.isel.leic.ps.ion_classcode.http.model.input.AssignmentInputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentCreatedOutputModel
 import com.isel.leic.ps.ion_classcode.http.model.output.AssignmentDeletedOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.StudentAssignmentModel
 import com.isel.leic.ps.ion_classcode.http.model.output.StudentAssignmentOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.output.TeacherAssignmentModel
 import com.isel.leic.ps.ion_classcode.http.model.output.TeacherAssignmentOutputModel
-import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
 import com.isel.leic.ps.ion_classcode.infra.LinkRelation
 import com.isel.leic.ps.ion_classcode.infra.siren
 import com.isel.leic.ps.ion_classcode.services.AssignmentServices
-import com.isel.leic.ps.ion_classcode.services.AssignmentServicesError
 import com.isel.leic.ps.ion_classcode.utils.Result
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
@@ -45,11 +41,10 @@ class AssigmentController(
         @PathVariable classroomId: Int,
         @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
-        return if (user is Student) {
-            getStudentAssigmentInfo(user, courseId, classroomId, assignmentId)
-        } else {
-            getTeacherAssigmentInfo(user, courseId, classroomId, assignmentId)
+        if (user is Student) {
+            return getStudentAssigmentInfo(user, courseId, classroomId, assignmentId)
         }
+        return getTeacherAssigmentInfo(courseId, classroomId, assignmentId)
     }
 
     /**
@@ -57,42 +52,35 @@ class AssigmentController(
      */
     private fun getStudentAssigmentInfo(user: User, courseId: Int, classroomId: Int, assignmentId: Int): ResponseEntity<*> {
         return when (val assignment = assigmentService.getStudentAssignmentInfo(assignmentId, user.id)) {
-            is Result.Problem -> problem(assignment.value)
-            is Result.Success ->  {
-                assignment.value as StudentAssignmentModel
-                siren(value = StudentAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.team)) {
-                    clazz("assignment")
-                    link(
-                        rel = LinkRelation("self"),
-                        href = Uris.assigmentUri(courseId, classroomId, assignmentId),
-                        needAuthentication = true
-                    )
-                    // TODO: Check under this line
-                    if (assignment.value.team == null) {
-                        when (val studentTeams = assigmentService.getAssignmentStudentTeams(assignmentId, user.id)) {
-                            is Result.Problem -> problem(studentTeams.value)
-                            is Result.Success -> {
-                                studentTeams.value.forEach {
-                                    action(
-                                        "join-team",
-                                        Uris.joinTeamUri(courseId, classroomId, assignmentId, it.id),
-                                        method = HttpMethod.POST,
-                                        type = "application/json",
-                                    ) {
-                                        hiddenField("assigmentId", assignmentId.toString())
-                                        numberField("teamId", it.id)
-                                    }
+            is Result.Problem -> assigmentService.problem(assignment.value)
+            is Result.Success -> siren(value = StudentAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.team)) {
+                clazz("assigment")
+                link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignmentId), needAuthentication = true)
+                // TODO: Check under this line
+                if (assignment.value.team == null) {
+                    when (val studentTeams = assigmentService.getAssignmentStudentTeams(assignmentId, user.id)) {
+                        is Result.Problem -> assigmentService.problem(studentTeams.value)
+                        is Result.Success -> {
+                            studentTeams.value.forEach {
+                                action(
+                                    "join-team",
+                                    Uris.joinTeamUri(courseId, classroomId, assignmentId, it.id),
+                                    method = HttpMethod.POST,
+                                    type = "application/json",
+                                ) {
+                                    hiddenField("assigmentId", assignmentId.toString())
+                                    numberField("teamId", it.id)
                                 }
+                            }
 
-                                if (studentTeams.value.size < assignment.value.assignment.maxNumberGroups) {
-                                    action(
-                                        "create-team",
-                                        Uris.createTeamUri(courseId, classroomId, assignmentId),
-                                        method = HttpMethod.POST,
-                                        type = "application/json",
-                                    ) {
-                                        hiddenField("assigmentId", assignmentId.toString())
-                                    }
+                            if (studentTeams.value.size < assignment.value.assignment.maxNumberGroups) {
+                                action(
+                                    "create-team",
+                                    Uris.createTeamUri(courseId, classroomId, assignmentId),
+                                    method = HttpMethod.POST,
+                                    type = "application/json",
+                                ) {
+                                    hiddenField("assigmentId", assignmentId.toString())
                                 }
                             }
                         }
@@ -105,53 +93,50 @@ class AssigmentController(
     /**
      * Get all information about an assigment for a teacher
      */
-    private fun getTeacherAssigmentInfo(user: User, courseId: Int, classroomId: Int, assignmentId: Int): ResponseEntity<*> {
+    private fun getTeacherAssigmentInfo(courseId: Int, classroomId: Int, assignmentId: Int): ResponseEntity<*> {
         return when (val assignment = assigmentService.getTeacherAssignmentInfo(assignmentId)) {
-            is Result.Problem -> problem(assignment.value)
-            is Result.Success -> {
-                assignment.value as TeacherAssignmentModel
-                siren(value = TeacherAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.teams)) {
-                    clazz("assignment")
+            is Result.Problem -> assigmentService.problem(assignment.value)
+            is Result.Success -> siren(value = TeacherAssignmentOutputModel(assignment.value.assignment, assignment.value.deliveries, assignment.value.teams)) {
+                clazz("assigment")
+                link(
+                    rel = LinkRelation("self"),
+                    href = Uris.assigmentUri(courseId, classroomId, assignmentId),
+                    needAuthentication = true,
+                )
+                link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
+                link(
+                    rel = LinkRelation("classroom"),
+                    href = Uris.classroomUri(courseId, classroomId),
+                    needAuthentication = true,
+                )
+                link(
+                    rel = LinkRelation("assigments"),
+                    href = Uris.assignmentsUri(courseId, classroomId),
+                    needAuthentication = true,
+                )
+                assignment.value.deliveries.forEach {
                     link(
-                        rel = LinkRelation("self"),
-                        href = Uris.assigmentUri(courseId, classroomId, assignmentId),
+                        rel = LinkRelation("delivery"),
+                        href = Uris.deliveryUri(courseId, classroomId, assignmentId, it.id),
                         needAuthentication = true,
                     )
-                    link(rel = LinkRelation("course"), href = Uris.courseUri(courseId), needAuthentication = true)
+                }
+                assignment.value.teams.forEach {
                     link(
-                        rel = LinkRelation("classroom"),
-                        href = Uris.classroomUri(courseId, classroomId),
+                        rel = LinkRelation("team"),
+                        href = Uris.teamUri(courseId, classroomId, assignmentId, it.id),
                         needAuthentication = true,
                     )
-                    link(
-                        rel = LinkRelation("assigments"),
-                        href = Uris.assignmentsUri(courseId, classroomId),
-                        needAuthentication = true,
-                    )
-                    assignment.value.deliveries.forEach {
-                        link(
-                            rel = LinkRelation("delivery"),
-                            href = Uris.deliveryUri(courseId, classroomId, assignmentId, it.id),
-                            needAuthentication = true,
-                        )
-                    }
-                    assignment.value.teams.forEach {
-                        link(
-                            rel = LinkRelation("team"),
-                            href = Uris.teamUri(courseId, classroomId, assignmentId, it.id),
-                            needAuthentication = true,
-                        )
-                    }
-                    action(
-                        "create-delivery",
-                        Uris.createDeliveryUri(courseId, classroomId, assignmentId),
-                        method = HttpMethod.POST,
-                        type = "application/json",
-                    ) {
-                        hiddenField("assigmentId", assignmentId.toString())
-                        textField("tag-control")
-                        timestampField("due-date")
-                    }
+                }
+                action(
+                    "create-delivery",
+                    Uris.createDeliveryUri(courseId, classroomId, assignmentId),
+                    method = HttpMethod.POST,
+                    type = "application/json",
+                ) {
+                    hiddenField("assigmentId", assignmentId.toString())
+                    textField("tag-control")
+                    timestampField("due-date")
                 }
             }
         }
@@ -169,7 +154,7 @@ class AssigmentController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val assignment = assigmentService.createAssignment(assignmentInfo, user.id)) {
-            is Result.Problem -> problem(assignment.value)
+            is Result.Problem -> assigmentService.problem(assignment.value)
             is Result.Success -> siren(value = AssignmentCreatedOutputModel(assignment.value)) {
                 clazz("assigment")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignment.value.id), needAuthentication = true)
@@ -190,25 +175,11 @@ class AssigmentController(
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
         return when (val delete = assigmentService.deleteAssignment(assignmentId)) {
-            is Result.Problem -> problem(delete.value)
+            is Result.Problem -> assigmentService.problem(delete.value)
             is Result.Success -> siren(value = AssignmentDeletedOutputModel(delete.value)) {
                 clazz("assigment-deleted")
                 link(rel = LinkRelation("self"), href = Uris.assigmentUri(courseId, classroomId, assignmentId), needAuthentication = true)
             }
-        }
-    }
-
-    /**
-     * Function to handle errors
-     */
-    private fun problem(error: AssignmentServicesError): ResponseEntity<ErrorMessageModel> {
-        return when (error) {
-            AssignmentServicesError.NotTeacher -> Problem.notTeacher
-            AssignmentServicesError.InvalidInput -> Problem.invalidInput
-            AssignmentServicesError.AssignmentNotFound -> Problem.notFound
-            AssignmentServicesError.AssignmentNotDeleted -> Problem.methodNotAllowed
-            AssignmentServicesError.ClassroomArchived -> Problem.invalidOperation
-            AssignmentServicesError.ClassroomNotFound -> Problem.notFound
         }
     }
 }

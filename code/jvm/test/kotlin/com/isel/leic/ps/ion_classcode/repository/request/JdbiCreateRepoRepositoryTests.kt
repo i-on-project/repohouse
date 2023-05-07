@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class JdbiCreateRepoRepositoryTests {
+
     @Test
     fun `createCreateRepoRequest should create a new createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
@@ -25,7 +26,7 @@ class JdbiCreateRepoRepositoryTests {
     fun `getCreateRepoRequestById should return the specific createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val id = 5
-        val creator = 4
+        val creator = 3
         val request = createRepoReq.getCreateRepoRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
     }
@@ -33,7 +34,7 @@ class JdbiCreateRepoRepositoryTests {
     @Test
     fun `getCreateRepoRequestsByUser should return createRepo requests for a user`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
-        val userId = 4
+        val userId = 3
         val requests = createRepoReq.getCreateRepoRequestsByUser(userId = userId)
         assert(requests.size == 2)
     }

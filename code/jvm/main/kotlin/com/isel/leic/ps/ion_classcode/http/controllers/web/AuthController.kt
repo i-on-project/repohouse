@@ -26,7 +26,6 @@ import com.isel.leic.ps.ion_classcode.services.OutboxServicesError
 import com.isel.leic.ps.ion_classcode.services.StudentServices
 import com.isel.leic.ps.ion_classcode.services.TeacherServices
 import com.isel.leic.ps.ion_classcode.services.UserServices
-import com.isel.leic.ps.ion_classcode.utils.Either
 import com.isel.leic.ps.ion_classcode.utils.Result
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ion_classcode.utils.cypher.AESEncrypt
@@ -312,13 +311,13 @@ class AuthController(
         return when (val student = studentServices.createStudent(githubId, input.schoolId)) {
             is Result.Success -> {
                 when (val userOutbox = outboxServices.createUserVerification(student.value.id)) {
-                    is Either.Right -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
+                    is Result.Success -> siren(StatusOutputModel("Verify user", "Verify your email to proceed with the verification")) {
                         clazz("registerStudent")
                         action(title = "registerStudent", href = Uris.AUTH_REGISTER_STUDENT_PATH, method = HttpMethod.POST, type = "application/json", block = {
                             numberField("schoolId")
                         })
                     }
-                    is Either.Left -> when (userOutbox.value) {
+                    is Result.Problem -> when (userOutbox.value) {
                         is OutboxServicesError.CooldownNotExpired -> siren(
                             StatusOutputModel(
                                 "On cooldown",
@@ -395,7 +394,7 @@ class AuthController(
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val user = userServices.getUserByGithubId(githubId)) {
             is Result.Success -> when (val checkOTP = outboxServices.checkOtp(user.value.id, input.otp)) {
-                is Either.Right -> {
+                is Result.Success -> {
                     siren(StatusOutputModel("User verified.", "User verified successfully, you can navigate to menu.")) {
                         clazz("verifyStudent")
                         action(title = "verify", href = Uris.AUTH_REGISTER_VERIFICATION_PATH, method = HttpMethod.POST, type = "application/json", block = {
@@ -403,7 +402,7 @@ class AuthController(
                         })
                     }
                 }
-                is Either.Left -> outboxServices.problem(checkOTP.value)
+                is Result.Problem -> outboxServices.problem(checkOTP.value)
             }
             is Result.Problem -> userServices.problem(user.value)
         }
@@ -419,13 +418,13 @@ class AuthController(
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
         return when (val user = userServices.getUserByGithubId(githubId)) {
             is Result.Success -> when (val resendEmail = outboxServices.resendEmail(user.value.id)) {
-                is Either.Right -> {
+                is Result.Success -> {
                     siren(StatusOutputModel("Email sent.", "Email sent successfully, check your email.")) {
                         clazz("resendEmail")
                         action(title = "self", href = Uris.AUTH_RESEND_EMAIL_PATH, method = HttpMethod.POST, type = "application/json", block = {})
                     }
                 }
-                is Either.Left -> outboxServices.problem(resendEmail.value)
+                is Result.Problem -> outboxServices.problem(resendEmail.value)
             }
             is Result.Problem -> userServices.problem(user.value)
         }

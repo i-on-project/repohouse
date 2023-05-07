@@ -13,8 +13,8 @@ class CooldownRepositoryTests {
     fun `can create a cooldown request`() = testWithHandleAndRollback { handle ->
         val cooldownRepo = JdbiCooldownRepository(handle)
         val userId = 1
-        val id = cooldownRepo.createCooldownRequest(userId = userId, endTime = Timestamp.from(Instant.now()))
-        val cooldown = cooldownRepo.getCooldownRequestRemainingTime(userId = id)
+        cooldownRepo.createCooldownRequest(userId = userId, endTime = Timestamp.from(Instant.now()))
+        val cooldown = cooldownRepo.getCooldownRequestRemainingTime(userId = userId)
         assert(cooldown != null)
     }
 

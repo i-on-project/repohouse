@@ -17,6 +17,7 @@ import org.jdbi.v3.core.kotlin.mapTo
 class JdbiUsersRepository(
     private val handle: Handle,
 ) : UsersRepository {
+
     /**
      * Method to verify if an email exists
      */
@@ -499,15 +500,23 @@ class JdbiUsersRepository(
     override fun deletePendingUsers() {
         handle.createUpdate(
             """
+                DELETE FROM apply
+                WHERE pending_teacher_id IN (SELECT id FROM pendingteacher
+                WHERE created_at < now() - interval '1 day')
+            """
+        ).execute()
+
+        handle.createUpdate(
+            """
             DELETE FROM pendingstudent
-            where  created_at < now() - interval '1 day'
+            WHERE  created_at < now() - interval '1 day'
             """,
         ).execute()
 
         handle.createUpdate(
             """
             DELETE FROM pendingteacher
-            where  created_at < now() - interval '1 day'
+            WHERE  created_at < now() - interval '1 day'
             """,
         ).execute()
     }

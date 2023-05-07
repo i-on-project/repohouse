@@ -26,6 +26,7 @@ import java.time.Instant
 
 @SpringBootTest
 class DeliveryServicesTests {
+
     companion object {
         val time: Timestamp = Timestamp.from(Instant.now())
     }
@@ -48,7 +49,12 @@ class DeliveryServicesTests {
                                     tagControl = "tagControl",
                                 ),
                             )
-                        } doReturn 1
+                        } doReturn Delivery(
+                            id = 2,
+                            dueDate = time,
+                            assignmentId = 2,
+                            tagControl = "tagControl2",
+                        )
                         on { getDeliveryById(deliveryId = 1) } doReturn Delivery(
                             id = 1,
                             dueDate = time,
@@ -160,7 +166,7 @@ class DeliveryServicesTests {
     // TEST: createDelivery
 
     @Test
-    fun `createDelivery should give an InvalidInput because the userId is invalid`() {
+    fun `createDelivery should give an InternalError because the userId is invalid`() {
         // given: an invalid user id
         val userId = -1
 
@@ -175,7 +181,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -204,7 +210,7 @@ class DeliveryServicesTests {
     }
 
     @Test
-    fun `createDelivery should give an InvalidInput because the tagControl is invalid`() {
+    fun `createDelivery should give an AssignmentNotFound because the tagControl is invalid`() {
         // given: an invalid tag control
         val tagControl = ""
 
@@ -219,7 +225,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -270,7 +276,7 @@ class DeliveryServicesTests {
     }
 
     @Test
-    fun `createDelivery should give an NotTeacher because the is not a teacher`() {
+    fun `createDelivery should give an InternalError because the is not a teacher`() {
         // given: an valid user id
         val userId = 2
 
@@ -285,7 +291,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.NotTeacher)
+            assert(delivery.value is DeliveryServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -304,7 +310,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Success) {
-            assert(delivery.value == 1)
+            assert(delivery.value.id == 1)
         } else {
             fail("Should not be Either.Right")
         }
@@ -313,7 +319,7 @@ class DeliveryServicesTests {
     // TEST: getDeliveryInfo
 
     @Test
-    fun `getDeliveryInfo should give an InvalidInput because the deliveryId is invalid`() {
+    fun `getDeliveryInfo should give an DeliveryNotFound because the deliveryId is invalid`() {
         // given: an invalid delivery id
         val deliveryId = -1
 
@@ -323,7 +329,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.DeliveryNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -363,7 +369,7 @@ class DeliveryServicesTests {
     // TEST: deleteDelivery
 
     @Test
-    fun `deleteDelivery should give an InvalidInput because the deliveryId is invalid`() {
+    fun `deleteDelivery should give an DeliveryNotFound because the deliveryId is invalid`() {
         // given: an invalid delivery id
         val deliveryId = -1
 
@@ -374,14 +380,14 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.DeliveryNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `deleteDelivery should give an InvalidInput because the userId is invalid`() {
+    fun `deleteDelivery should give an InternalError because the userId is invalid`() {
         // given: an invalid user id
         val userId = -1
 
@@ -392,14 +398,14 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `deleteDelivery should give an NotTeacher because the is not a teacher`() {
+    fun `deleteDelivery should give an InternalError because the is not a teacher`() {
         // given: an valid user id
         val userId = 3
 
@@ -410,7 +416,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.NotTeacher)
+            assert(delivery.value is DeliveryServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -491,7 +497,7 @@ class DeliveryServicesTests {
     // TEST: updateDelivery
 
     @Test
-    fun `updateDelivery should give an InvalidInput because the deliveryId is invalid`() {
+    fun `updateDelivery should give an DeliveryNotFound because the deliveryId is invalid`() {
         // given: an invalid delivery id
         val deliveryId = -1
 
@@ -507,14 +513,14 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.DeliveryNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `updateDelivery should give an InvalidInput because the userId is invalid`() {
+    fun `updateDelivery should give an InternalError because the userId is invalid`() {
         // given: an invalid user id
         val userId = -1
 
@@ -530,14 +536,14 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `updateDelivery should give an InvalidInput because the assignmentId is invalid`() {
+    fun `updateDelivery should give an AssignmentNotFound because the assignmentId is invalid`() {
         // given: an invalid assignment id
         val assignmentId = -1
 
@@ -553,7 +559,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -583,7 +589,7 @@ class DeliveryServicesTests {
     }
 
     @Test
-    fun `updateDelivery should give an NotTeacher because the is not a teacher`() {
+    fun `updateDelivery should give an InternalError because the is not a teacher`() {
         // given: an valid user id
         val userId = 4
 
@@ -599,7 +605,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.NotTeacher)
+            assert(delivery.value is DeliveryServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }

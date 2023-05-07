@@ -26,7 +26,7 @@ class JoinTeamRepositoryTests {
     fun `getJoinTeamRequestById should return the specific joinTeam request`() = testWithHandleAndRollback { handle ->
         val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
         val id = 9
-        val creator = 4
+        val creator = 5
         val request = joinTeamReq.getJoinTeamRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
     }
@@ -34,7 +34,7 @@ class JoinTeamRepositoryTests {
     @Test
     fun `getJoinTeamRequestsByUser should return joinTeam requests for a user`() = testWithHandleAndRollback { handle ->
         val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
-        val userId = 4
+        val userId = 5
         val requests = joinTeamReq.getJoinTeamRequestsByUser(userId = userId)
         assert(requests.size == 2)
     }

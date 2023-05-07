@@ -70,7 +70,7 @@ class JdbiApplyRepository(
             WHERE pending_teacher_id = :teacherId
             """,
         )
-            .bind("pending_teacher_id", teacherId)
+            .bind("teacherId", teacherId)
             .mapTo<Apply>()
             .list()
     }

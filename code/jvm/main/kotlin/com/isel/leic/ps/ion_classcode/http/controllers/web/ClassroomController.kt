@@ -158,7 +158,6 @@ class ClassroomController(
     @PostMapping(Uris.INVITE_LINK_PATH, produces = ["application/vnd.siren+json"])
     fun inviteLink(
         user: User,
-        @PathVariable courseId: Int,
         @PathVariable inviteLink: String,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
@@ -175,7 +174,6 @@ class ClassroomController(
                 ),
             ) {
                 clazz("classroom")
-                link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId, enter.value.id), needAuthentication = true)
             }
         }
     }

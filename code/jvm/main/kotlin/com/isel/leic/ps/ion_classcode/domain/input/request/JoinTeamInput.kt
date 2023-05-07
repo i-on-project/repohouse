@@ -9,11 +9,6 @@ data class JoinTeamInput(
     override val composite: Int? = null,
 ) : RequestInputInterface {
     fun isNotValid(): Boolean{
-        val cond = teamId <= 0 || assignmentId <= 0
-        return if (composite == null) {
-            cond
-        } else {
-            cond || composite <= 0
-        }
+        return composite != null && composite <= 0
     }
 }

@@ -28,7 +28,7 @@ class JdbiArchiveRepoRequestRepositoryTestsInterface {
     fun `getArchiveRepoRequestById should return the specific archiveRepo request`() = testWithHandleAndRollback { handle ->
         val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
         val id = 3
-        val creator = 3
+        val creator = 1
         val request = archiveReq.getArchiveRepoRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
     }
@@ -36,7 +36,7 @@ class JdbiArchiveRepoRequestRepositoryTestsInterface {
     @Test
     fun `getArchiveRepoRequestsByUser should return archiveRepo requests for a user`() = testWithHandleAndRollback { handle ->
         val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
-        val userId = 3
+        val userId = 1
         val requests = archiveReq.getArchiveRepoRequestsByUser(userId = userId)
         assert(requests.size == 2)
     }

@@ -7,11 +7,15 @@ import com.isel.leic.ps.ion_classcode.domain.input.TagInput
 import com.isel.leic.ps.ion_classcode.http.model.github.Collaborator
 import com.isel.leic.ps.ion_classcode.http.model.github.Tag
 import com.isel.leic.ps.ion_classcode.http.model.output.DeliveryModel
+import com.isel.leic.ps.ion_classcode.http.model.problem.ErrorMessageModel
+import com.isel.leic.ps.ion_classcode.http.model.problem.Problem
+import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ion_classcode.utils.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 
 /**
@@ -35,6 +39,7 @@ sealed class DeliveryServicesError {
     object AssignmentNotFound : DeliveryServicesError()
     object ClassroomNotFound : DeliveryServicesError()
     object ClassroomArchived : DeliveryServicesError()
+    object InternalError : DeliveryServicesError()
 }
 
 /**
@@ -45,25 +50,25 @@ class DeliveryServices(
     val transactionManager: TransactionManager,
     val githubServices: GithubServices,
 ) {
+
     /**
      * Method that creates a delivery
      */
     fun createDelivery(deliveryInfo: DeliveryInput, userId: Int): DeliveryCreatedResponse {
-        if (deliveryInfo.isNotValid() || userId <= 0) {
-            return Result.Problem(value = DeliveryServicesError.InvalidInput)
-        }
+        if (deliveryInfo.isNotValid()) return Result.Problem(DeliveryServicesError.InvalidInput)
         return transactionManager.run {
-            val isArchived = checkIfArchived(assignmentId = deliveryInfo.assignmentId)
+            if (it.usersRepository.getTeacher(userId) == null) return@run Result.Problem(DeliveryServicesError.InternalError)
+            if (it.assignmentRepository.getAssignmentById(deliveryInfo.assignmentId) == null) return@run Result.Problem(DeliveryServicesError.AssignmentNotFound)
+            val isArchived = checkIfArchived(it, deliveryInfo.assignmentId)
             if (isArchived is Result.Problem) return@run isArchived
-            if (it.usersRepository.getTeacher(teacherId = userId) == null) return@run Result.Problem(value = DeliveryServicesError.NotTeacher)
             val deliveryId = it.deliveryRepository.createDelivery(
-                delivery = DeliveryInput(
+                DeliveryInput(
                     dueDate = deliveryInfo.dueDate,
                     assignmentId = deliveryInfo.assignmentId,
                     tagControl = deliveryInfo.tagControl,
-                ),
+                )
             )
-            Result.Success(value = deliveryId)
+            Result.Success(deliveryId)
         }
     }
 
@@ -71,15 +76,13 @@ class DeliveryServices(
      * Method to get a delivery
      */
     fun getDeliveryInfo(deliveryId: Int): DeliveryResponse {
-        if (deliveryId <= 0) return Result.Problem(value = DeliveryServicesError.InvalidInput)
         return transactionManager.run {
-            val delivery = it.deliveryRepository.getDeliveryById(deliveryId = deliveryId)
-                ?: return@run Result.Problem(value = DeliveryServicesError.DeliveryNotFound)
-            val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
+            val delivery = it.deliveryRepository.getDeliveryById(deliveryId) ?: return@run Result.Problem(DeliveryServicesError.DeliveryNotFound)
+            val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId)
             val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
-            val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId)
+            val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId)
             Result.Success(
-                value = DeliveryModel(
+                DeliveryModel(
                     delivery = delivery,
                     teamsDelivered = teamsDelivered,
                     teamsNotDelivered = teams.filter { team -> team.id !in teamsDeliveredIds },
@@ -93,14 +96,13 @@ class DeliveryServices(
      * Only if the delivery has no teams
      */
     fun deleteDelivery(deliveryId: Int, userId: Int): DeliveryDeletedResponse {
-        if (deliveryId <= 0 || userId <= 0) return Result.Problem(value = DeliveryServicesError.InvalidInput)
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(teacherId = userId) == null) return@run Result.Problem(value = DeliveryServicesError.NotTeacher)
-            val delivery = it.deliveryRepository.getDeliveryById(deliveryId = deliveryId) ?: return@run Result.Problem(value = DeliveryServicesError.DeliveryNotFound)
-            val isArchived = checkIfArchived(assignmentId = delivery.assignmentId)
+            if (it.usersRepository.getTeacher(userId) == null) return@run Result.Problem(DeliveryServicesError.InternalError)
+            val delivery = it.deliveryRepository.getDeliveryById(deliveryId) ?: return@run Result.Problem(DeliveryServicesError.DeliveryNotFound)
+            val isArchived = checkIfArchived(it, delivery.assignmentId)
             if (isArchived is Result.Problem) return@run isArchived
-            if (it.deliveryRepository.getTeamsByDelivery(deliveryId = deliveryId).isNotEmpty()) Result.Problem(value = DeliveryServicesError.DeliveryWithTeams)
-            it.deliveryRepository.deleteDelivery(deliveryId = deliveryId)
+            if (it.deliveryRepository.getTeamsByDelivery(deliveryId).isNotEmpty()) Result.Problem(DeliveryServicesError.DeliveryWithTeams)
+            it.deliveryRepository.deleteDelivery(deliveryId)
             Result.Success(true)
         }
     }
@@ -109,13 +111,11 @@ class DeliveryServices(
      * Method to update a delivery
      */
     fun updateDelivery(deliveryId: Int, deliveryInfo: DeliveryInput, userId: Int): DeliveryUpdateResponse {
-        if (deliveryId <= 0 || userId <= 0 || deliveryInfo.isNotValid()) {
-            return Result.Problem(value = DeliveryServicesError.InvalidInput)
-        }
+        if (deliveryInfo.isNotValid()) return Result.Problem(DeliveryServicesError.InvalidInput)
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(teacherId = userId) == null) return@run Result.Problem(value = DeliveryServicesError.NotTeacher)
-            val delivery = it.deliveryRepository.getDeliveryById(deliveryId = deliveryId) ?: return@run Result.Problem(value = DeliveryServicesError.DeliveryNotFound)
-            val isArchived = checkIfArchived(assignmentId = delivery.assignmentId)
+            it.usersRepository.getTeacher(userId) ?: return@run Result.Problem(DeliveryServicesError.InternalError)
+            val delivery = it.deliveryRepository.getDeliveryById(deliveryId) ?: return@run Result.Problem(DeliveryServicesError.DeliveryNotFound)
+            val isArchived = checkIfArchived(it, delivery.assignmentId)
             if (isArchived is Result.Problem) return@run isArchived
             if (delivery.tagControl != deliveryInfo.tagControl) {
                 it.deliveryRepository.updateTagControlFromDelivery(deliveryId = deliveryId, tagControl = deliveryInfo.tagControl)
@@ -204,18 +204,30 @@ class DeliveryServices(
     /**
      * Method to check if the classroom is archived
      */
-    private fun checkIfArchived(assignmentId: Int): Result<DeliveryServicesError, Boolean> {
-        val assignment = transactionManager.run {
-            it.assignmentRepository.getAssignmentById(assignmentId)
-        } ?: return Result.Problem(value = DeliveryServicesError.AssignmentNotFound)
-
-        val classroom = transactionManager.run {
-            it.classroomRepository.getClassroomById(assignment.classroomId)
-        } ?: return Result.Problem(value = DeliveryServicesError.ClassroomNotFound)
+    private fun checkIfArchived(transaction: Transaction, assignmentId: Int): Result<DeliveryServicesError, Boolean> {
+        val assignment = transaction.assignmentRepository.getAssignmentById(assignmentId) ?: return Result.Problem(DeliveryServicesError.AssignmentNotFound)
+        val classroom = transaction.classroomRepository.getClassroomById(assignment.classroomId) ?: return Result.Problem(DeliveryServicesError.ClassroomNotFound)
         return if (classroom.isArchived) {
-            Result.Problem(value = DeliveryServicesError.ClassroomArchived)
+            Result.Problem(DeliveryServicesError.ClassroomArchived)
         } else {
             Result.Success(true)
+        }
+    }
+
+    /**
+     * Function to handle the errors
+     */
+    fun problem(error: DeliveryServicesError): ResponseEntity<ErrorMessageModel> {
+        return when (error) {
+            DeliveryServicesError.DeliveryNotFound -> Problem.notFound
+            DeliveryServicesError.InvalidInput -> Problem.invalidInput
+            DeliveryServicesError.NotTeacher -> Problem.notTeacher
+            DeliveryServicesError.DeliveryWithTeams -> Problem.invalidOperation
+            DeliveryServicesError.CourseNotFound -> Problem.notFound
+            DeliveryServicesError.AssignmentNotFound -> Problem.notFound
+            DeliveryServicesError.ClassroomArchived -> Problem.invalidOperation
+            DeliveryServicesError.ClassroomNotFound -> Problem.notFound
+            DeliveryServicesError.InternalError -> Problem.internalError
         }
     }
 }

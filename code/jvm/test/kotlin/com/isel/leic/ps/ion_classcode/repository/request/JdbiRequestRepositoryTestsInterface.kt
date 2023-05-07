@@ -18,7 +18,7 @@ class JdbiRequestRepositoryTestsInterface {
     @Test
     fun `getRequestById should return the specific request`() = testWithHandleAndRollback { handle ->
         val requestRep = JdbiRequestRepository(handle = handle)
-        val id = 1
+        val id = 3
         val creator = 1
         val request = requestRep.getRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
@@ -27,7 +27,7 @@ class JdbiRequestRepositoryTestsInterface {
     @Test
     fun `changeStatusRequest should change the status specific request`() = testWithHandleAndRollback { handle ->
         val requestRep = JdbiRequestRepository(handle = handle)
-        val id = 1
+        val id = 3
         val state = "Rejected"
         requestRep.changeStateRequest(id = id, state = state)
         val request = requestRep.getRequestById(id = id) ?: fail("Request not found")

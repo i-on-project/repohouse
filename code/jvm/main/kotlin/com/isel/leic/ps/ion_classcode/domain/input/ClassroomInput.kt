@@ -9,6 +9,6 @@ data class ClassroomInput(
     val teacherId: Int
 ) {
     fun isNotValid(): Boolean {
-        return !(name.isNotBlank() && courseId > 0 && teacherId > 0)
+        return name.isBlank()
     }
 }

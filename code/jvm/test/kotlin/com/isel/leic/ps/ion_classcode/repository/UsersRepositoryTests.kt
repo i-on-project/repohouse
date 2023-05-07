@@ -110,7 +110,7 @@ class UsersRepositoryTests {
     @Test
     fun `can create a pending student`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        userRepo.createStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
+        userRepo.createPendingStudent(student = StudentInput(name = "test1245", email = "test5@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345))
     }
 
     @Test
@@ -145,7 +145,7 @@ class UsersRepositoryTests {
     fun `can delete pending users`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         userRepo.deletePendingUsers()
-        val pendingStudent = userRepo.getPendingStudentByGithubId(githubId = 2222)
+        val pendingStudent = userRepo.getPendingStudentByGithubId(githubId = 2225)
         val pendingTeacher = userRepo.getPendingTeacherByGithubId(githubId = 2227)
         assert(pendingStudent == null && pendingTeacher == null)
     }
@@ -175,7 +175,7 @@ class UsersRepositoryTests {
     @Test
     fun `can create a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        userRepo.createTeacher(teacher = TeacherInput(name = "test142", email = "test5@alunos.isel.pt", githubUsername = "test1239", githubToken = "token5", githubId = 123415, token = "token5"))
+        userRepo.createTeacher(teacher = TeacherInput(name = "test142", email = "test8@alunos.isel.pt", githubUsername = "test1239", githubToken = "token142", githubId = 123415, token = "token142"))
     }
 
     @Test
@@ -266,7 +266,7 @@ class UsersRepositoryTests {
     @Test
     fun `can not get github token of a teacher`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val token = userRepo.getTeacherGithubToken(id = 1)
+        val token = userRepo.getTeacherGithubToken(id = 3)
         assert(token == null)
     }
 
@@ -276,5 +276,35 @@ class UsersRepositoryTests {
         userRepo.updateTeacherGithubToken(id = 1, token = "test")
         val token = userRepo.getTeacherGithubToken(id = 1)
         assert(token == "test")
+    }
+
+    @Test
+    fun `store teacher access token`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        userRepo.storeAccessTokenEncrypted(token = "token1234", githubId = 1234187)
+        val token = userRepo.getAccessTokenEncrypted(githubId = 1234187)
+        assert(token == "token1234")
+    }
+
+    @Test
+    fun `get teacher access token`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val token = userRepo.getAccessTokenEncrypted(githubId = 12345)
+        assert(token == "accessstoken1")
+    }
+
+    @Test
+    fun `can not get teacher access token`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        val token = userRepo.getAccessTokenEncrypted(githubId = 99999)
+        assert(token == null)
+    }
+
+    @Test
+    fun `delete teacher access token`() = testWithHandleAndRollback { handle ->
+        val userRepo = JdbiUsersRepository(handle = handle)
+        userRepo.deleteAccessTokenEncrypted(githubId = 12345)
+        val token = userRepo.getAccessTokenEncrypted(githubId = 12345)
+        assert(token == null)
     }
 }

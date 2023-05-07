@@ -11,8 +11,7 @@ data class AssignmentInputModel(
     val dueDate: Timestamp,
 ) {
     fun isNotValid(): Boolean {
-        return classroomId <= 0 ||
-            maxNumberElems <= 0 ||
+        return maxNumberElems <= 0 ||
             maxNumberGroups <= 0 ||
             description.isBlank() ||
             title.isBlank()

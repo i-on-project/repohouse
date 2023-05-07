@@ -29,7 +29,7 @@ class OtpRepositoryTests {
     @Test
     fun `can not get otp request`() = testWithHandleAndRollback { handle ->
         val otpRepo = JdbiOtpRepository(handle)
-        val userId = 5
+        val userId = 2
         val otp = otpRepo.getOtpRequest(userId = userId)
         assert(otp == null)
     }

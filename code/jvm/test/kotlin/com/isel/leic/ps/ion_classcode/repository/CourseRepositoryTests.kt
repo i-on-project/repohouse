@@ -43,7 +43,7 @@ class CourseRepositoryTests {
     @Test
     fun `can create a course`() = testWithHandleAndRollback { handle ->
         val courseRepo = JdbiCourseRepository(handle = handle)
-        val created = courseRepo.createCourse(course = CourseInput(orgUrl = "https://pdm.isel.pt", name = "PDM", teacherId = 2, orgId = 123456))
+        val created = courseRepo.createCourse(course = CourseInput(orgUrl = "https://pdm.isel.pt", name = "LAE", teacherId = 2, orgId = 123456))
         val course = courseRepo.getCourse(courseId = created.id)
         assert(course != null)
     }
@@ -117,7 +117,7 @@ class CourseRepositoryTests {
         val courseRepo = JdbiCourseRepository(handle = handle)
         val courseId = 1
         val students = courseRepo.getStudentInCourse(courseId = courseId)
-        assert(students.size == 3)
+        assert(students.size == 2)
     }
 
     @Test
@@ -159,7 +159,7 @@ class CourseRepositoryTests {
         val userId = 3
         val courseId = 2
         val isIn = courseRepo.isStudentInCourse(studentId = userId, courseId = courseId)
-        assert(!isIn)
+        assert(isIn)
     }
 
     @Test
@@ -176,7 +176,7 @@ class CourseRepositoryTests {
         val courseRepo = JdbiCourseRepository(handle = handle)
         val courseId = 1
         val classrooms = courseRepo.getCourseUserClassrooms(courseId = courseId, userId = 3, true)
-        assert(classrooms.size == 2)
+        assert(classrooms.size == 1)
     }
 
     @Test

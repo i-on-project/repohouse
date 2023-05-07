@@ -10,5 +10,5 @@ data class DeliveryInput(
     val assignmentId: Int,
     val tagControl: String,
 ) {
-    fun isNotValid() = assignmentId <= 0 || tagControl.isEmpty()
+    fun isNotValid() = tagControl.isEmpty()
 }

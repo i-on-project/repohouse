@@ -26,7 +26,7 @@ class JdbiLeaveCourseInputRepositoryTests {
     fun `getLeaveCourseRequestById should return the specific leaveCourse request`() = testWithHandleAndRollback { handle ->
         val leaveCourseReq = JdbiLeaveCourseRequestRepository(handle = handle)
         val id = 11
-        val creator = 5
+        val creator = 4
         val request = leaveCourseReq.getLeaveCourseRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
     }
@@ -34,7 +34,7 @@ class JdbiLeaveCourseInputRepositoryTests {
     @Test
     fun `getLeaveCourseRequestsByUser should return leaveCourse requests for a user`() = testWithHandleAndRollback { handle ->
         val leaveCourseReq = JdbiLeaveCourseRequestRepository(handle = handle)
-        val userId = 5
+        val userId = 4
         val requests = leaveCourseReq.getLeaveCourseRequestsByUser(userId = userId)
         assert(requests.size == 2)
     }

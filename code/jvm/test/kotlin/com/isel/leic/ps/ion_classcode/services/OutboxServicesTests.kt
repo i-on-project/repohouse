@@ -33,9 +33,9 @@ class OutboxServicesTests {
             override fun <R> run(block: (Transaction) -> R): R {
                 val mockedTransaction = mock<Transaction> {
                     val mockedOutboxRepository = mock<OutboxRepository> {
-                        on { createOutboxRequest(outbox = OutboxInput(userId = 1, otp = 3)) } doReturn 1
-                        on { getOutboxRequest(userId = 1) } doReturn Outbox(userId = 1, otp = 1, status = "Status", expiredAt = Timestamp.from(Instant.from(Instant.now().minusSeconds(1000))))
-                        on { getOutboxRequest(userId = 2) } doReturn Outbox(userId = 2, otp = 2, status = "Status", expiredAt = Timestamp.from(Instant.from(Instant.now().plusSeconds(1000))))
+                        on { createOutboxRequest(outbox = OutboxInput(userId = 1)) } doReturn Outbox(userId = 1, status = "Status", sentAt = Timestamp.from(Instant.from(Instant.now())))
+                        on { getOutboxRequest(userId = 1) } doReturn Outbox(userId = 1, status = "Status", sentAt = Timestamp.from(Instant.from(Instant.now())))
+                        on { getOutboxRequest(userId = 2) } doReturn Outbox(userId = 2, status = "Status", sentAt = Timestamp.from(Instant.from(Instant.now())))
                     }
                     val mockedUsersRepository = mock<UsersRepository> {
                         on { getUserById(userId = 1) } doReturn Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 1, schoolId = null)
@@ -56,7 +56,7 @@ class OutboxServicesTests {
     // TEST: createUserVerification
 
     @Test
-    fun `createUserVerification should give an InvalidInput because the userId is invalid`() {
+    fun `createUserVerification should give an InternalError because the userId is invalid`() {
         // given: an invalid user id
         val userId = -1
 
@@ -66,7 +66,7 @@ class OutboxServicesTests {
         )
 
         if (outboxOtp is Result.Problem) {
-            assert(outboxOtp.value is OutboxServicesError.InvalidInput)
+            assert(outboxOtp.value is OutboxServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -92,14 +92,11 @@ class OutboxServicesTests {
     // TEST: checkOtp
 
     @Test
-    fun `checkOtp should give an InvalidInput because the userId is invalid`() {
-        // given: an invalid user id
-        val userId = -1
-
+    fun `checkOtp should give an InvalidInput because the otp is invalid`() {
         // when: getting an error because of an invalid user id
         val outboxOtp = outboxServices.checkOtp(
-            userId = userId,
-            otp = 1,
+            userId = 1,
+            otp = -1,
         )
 
         if (outboxOtp is Result.Problem) {
@@ -110,9 +107,9 @@ class OutboxServicesTests {
     }
 
     @Test
-    fun `checkOtp should give an OtpNotFound because the otp is not in database`() {
+    fun `checkOtp should give an OtpNotFound because the user is not in database`() {
         // given: an invalid otp
-        val userId = 3
+        val userId = 123
 
         // when: getting an error because the otp is not in database
         val outboxOtp = outboxServices.checkOtp(

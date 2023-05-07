@@ -83,7 +83,7 @@ class AssignmentServiceTests {
     // TEST: createAssignment
 
     @Test
-    fun `createAssignment should give an InvalidInput because the userId is invalid`() {
+    fun `createAssignment should give an InternalError because the userId is invalid`() {
         // given: an invalid user id
         val userId = -1
 
@@ -101,7 +101,7 @@ class AssignmentServiceTests {
         )
 
         if (assignment is Result.Problem) {
-            assert(assignment.value is AssignmentServicesError.InvalidInput)
+            assert(assignment.value is AssignmentServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -126,7 +126,7 @@ class AssignmentServiceTests {
         )
 
         if (assignment is Result.Problem) {
-            assert(assignment.value is AssignmentServicesError.InvalidInput)
+            assert(assignment.value is AssignmentServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -233,7 +233,7 @@ class AssignmentServiceTests {
     }
 
     @Test
-    fun `createAssignment should give an NotTeacher because user id is not in database`() {
+    fun `createAssignment should give an InternalError because user id is not in database`() {
         // given: a valid user id
         val userId = 4
 
@@ -251,7 +251,7 @@ class AssignmentServiceTests {
         )
 
         if (assignment is Result.Problem) {
-            assert(assignment.value is AssignmentServicesError.NotTeacher)
+            assert(assignment.value is AssignmentServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -332,7 +332,7 @@ class AssignmentServiceTests {
     // TEST: getAssigmentInfo
 
     @Test
-    fun `getAssigmentInfo should give an InvalidInput because assignment id is invalid`() {
+    fun `getStudentAssigmentInfo should give an AssignmentNotFound because assignment id is invalid`() {
         // given: a invalid assignment id
         val assignmentId = -1
 
@@ -340,7 +340,7 @@ class AssignmentServiceTests {
         val assignment = assignmentServices.getTeacherAssignmentInfo(assignmentId = assignmentId)
 
         if (assignment is Result.Problem) {
-            assert(assignment.value is AssignmentServicesError.InvalidInput)
+            assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -376,10 +376,57 @@ class AssignmentServiceTests {
         }
     }
 
+    // test: getStudentAssignmentInfo
+
+    @Test
+    fun `getStudentAssignmentInfo should give an AssignmentNotFound because assignment id is invalid`() {
+        // given: a invalid assignment id
+        val assignmentId = -1
+
+        // when: getting an error because the assignment id is invalid
+        val assignment = assignmentServices.getStudentAssignmentInfo(assignmentId = assignmentId, studentId = 3)
+
+        if (assignment is Result.Problem) {
+            assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `getStudentAssignmentInfo should give an AssignmentNotFound because assignment id is not in database`() {
+        // given: a valid assignment id
+        val assignmentId = 5
+
+        // when: getting an error because the assignment id is not in database
+        val assignment = assignmentServices.getStudentAssignmentInfo(assignmentId = assignmentId, studentId = 3)
+
+        if (assignment is Result.Problem) {
+            assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `getStudentAssignmentInfo should give a assignment`() {
+        // given: a valid assignment id
+        val assignmentId = 1
+
+        // when: getting the assignment
+        val assignment = assignmentServices.getStudentAssignmentInfo(assignmentId = assignmentId, studentId = 3)
+
+        if (assignment is Result.Success) {
+            assert(assignment.value.assignment.id == assignmentId)
+        } else {
+            fail("Should not be Either.Left")
+        }
+    }
+
     // TEST: deleteAssignment
 
     @Test
-    fun `deleteAssignment should give an InvalidInput because assignment id is invalid`() {
+    fun `deleteAssignment should give an AssignmentNotFound because assignment id is invalid`() {
         // given: a invalid assignment id
         val assignmentId = -1
 
@@ -387,7 +434,7 @@ class AssignmentServiceTests {
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
 
         if (assignment is Result.Problem) {
-            assert(assignment.value is AssignmentServicesError.InvalidInput)
+            assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -471,7 +518,7 @@ class AssignmentServiceTests {
     // TEST: getAssignmentStudentTeams
 
     @Test
-    fun `getAssignmentStudentTeams should give an InvalidInput because assignment id is invalid`() {
+    fun `getAssignmentStudentTeams should give an AssignmentNotFound because assignment id is invalid`() {
         // given: a invalid assignment id
         val assignmentId = -1
 
@@ -479,14 +526,14 @@ class AssignmentServiceTests {
         val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 1)
 
         if (assignment is Result.Problem) {
-            assert(assignment.value is AssignmentServicesError.InvalidInput)
+            assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `getAssignmentStudentTeams should give an InvalidInput because student id is invalid`() {
+    fun `getAssignmentStudentTeams should give an InternalError because student id is invalid`() {
         // given: a invalid student id
         val studentId = -1
 
@@ -494,7 +541,7 @@ class AssignmentServiceTests {
         val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = 1, studentId = studentId)
 
         if (assignment is Result.Problem) {
-            assert(assignment.value is AssignmentServicesError.InvalidInput)
+            assert(assignment.value is AssignmentServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
