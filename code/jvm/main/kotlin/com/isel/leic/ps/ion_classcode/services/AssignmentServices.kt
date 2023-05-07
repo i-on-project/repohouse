@@ -85,7 +85,7 @@ class AssignmentServices(
     /**
      * Method that gets an assigment for a student
      */
-    fun getStudentAssignmentInfo(assignmentId: Int,studentId: Int): AssignmentResponse {
+    fun getStudentAssignmentInfo(assignmentId: Int, studentId: Int): AssignmentResponse {
         if (assignmentId <= 0) return Result.Problem(value = AssignmentServicesError.InvalidInput)
         return transactionManager.run {
             val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)

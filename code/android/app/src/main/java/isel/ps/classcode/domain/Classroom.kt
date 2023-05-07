@@ -11,6 +11,7 @@ data class Classroom(
     val lastSync: Timestamp,
     val inviteLink: String,
     val isArchived: Boolean,
+    val courseId: Int
 ) {
     constructor(classCodeClassroomDeserialization: ClassCodeClassroomDeserialization): this(
         id = classCodeClassroomDeserialization.id,
@@ -18,12 +19,14 @@ data class Classroom(
         lastSync = classCodeClassroomDeserialization.lastSync,
         inviteLink = classCodeClassroomDeserialization.inviteLink,
         isArchived = classCodeClassroomDeserialization.isArchived,
+        courseId = classCodeClassroomDeserialization.courseId
     )
     fun toLocalClassroomDto(): LocalClassroomDto = LocalClassroomDto(
         id = id,
         name = name,
         lastSync = lastSync,
         inviteLink = inviteLink,
-        isArchived = isArchived
+        isArchived = isArchived,
+        courseId = courseId
     )
 }

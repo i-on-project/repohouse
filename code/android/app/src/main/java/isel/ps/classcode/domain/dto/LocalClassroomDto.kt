@@ -12,12 +12,14 @@ data class LocalClassroomDto(
     val lastSync: Timestamp,
     val inviteLink: String,
     val isArchived: Boolean,
+    val courseId: Int
 ): Parcelable {
     fun toClassroom(): Classroom = Classroom(
         id = id,
         name = name,
         lastSync = lastSync,
         inviteLink = inviteLink,
-        isArchived = isArchived
+        isArchived = isArchived,
+        courseId = courseId
     )
 }

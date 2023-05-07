@@ -20,6 +20,7 @@ DELETE FROM createrepo;
 DELETE FROM Request;
 DELETE FROM Classroom;
 DELETE FROM student_classroom;
+DELETE FROM teacher_course;
 DELETE FROM Course;
 DELETE FROM Student;
 DELETE FROM Teacher;
@@ -28,6 +29,7 @@ DELETE FROM outbox;
 DELETE From cooldown;
 DELETE FROM Users;
 DELETE FROM AccessToken;
+
 
 COMMIT TRANSACTION;
 

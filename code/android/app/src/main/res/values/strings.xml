@@ -11,6 +11,7 @@
     <string name="course_image">Course image</string>
     <string name="credits_icon">Credits icon</string>
     <string name="archived_icon">Archived icon</string>
+    <string name="assignment_icon">Assignment icon</string>
     <string name="filter_icon">Filter icon</string>
     <string name="checked_icon">checked icon</string>
     <string name="logout_icon">Logout icon</string>

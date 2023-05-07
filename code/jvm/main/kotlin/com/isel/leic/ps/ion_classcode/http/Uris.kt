@@ -93,14 +93,14 @@ object Uris {
     fun editClassroomUri(courseId: Int, classroomId: Int): String = UriTemplate(EDIT_CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()
     fun inviteLinkUri(courseId: Int, inviteLink: String): String = UriTemplate(INVITE_LINK_PATH).expand(courseId, inviteLink).toASCIIString()
     fun assignmentsUri(courseId: Int, classroomId: Int): String = UriTemplate(ASSIGMENTS_PATH).expand(courseId, classroomId).toASCIIString()
-    fun assigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
+    fun assigmentUri(courseId: Int, classroomId: Int, assignmentId: Int): String = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assignmentId).toASCIIString()
     fun createAssigmentUri(courseId: Int, classroomId: Int): String = UriTemplate(CREATE_ASSIGNMENT_PATH).expand(courseId, classroomId).toASCIIString()
     fun deliveriesUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(DELIVERIES_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
     fun deliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): String = UriTemplate(DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId).toASCIIString()
     fun createDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(CREATE_DELIVERY_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
     fun deleteAssigmentUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(DELETE_ASSIGMENT_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
     fun teamsUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(TEAMS_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
-    fun teamUri(courseId: Int, classroomId: Int, assigmentId: Int, teamId: Int): String = UriTemplate(TEAM_PATH).expand(courseId, classroomId, assigmentId, teamId).toASCIIString()
+    fun teamUri(courseId: Int, classroomId: Int, assignmentId: Int, teamId: Int): String = UriTemplate(TEAM_PATH).expand(courseId, classroomId, assignmentId, teamId).toASCIIString()
     fun editDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): String = UriTemplate(EDIT_DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId).toASCIIString()
     fun syncDeliveryUri(courseId: Int, classroomId: Int, assigmentId: Int, deliveryId: Int): String = UriTemplate(SYNC_DELIVERY_PATH).expand(courseId, classroomId, assigmentId, deliveryId).toASCIIString()
     fun createTeamUri(courseId: Int, classroomId: Int, assigmentId: Int): String = UriTemplate(CREATE_TEAM_PATH).expand(courseId, classroomId, assigmentId).toASCIIString()
@@ -124,4 +124,8 @@ object Uris {
     const val MOBILE_MENU_PATH = "$MOBILE_API/menu"
     const val MOBILE_COURSES_PATH = "$MOBILE_API/courses"
     const val MOBILE_COURSE_PATH = "$MOBILE_COURSES_PATH/{courseId}"
+    const val MOBILE_CLASSROOMS_PATH = "$MOBILE_COURSE_PATH/classrooms"
+    const val MOBILE_CLASSROOM_PATH = "$MOBILE_CLASSROOMS_PATH/{classroomId}"
+    const val MOBILE_ASSIGMENTS_PATH = "$MOBILE_CLASSROOM_PATH/assignments"
+    const val MOBILE_ASSIGMENT_PATH = "$MOBILE_ASSIGMENTS_PATH/{assignmentId}"
 }

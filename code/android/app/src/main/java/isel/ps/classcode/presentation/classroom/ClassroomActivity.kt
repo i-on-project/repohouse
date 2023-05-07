@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.dto.LocalClassroomDto
-import isel.ps.classcode.domain.dto.LocalCourseDto
 import isel.ps.classcode.presentation.classroom.services.ClassroomServices
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
@@ -44,7 +43,7 @@ class ClassroomActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val classroom = getClassroomExtra()
         if (classroom != null) {
-            vm.getClassroom(classroom.id)
+            vm.getAssignments(classroomId =  classroom.id, courseId = classroom.courseId)
         }
         setContent {
             ClasscodeTheme {
@@ -52,7 +51,9 @@ class ClassroomActivity : ComponentActivity() {
                     ClassroomScreen(
                         classroom = classroom,
                         teams = vm.teams,
+                        assignments = vm.assignments,
                         onTeamSelected = {  },
+                        onAssignmentChange = { assignment -> vm.getTeams(courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id) },
                         onBackRequest = { finish() }
                     )
             }
@@ -66,12 +67,6 @@ class ClassroomActivity : ComponentActivity() {
                 intent.getParcelableExtra(CLASSROOM_EXTRA, LocalClassroomDto::class.java)
             else
                 intent.getParcelableExtra(CLASSROOM_EXTRA)
-        return if (classroomExtra != null) Classroom(
-            id = classroomExtra.id,
-            lastSync = classroomExtra.lastSync,
-            name = classroomExtra.name,
-            inviteLink = classroomExtra.inviteLink,
-            isArchived = classroomExtra.isArchived,
-        ) else null
+        return classroomExtra?.toClassroom()
     }
 }

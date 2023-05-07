@@ -105,7 +105,7 @@ fun ShowCourseInfo(
         modifier = modifier.padding(8.dp)
     ) {
         val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
-        AvatarImage(avatarUrl = course.orgUrl)
+        AvatarImage(avatarUrl = "https://avatars.githubusercontent.com/u/${course.orgId}?s=200&v=4")
         Text(text = course.name, style = MaterialTheme.typography.titleMedium, color = textColor)
     }
 }

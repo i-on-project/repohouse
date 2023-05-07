@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.CLASSCODE_COURSE_URL
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.Classroom
-import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.deserialization.ClassCodeCourseDto
 import isel.ps.classcode.domain.deserialization.ClassCodeCourseDtoType
-import isel.ps.classcode.domain.deserialization.ClassCodeMenuDtoType
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError

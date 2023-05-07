@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material3.Card
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import isel.ps.classcode.R
+import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.Team
 import isel.ps.classcode.presentation.course.ChosenIcon
@@ -56,6 +58,8 @@ fun ClassroomScreen(
     classroom: Classroom,
     teams: List<Team>? = null,
     onTeamSelected: (Team) -> Unit,
+    assignments: List<Assignment>? = null,
+    onAssignmentChange: (Assignment) -> Unit,
     onBackRequest: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -80,8 +84,8 @@ fun ClassroomScreen(
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
             ShowClassroom(classroom = classroom)
-            if (teams != null) {
-                ShowTeams(teams = teams, onTeamSelected = onTeamSelected)
+            if (teams != null && assignments != null) {
+                ShowTeams(teams = teams, onTeamSelected = onTeamSelected, assignments = assignments, onAssignmentChange = onAssignmentChange)
             } else {
                 LoadingAnimationCircle()
             }
@@ -110,14 +114,26 @@ fun ShowClassroom(modifier: Modifier = Modifier, classroom: Classroom) {
 }
 
 @Composable
-fun ShowTeams(modifier: Modifier = Modifier, teams: List<Team>, onTeamSelected: (Team) -> Unit) {
+fun ShowTeams(modifier: Modifier = Modifier, teams: List<Team>, onAssignmentChange: (Assignment) -> Unit, assignments: List<Assignment>, onTeamSelected: (Team) -> Unit) {
     var type by remember { mutableStateOf(ListFilter.NORMAL) }
+    var assignmentChosen by remember {
+        val assignment = if (assignments.isEmpty()) null else assignments.first()
+        mutableStateOf(assignment)
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        ChooseListFilter(type = type, onTypeChange = { type = it })
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+            ChooseListFilter(type = type, onTypeChange = { type = it })
+            ChooseAssignmentFilter(currentAssignment = assignmentChosen, assignments = assignments,
+                onAssignmentChange = {
+                    assignmentChosen = it
+                    onAssignmentChange(it)
+                }
+            )
+        }
         LazyColumn(
             contentPadding = PaddingValues(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -171,11 +187,7 @@ fun TeamCard(
 @Composable
 private fun ChooseListFilter(type: ListFilter, onTypeChange: (ListFilter) -> Unit) {
     var expanded by remember { mutableStateOf<Boolean>(false) }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.TopEnd)
-    ) {
+    Box {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(
                 imageVector = Icons.Default.FilterAlt,
@@ -202,6 +214,32 @@ private fun ChooseListFilter(type: ListFilter, onTypeChange: (ListFilter) -> Uni
                 onClick = { onTypeChange(ListFilter.NOT_CREATED) },
                 trailingIcon = { if (type == ListFilter.NOT_CREATED) ChosenIcon() }
             )
+        }
+    }
+}
+
+@Composable
+private fun ChooseAssignmentFilter(currentAssignment: Assignment?, assignments: List<Assignment>, onAssignmentChange: (Assignment) -> Unit) {
+    var expanded by remember { mutableStateOf<Boolean>(false) }
+    Box {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(
+                imageVector = Icons.Default.Assignment,
+                contentDescription = stringResource(id = R.string.assignment_icon)
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            assignments.forEach { assignment ->
+                DropdownMenuItem(
+                    text = { Text(assignment.title) },
+                    onClick = { onAssignmentChange(assignment) },
+                    trailingIcon = { if (currentAssignment == assignment) ChosenIcon() }
+                )
+            }
         }
     }
 }

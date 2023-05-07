@@ -42,9 +42,9 @@ data class AssignmentDeletedOutputModel(
 /**
  * Represents a Assigment Model for inner functions.
  */
-interface AssignmentModel {
-    val assignment: Assignment
-    val deliveries: List<Delivery>
+sealed class AssignmentModel {
+    abstract val assignment: Assignment
+    abstract val deliveries: List<Delivery>
 }
 
 /**
@@ -54,7 +54,7 @@ data class TeacherAssignmentModel(
     override val assignment: Assignment,
     override val deliveries: List<Delivery>,
     val teams: List<Team>,
-) : AssignmentModel
+) : AssignmentModel()
 
 /**
  * Represents an Assigment Model for the student.
@@ -63,4 +63,4 @@ data class StudentAssignmentModel(
     override val assignment: Assignment,
     override val deliveries: List<Delivery>,
     val team: Team?,
-) : AssignmentModel
+) : AssignmentModel()
