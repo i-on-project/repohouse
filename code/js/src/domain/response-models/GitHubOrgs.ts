@@ -5,6 +5,7 @@ export interface GitHubOrg{
     login: string,
     url: string,
     avatar_url: string
+    id: number
 }
 export interface GitHubOrgs{
     orgs: GitHubOrg[]

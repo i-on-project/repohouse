@@ -375,11 +375,9 @@ function CourseCreatePost() {
 
 function Classroom() {
     const {courseId, classroomId} = useParams<{ courseId: string, classroomId: string }>();
-    console.log("courseId: " + courseId)
     return (
         <div>
-            <ShowClassroomFetch classroomServices={classroomServices} classroomId={Number(classroomId)}
-                                courseId={Number(courseId)}/>
+            <ShowClassroomFetch classroomServices={classroomServices} classroomId={Number(classroomId)} courseId={Number(courseId)}/>
         </div>
     )
 }
