@@ -1,7 +1,9 @@
 package isel.ps.classcode.dataAccess
 
+import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import androidx.annotation.RequiresApi
 import java.security.KeyStore
 import java.util.Base64
 import javax.crypto.Cipher
@@ -18,6 +20,7 @@ enum class TypeOfData(val alias: String) {
  * The class that will be used to encrypt and decrypt the token. Uses a androidKeyStore.
  * The key is generated if it doesn't exist, and if it exists it is used to encrypt and decrypt the token.
  * The algorithm used was AED, the block mode was CBC and the padding was PKCS7.
+ * Importanto to notice, the key to be use need a user authentication.
  */
 
 class CryptoManager {
@@ -47,7 +50,8 @@ class CryptoManager {
                 KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                     .setBlockModes(BLOCK_MODE)
                     .setEncryptionPaddings(PADDING)
-                    .setUserAuthenticationRequired(false) // MUDAR ISTO PARA PRECISAR DE USER AUTHENTICATION
+                    .setUserAuthenticationRequired(true) // MUDAR ISTO PARA PRECISAR DE USER AUTHENTICATION
+                    .setUserAuthenticationParameters(10000, KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL)
                     .setRandomizedEncryptionRequired(true)
                     .build()
             )

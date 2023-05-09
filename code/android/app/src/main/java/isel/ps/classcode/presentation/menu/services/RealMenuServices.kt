@@ -21,7 +21,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
- * The implementation of menu services that will be used on the final product
+ * Implementation of the [MenuServices] interface that will be used for the real app
  */
 
 class RealMenuServices(private val sessionStore: SessionStore, private val objectMapper: ObjectMapper, private val httpClient: OkHttpClient) : MenuServices {
@@ -61,7 +61,7 @@ class RealMenuServices(private val sessionStore: SessionStore, private val objec
         }
     }
 
-    override fun logout() {
-        TODO("Not yet implemented")
+    override suspend fun logout() {
+        sessionStore.cleanTokens()
     }
 }

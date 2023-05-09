@@ -22,6 +22,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +40,7 @@ import isel.ps.classcode.presentation.views.AvatarImage
 import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
 import isel.ps.classcode.ui.theme.ClasscodeTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,15 +48,16 @@ fun MenuScreen(
     userInfo: UserInfo?,
     courses: List<Course>? = listOf(),
     onCourseSelected: (Course) -> Unit = {  },
-    onBackRequest: () -> Unit = {  },
+    onBackRequest: suspend () -> Unit = {  },
     onCreditsRequested: () -> Unit = {  },
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopBar(
                 name = stringResource(id = R.string.menu_top_page),
-                onBackRequested = onBackRequest,
+                onBackRequested = { scope.launch { onBackRequest() } },
                 scrollBehavior = scrollBehavior,
                 onCreditsRequested = onCreditsRequested
             )
@@ -67,7 +71,12 @@ fun MenuScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = it.calculateTopPadding() + 8.dp, start = 32.dp, end = 32.dp, bottom = it.calculateBottomPadding())
+                .padding(
+                    top = it.calculateTopPadding() + 8.dp,
+                    start = 32.dp,
+                    end = 32.dp,
+                    bottom = it.calculateBottomPadding()
+                )
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
             if (userInfo != null) {

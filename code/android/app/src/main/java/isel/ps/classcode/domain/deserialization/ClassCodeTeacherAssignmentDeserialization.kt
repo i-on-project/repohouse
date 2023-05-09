@@ -6,6 +6,9 @@ import isel.ps.classcode.http.hypermedia.SirenEntity
 typealias ClassCodeTeacherAssignmentDto = SirenEntity<ClassCodeTeacherAssignmentDeserialization>
 val ClassCodeTeacherAssignmentDtoType = SirenEntity.getType<ClassCodeTeacherAssignmentDeserialization>()
 
+/**
+ * Class used to deserialize the ClassCodeTeacherAssignment response from the database
+ */
 data class ClassCodeTeacherAssignmentDeserialization(
     @JsonProperty("assignment")val assignment: ClassCodeAssignmentDeserialization,
     @JsonProperty("deliveries")val deliveries: List<ClassCodeDeliveryDeserialization>,

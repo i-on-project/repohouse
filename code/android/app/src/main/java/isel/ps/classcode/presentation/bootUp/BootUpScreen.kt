@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -38,20 +39,22 @@ const val BOOT_UP_DELAY = 2000L
 @Composable
 fun BootUpScreen(actionHandler: () -> Unit = { }) {
     var visible by remember { mutableStateOf(true) }
-    LaunchedEffect(Unit) {
-        delay(timeMillis = BOOT_UP_DELAY)
-        visible = false
-        actionHandler()
-    }
-    AnimatedVisibility(
-        visible = visible,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
-        enter = slideInHorizontally() + fadeIn(animationSpec = tween(durationMillis = 1000, easing = LinearEasing)),
-        exit = fadeOut(animationSpec = tween(durationMillis = 1000, easing = LinearEasing))
-    ) {
-        IselLogoView()
+    Box(modifier = Modifier.fillMaxSize()) {
+        LaunchedEffect(Unit) {
+            delay(timeMillis = BOOT_UP_DELAY)
+            visible = false
+            actionHandler()
+        }
+        AnimatedVisibility(
+            visible = visible,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background),
+            enter = slideInHorizontally() + fadeIn(animationSpec = tween(durationMillis = 1000, easing = LinearEasing)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 1000, easing = LinearEasing))
+        ) {
+            IselLogoView()
+        }
     }
 }
 

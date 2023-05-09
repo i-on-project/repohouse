@@ -2,6 +2,9 @@ package isel.ps.classcode.domain.deserialization
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/**
+ * Class used to deserialize the ClassCodeStudent response from the database
+ */
 data class ClassCodeStudentDeserialization(
     @JsonProperty("name") val name: String,
     @JsonProperty("email") val email: String,

@@ -5,6 +5,9 @@ import isel.ps.classcode.domain.dto.LocalClassroomDto
 import java.sql.Timestamp
 
 
+/**
+ * The class that represents a classroom.
+ */
 data class Classroom(
     val id: Int,
     val name: String,
@@ -21,6 +24,10 @@ data class Classroom(
         isArchived = classCodeClassroomDeserialization.isArchived,
         courseId = classCodeClassroomDeserialization.courseId
     )
+
+    /**
+     * Function to pass a classroom to a local classroom dto.
+     */
     fun toLocalClassroomDto(): LocalClassroomDto = LocalClassroomDto(
         id = id,
         name = name,

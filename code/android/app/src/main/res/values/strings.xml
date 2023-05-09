@@ -13,7 +13,8 @@
     <string name="archived_icon">Archived icon</string>
     <string name="assignment_icon">Assignment icon</string>
     <string name="filter_icon">Filter icon</string>
-    <string name="checked_icon">checked icon</string>
+    <string name="checked_icon">Checked icon</string>
+    <string name="warning_icon">Warning icon</string>
     <string name="logout_icon">Logout icon</string>
     <string name="logout">Logout</string>
     <string name="dropdown_menu_item_normal">Normal</string>

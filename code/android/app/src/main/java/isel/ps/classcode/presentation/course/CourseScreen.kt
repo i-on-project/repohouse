@@ -44,8 +44,10 @@ import androidx.compose.ui.unit.dp
 import isel.ps.classcode.R
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.Course
+import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.login.LoginScreen
 import isel.ps.classcode.presentation.views.AvatarImage
+import isel.ps.classcode.presentation.views.ClassCodeErrorView
 import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
 import isel.ps.classcode.ui.theme.ClasscodeTheme
@@ -61,6 +63,8 @@ fun CourseScreen(
     classrooms: List<Classroom>? = null,
     onClassroomSelected: (Classroom) -> Unit,
     onBackRequest: () -> Unit,
+    error: HandleClassCodeResponseError? = null,
+    onDismissRequest: () -> Unit =  {}
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -83,6 +87,9 @@ fun CourseScreen(
                 .padding(top = it.calculateTopPadding(), start = 16.dp, end = 16.dp)
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
+            if (error != null) {
+                ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
+            }
             ShowCourseInfo(course = course)
             Spacer(modifier = Modifier.size(8.dp))
             if (classrooms != null) {
@@ -191,17 +198,17 @@ private fun ChooseListFilter(type: ListFilter, onTypeChange: (ListFilter) -> Uni
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_normal)) },
                 onClick = { onTypeChange(ListFilter.NORMAL) },
-                trailingIcon = { if (type == ListFilter.NORMAL) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.NORMAL) ChosenIcon() }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_archived)) },
                 onClick = { onTypeChange(ListFilter.ARCHIVED) },
-                trailingIcon = { if (type == ListFilter.ARCHIVED) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.ARCHIVED) ChosenIcon() }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_unarchived)) },
                 onClick = { onTypeChange(ListFilter.UNARCHIVED) },
-                trailingIcon = { if (type == ListFilter.UNARCHIVED) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.UNARCHIVED) ChosenIcon() }
             )
         }
     }

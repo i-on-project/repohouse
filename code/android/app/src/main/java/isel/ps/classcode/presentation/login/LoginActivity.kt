@@ -15,6 +15,7 @@ import isel.ps.classcode.CLASSCODE_AUTH_URL
 import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.R
 import isel.ps.classcode.TAG
+import isel.ps.classcode.presentation.connectivityObserver.NetworkConnectivityObserver
 import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.menu.MenuActivity
 import isel.ps.classcode.ui.theme.ClasscodeTheme
@@ -24,9 +25,11 @@ class LoginActivity : ComponentActivity() {
     private val githubLoginServices: LoginServices by lazy { (application as DependenciesContainer).loginServices }
 
     companion object {
-        fun navigate(origin: ComponentActivity) {
+        fun navigate(origin: ComponentActivity, flags: Int? = null) {
             with(origin) {
-                val intent = Intent(this, LoginActivity::class.java)
+                val intent = Intent(this, LoginActivity::class.java).apply {
+                    flags?.let { addFlags(it) }
+                }
                 startActivity(intent)
             }
         }
@@ -36,7 +39,7 @@ class LoginActivity : ComponentActivity() {
     private val vm by viewModels<LoginViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return LoginViewModel(loginServices = githubLoginServices) as T
+                return LoginViewModel(loginServices = githubLoginServices, connectivityObserver = NetworkConnectivityObserver(context = this@LoginActivity)) as T
             }
         }
     }
@@ -46,6 +49,8 @@ class LoginActivity : ComponentActivity() {
         setContent {
             ClasscodeTheme {
                 LoginScreen(
+                    error = vm.error,
+                    onDismissRequest = { finish() },
                     loginHandler = {
                         sendToClassscodeToStartOauthScheme()
                     },

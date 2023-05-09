@@ -18,5 +18,9 @@ data class Course(
         orgId = classCodeCourseWithoutClassroomsDeserialization.orgId,
         name = classCodeCourseWithoutClassroomsDeserialization.name
     )
+
+    /**
+     * Function to pass a course to a local course dto.
+     */
     fun toLocalCourseDto(): LocalCourseDto = LocalCourseDto(id = id, name = name, orgUrl = orgUrl, orgId = orgId)
 }

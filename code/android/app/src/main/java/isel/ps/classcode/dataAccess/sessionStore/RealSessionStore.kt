@@ -81,15 +81,18 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
             ).data
         }
 
-    override suspend fun checkIfGithubTokenExists(): Boolean {
-        return dataStore.data.map { preferences ->
-            preferences.contains(githubTokenKey) // Use a default value if the entry doesn't exist
-        }.first()
+    override suspend fun cleanTokens() {
+        dataStore.edit { preferences ->
+            preferences.remove(githubTokenKey)
+            preferences.remove(githubIv)
+            preferences.remove(classCodeCookieKey)
+            preferences.remove(classCodeIv)
+        }
     }
 
-    override suspend fun checkIfClassCodeTokenExists(): Boolean {
+    override suspend fun checkIfTokensExists(): Boolean {
         return dataStore.data.map { preferences ->
-            preferences.contains(classCodeCookieKey) // Use a default value if the entry doesn't exist
+            preferences.contains(githubTokenKey) && preferences.contains(classCodeCookieKey) // Use a default value if the entry doesn't exist
         }.first()
     }
 }

@@ -10,6 +10,7 @@ interface SessionStore {
     suspend fun storeClassCodeSessionCookie(token: String)
     fun getGithubToken(): Flow<String>
     fun getSessionCookie(): Flow<String>
-    suspend fun checkIfGithubTokenExists(): Boolean
-    suspend fun checkIfClassCodeTokenExists(): Boolean
+
+    suspend fun cleanTokens()
+    suspend fun checkIfTokensExists(): Boolean
 }

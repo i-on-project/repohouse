@@ -3,6 +3,9 @@ package isel.ps.classcode.dataAccess.sessionStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
+/**
+ *  Implementation of session store for tests
+ */
 class FakeSessionStore(alreadyLoggedIn: Boolean): SessionStore {
     private var gitHubTokenStorage: String? = if (alreadyLoggedIn) "githubToken" else null
     private var classCodeTokenStorage: String? = if (alreadyLoggedIn) "classcodeToken" else null
@@ -24,11 +27,11 @@ class FakeSessionStore(alreadyLoggedIn: Boolean): SessionStore {
         return flowOf(token)
     }
 
-    override suspend fun checkIfGithubTokenExists(): Boolean {
-        return gitHubTokenStorage != null
+    override suspend fun cleanTokens() {
+        gitHubTokenStorage = null
+        classCodeTokenStorage = null
     }
 
-    override suspend fun checkIfClassCodeTokenExists(): Boolean {
-        return classCodeTokenStorage != null
-    }
+    override suspend fun checkIfTokensExists(): Boolean =
+        gitHubTokenStorage != null && classCodeTokenStorage != null
 }

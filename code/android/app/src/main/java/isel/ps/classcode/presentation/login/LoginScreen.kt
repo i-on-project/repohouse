@@ -22,12 +22,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.ps.classcode.R
+import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.presentation.views.ClassCodeErrorView
 import isel.ps.classcode.presentation.views.TopBar
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(loginHandler: () -> Unit = {  }) {
+fun LoginScreen(
+    loginHandler: () -> Unit = {  },
+    error: HandleClassCodeResponseError? = null,
+    onDismissRequest: () -> Unit =  {}
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { TopBar(name = stringResource(id = R.string.login)) },
@@ -41,6 +47,9 @@ fun LoginScreen(loginHandler: () -> Unit = {  }) {
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (error != null) {
+                ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
+            }
             @DrawableRes val logo = if (isSystemInDarkTheme()) R.drawable.github_mark_white else R.drawable.github_mark
             Image(
                 painter = painterResource(id = logo),
