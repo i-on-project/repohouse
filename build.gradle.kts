@@ -66,3 +66,27 @@ tasks.withType<Test> {
 tasks.named("check") {
     dependsOn("ktlintCheck")
 }
+
+task<Exec>("dbDockerUp") {
+    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-docker")
+}
+
+task<Exec>("dbDockerWait") {
+    commandLine("docker", "exec", "db-docker", "/app/bin/wait-for-postgres.sh", "localhost")
+    dependsOn("dbDockerUp")
+}
+
+task<Exec>("dbDockerDown") {
+    commandLine("docker-compose", "down")
+}
+
+task<Exec>("composeUp") {
+    commandLine("POSTGRES_USER=${System.getenv("POSTGRES_USER")}", "POSTGRES_PASSWORD=${System.getenv("POSTGRES_PASSWORD")}" , "docker-compose", "up", "--build", "--force-recreate")
+    dependsOn("extractUberJar")
+}
+
+tasks.named("check") {
+    dependsOn("ktlintCheck")
+    dependsOn("dbDockerWait")
+    finalizedBy("dbDockerDown")
+}
