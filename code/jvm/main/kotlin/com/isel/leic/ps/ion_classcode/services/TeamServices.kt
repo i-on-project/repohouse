@@ -145,10 +145,10 @@ class TeamServices(
                 ?: return@run Result.Problem(TeamServicesError.InternalError)
             if (classroom.isArchived) return@run Result.Problem(TeamServicesError.ClassroomArchived)
             when (it.teamRepository.getTeamById(joinInfo.teamId)) {
-                null -> Result.Problem(TeamServicesError.TeamNotFound)
+                null -> return@run Result.Problem(TeamServicesError.TeamNotFound)
                 else -> {
                     val request = it.joinTeamRepository.createJoinTeamRequest(joinInfo, creator)
-                    Result.Success(request)
+                    return@run Result.Success(request)
                 }
             }
         }
@@ -163,7 +163,7 @@ class TeamServices(
                 ?: return@run Result.Problem(TeamServicesError.ClassroomNotFound)
             if (classroom.isArchived) return@run Result.Problem(TeamServicesError.ClassroomArchived)
             when (it.teamRepository.getTeamById(teamId)) {
-                null -> Result.Problem(TeamServicesError.TeamNotFound)
+                null -> return@run Result.Problem(TeamServicesError.TeamNotFound)
                 else -> {
                     val request = it.requestRepository.getRequestById(requestId)
                         ?: return@run Result.Problem(TeamServicesError.RequestNotFound)
@@ -177,12 +177,12 @@ class TeamServices(
                                 it.requestRepository.changeStateRequest(reqId, "Pending")
                             }
                         } else {
-                            Result.Problem(TeamServicesError.RequestNotFound)
+                            return@run Result.Problem(TeamServicesError.RequestNotFound)
                         }
                     } else {
                         it.requestRepository.changeStateRequest(requestId, "Pending")
                     }
-                    Result.Success(true)
+                    return@run Result.Success(true)
                 }
             }
         }
@@ -197,10 +197,10 @@ class TeamServices(
             val classroom = it.classroomRepository.getClassroomById(classroomId) ?: return@run Result.Problem(TeamServicesError.ClassroomNotFound)
             if (classroom.isArchived) return@run Result.Problem(TeamServicesError.ClassroomArchived)
             when (it.teamRepository.getTeamById(feedbackInfo.teamId)) {
-                null -> Result.Problem(TeamServicesError.TeamNotFound)
+                null -> return@run Result.Problem(TeamServicesError.TeamNotFound)
                 else -> {
                     val feedback = it.feedbackRepository.createFeedback(feedbackInfo)
-                    Result.Success(feedback)
+                    return@run Result.Success(feedback)
                 }
             }
         }

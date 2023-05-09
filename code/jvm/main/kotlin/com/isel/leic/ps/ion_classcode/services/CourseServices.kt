@@ -46,11 +46,11 @@ class CourseServices(
      */
     fun getCourseById(courseId: Int, userId: Int, student: Boolean): CourseResponse {
         return transactionManager.run {
-            if (it.usersRepository.getUserById(userId) == null) Result.Problem(CourseServicesError.InternalError)
+            if (it.usersRepository.getUserById(userId) == null) return@run Result.Problem(CourseServicesError.InternalError)
             val course = it.courseRepository.getCourse(courseId) ?: return@run Result.Problem(CourseServicesError.CourseNotFound)
             val classrooms = it.courseRepository.getCourseUserClassrooms(courseId, userId, student)
             val students = it.courseRepository.getStudentInCourse(courseId)
-            Result.Success(
+            return@run Result.Success(
                 CourseWithClassrooms(
                     id = course.id,
                     orgUrl = course.orgUrl,
@@ -71,16 +71,16 @@ class CourseServices(
     fun createCourse(courseInfo: CourseInputModel, teacherId: Int): CourseCreatedResponse {
         if (courseInfo.isNotValid()) return Result.Problem(CourseServicesError.InvalidInput)
         return transactionManager.run {
-            if (it.usersRepository.getTeacher(teacherId) == null) Result.Problem(CourseServicesError.InternalError)
+            if (it.usersRepository.getTeacher(teacherId) == null) return@run Result.Problem(CourseServicesError.InternalError)
             val courseByOrg = it.courseRepository.getCourseByOrg(courseInfo.orgUrl)
             if (courseByOrg != null) {
-                Result.Success(it.courseRepository.addTeacherToCourse(teacherId, courseByOrg.id))
+                return@run Result.Success(it.courseRepository.addTeacherToCourse(teacherId, courseByOrg.id))
             } else if (it.courseRepository.checkIfCourseNameExists(courseInfo.name)) {
-                Result.Problem(CourseServicesError.CourseNameAlreadyExists)
+                return@run Result.Problem(CourseServicesError.CourseNameAlreadyExists)
             }
             val id = it.courseRepository.createCourse(CourseInput(courseInfo.orgUrl, courseInfo.name, courseInfo.orgId, teacherId)).id
             val course = it.courseRepository.addTeacherToCourse(teacherId, id)
-            Result.Success(course)
+            return@run Result.Success(course)
         }
     }
 
@@ -91,14 +91,14 @@ class CourseServices(
     fun archiveOrDeleteCourse(courseId: Int): CourseArchivedResponse {
         return transactionManager.run {
             val course = it.courseRepository.getCourse(courseId) ?: return@run Result.Problem(CourseServicesError.CourseNotFound)
-            if (course.isArchived) Result.Problem(CourseServicesError.CourseArchived)
+            if (course.isArchived) return@run Result.Problem(CourseServicesError.CourseArchived)
             val classrooms = it.courseRepository.getCourseAllClassrooms(courseId)
             if (classrooms.isNotEmpty()) {
                 it.courseRepository.archiveCourse(courseId)
-                Result.Success(CourseArchivedResult.CourseArchived)
+                return@run Result.Success(CourseArchivedResult.CourseArchived)
             } else {
                 it.courseRepository.deleteCourse(courseId)
-                Result.Success(CourseArchivedResult.CourseDeleted)
+                return@run Result.Success(CourseArchivedResult.CourseDeleted)
             }
         }
     }
@@ -108,10 +108,11 @@ class CourseServices(
      */
     fun leaveCourse(courseId: Int, userId: Int): LeaveCourseResponse {
         return transactionManager.run {
-            if (it.courseRepository.getCourse(courseId) == null) Result.Problem(CourseServicesError.CourseNotFound)
-            if (!it.courseRepository.isStudentInCourse(userId, courseId)) Result.Problem(CourseServicesError.UserNotInCourse)
+            if (it.usersRepository.getUserById(userId) == null) return@run Result.Problem(CourseServicesError.InternalError)
+            if (it.courseRepository.getCourse(courseId) == null) return@run Result.Problem(CourseServicesError.CourseNotFound)
+            if (!it.courseRepository.isStudentInCourse(userId, courseId)) return@run Result.Problem(CourseServicesError.UserNotInCourse)
             val course = it.courseRepository.leaveCourse(courseId, userId)
-            Result.Success(course)
+            return@run Result.Success(course)
         }
     }
 

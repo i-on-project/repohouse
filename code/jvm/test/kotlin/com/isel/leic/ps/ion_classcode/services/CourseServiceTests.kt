@@ -52,15 +52,26 @@ class CourseServiceTests {
                         on {
                             createCourse(course = CourseInput(orgUrl = "orgUrl3", name = "courseName3", teacherId = 1, orgId = 2222))
                         } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 2222)
+                        on {
+                            createCourse(course = CourseInput(orgUrl = "orgUrl", name = "courseName3", teacherId = 1, orgId = 2222))
+                        } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 2222)
                         on { getCourse(courseId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 1111)
                         on { getCourse(courseId = 2) } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(teacherWithoutToken), isArchived = true, orgId = 2222)
                         on { getCourse(courseId = 3) } doReturn Course(id = 3, orgUrl = "orgUrl2", name = "courseName2", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 3333)
                         on { getCourseUserClassrooms(courseId = 1, userId = 2, student = true) } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteLink = "inviteLink"))
                         on { getStudentInCourse(courseId = 1) } doReturn listOf(student)
                         on { getCourseByOrg(orgUrl = "orgUrl") } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 1111)
+                        on { getCourseByOrg(orgUrl = "orgUrl3") } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(
+                            teacherWithoutToken,
+                            TeacherWithoutToken(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, isCreated = false)), isArchived = false, orgId = 2222)
                         on {
                             addTeacherToCourse(teacherId = 1, courseId = 2)
-                        } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(
+                        } doReturn Course(id = 2, orgUrl = "orgUrl", name = "courseName", teachers = listOf(
+                            teacherWithoutToken,
+                            TeacherWithoutToken(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, isCreated = false)), isArchived = false, orgId = 2222)
+                        on {
+                            addTeacherToCourse(teacherId = 1, courseId = 1)
+                        } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(
                             teacherWithoutToken,
                             TeacherWithoutToken(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, isCreated = false)), isArchived = false, orgId = 2222)
                         on { checkIfCourseNameExists(name = "courseName") } doReturn true
@@ -102,7 +113,7 @@ class CourseServiceTests {
     }
 
     @Test
-    fun `getCourseById should give an InvalidInput because the userId is invalid`() {
+    fun `getCourseById should give an InternalError because the userId is invalid`() {
         // given: an invalid user id and a valid course id
         val userId = -1
         val courseId = 1
@@ -282,8 +293,8 @@ class CourseServiceTests {
         val course = courseService.createCourse(
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl",
-                name = "name",
-                orgId = 1
+                name = "courseName3",
+                orgId = 2222
             ),
             teacherId = 1
         )
@@ -303,7 +314,7 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl3",
                 name = "courseName3",
-                orgId = 5
+                orgId = 2222
             ),
             teacherId = 1
         )
@@ -416,7 +427,7 @@ class CourseServiceTests {
     }
 
     @Test
-    fun `leaveCourse should give an UserNotInCourse because the userId is invalid`() {
+    fun `leaveCourse should give an InternalError because the userId is invalid`() {
         // given: an invalid user id and a valid course id
         val userId = -1
         val courseId = 1
@@ -425,7 +436,7 @@ class CourseServiceTests {
         val course = courseService.leaveCourse(courseId = courseId, userId = userId)
 
         if (course is Result.Problem) {
-            assert(course.value is CourseServicesError.UserNotInCourse)
+            assert(course.value is CourseServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -448,16 +459,16 @@ class CourseServiceTests {
     }
 
     @Test
-    fun `leaveCourse should give an UserNotFound because the the user id does not exist in database`() {
+    fun `leaveCourse should give an InternalError because the the user id does not exist in database`() {
         // given: a valid user id and a valid course id
         val courseId = 1
-        val userId = 2
+        val userId = 5
 
         // when: getting an error because the user id that doesn't exist in database
         val course = courseService.leaveCourse(courseId = courseId, userId = userId)
 
         if (course is Result.Problem) {
-            assert(course.value is CourseServicesError.UserNotInCourse)
+            assert(course.value is CourseServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }

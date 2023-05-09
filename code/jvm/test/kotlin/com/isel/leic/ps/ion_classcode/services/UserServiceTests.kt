@@ -1,11 +1,13 @@
 package com.isel.leic.ps.ion_classcode.services
 
+import com.isel.leic.ps.ion_classcode.domain.Course
 import com.isel.leic.ps.ion_classcode.domain.PendingStudent
 import com.isel.leic.ps.ion_classcode.domain.PendingTeacher
 import com.isel.leic.ps.ion_classcode.domain.Student
 import com.isel.leic.ps.ion_classcode.domain.Teacher
 import com.isel.leic.ps.ion_classcode.domain.input.StudentInput
 import com.isel.leic.ps.ion_classcode.domain.input.TeacherInput
+import com.isel.leic.ps.ion_classcode.repository.CourseRepository
 import com.isel.leic.ps.ion_classcode.repository.UsersRepository
 import com.isel.leic.ps.ion_classcode.repository.transaction.Transaction
 import com.isel.leic.ps.ion_classcode.repository.transaction.TransactionManager
@@ -162,6 +164,19 @@ class UserServiceTests {
                         )
 
                         on {
+                            getUserById(userId = 1)
+                        } doReturn Student(
+                            name = "student2",
+                            token = "token3",
+                            githubId = 1234152,
+                            githubUsername = "test12345",
+                            isCreated = false,
+                            email = "test3@alunos.isel.pt",
+                            id = 1,
+                            schoolId = 1235
+                        )
+
+                        on {
                             getUserByGithubId(githubId = 12555L)
                         } doReturn Teacher(
                             name = "teacher2",
@@ -212,8 +227,16 @@ class UserServiceTests {
                         on {
                             checkIfSchoolIdExists(schoolId = 1235)
                         } doReturn true
+
+                        on {
+                            getAccessTokenEncrypted(githubId = 12555)
+                        } doReturn "token"
+                    }
+                    val mockedCourseRepository = mock<CourseRepository> {
+                        on { getAllUserCourses(userId = 1) } doReturn listOf(Course(id = 1, orgUrl = "orgUrl", name = "name", teachers = listOf(), orgId = 1L))
                     }
                     on { usersRepository } doReturn mockedUsersRepository
+                    on { courseRepository } doReturn mockedCourseRepository
                 }
                 return block(mockedTransaction)
             }
@@ -386,12 +409,12 @@ class UserServiceTests {
 
     @Test
     fun `storeAccessTokenEncrypted should return`() {
-        val result = userServices.storeAccessTokenEncrypted(token = "KSDJksBANDPASS80H", 12345)
+        val result = userServices.storeAccessTokenEncrypted(token = "KSDJksBANDPASS80H", 12555)
 
         if (result is Result.Success) {
             assert(true)
         } else {
-            fail("Should not be Either.Right")
+            fail("Should not be Either.Left")
         }
     }
 
@@ -408,10 +431,10 @@ class UserServiceTests {
 
     @Test
     fun `getTokens should return if githubId is valid`() {
-        val result = userServices.getTokens(githubId = 12345)
+        val result = userServices.getTokens(githubId = 12555)
 
         if (result is Result.Success) {
-            assert(result.value.classCodeToken == "token")
+            assert(result.value.classCodeToken == "token1")
         } else {
             fail("Should not be Either.Left")
         }

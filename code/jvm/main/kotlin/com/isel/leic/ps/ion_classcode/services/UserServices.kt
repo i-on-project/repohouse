@@ -48,9 +48,9 @@ class UserServices(
         return transactionManager.run {
             val user = it.usersRepository.getUserByToken(token)
             if (user == null) {
-                Result.Problem(UserServicesError.UserNotAuthenticated)
+                return@run Result.Problem(UserServicesError.UserNotAuthenticated)
             } else {
-                Result.Success(user)
+                return@run Result.Success(user)
             }
         }
     }
@@ -64,7 +64,7 @@ class UserServices(
             val user = it.usersRepository.getUserByGithubId(githubId)
             if (user !is Teacher) return@run Result.Problem(UserServicesError.InternalError)
             it.usersRepository.storeAccessTokenEncrypted(token, githubId)
-            Result.Success(Unit)
+            return@run Result.Success(Unit)
         }
     }
 
@@ -78,10 +78,10 @@ class UserServices(
             if (user !is Teacher) return@run Result.Problem(UserServicesError.NotTeacher)
             val accessToken = it.usersRepository.getAccessTokenEncrypted(githubId)
             if (accessToken == null) {
-                Result.Problem(UserServicesError.InternalError)
+                return@run Result.Problem(UserServicesError.InternalError)
             } else {
                 it.usersRepository.deleteAccessTokenEncrypted(githubId)
-                Result.Success(Tokens(accessToken, user.token))
+                return@run Result.Success(Tokens(accessToken, user.token))
             }
         }
     }
@@ -93,9 +93,9 @@ class UserServices(
         return transactionManager.run {
             val user = it.usersRepository.getUserByGithubId(githubId)
             if (user == null) {
-                Result.Problem(UserServicesError.UserNotFound)
+                return@run Result.Problem(UserServicesError.UserNotFound)
             } else {
-                Result.Success(user)
+                return@run Result.Success(user)
             }
         }
     }
@@ -107,9 +107,9 @@ class UserServices(
         return transactionManager.run {
             val user = if (position == "Teacher") it.usersRepository.getPendingTeacherByGithubId(githubId) else it.usersRepository.getPendingStudentByGithubId(githubId)
             if (user == null) {
-                Result.Problem(UserServicesError.UserNotFound)
+                return@run Result.Problem(UserServicesError.UserNotFound)
             } else {
-                Result.Success(user)
+                return@run Result.Success(user)
             }
         }
     }
@@ -130,9 +130,9 @@ class UserServices(
      */
     fun getAllUserCourses(userId: Int): UserCoursesResponse {
         return transactionManager.run {
-            it.usersRepository.getUserById(userId) ?: Result.Problem(UserServicesError.InternalError)
+            it.usersRepository.getUserById(userId) ?: return@run Result.Problem(UserServicesError.InternalError)
             val courses = it.courseRepository.getAllUserCourses(userId)
-            Result.Success(courses)
+            return@run Result.Success(courses)
         }
     }
 
