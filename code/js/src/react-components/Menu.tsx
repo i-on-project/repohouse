@@ -33,6 +33,7 @@ export function ShowMenuFetch({
     const [isOpened, setIsOpened] = useState(false)
     const [inviteCode, setInviteCode] = useState<string>('')
     const [error, setError] = useState(false)
+    const navigate = useNavigate()
     const loggedIn = useLoggedIn()
 
     const handleChangeInviteCode = useCallback(async (value) => {
@@ -44,8 +45,10 @@ export function ShowMenuFetch({
         const response = await menuServices.inviteLink(inviteCode)
         if (response instanceof ErrorMessageModel) {
             setError(true)
-        } else {
+        }
+        if (response instanceof SirenEntity) {
             setIsOpened(false)
+            navigate('/courses/' + response.properties.courseId + "/classrooms/" + response.properties.classroom.id)
         }
     }, [inviteCode, setIsOpened, setError])
 

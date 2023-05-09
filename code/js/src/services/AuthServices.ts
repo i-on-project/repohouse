@@ -50,7 +50,12 @@ export class AuthServices {
         return await fetchGet<StateDtoProperties>(link.href)
     }
 
-    async logout() {
+    resend = async () => {
+        const link = await navigationRepository.ensureAction(Hypermedia.AUTH_RESEND_KEY, systemServices.home)
+        return await fetchPost<StatusDtoProperties>(link.href)
+    }
+
+    logout = async () => {
         const link = await navigationRepository.ensureAction(Hypermedia.LOGOUT_KEY, systemServices.home)
         return await fetchPost(link.href)
     }

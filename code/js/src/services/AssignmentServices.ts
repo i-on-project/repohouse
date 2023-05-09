@@ -27,12 +27,6 @@ export class AssignmentServices {
         return await fetchDelete<AssignmentDeletedDtoProperties>(href)
     }
 
-    editAssignment = async (body: AssignmentBody) => {
-        const link = await navigationRepository.ensureLink(Hypermedia.COURSE_KEY, systemServices.home)
-        //TODO
-        return await fetchPost<AssignmentDtoProperties>(link.href, body)
-    }
-
     joinTeam = async (body:JoinTeamBody,courseId,classroomId,assignmentId) => {
         const link = await navigationRepository.ensureAction(Hypermedia.JOIN_TEAM_KEY, systemServices.home)
         const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId})

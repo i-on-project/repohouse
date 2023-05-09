@@ -34,7 +34,7 @@ export function ShowDeliveryFetch({
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            // TODO: refresh/update content of the delivery page
+            navigate(`/courses/${courseId}/classrooms/${classroomId}/assignments/${assignmentId}/deliveries/${deliveryId}`, {replace: true})
         }
     }, [setError]);
 
@@ -103,8 +103,15 @@ export function ShowDeliveryFetch({
                         variant="subtitle1"
                         sx={typographyStyle}
                     >
-                        {"Last Sync Time: " }
-                        // TODO: add last sync time
+                        {"Last Sync Time: " + content.properties.delivery.lastSync.toLocaleString(
+                            "en-GB",
+                            {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                month: "short",
+                                day: "2-digit"
+                            }
+                        )}
                     </Typography>
                     <Grid
                         container

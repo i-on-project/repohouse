@@ -9,6 +9,7 @@ export const AUTH_REGISTER_STUDENT = "registerStudent"
 export const AUTH_REGISTER_TEACHER = "registerTeacher"
 export const AUTH_STATUS_KEY = "status"
 export const AUTH_STATE_KEY = "state"
+export const AUTH_RESEND_KEY = "resendEmail"
 export const AUTH_VERIFY_STUDENT_KEY = "verify"
 export const LOGOUT_KEY = "logout"
 export const ORGS_KEY = "orgs"
@@ -88,5 +89,6 @@ export const systemActionKeys = [
     DELETE_ASSIGNMENT_KEY,
     CREATE_DELIVERY_KEY,
     EDIT_DELIVERY_KEY,
-    CHANGE_REQUEST_STATUS_KEY
+    CHANGE_REQUEST_STATUS_KEY,
+    AUTH_RESEND_KEY
 ]

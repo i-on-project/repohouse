@@ -4,7 +4,7 @@ import { fetchGet, fetchPost } from "../http/Fetch"
 import { MenuDtoProperties}  from "../domain/dto/MenuDtoProperties"
 import { TeacherPendingApprovalDtoProperties } from "../domain/dto/TeacherDtoProperties"
 import { parse } from "uri-template"
-import { ClassroomDtoProperties } from "../domain/dto/ClassroomDtoProperties"
+import {ClassroomDtoProperties, ClassroomInviteDtoProperties} from "../domain/dto/ClassroomDtoProperties"
 
 
 export class MenuServices {
@@ -33,6 +33,6 @@ export class MenuServices {
     inviteLink = async (inviteCode) => {
         const link = await navigationRepository.ensureAction(Hypermedia.INVITE_CODE_KEY, systemServices.home)
         const href = parse(link.href).expand({inviteLink: inviteCode})
-        return await fetchPost<ClassroomDtoProperties>(href, null)
+        return await fetchPost<ClassroomInviteDtoProperties>(href, null)
     }
 }
