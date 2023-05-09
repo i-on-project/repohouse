@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.first
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
+/**
+ * Implementation of the [CourseServices] interface that will be in the real app
+ */
+
 class RealCourseServices(private val sessionStore: SessionStore, private val objectMapper: ObjectMapper, private val httpClient: OkHttpClient) : CourseServices {
     override suspend fun getClassrooms(courseId: Int): Either<HandleClassCodeResponseError, List<Classroom>> {
         val cookie = sessionStore.getSessionCookie()

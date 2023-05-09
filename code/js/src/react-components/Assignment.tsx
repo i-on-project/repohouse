@@ -467,29 +467,28 @@ export function ShowAssigmentTeamsFetch({
     const [teamName, setTeamName] = useState<string>(null)
     const navigate = useNavigate()
 
-    const handleJoinTeam = useCallback((event:any) => {
+    const handleJoinTeam = useCallback(async (event:any) => {
         event.preventDefault()
         const teamId = event.target.value
         const body = new JoinTeamBody(assignment.id,teamId)
-        const response = assignmentServices.joinTeam(body,courseId,classroomId,assignment.id)
+        const response = await assignmentServices.joinTeam(body,courseId,classroomId,assignment.id)
         if(response instanceof ErrorMessageModel) {
             setError(response)
         }
         if (response instanceof SirenEntity) {
-            navigate("/courses/" + courseId +"/classrooms/"+classroomId+"/assignments/"+assignment.id+"teams/"+teamId, { replace: true })
+            navigate("/courses/" + courseId +"/classrooms/"+classroomId+"/assignments/"+assignment.id+"/teams/"+teamId, { replace: true })
         }
     },[setError])
 
-    const handleCreateTeam = useCallback((event:any) => {
+    const handleCreateTeam = useCallback(async (event: any) => {
         event.preventDefault()
         const body = new CreateTeamBody(null)
-        const response = assignmentServices.createTeam(body,courseId,classroomId,assignment.id)
-        if(response instanceof ErrorMessageModel) {
+        const response = await assignmentServices.createTeam(body, courseId, classroomId, assignment.id)
+        if (response instanceof ErrorMessageModel) {
             setError(response)
         }
         if (response instanceof SirenEntity) {
-            // TODO: Check this, maybe id is not the correct property
-            navigate("/courses/" + courseId +"/classrooms/"+classroomId+"/assignments/"+assignment.id+"teams/"+response.properties.id, { replace: true })
+            navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assignments/" + assignment.id + "/teams/" + response.properties.id, {replace: true})
         }
     },[setError])
 

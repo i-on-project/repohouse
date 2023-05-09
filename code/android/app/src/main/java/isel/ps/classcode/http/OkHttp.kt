@@ -3,9 +3,10 @@ package isel.ps.classcode.http
 import com.fasterxml.jackson.core.exc.StreamReadException
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
+import isel.ps.classcode.domain.GitHubError
+import isel.ps.classcode.domain.ProblemJson
 import isel.ps.classcode.domain.deserialization.GithubErrorDeserialization
 import isel.ps.classcode.domain.deserialization.ProblemJsonDeserialization
-import isel.ps.classcode.http.hypermedia.SirenEntity
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.utils.Either
@@ -54,7 +55,8 @@ inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper
     }
     else {
         try {
-            Either.Left(value = HandleGitHubResponseError.FailRequest(error = jsonMapper.readValue(body, GithubErrorDeserialization::class.java)))
+            val githubErrorDeserialization = jsonMapper.readValue(body, GithubErrorDeserialization::class.java)
+            Either.Left(value = HandleGitHubResponseError.FailRequest(error = GitHubError(githubErrorDeserialization = githubErrorDeserialization)))
         } catch (e: StreamReadException) {
             Either.Left(value = HandleGitHubResponseError.FailDeserialize(error = "Failed to deserialize error response body: $body"))
         }
@@ -75,12 +77,10 @@ inline fun <reified R : Any> handleSirenResponseClassCode(response: Response, ty
         }
     } else {
         try {
+            val problemJsonDeserialization = jsonMapper.readValue(body, ProblemJsonDeserialization::class.java)
             Either.Left(
-                value = HandleClassCodeResponseError.FailRequest(
-                    error = jsonMapper.readValue(
-                        body,
-                        ProblemJsonDeserialization::class.java
-                    )
+                    value = HandleClassCodeResponseError.FailRequest(
+                    error = ProblemJson(problemJsonDeserialization = problemJsonDeserialization)
                 )
             )
         } catch (e: StreamReadException) {

@@ -8,6 +8,9 @@ import kotlinx.coroutines.delay
 import java.sql.Timestamp
 import java.time.Instant
 
+/**
+ * Implementation of the [ClassroomServices] interface that will be used for tests
+ */
 class FakeClassroomServices : ClassroomServices {
     override suspend fun getAssignments(classroomId: Int, courseId: Int): Either<HandleClassCodeResponseError, List<Assignment>> {
         delay(2000)

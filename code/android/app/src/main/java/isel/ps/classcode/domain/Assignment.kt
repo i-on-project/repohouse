@@ -3,6 +3,9 @@ package isel.ps.classcode.domain
 import isel.ps.classcode.domain.deserialization.ClassCodeAssignmentDeserialization
 import java.sql.Timestamp
 
+/**
+ * The class that represents an assignment.
+ */
 data class Assignment(
     val id: Int,
     val classroomId: Int,

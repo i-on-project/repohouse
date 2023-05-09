@@ -6,6 +6,9 @@ import isel.ps.classcode.http.hypermedia.SirenEntity
 typealias ClassCodeCourseDto = SirenEntity<ClassCodeCourseWithClassroomsDeserialization>
 val ClassCodeCourseDtoType = SirenEntity.getType<ClassCodeCourseWithClassroomsDeserialization>()
 
+/**
+ * Class used to deserialize the ClassCodeCourse response from the database
+ */
 data class ClassCodeCourseWithClassroomsDeserialization (
     @JsonProperty("id")val id: Int,
     @JsonProperty("orgUrl")val orgUrl: String,

@@ -184,6 +184,7 @@ CREATE TABLE Delivery(
     due_date timestamp not null,
     tag_control text not null,
     assignment_id int not null,
+    last_sync timestamp not null,
     foreign key (assignment_id) references Assignment(id)
 );
 
@@ -238,4 +239,3 @@ CREATE TABLE OTP(
 );
 
 COMMIT;
-

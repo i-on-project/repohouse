@@ -47,15 +47,18 @@ class ClassroomActivity : ComponentActivity() {
         }
         setContent {
             ClasscodeTheme {
-                if (classroom != null)
+                if (classroom != null) {
                     ClassroomScreen(
                         classroom = classroom,
                         teams = vm.teams,
                         assignments = vm.assignments,
-                        onTeamSelected = {  },
+                        onTeamSelected = { },
                         onAssignmentChange = { assignment -> vm.getTeams(courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id) },
-                        onBackRequest = { finish() }
+                        onBackRequest = { finish() },
+                        error = vm.error,
+                        onDismissRequest = { finish() },
                     )
+                }
             }
         }
     }

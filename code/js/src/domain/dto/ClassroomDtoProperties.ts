@@ -31,6 +31,21 @@ export class ClassroomDtoProperties {
     }
 }
 
+export interface ClassroomInviteDtoProperties{
+    courseId: number,
+    classroom: ClassroomDtoProperties
+}
+
+export class ClassroomInviteDtoProperties {
+    constructor(
+        courseId: number,
+        classroom: ClassroomDtoProperties
+    ) {
+        this.courseId = courseId
+        this.classroom = classroom
+    }
+}
+
 export interface ClassroomBody {
     name: String,
 }

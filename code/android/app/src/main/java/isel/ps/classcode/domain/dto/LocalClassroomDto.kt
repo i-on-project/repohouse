@@ -5,6 +5,9 @@ import isel.ps.classcode.domain.Classroom
 import kotlinx.parcelize.Parcelize
 import java.sql.Timestamp
 
+/**
+ * The class that represents a classroom when passing info from a activity to another.
+ */
 @Parcelize
 data class LocalClassroomDto(
     val id: Int,
@@ -14,6 +17,10 @@ data class LocalClassroomDto(
     val isArchived: Boolean,
     val courseId: Int
 ): Parcelable {
+
+    /**
+     * Function to pass a local classroom dto to a classroom.
+     */
     fun toClassroom(): Classroom = Classroom(
         id = id,
         name = name,

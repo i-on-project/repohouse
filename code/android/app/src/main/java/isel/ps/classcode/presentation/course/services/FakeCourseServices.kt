@@ -2,11 +2,15 @@ package isel.ps.classcode.presentation.course.services
 
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.presentation.menu.services.MenuServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.delay
 import java.sql.Timestamp
 import java.time.Instant
 
+/**
+ * Implementation of the [CourseServices] interface that will be used for tests
+ */
 class FakeCourseServices: CourseServices {
     override suspend fun getClassrooms(courseId: Int): Either<HandleClassCodeResponseError, List<Classroom>> {
         delay(2000)

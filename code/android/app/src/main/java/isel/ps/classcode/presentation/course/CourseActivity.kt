@@ -55,6 +55,8 @@ class CourseActivity: ComponentActivity() {
                             ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto())
                         },
                         classrooms = vm.classrooms,
+                        error = vm.error,
+                        onDismissRequest = { finish() },
                     )
                 }
                 else {

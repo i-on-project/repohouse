@@ -3,6 +3,9 @@ package isel.ps.classcode.domain.deserialization
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.sql.Timestamp
 
+/**
+ * Class used to deserialize the ClassCodeClassroom response from the database
+ */
 data class ClassCodeClassroomDeserialization(
     @JsonProperty("id") val id: Int,
     @JsonProperty("name") val name: String,

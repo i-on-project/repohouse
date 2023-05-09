@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.presentation.course.CourseActivity
 import isel.ps.classcode.presentation.credits.CreditsActivity
+import isel.ps.classcode.presentation.login.LoginActivity
 import isel.ps.classcode.presentation.menu.services.MenuServices
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
@@ -46,7 +47,7 @@ class MenuActivity : ComponentActivity() {
                     courses = vm.courses,
                     onBackRequest = {
                         vm.logout()
-                        finish()
+                        LoginActivity.navigate(origin = this, flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     },
                     onCreditsRequested = { CreditsActivity.navigate(origin = this) },
                     onCourseSelected = { course ->

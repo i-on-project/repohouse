@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
+/**
+ * The user that is trying to log in classcode server is not present in the classcode
+ */
 class UserNotFoundErrorActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

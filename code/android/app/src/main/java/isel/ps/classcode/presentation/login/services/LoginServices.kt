@@ -1,8 +1,6 @@
 package isel.ps.classcode.presentation.login.services
 
-import isel.ps.classcode.domain.AuthInfo
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
-import isel.ps.classcode.http.utils.HandleRedirectClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 
 

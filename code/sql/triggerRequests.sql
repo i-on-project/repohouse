@@ -80,5 +80,26 @@ CREATE trigger DeleteTeachersTrigger
 after delete on teacher
 for each row execute procedure DeleteTeachers();
 
+
+CREATE OR REPLACE FUNCTION SyncClassroom()
+    RETURNS trigger
+AS $$
+begin
+    if (new.last_sync != old.last_sync) then
+        update classroom set last_sync = new.last_sync where id = (
+            select classroom_id from assignment where id = new.assignment_id
+        );
+        return new;
+    end if;
+end;
+$$ LANGUAGE plpgsql;
+
+CREATE trigger SyncClassroom
+    after update on delivery
+    for each row execute procedure SyncClassroom();
+
+
 COMMIT TRANSACTION;
+
+
 

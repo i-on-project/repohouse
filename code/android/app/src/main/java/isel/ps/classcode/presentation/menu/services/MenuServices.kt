@@ -12,5 +12,5 @@ import isel.ps.classcode.presentation.utils.Either
 interface MenuServices {
     suspend fun getUserInfo(): Either<HandleGitHubResponseError, UserInfo>
     suspend fun getCourses(): Either<HandleClassCodeResponseError, List<Course>>
-    fun logout()
+    suspend fun logout()
 }

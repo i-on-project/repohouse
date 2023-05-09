@@ -44,7 +44,9 @@ import isel.ps.classcode.R
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.Team
+import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.course.ChosenIcon
+import isel.ps.classcode.presentation.views.ClassCodeErrorView
 import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
 
@@ -61,6 +63,8 @@ fun ClassroomScreen(
     assignments: List<Assignment>? = null,
     onAssignmentChange: (Assignment) -> Unit,
     onBackRequest: () -> Unit,
+    error: HandleClassCodeResponseError? = null,
+    onDismissRequest: () -> Unit =  {}
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -83,6 +87,9 @@ fun ClassroomScreen(
                 .padding(top = it.calculateTopPadding(), start = 24.dp, end = 24.dp)
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
+            if (error != null) {
+                ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
+            }
             ShowClassroom(classroom = classroom)
             if (teams != null && assignments != null) {
                 ShowTeams(teams = teams, onTeamSelected = onTeamSelected, assignments = assignments, onAssignmentChange = onAssignmentChange)
@@ -202,17 +209,17 @@ private fun ChooseListFilter(type: ListFilter, onTypeChange: (ListFilter) -> Uni
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_normal)) },
                 onClick = { onTypeChange(ListFilter.NORMAL) },
-                trailingIcon = { if (type == ListFilter.NORMAL) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.NORMAL) ChosenIcon() }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_created)) },
                 onClick = { onTypeChange(ListFilter.CREATED) },
-                trailingIcon = { if (type == ListFilter.CREATED) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.CREATED) ChosenIcon() }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_not_created)) },
                 onClick = { onTypeChange(ListFilter.NOT_CREATED) },
-                trailingIcon = { if (type == ListFilter.NOT_CREATED) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.NOT_CREATED) ChosenIcon() }
             )
         }
     }
@@ -237,7 +244,7 @@ private fun ChooseAssignmentFilter(currentAssignment: Assignment?, assignments: 
                 DropdownMenuItem(
                     text = { Text(assignment.title) },
                     onClick = { onAssignmentChange(assignment) },
-                    trailingIcon = { if (currentAssignment == assignment) ChosenIcon() }
+                    leadingIcon = { if (currentAssignment == assignment) ChosenIcon() }
                 )
             }
         }

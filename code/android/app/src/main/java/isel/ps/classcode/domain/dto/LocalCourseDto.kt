@@ -5,7 +5,7 @@ import isel.ps.classcode.domain.Course
 import kotlinx.parcelize.Parcelize
 
 /**
- * Represents a course
+ * Represents a course when passing info from a activity to another.
  */
 @Parcelize
 data class LocalCourseDto(
@@ -14,5 +14,9 @@ data class LocalCourseDto(
     val orgId: Long,
     val name: String,
 ) : Parcelable {
+
+    /**
+     * Function to pass a local course dto to a course.
+     */
     fun toCourseDto(): Course = Course(id = id, name = name, orgId = orgId,orgUrl = orgUrl)
 }

@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
+/**
+ * This will be used, when the user that is trying to log in classcode server is a pending teacher, that means that it don´t have access to this app
+ */
 class PendingTeacherErrorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

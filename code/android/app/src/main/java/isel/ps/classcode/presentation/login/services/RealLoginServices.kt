@@ -18,7 +18,7 @@ import okhttp3.Request
 private data class Storage(val body: Either<HandleClassCodeResponseError, ClassCodeAuthDto>, val sessionCookie: String = "")
 
 /**
- * The implementation of login services that will be used on the final product
+ * Implementation of the [LoginServices] interface that will be used for the real app
  */
 class RealLoginServices(private val httpClient: OkHttpClient, private val objectMapper: ObjectMapper, private val sessionStore: SessionStore) :
     LoginServices {

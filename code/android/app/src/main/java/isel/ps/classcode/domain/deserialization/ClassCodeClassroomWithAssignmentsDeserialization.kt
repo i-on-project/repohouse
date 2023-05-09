@@ -7,6 +7,9 @@ import java.sql.Timestamp
 typealias ClassCodeClassroomWithAssignmentsDto = SirenEntity<ClassCodeClassroomWithAssignmentsDeserialization>
 val ClassCodeClassroomWithAssignmentsDtoType = SirenEntity.getType<ClassCodeClassroomWithAssignmentsDeserialization>()
 
+/**
+ * Class used to deserialize the ClassCodeClassroomWithAssignments response from the database
+ */
 data class ClassCodeClassroomWithAssignmentsDeserialization(
     @JsonProperty("id")val id: Int,
     @JsonProperty("name")val name: String,

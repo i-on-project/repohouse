@@ -39,6 +39,15 @@ export function ShowVerifyFetch({
         }
     },[otp,setError,setRedirect])
 
+    const handleResend = useCallback(async (event: any) => {
+        event.preventDefault()
+        const res = await authServices.resend()
+        if (res instanceof ErrorMessageModel) {
+            setError(res)
+        }
+    },[setError])
+
+
 
     if (redirect) {
         return <Navigate to={"/auth/student"}/>
@@ -54,8 +63,8 @@ export function ShowVerifyFetch({
                 Verify
             </Typography>
             <TextField label={"OTP"} required type={"number"} onChange={(event) => setOtp(Number(event.target.value))}/>
-            // TODO: add resend button
-            <Button onClick={handleSubmit}>Send</Button>
+            <Button onClick={handleResend}>Resend</Button>
+            <Button onClick={handleSubmit}>Verify</Button>
             <ErrorAlert error={serror} onClose={() => { setError(null) }}/>
         </Box>
     )
