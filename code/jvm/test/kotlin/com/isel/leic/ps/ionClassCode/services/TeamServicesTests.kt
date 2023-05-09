@@ -6,6 +6,7 @@ import com.isel.leic.ps.ionClassCode.domain.Feedback
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.FeedbackInput
+import com.isel.leic.ps.ionClassCode.domain.input.TeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
@@ -20,8 +21,10 @@ import com.isel.leic.ps.ionClassCode.domain.requests.Request
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.FeedbackRepository
+import com.isel.leic.ps.ionClassCode.repository.OutboxRepository
 import com.isel.leic.ps.ionClassCode.repository.RepoRepository
 import com.isel.leic.ps.ionClassCode.repository.TeamRepository
+import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository
@@ -57,6 +60,7 @@ class TeamServicesTests {
                     val mockedTeamRepository = mock<TeamRepository> {
                         on { getTeamById(id = 1) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
                         on { getStudentsFromTeam(teamId = 1) } doReturn listOf(Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 3, schoolId = null))
+                        on { createTeam(team = TeamInput(name = "Classroom2 - 1 - 1", 1, false)) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
                     }
                     val mockedRepoRepository = mock<RepoRepository> {
                         on { getReposByTeam(teamId = 1) } doReturn listOf()

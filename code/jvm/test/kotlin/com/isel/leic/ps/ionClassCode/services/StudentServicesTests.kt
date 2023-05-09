@@ -1,11 +1,12 @@
 package com.isel.leic.ps.ionClassCode.services
 
-import com.isel.leic.ps.ionClassCode.domain.Course
+import com.isel.leic.ps.ionClassCode.domain.PendingStudent
+import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.input.StudentInput
-import com.isel.leic.ps.ionClassCode.repository.CourseRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ionClassCode.tokenHash.GenericTokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -41,7 +42,7 @@ class StudentServicesTests {
                         on { checkIfEmailExists(email = "fail@alunos.isel.pt") } doReturn true
                         on { checkIfTokenExists(token = GenericTokenHash("SHA256").getTokenHash("tokenFail")) } doReturn true
                         on { checkIfGithubUsernameExists(githubUsername = "testFail") } doReturn true
-                        on { createStudent(student = StudentInput("name", "email", "github", 1238, "token", 12345)) } doReturn Student("name", "email", 1, "github", 12345, token = "token", schoolId = 123, isCreated = true)
+                        on { createStudent(student = StudentInput("name", "A1238@alunos.isel.pt", "github", 1238, "token", 12345)) } doReturn Student("name", "email", 1, "github", 12345, token = "token", schoolId = 123, isCreated = true)
                         on { createPendingStudent(student = StudentInput("name", "test@alunos.isel.pt", "username", null, GenericTokenHash("SHA256").getTokenHash("token1"), 12345)) } doReturn PendingStudent("name", "email", 1, "github", 12345, token = "token", isCreated = false)
                     }
                     on { usersRepository } doReturn mockedUserRepository

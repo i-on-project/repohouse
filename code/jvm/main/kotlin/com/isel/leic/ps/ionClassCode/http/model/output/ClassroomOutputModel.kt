@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.http.model.output
 
 import com.isel.leic.ps.ionClassCode.domain.Assignment
-import com.isel.leic.ps.ionClassCode.domain.Student
+import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import java.io.File
 import java.sql.Timestamp
 
@@ -14,11 +14,11 @@ data class ClassroomOutputModel(
     val isArchived: Boolean,
     val lastSync: Timestamp,
     val assignments: List<Assignment>,
-    val students: List<Student>,
+    val students: List<StudentWithoutToken>,
 ) : OutputModel
 
 /**
- * Represents a Classroom Archieved or Deleted Output Model.
+ * Represents a Classroom Archived or Deleted Output Model.
  */
 data class ClassroomArchivedOrDeletedOutputModel(
     val id: Int,
@@ -35,7 +35,7 @@ data class ClassroomModel(
     val isArchived: Boolean,
     val lastSync: Timestamp,
     val assignments: List<Assignment>,
-    val students: List<Student>,
+    val students: List<StudentWithoutToken>,
 ) : OutputModel
 
 /**

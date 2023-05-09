@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ionClassCode.services
 
+import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
@@ -66,7 +67,7 @@ class ClassroomServices(
                             isArchived = classroom.isArchived,
                             lastSync = classroom.lastSync,
                             assignments = assignments,
-                            students = students,
+                            students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         ),
                     )
                 }
@@ -145,7 +146,7 @@ class ClassroomServices(
                             isArchived = false,
                             lastSync = classroom.lastSync,
                             assignments = assignments,
-                            students = students,
+                            students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         ),
                     )
                 }
@@ -175,10 +176,10 @@ class ClassroomServices(
                     classroom = ClassroomModel(
                         id = classroom.id,
                         name = classroom.name,
-                        isArchived = classroom.isArchived,
+                        isArchived = false,
                         lastSync = classroom.lastSync,
                         assignments = assignments,
-                        students = students,
+                        students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                     ),
                 ),
             )

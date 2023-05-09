@@ -2,7 +2,7 @@ package com.isel.leic.ps.ionClassCode.http.model.output
 
 import com.isel.leic.ps.ionClassCode.domain.Feedback
 import com.isel.leic.ps.ionClassCode.domain.Repo
-import com.isel.leic.ps.ionClassCode.domain.Student
+import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
@@ -12,7 +12,7 @@ import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
  */
 data class TeamOutputModel(
     val team: Team,
-    val students: List<Student>,
+    val students: List<StudentWithoutToken>,
     val repos: List<Repo>,
     val feedbacks: List<Feedback>,
 )
@@ -29,7 +29,7 @@ data class TeamsOutputModel(
  */
 data class TeamModel(
     val team: Team,
-    val students: List<Student>,
+    val students: List<StudentWithoutToken>,
     val repos: List<Repo>,
     val feedbacks: List<Feedback>,
 )

@@ -3,6 +3,7 @@ package com.isel.leic.ps.ionClassCode.services
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Delivery
+import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.AssignmentInput
 import com.isel.leic.ps.ionClassCode.http.model.input.AssignmentInputModel
@@ -65,7 +66,7 @@ class AssignmentServiceTests {
 
                     val mockedDeliveriesRepository = mock<DeliveryRepository> {
                         on { getDeliveriesByAssignment(assignmentId = 1) } doReturn listOf()
-                        on { getDeliveriesByAssignment(assignmentId = 4) } doReturn listOf(Delivery(id = 1, assignmentId = 1, dueDate = Timestamp.from(Instant.now()), tagControl = "tagControl"))
+                        on { getDeliveriesByAssignment(assignmentId = 4) } doReturn listOf(Delivery(id = 1, assignmentId = 1, dueDate = Timestamp.from(Instant.now()), tagControl = "tagControl", lastSync = Timestamp.from(Instant.now())))
                     }
 
                     val mockedTeamsRepository = mock<TeamRepository> {
@@ -526,7 +527,7 @@ class AssignmentServiceTests {
         val assignmentId = -1
 
         // when: getting an error because the assignment id is invalid
-        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 1)
+        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 3)
 
         if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotFound)

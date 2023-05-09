@@ -2,17 +2,21 @@ package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.Apply
 import com.isel.leic.ps.ionClassCode.domain.Course
+import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.TeacherInput
 import com.isel.leic.ps.ionClassCode.http.model.input.TeachersPendingInputModel
 import com.isel.leic.ps.ionClassCode.repository.ApplyRepository
 import com.isel.leic.ps.ionClassCode.repository.CourseRepository
+import com.isel.leic.ps.ionClassCode.repository.OutboxRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.request.RequestRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ionClassCode.tokenHash.GenericTokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
+import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -38,7 +42,7 @@ class TeacherServicesTests {
                 val mockedTransaction = mock<Transaction> {
                     val mockedCourseRepository = mock<CourseRepository> {
                         on {
-                            getAllUserCourses(1)
+                            getAllTeacherCourses(1)
                         } doReturn listOf(Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(), isArchived = false, orgId = 1L))
                     }
                     val mockedUserRepository = mock<UsersRepository> {

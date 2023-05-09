@@ -169,7 +169,7 @@ class TeacherServices(
         val orgs = githubServices.fetchTeacherOrgs(githubToken).map { GitHubOrgsModel(it.login, it.url.replace("api.github.com/orgs", "github.com"), it.avatar_url) }
         return transactionManager.run {
             it.usersRepository.getTeacher(teacherId) ?: return@run Result.Problem(TeacherServicesError.InternalError)
-            val teacherCourses = it.courseRepository.getAllUserCourses(teacherId)
+            val teacherCourses = it.courseRepository.getAllTeacherCourses(teacherId)
             val orgsToAdd = orgs.filter { org ->
                 teacherCourses.none { teacherOrg ->
                     teacherOrg.orgUrl == org.url

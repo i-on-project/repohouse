@@ -1,11 +1,13 @@
 package com.isel.leic.ps.ionClassCode.services
 
+import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.PendingStudent
 import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.StudentInput
 import com.isel.leic.ps.ionClassCode.domain.input.TeacherInput
+import com.isel.leic.ps.ionClassCode.repository.CourseRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
@@ -231,7 +233,7 @@ class UserServiceTests {
                         } doReturn "token"
                     }
                     val mockedCourseRepository = mock<CourseRepository> {
-                        on { getAllUserCourses(userId = 1) } doReturn listOf(Course(id = 1, orgUrl = "orgUrl", name = "name", teachers = listOf(), orgId = 1L))
+                        on { getAllStudentCourses(userId = 1) } doReturn listOf(Course(id = 1, orgUrl = "orgUrl", name = "name", teachers = listOf(), orgId = 1L))
                     }
                     on { usersRepository } doReturn mockedUsersRepository
                     on { courseRepository } doReturn mockedCourseRepository

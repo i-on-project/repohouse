@@ -1,9 +1,11 @@
 package com.isel.leic.ps.ionClassCode.services
 
+import com.isel.leic.ps.ionClassCode.domain.Otp
 import com.isel.leic.ps.ionClassCode.domain.Outbox
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.input.OutboxInput
 import com.isel.leic.ps.ionClassCode.repository.CooldownRepository
+import com.isel.leic.ps.ionClassCode.repository.OtpRepository
 import com.isel.leic.ps.ionClassCode.repository.OutboxRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction

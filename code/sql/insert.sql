@@ -120,12 +120,12 @@ VALUES (3, 1);
 INSERT INTO student_team (student, team)
 VALUES (3, 4);
 
-INSERT INTO delivery (id, due_date, tag_control, assignment_id)
-VALUES (1, CURRENT_TIMESTAMP, 'tag', 1);
-INSERT INTO delivery (id, due_date, tag_control, assignment_id)
-VALUES (2, CURRENT_TIMESTAMP, 'tag1', 1);
-INSERT INTO delivery (id, due_date, tag_control, assignment_id)
-VALUES (3, CURRENT_TIMESTAMP, 'tag2', 2);
+INSERT INTO delivery (id, due_date, tag_control, assignment_id, last_sync)
+VALUES (1, CURRENT_TIMESTAMP, 'tag', 1, CURRENT_TIMESTAMP);
+INSERT INTO delivery (id, due_date, tag_control, assignment_id, last_sync)
+VALUES (2, CURRENT_TIMESTAMP, 'tag1', 1, CURRENT_TIMESTAMP);
+INSERT INTO delivery (id, due_date, tag_control, assignment_id, last_sync)
+VALUES (3, CURRENT_TIMESTAMP, 'tag2', 2, CURRENT_TIMESTAMP);
 SELECT setval('delivery_id_seq', (SELECT MAX(id) from "delivery"));
 
 INSERT INTO feedback (description, label, team_id)

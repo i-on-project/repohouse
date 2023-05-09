@@ -139,11 +139,11 @@ class AssignmentServices(
             it.usersRepository.getStudent(studentId) ?: return@run Result.Problem(AssignmentServicesError.InternalError)
             val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
             if (assignment == null) {
-                Result.Problem(value = AssignmentServicesError.AssignmentNotFound)
+                return@run Result.Problem(value = AssignmentServicesError.AssignmentNotFound)
             } else {
                 val assigmentTeams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
                 val studentTeams = it.teamRepository.getTeamsFromStudent(studentId = studentId)
-                Result.Success(value = assigmentTeams.filter { assigmentTeam -> studentTeams.any { studentTeam -> studentTeam.id == assigmentTeam.id } })
+                return@run Result.Success(value = assigmentTeams.filter { assigmentTeam -> studentTeams.any { studentTeam -> studentTeam.id == assigmentTeam.id } })
             }
         }
     }
