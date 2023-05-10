@@ -94,11 +94,11 @@ export function ShowClassroomFetch({
                         <Box sx={alignHorizontalyBoxStyle}>
                             { !content.properties.isArchived ? (
                                 <>
-                                    <Button onClick={handleCreateAssigment}>Create Assigment</Button>
-                                    <Button onClick={handleArchiveClassroom}>Archive Classroom</Button>
+                                    <Button variant="outlined" onClick={handleCreateAssigment}>Create Assigment</Button>
+                                    <Button variant="outlined" onClick={handleArchiveClassroom}>Archive Classroom</Button>
                                 </>
                             ):null}
-                            <Button onClick={handleLocalCopy}>Local Copy</Button>
+                            <Button variant="outlined" onClick={handleLocalCopy}>Local Copy</Button>
                         </Box>
                     ):null}
                     <Grid

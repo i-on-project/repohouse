@@ -60,7 +60,6 @@ class OkHttp(
     }
 
     override suspend fun <T : Any> makeCallToList(request: Request, kClass: Class<T>): List<T> {
-
         val body = send(request)
         val listType = jsonMapper.typeFactory.constructCollectionType(ArrayList::class.java, kClass)
         try {

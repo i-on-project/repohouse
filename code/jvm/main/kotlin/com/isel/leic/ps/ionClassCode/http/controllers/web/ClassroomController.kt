@@ -217,7 +217,8 @@ class ClassroomController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val localCopy = classroomServices.localCopy(classroomId, "C:\\Users\\ricar\\OneDrive\\Documentos")) {
+        // TODO : check for other users
+        return when (val localCopy = classroomServices.localCopy(classroomId)) {
             is Result.Problem -> classroomServices.problem(localCopy.value)
             is Result.Success ->
                 ResponseEntity

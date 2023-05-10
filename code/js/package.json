@@ -34,6 +34,7 @@
     "start": "webpack serve"
   },
   "devDependencies": {
+    "@playwright/test": "^1.33.0",
     "@types/js-cookie": "^3.0.3",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",

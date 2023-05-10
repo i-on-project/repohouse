@@ -91,10 +91,11 @@ begin
         );
         return new;
     end if;
+    return new;
 end;
 $$ LANGUAGE plpgsql;
 
-CREATE trigger SyncClassroom
+CREATE trigger Sync
     after update on delivery
     for each row execute procedure SyncClassroom();
 

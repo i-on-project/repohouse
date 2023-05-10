@@ -103,13 +103,13 @@ export function ShowDeliveryFetch({
                         variant="subtitle1"
                         sx={typographyStyle}
                     >
-                        {"Last Sync Time: " + content.properties.delivery.lastSync.toLocaleString(
+                        {"Last Sync Time: " + new Date(content.properties.delivery.lastSync).toLocaleString(
                             "en-GB",
                             {
                                 hour: "2-digit",
                                 minute: "2-digit",
                                 month: "short",
-                                day: "2-digit"
+                                day: "2-digit",
                             }
                         )}
                     </Typography>

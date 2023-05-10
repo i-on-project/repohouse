@@ -16,7 +16,6 @@ export class MenuServices {
 
     getTeachersPendingApproval = async () => {
         const link = await navigationRepository.ensureLink(Hypermedia.TEACHERS_APPROVAL_KEY, systemServices.home)
-        console.log(link.href)
         return await fetchGet<TeacherPendingApprovalDtoProperties>(link.href)
     }
 
@@ -26,13 +25,12 @@ export class MenuServices {
             approved: approved,
             rejected: rejected
         }
-        console.log(link.href)
         return await fetchPost<TeacherPendingApprovalDtoProperties>(link.href, body)
     }
 
     inviteLink = async (inviteCode) => {
         const link = await navigationRepository.ensureAction(Hypermedia.INVITE_CODE_KEY, systemServices.home)
         const href = parse(link.href).expand({inviteLink: inviteCode})
-        return await fetchPost<ClassroomInviteDtoProperties>(href, null)
+        return await fetchPost<ClassroomInviteDtoProperties>(href)
     }
 }

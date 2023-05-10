@@ -1,9 +1,14 @@
-import { navigationRepository, systemServices } from "../react-components"
+import {navigationRepository, systemServices} from "../react-components"
 import * as Hypermedia from "../http/Hypermedia"
-import { fetchGet, fetchPost, fetchPut } from "../http/Fetch"
-import { CourseBody, CourseCreatedDtoProperties, CourseDtoProperties, CourseWithClassroomsDtoProperties } from "../domain/dto/CourseDtoProperties"
-import { GitHubOrgsDtoProperties } from "../domain/dto/GitHubOrgsDtoProperties"
-import { parse } from "uri-template"
+import {fetchGet, fetchPost, fetchPut} from "../http/Fetch"
+import {
+    CourseBody,
+    CourseCreatedDtoProperties,
+    CourseDtoProperties,
+    CourseWithClassroomsDtoProperties
+} from "../domain/dto/CourseDtoProperties"
+import {GitHubOrgsDtoProperties} from "../domain/dto/GitHubOrgsDtoProperties"
+import {parse} from "uri-template"
 
 
 export class CourseServices {
@@ -16,9 +21,7 @@ export class CourseServices {
 
     getTeacherOrgs = async () => {
         const link = await navigationRepository.ensureLink(Hypermedia.ORGS_KEY, systemServices.home)
-        const  resp = await fetchGet<GitHubOrgsDtoProperties>(link.href)
-        console.log(resp)
-        return resp
+        return await fetchGet<GitHubOrgsDtoProperties>(link.href)
     }
 
     createCourse = async (course: CourseBody) => {

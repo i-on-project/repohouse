@@ -56,13 +56,16 @@ export class CourseWithClassroomsDtoProperties {
 export class CourseBody{
     constructor(
         name: string,
-        orgUrl: string
+        orgUrl: string,
+        orgId: number
     ) {
         this.name = name
         this.orgUrl = orgUrl
+        this.orgId = orgId
     }
     name: string
     orgUrl: string
+    orgId: number
 }
 
 export interface CourseCreatedDtoProperties{

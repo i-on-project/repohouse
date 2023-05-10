@@ -28,12 +28,12 @@ export class DeliveryServices {
     deleteDelivery = async (courseId, classroomId,assignmentId,deliveryId) => {
         const link = await navigationRepository.ensureAction(Hypermedia.DELETE_DELIVERY_KEY, systemServices.home)
         const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,deliveryId:deliveryId})
-        return await fetchDelete<DeliveryDeletedDtoProperties>(link.href)
+        return await fetchDelete<DeliveryDeletedDtoProperties>(href)
     }
 
     editDelivery = async (courseId, classroomId,assignmentId,deliveryId,body: DeliveryBody) => {
         const link = await navigationRepository.ensureAction(Hypermedia.EDIT_DELIVERY_KEY, systemServices.home)
         const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,deliveryId:deliveryId})
-        return await fetchPost<DeliveryDtoProperties>(link.href, body)
+        return await fetchPost<DeliveryDtoProperties>(href, body)
     }
 }

@@ -217,7 +217,7 @@ class ClassroomServices(
     /**
      * Method to get the local copy of the classroom to path in the personal computer
      */
-    fun localCopy(classroomId: Int, path: String): ClassroomLocalCopyResponse {
+    fun localCopy(classroomId: Int): ClassroomLocalCopyResponse {
         val reposArray = mutableMapOf<String, String>()
         var classroomName = ""
         transactionManager.run {
@@ -235,7 +235,7 @@ class ClassroomServices(
             classroomName = classroom.name
         }
         val fileName = "localCopy_$classroomName.sh"
-        val shellFile = File("$path/$fileName")
+        val shellFile = File(fileName)
         shellFile.writeText("#!/bin/bash\n")
         shellFile.appendText("ClassroomName=$classroomName\n")
         shellFile.appendText("mkdir classcode\n")
