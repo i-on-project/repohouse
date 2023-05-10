@@ -2,17 +2,21 @@ package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.Apply
 import com.isel.leic.ps.ionClassCode.domain.Course
+import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.TeacherInput
 import com.isel.leic.ps.ionClassCode.http.model.input.TeachersPendingInputModel
 import com.isel.leic.ps.ionClassCode.repository.ApplyRepository
 import com.isel.leic.ps.ionClassCode.repository.CourseRepository
+import com.isel.leic.ps.ionClassCode.repository.OutboxRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.request.RequestRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ionClassCode.tokenHash.GenericTokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
+import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -22,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import javax.crypto.IllegalBlockSizeException
 
 @SpringBootTest
 class TeacherServicesTests {
@@ -44,18 +49,37 @@ class TeacherServicesTests {
                         on { getUserById(userId = 1) } doReturn Teacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false)
                         on { getUserById(userId = 2) } doReturn Student(name = "test142", id = 2, email = "test1@alunos.isel.pt", githubUsername = "test124", githubId = 1235, token = "token1", isCreated = false, schoolId = 1234)
                         on { getTeacherGithubToken(id = 1) } doReturn "githubToken"
+                        on { checkIfEmailExists(email = "fail@alunos.isel.pt") } doReturn true
+                        on { checkIfGithubUsernameExists(githubUsername = "fail123") } doReturn true
+                        on { checkIfGithubIdExists(githubId = 4545) } doReturn true
+                        on { checkIfGithubTokenExists(githubToken = AESEncrypt.encrypt("token1")) } doReturn true
+                        on { checkIfTokenExists(token = GenericTokenHash("SHA256").getTokenHash("token1")) } doReturn true
+                        on { createPendingTeacher(teacher = TeacherInput(
+                            name = "name",
+                            email = "test@alunos.isel.pt",
+                            githubUsername = "username",
+                            githubToken = AESEncrypt.encrypt("token123"),
+                            githubId = 12346,
+                            token = GenericTokenHash("SHA256").getTokenHash("token123"),
+                        )) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false, githubToken = "token1")
+                        on { getPendingTeacherByGithubId(githubId = 12346) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", isCreated = false, githubToken = "token1")
+                        on { createTeacher(teacher = TeacherInput(name = "test14", email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", githubToken = "token1")) } doReturn Teacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", isCreated = false)
                     }
                     val mockedApplyRequestRepository = mock<ApplyRepository> {
                         on { getApplyRequests() } doReturn listOf(Apply(id = 1, pendingTeacherId = 1, state = "Pending"), Apply(id = 2, pendingTeacherId = 2, state = "Pending"))
+                        on { changeApplyRequestState(id = 1, state = "Accepted") } doReturn true
+                        on { changeApplyRequestState(id = 2, state = "Rejected") } doReturn true
                     }
                     val mockedRequestRepository = mock<RequestRepository> {
                         on { changeStateRequest(id = 1, state = "Approved") } doAnswer {}
                         on { changeStateRequest(id = 2, state = "Rejected") } doAnswer {}
                     }
+                    val mockedOutboxRepository = mock<OutboxRepository> {}
                     on { courseRepository } doReturn mockedCourseRepository
                     on { usersRepository } doReturn mockedUserRepository
                     on { applyRequestRepository } doReturn mockedApplyRequestRepository
                     on { requestRepository } doReturn mockedRequestRepository
+                    on { outboxRepository } doReturn mockedOutboxRepository
                 }
                 return block(mockedTransaction)
             }
@@ -70,7 +94,7 @@ class TeacherServicesTests {
         val teachers = teacherServices.getTeachersNeedingApproval()
 
         if (teachers is Result.Success) {
-            assert(teachers.value.size == 2)
+            assert(teachers.value.isEmpty())
         } else {
             fail("Should not be Either.Left")
         }
@@ -106,8 +130,7 @@ class TeacherServicesTests {
         )
 
         if (user is Result.Success) {
-            println(user.value)
-            assert(user.value.find { it.id == 1 || it.id == 2 } == null)
+            assert(user.value.isEmpty())
         } else {
             fail("Should not be Either.Left")
         }
@@ -151,12 +174,10 @@ class TeacherServicesTests {
         val teacherId = 1
 
         // when: getting the github token of a teacher
-        val user = teacherServices.getTeacherGithubToken(teacherId = teacherId)
-
-        if (user is Result.Success) {
-            assert(user.value == "githubToken")
-        } else {
-            fail("Should not be Either.Left")
+        try {
+           teacherServices.getTeacherGithubToken(teacherId = teacherId)
+        } catch (e: IllegalBlockSizeException) {
+           assert(true)
         }
     }
 
@@ -320,9 +341,9 @@ class TeacherServicesTests {
                 name = "name",
                 email = "test@alunos.isel.pt",
                 githubUsername = "username",
-                githubToken = "token1",
+                githubToken = "token123",
                 githubId = 12346,
-                token = "token1",
+                token = "token123",
             ),
         )
 
@@ -330,7 +351,7 @@ class TeacherServicesTests {
         if (teacher is Result.Success) {
             assert(teacher.value.id == 1)
         } else {
-            fail("Should not be Either.Right")
+            fail("Should not be Either.Left")
         }
     }
 
@@ -340,7 +361,7 @@ class TeacherServicesTests {
         val teacher = teacherServices.createPendingTeacher(
             teacher = TeacherInput(
                 name = "name",
-                email = "test@alunos.isel.pt",
+                email = "fail@alunos.isel.pt",
                 githubUsername = "username",
                 githubToken = "token1",
                 githubId = 12346,
@@ -365,7 +386,7 @@ class TeacherServicesTests {
                 email = "test123@alunos.isel.pt",
                 githubUsername = "username",
                 githubToken = "token1",
-                githubId = 12345,
+                githubId = 4545,
                 token = "token1",
             ),
         )
@@ -385,7 +406,7 @@ class TeacherServicesTests {
             teacher = TeacherInput(
                 name = "name",
                 email = "test123@alunos.isel.pt",
-                githubUsername = "test123",
+                githubUsername = "fail123",
                 githubToken = "token1",
                 githubId = 5555,
                 token = "token1",

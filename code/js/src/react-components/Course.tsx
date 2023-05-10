@@ -153,8 +153,7 @@ export function ShowCourseCreateFetch({
     const [error, setError] = useState(false)
     
     const handleSubmit = useCallback((org: GitHubOrg) => {
-        console.log(org)
-        navigate("/courses/create", {state: {body: new CourseBody(org.login, org.url,org.id)} })
+        navigate("/courses/create", {state: {body: new CourseBody(org.login, org.url, org.id)} })
     }, [])
 
     if (content instanceof ErrorMessageModel || error) {

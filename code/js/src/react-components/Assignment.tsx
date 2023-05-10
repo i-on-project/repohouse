@@ -12,7 +12,7 @@ import {
     CircularProgress, Grid,
     TextField,
     Button,
-    Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemAvatar, Avatar, ListItemText
+    Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem,
 } from "@mui/material";
 import {Link, Navigate, useNavigate} from "react-router-dom";
 import {Card} from "react-bootstrap";
@@ -374,7 +374,7 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
     return(
         <Box sx={homeBoxStyle}>
             <Typography variant="h3" component="h1" gutterBottom sx={typographyStyle}>
-                Create Gamemode
+                Create Assignment
             </Typography>
 
             <TextField onChange={handleTitleChange} value={title} id="title" label="Title" variant="outlined" required sx={{margin:"6px"}}/>
@@ -460,11 +460,10 @@ export function ShowAssigmentTeamsFetch({
 }){
 
     const content = useAsync(async () => {
-        return await assignmentServices.teams(courseId,classroomId,assignment.id);
+        return await assignmentServices.teams(courseId,classroomId,assignment.id)
     });
 
-    const [serror, setError] = useState<ErrorMessageModel>(error);
-    const [teamName, setTeamName] = useState<string>(null)
+    const [serror, setError] = useState<ErrorMessageModel>(error)
     const navigate = useNavigate()
 
     const handleJoinTeam = useCallback(async (event:any) => {

@@ -68,6 +68,7 @@ class OutboxServices(
     fun checkOtp(userId: Int, otp: Int): UpdateOutboxResponse {
         if (otp <= 0) return Result.Problem(OutboxServicesError.InvalidInput)
         return transactionManager.run {
+            it.usersRepository.getStudent(userId) ?: return@run Result.Problem(OutboxServicesError.InternalError)
             val cooldown = it.cooldownRepository.getCooldownRequestRemainingTime(userId)
             if (cooldown != null) return@run Result.Problem(OutboxServicesError.CooldownNotExpired(cooldown))
             var otpRequest = it.otpRepository.getOtpRequest(userId) ?: return@run Result.Problem(OutboxServicesError.OtpNotFound)

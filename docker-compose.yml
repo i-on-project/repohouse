@@ -1,0 +1,49 @@
+version: "3.3"
+services:
+  # The service running the DB
+  db-tests:
+    container_name: db-docker
+    hostname: db-docker
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD${POSTGRES_PASSWORD}
+      - POSTGRES_DB=db
+    ports:
+      - "5432:5432"
+
+  # spring-service-1 and spring-service-2 are used to illustrate scenarios with a fixed number of servers
+  # with static and well know names.
+  spring-service:
+    container_name: spring-service
+    hostname: spring-service
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-Spring
+    environment:
+      PORT: 8081
+      JDBC_DATABASE_URL: "jdbc:postgresql://db-docker:5432/db?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
+
+    ports:
+      - "8081:8081"
+
+  # The service running the load-balancer
+  nginx:
+    container_name: nginx
+    image: nginx
+    ports:
+      - "8080:8080"
+      - "8088:8088"
+    volumes:
+      - ./docker/nginx:/etc/nginx
+    depends_on:
+      - spring-service
+
+  ubuntu:
+    container_name: ubuntu
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-ubuntu
+    tty: true

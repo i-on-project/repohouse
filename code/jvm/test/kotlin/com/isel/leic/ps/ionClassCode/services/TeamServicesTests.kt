@@ -6,6 +6,7 @@ import com.isel.leic.ps.ionClassCode.domain.Feedback
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.FeedbackInput
+import com.isel.leic.ps.ionClassCode.domain.input.TeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
@@ -20,8 +21,10 @@ import com.isel.leic.ps.ionClassCode.domain.requests.Request
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.FeedbackRepository
+import com.isel.leic.ps.ionClassCode.repository.OutboxRepository
 import com.isel.leic.ps.ionClassCode.repository.RepoRepository
 import com.isel.leic.ps.ionClassCode.repository.TeamRepository
+import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository
@@ -57,6 +60,7 @@ class TeamServicesTests {
                     val mockedTeamRepository = mock<TeamRepository> {
                         on { getTeamById(id = 1) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
                         on { getStudentsFromTeam(teamId = 1) } doReturn listOf(Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 3, schoolId = null))
+                        on { createTeam(team = TeamInput(name = "Classroom2 - 1 - 1", 1, false)) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
                     }
                     val mockedRepoRepository = mock<RepoRepository> {
                         on { getReposByTeam(teamId = 1) } doReturn listOf()
@@ -105,6 +109,19 @@ class TeamServicesTests {
                     val mockedCreateRepoRepository = mock<CreateRepoRepository> {
                         on { createCreateRepoRequest(request = CreateRepoInput(teamId = 1), creator = 2) } doReturn CreateRepo(id = 1, creator = 2, teamId = 1)
                     }
+                    val mockedOutboxRepository = mock<OutboxRepository> {}
+                    val mockedUsersRepository = mock<UsersRepository> {
+                        on { getStudent(studentId = 1) } doReturn Student(
+                            name = "student2",
+                            token = "token3",
+                            githubId = 1234152,
+                            githubUsername = "test12345",
+                            isCreated = false,
+                            email = "test3@alunos.isel.pt",
+                            id = 1,
+                            schoolId = 1235
+                        )
+                    }
                     on { teamRepository } doReturn mockedTeamRepository
                     on { repoRepository } doReturn mockedRepoRepository
                     on { feedbackRepository } doReturn mockedFeedbackRepository
@@ -116,6 +133,8 @@ class TeamServicesTests {
                     on { assignmentRepository } doReturn mockedAssignmentRepository
                     on { requestRepository } doReturn mockedRequestRepository
                     on { createRepoRepository } doReturn mockedCreateRepoRepository
+                    on { outboxRepository } doReturn mockedOutboxRepository
+                    on { usersRepository } doReturn mockedUsersRepository
                 }
                 return block(mockedTransaction)
             }
@@ -216,7 +235,7 @@ class TeamServicesTests {
     }
 
     @Test
-    fun `createTeamRequest should give an InvalidData because the assignmentId is invalid`() {
+    fun `createTeamRequest should give an AssignmentNotFound because the assignmentId is invalid`() {
         // given: an invalid assignment id
         val assignmentId = -1
 
@@ -231,7 +250,7 @@ class TeamServicesTests {
         )
 
         if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
+            assert(team.value is TeamServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -293,7 +312,7 @@ class TeamServicesTests {
             ),
             assignmentId = 1,
             classroomId = classroomId,
-            creator = 2,
+            creator = 1,
         )
 
         if (team is Result.Problem) {
@@ -312,11 +331,11 @@ class TeamServicesTests {
             ),
             assignmentId = 1,
             classroomId = 2,
-            creator = 2,
+            creator = 1,
         )
 
         if (team is Result.Success) {
-            assert(team.value.id == 2)
+            assert(team.value.id == 1)
         } else {
             fail("Should not be Either.Left")
         }
@@ -455,12 +474,12 @@ class TeamServicesTests {
         // given: an invalid team id
         val teamId = -1
 
-        // when: getting an error because of an team id
+        // when: getting an error because of a team id
         val team = teamServices.joinTeamRequest(
             joinInfo = JoinTeamInput(
                 composite = null,
                 teamId = teamId,
-                assignmentId = 1,
+                assignmentId = 2,
             ),
             creator = 1,
         )
@@ -615,7 +634,7 @@ class TeamServicesTests {
         val team = teamServices.updateTeamRequestStatus(
             requestId = requestId,
             teamId = 1,
-            classroomId = 1,
+            classroomId = 2,
         )
 
         if (team is Result.Problem) {
@@ -634,7 +653,7 @@ class TeamServicesTests {
         val team = teamServices.updateTeamRequestStatus(
             requestId = 1,
             teamId = teamId,
-            classroomId = 1,
+            classroomId = 2,
         )
 
         if (team is Result.Problem) {
@@ -789,7 +808,7 @@ class TeamServicesTests {
                 description = "description",
                 label = "label",
             ),
-            classroomId = 1,
+            classroomId = 2,
         )
 
         if (team is Result.Problem) {

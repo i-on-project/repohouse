@@ -56,22 +56,18 @@ class TeacherServices(
      */
     fun createTeacher(githubId: Long): TeacherCreationResult {
         return transactionManager.run {
-            val teacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: Result.Problem(TeacherServicesError.TeacherNotFound)
-            if (teacher is PendingTeacher) {
-                val teacherRes = it.usersRepository.createTeacher(
-                    TeacherInput(
-                        name = teacher.name,
-                        email = teacher.email,
-                        githubUsername = teacher.githubUsername,
-                        githubId = teacher.githubId,
-                        token = teacher.token,
-                        githubToken = teacher.githubToken,
-                    ),
-                )
-                if (teacherRes == null) Result.Problem(TeacherServicesError.InternalError) else Result.Success(teacherRes)
-            } else {
-                Result.Problem(TeacherServicesError.TeacherNotFound)
-            }
+            val teacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: return@run Result.Problem(TeacherServicesError.TeacherNotFound)
+            val teacherRes = it.usersRepository.createTeacher(
+                TeacherInput(
+                    name = teacher.name,
+                    email = teacher.email,
+                    githubUsername = teacher.githubUsername,
+                    githubId = teacher.githubId,
+                    token = teacher.token,
+                    githubToken = teacher.githubToken,
+                ),
+            )
+            return@run if (teacherRes == null) Result.Problem(TeacherServicesError.InternalError) else Result.Success(teacherRes)
         }
     }
 
@@ -83,11 +79,11 @@ class TeacherServices(
         val hash = tokenHash.getTokenHash(teacher.token)
         val githubToken = AESEncrypt.encrypt(teacher.githubToken)
         return transactionManager.run {
-            if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) Result.Problem(TeacherServicesError.GithubUserNameInUse)
-            if (it.usersRepository.checkIfEmailExists(teacher.email)) Result.Problem(TeacherServicesError.EmailInUse)
-            if (it.usersRepository.checkIfGithubIdExists(teacher.githubId)) Result.Problem(TeacherServicesError.GithubIdInUse)
-            if (it.usersRepository.checkIfTokenExists(teacher.token)) Result.Problem(TeacherServicesError.TokenInUse)
-            if (it.usersRepository.checkIfGithubTokenExists(teacher.githubToken)) Result.Problem(TeacherServicesError.TokenInUse)
+            if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) return@run Result.Problem(TeacherServicesError.GithubUserNameInUse)
+            if (it.usersRepository.checkIfEmailExists(teacher.email)) return@run Result.Problem(TeacherServicesError.EmailInUse)
+            if (it.usersRepository.checkIfGithubIdExists(teacher.githubId)) return@run Result.Problem(TeacherServicesError.GithubIdInUse)
+            if (it.usersRepository.checkIfTokenExists(hash)) return@run Result.Problem(TeacherServicesError.TokenInUse)
+            if (it.usersRepository.checkIfGithubTokenExists(githubToken)) return@run Result.Problem(TeacherServicesError.TokenInUse)
             val teacherRes = it.usersRepository.createPendingTeacher(
                 TeacherInput(
                     name = teacher.name,
@@ -99,7 +95,7 @@ class TeacherServices(
                 ),
             )
             it.applyRequestRepository.createApplyRequest(ApplyInput(teacherRes.id))
-            Result.Success(teacherRes)
+            return@run Result.Success(teacherRes)
         }
     }
 
@@ -126,7 +122,7 @@ class TeacherServices(
                 val updated = it.applyRequestRepository.changeApplyRequestState(teacherRequest, "Rejected")
                 if (!updated) return@run Result.Problem(TeacherServicesError.RequestNotFound)
             }
-            Result.Success(getTeachersNeedingApproval(it))
+            return@run Result.Success(getTeachersNeedingApproval(it))
         }
     }
 
@@ -137,9 +133,9 @@ class TeacherServices(
         return transactionManager.run {
             val githubToken = it.usersRepository.getTeacherGithubToken(teacherId)
             if (githubToken == null) {
-                Result.Problem(TeacherServicesError.InternalError)
+                return@run Result.Problem(TeacherServicesError.InternalError)
             } else {
-                Result.Success(AESDecrypt.decrypt(githubToken))
+                return@run Result.Success(AESDecrypt.decrypt(githubToken))
             }
         }
     }
@@ -147,9 +143,8 @@ class TeacherServices(
     fun updateTeacherGithubToken(teacherId: Int, token: String): UpdateTeacherGithubTokenResult {
         val githubTokenHash = AESEncrypt.encrypt(token)
         return transactionManager.run {
-            val user = it.usersRepository.getTeacher(teacherId)
-            if (user == null) Result.Problem(TeacherServicesError.InternalError)
-            Result.Success(it.usersRepository.updateTeacherGithubToken(teacherId, githubTokenHash))
+            it.usersRepository.getTeacher(teacherId) ?: return@run Result.Problem(TeacherServicesError.InternalError)
+            return@run Result.Success(it.usersRepository.updateTeacherGithubToken(teacherId, githubTokenHash))
         }
     }
 
@@ -173,14 +168,14 @@ class TeacherServices(
     suspend fun getTeacherOrgs(teacherId: Int, githubToken: String): TeacherOrgsResponse {
         val orgs = githubServices.fetchTeacherOrgs(githubToken).map { GitHubOrgsModel(it.login, it.url.replace("api.github.com/orgs", "github.com"), it.avatar_url, it.id) }
         return transactionManager.run {
-            it.usersRepository.getTeacher(teacherId) ?: Result.Problem(TeacherServicesError.InternalError)
+            it.usersRepository.getTeacher(teacherId) ?: return@run Result.Problem(TeacherServicesError.InternalError)
             val teacherCourses = it.courseRepository.getAllTeacherCourses(teacherId)
             val orgsToAdd = orgs.filter { org ->
                 teacherCourses.none { teacherOrg ->
                     teacherOrg.orgUrl == org.url
                 }
             }
-            Result.Success(orgsToAdd)
+            return@run Result.Success(orgsToAdd)
         }
     }
 

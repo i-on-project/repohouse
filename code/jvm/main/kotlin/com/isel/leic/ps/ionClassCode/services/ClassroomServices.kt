@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ionClassCode.services
 
+import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
@@ -55,18 +56,18 @@ class ClassroomServices(
     fun getClassroom(classroomId: Int): ClassroomResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {
-                null -> Result.Problem(ClassroomServicesError.ClassroomNotFound)
+                null -> return@run Result.Problem(ClassroomServicesError.ClassroomNotFound)
                 else -> {
                     val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
                     val students = it.classroomRepository.getStudentsByClassroom(classroomId)
-                    Result.Success(
+                    return@run Result.Success(
                         ClassroomModel(
                             id = classroom.id,
                             name = classroom.name,
                             isArchived = classroom.isArchived,
                             lastSync = classroom.lastSync,
                             assignments = assignments,
-                            students = students,
+                            students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         ),
                     )
                 }
@@ -132,20 +133,20 @@ class ClassroomServices(
         if (classroomUpdateInput.isNotValid()) return Result.Problem(ClassroomServicesError.InvalidInput)
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {
-                null -> Result.Problem(ClassroomServicesError.ClassroomNotFound)
+                null -> return@run Result.Problem(ClassroomServicesError.ClassroomNotFound)
                 else -> {
-                    if (classroom.isArchived) Result.Problem(ClassroomServicesError.ClassroomArchived)
+                    if (classroom.isArchived) return@run Result.Problem(ClassroomServicesError.ClassroomArchived)
                     it.classroomRepository.updateClassroomName(classroomId, classroomUpdateInput)
                     val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
                     val students = it.classroomRepository.getStudentsByClassroom(classroomId)
-                    Result.Success(
+                    return@run Result.Success(
                         ClassroomModel(
                             id = classroom.id,
                             name = classroomUpdateInput.name,
-                            isArchived = classroom.isArchived,
+                            isArchived = false,
                             lastSync = classroom.lastSync,
                             assignments = assignments,
-                            students = students,
+                            students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         ),
                     )
                 }
@@ -157,37 +158,31 @@ class ClassroomServices(
      * Method to enter a classroom with an invitation link
      */
     fun enterClassroomWithInvite(inviteLink: String, studentId: Int): ClassroomEnterResponse {
-        if (inviteLink.isBlank()) return Result.Problem(ClassroomServicesError.InviteLinkNotFound)
+        if (inviteLink.isBlank()) return Result.Problem(ClassroomServicesError.InvalidInput)
         return transactionManager.run {
             it.usersRepository.getStudent(studentId) ?: return@run Result.Problem(ClassroomServicesError.InternalError)
-            when (val classroom = it.classroomRepository.getClassroomByInviteLink(inviteLink)) {
-                null -> Result.Problem(ClassroomServicesError.InviteLinkNotFound)
-                else -> {
-                    if (classroom.isArchived) Result.Problem(ClassroomServicesError.ClassroomArchived)
-                    val prevStudents = it.classroomRepository.getStudentsByClassroom(classroom.id)
-                    if (prevStudents.any { prevStudent -> prevStudent.id == studentId }) {
-                        Result.Problem(
-                            ClassroomServicesError.AlreadyInClassroom,
-                        )
-                    }
-                    it.classroomRepository.addStudentToClassroom(classroom.id, studentId)
-                    val assignments = it.assignmentRepository.getClassroomAssignments(classroom.id)
-                    val students = it.classroomRepository.getStudentsByClassroom(classroom.id)
-                    Result.Success(
-                        ClassroomInviteModel(
-                            courseId = classroom.courseId,
-                            classroom = ClassroomModel(
-                                id = classroom.id,
-                                name = classroom.name,
-                                isArchived = classroom.isArchived,
-                                lastSync = classroom.lastSync,
-                                assignments = assignments,
-                                students = students,
-                            ),
-                        ),
-                    )
-                }
-            }
+            val classroom = it.classroomRepository.getClassroomByInviteLink(inviteLink) ?: return@run Result.Problem(ClassroomServicesError.InviteLinkNotFound)
+            if (classroom.isArchived) return@run Result.Problem(ClassroomServicesError.ClassroomArchived)
+            val prevStudents = it.classroomRepository.getStudentsByClassroom(classroom.id)
+            if (prevStudents.any { prevStudent -> prevStudent.id == studentId }) return@run Result.Problem(
+                ClassroomServicesError.AlreadyInClassroom
+            )
+            it.classroomRepository.addStudentToClassroom(classroom.id, studentId)
+            val assignments = it.assignmentRepository.getClassroomAssignments(classroom.id)
+            val students = it.classroomRepository.getStudentsByClassroom(classroom.id)
+            return@run Result.Success(
+                ClassroomInviteModel(
+                    courseId = classroom.courseId,
+                    classroom = ClassroomModel(
+                        id = classroom.id,
+                        name = classroom.name,
+                        isArchived = false,
+                        lastSync = classroom.lastSync,
+                        assignments = assignments,
+                        students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
+                    ),
+                ),
+            )
         }
     }
 

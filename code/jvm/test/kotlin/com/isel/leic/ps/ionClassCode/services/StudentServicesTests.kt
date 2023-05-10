@@ -1,11 +1,12 @@
 package com.isel.leic.ps.ionClassCode.services
 
-import com.isel.leic.ps.ionClassCode.domain.Course
+import com.isel.leic.ps.ionClassCode.domain.PendingStudent
+import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.input.StudentInput
-import com.isel.leic.ps.ionClassCode.repository.CourseRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
+import com.isel.leic.ps.ionClassCode.tokenHash.GenericTokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -30,16 +31,21 @@ class StudentServicesTests {
             override fun <R> run(block: (Transaction) -> R): R {
                 val mockedTransaction = mock<Transaction> {
                     val mockedUserRepository = mock<UsersRepository> {
+                        on { getStudentSchoolId(id = -1) } doReturn null
                         on { getStudentSchoolId(id = 1) } doReturn 123
                         on { getStudentSchoolId(id = 2) } doReturn null
+                        on { getPendingStudentByGithubId(githubId = 12345) } doReturn PendingStudent("name", "email", 1, "github", 12345, token = "token")
                         on { updateStudentSchoolId(userId = 1, schoolId = 123) } doAnswer {}
-                    }
-
-                    val mockedCourseRepository = mock<CourseRepository> {
-                        on { getAllStudentCourses(userId = 1) } doReturn listOf(Course(id = 1, orgUrl = "orgUrl", name = "name", teachers = listOf(), orgId = 1L))
+                        on { checkIfGithubIdExists(githubId = 123456) } doReturn true
+                        on { checkIfSchoolIdExists(schoolId = 1238) } doReturn false
+                        on { checkIfSchoolIdExists(schoolId = 1235) } doReturn true
+                        on { checkIfEmailExists(email = "fail@alunos.isel.pt") } doReturn true
+                        on { checkIfTokenExists(token = GenericTokenHash("SHA256").getTokenHash("tokenFail")) } doReturn true
+                        on { checkIfGithubUsernameExists(githubUsername = "testFail") } doReturn true
+                        on { createStudent(student = StudentInput("name", "A1238@alunos.isel.pt", "github", 1238, "token", 12345)) } doReturn Student("name", "email", 1, "github", 12345, token = "token", schoolId = 123, isCreated = true)
+                        on { createPendingStudent(student = StudentInput("name", "test@alunos.isel.pt", "username", null, GenericTokenHash("SHA256").getTokenHash("token1"), 12345)) } doReturn PendingStudent("name", "email", 1, "github", 12345, token = "token", isCreated = false)
                     }
                     on { usersRepository } doReturn mockedUserRepository
-                    on { courseRepository } doReturn mockedCourseRepository
                 }
                 return block(mockedTransaction)
             }
@@ -267,7 +273,7 @@ class StudentServicesTests {
         val student = studentServices.createPendingStudent(
             student = StudentInput(
                 name = "username",
-                email = "test123@alunos.isel.pt",
+                email = "fail@alunos.isel.pt",
                 githubUsername = "username",
                 githubId = 55555,
                 token = "token123",
@@ -290,7 +296,7 @@ class StudentServicesTests {
                 name = "name",
                 email = "test123@alunos.isel.pt",
                 githubUsername = "username",
-                githubId = 12345,
+                githubId = 123456,
                 token = "token1",
             ),
         )
@@ -310,7 +316,7 @@ class StudentServicesTests {
             student = StudentInput(
                 name = "name",
                 email = "test@alunos.isel.pt",
-                githubUsername = "test123",
+                githubUsername = "testFail",
                 githubId = 12345,
                 token = "token1",
             ),
@@ -333,7 +339,7 @@ class StudentServicesTests {
                 email = "test123@alunos.isel.pt",
                 githubUsername = "username",
                 githubId = 12345,
-                token = "token1",
+                token = "tokenFail",
             ),
         )
 

@@ -3,6 +3,7 @@ package com.isel.leic.ps.ionClassCode.services
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Delivery
+import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.AssignmentInput
 import com.isel.leic.ps.ionClassCode.http.model.input.AssignmentInputModel
@@ -58,6 +59,9 @@ class AssignmentServiceTests {
                         on {
                             getTeacher(teacherId = 1)
                         } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 123452, token = "token1", id = 2, email = "test1@alunos.isel.pt")
+                        on {
+                            getStudent(studentId = 3)
+                        } doReturn Student(name = "student3", email = "email3", id = 3, githubUsername = "test1234", githubId = 123452, token = "token1", isCreated = true, schoolId = 48309)
                     }
 
                     val mockedDeliveriesRepository = mock<DeliveryRepository> {
@@ -523,7 +527,7 @@ class AssignmentServiceTests {
         val assignmentId = -1
 
         // when: getting an error because the assignment id is invalid
-        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 1)
+        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 3)
 
         if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
@@ -553,7 +557,7 @@ class AssignmentServiceTests {
         val assignmentId = 5
 
         // when: getting a list of teams
-        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 1)
+        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 3)
 
         if (assignment is Result.Problem) {
             assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
@@ -565,7 +569,7 @@ class AssignmentServiceTests {
     @Test
     fun `getAssignmentStudentTeams should give a list teams`() {
         // when: getting an error because the assignment id is not in database
-        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = 1, studentId = 1)
+        val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = 1, studentId = 3)
 
         if (assignment is Result.Success) {
             assert(assignment.value.isEmpty())

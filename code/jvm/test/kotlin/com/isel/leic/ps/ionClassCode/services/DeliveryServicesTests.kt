@@ -194,7 +194,7 @@ class DeliveryServicesTests {
     }
 
     @Test
-    fun `createDelivery should give an InvalidInput because the assignmentId is invalid`() {
+    fun `createDelivery should give an AssignmentNotFound because the assignmentId is invalid`() {
         // given: an invalid assignment id
         val assignmentId = -1
 
@@ -209,14 +209,14 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.InvalidInput)
+            assert(delivery.value is DeliveryServicesError.AssignmentNotFound)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `createDelivery should give an AssignmentNotFound because the tagControl is invalid`() {
+    fun `createDelivery should give an InvalidInput because the tagControl is invalid`() {
         // given: an invalid tag control
         val tagControl = ""
 
@@ -231,7 +231,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Problem) {
-            assert(delivery.value is DeliveryServicesError.AssignmentNotFound)
+            assert(delivery.value is DeliveryServicesError.InvalidInput)
         } else {
             fail("Should not be Either.Right")
         }
@@ -316,7 +316,7 @@ class DeliveryServicesTests {
         )
 
         if (delivery is Result.Success) {
-            assert(delivery.value.id == 1)
+            assert(delivery.value.id == 2)
         } else {
             fail("Should not be Either.Right")
         }

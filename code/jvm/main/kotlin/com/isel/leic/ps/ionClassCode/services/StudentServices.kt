@@ -47,23 +47,19 @@ class StudentServices(
     fun createStudent(githubId: Long, schoolId: Int): StudentCreationResult {
         if (schoolId <= 0) return Result.Problem(StudentServicesError.InvalidData)
         return transactionManager.run {
-            val student = it.usersRepository.getPendingStudentByGithubId(githubId) ?: Result.Problem(StudentServicesError.StudentNotFound)
-            if (student is PendingStudent) {
-                if (it.usersRepository.checkIfSchoolIdExists(schoolId)) Result.Problem(StudentServicesError.SchoolIdInUse)
-                val studentRes = it.usersRepository.createStudent(
-                    StudentInput(
-                        name = student.name,
-                        email = "A$schoolId@alunos.isel.pt", //TODO: Find way to be generic
-                        githubUsername = student.githubUsername,
-                        githubId = student.githubId,
-                        token = student.token,
-                        schoolId = schoolId,
-                    ),
-                )
-                if (studentRes == null) Result.Problem(StudentServicesError.InternalError) else Result.Success(studentRes)
-            } else {
-                Result.Problem(StudentServicesError.StudentNotFound)
-            }
+            val student = it.usersRepository.getPendingStudentByGithubId(githubId) ?: return@run Result.Problem(StudentServicesError.StudentNotFound)
+            if (it.usersRepository.checkIfSchoolIdExists(schoolId)) return@run Result.Problem(StudentServicesError.SchoolIdInUse)
+            val studentRes = it.usersRepository.createStudent(
+                StudentInput(
+                    name = student.name,
+                    email = "A$schoolId@alunos.isel.pt",
+                    githubUsername = student.githubUsername,
+                    githubId = student.githubId,
+                    token = student.token,
+                    schoolId = schoolId,
+                ),
+            )
+            if (studentRes == null) return@run Result.Problem(StudentServicesError.InternalError) else Result.Success(studentRes)
         }
     }
 
@@ -73,11 +69,11 @@ class StudentServices(
     fun createPendingStudent(student: StudentInput): PendingStudentCreationResult {
         if (student.isNotValid()) return Result.Problem(StudentServicesError.InternalError)
         return transactionManager.run {
-            if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) Result.Problem(StudentServicesError.GithubUserNameInUse)
-            if (it.usersRepository.checkIfEmailExists(student.email)) Result.Problem(StudentServicesError.EmailInUse)
-            if (it.usersRepository.checkIfGithubIdExists(student.githubId)) Result.Problem(StudentServicesError.GithubIdInUse)
-            if (it.usersRepository.checkIfTokenExists(student.token)) Result.Problem(StudentServicesError.TokenInUse)
             val hash = tokenHash.getTokenHash(student.token)
+            if (it.usersRepository.checkIfGithubUsernameExists(student.githubUsername)) return@run Result.Problem(StudentServicesError.GithubUserNameInUse)
+            if (it.usersRepository.checkIfEmailExists(student.email)) return@run Result.Problem(StudentServicesError.EmailInUse)
+            if (it.usersRepository.checkIfGithubIdExists(student.githubId)) return@run Result.Problem(StudentServicesError.GithubIdInUse)
+            if (it.usersRepository.checkIfTokenExists(hash)) return@run Result.Problem(StudentServicesError.TokenInUse)
             val studentRes = it.usersRepository.createPendingStudent(
                 StudentInput(
                     name = student.name,
@@ -88,7 +84,7 @@ class StudentServices(
                     schoolId = student.schoolId,
                 ),
             )
-            Result.Success(studentRes)
+            return@run Result.Success(studentRes)
         }
     }
 
@@ -99,9 +95,9 @@ class StudentServices(
         return transactionManager.run {
             val schoolId = it.usersRepository.getStudentSchoolId(studentId)
             if (schoolId != null) {
-                Result.Success(schoolId)
+                return@run Result.Success(schoolId)
             } else {
-                Result.Problem(StudentServicesError.InternalError)
+                return@run Result.Problem(StudentServicesError.InternalError)
             }
         }
     }

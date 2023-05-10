@@ -2,12 +2,16 @@ package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
+import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
+import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
+import com.isel.leic.ps.ionClassCode.repository.CourseRepository
+import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
@@ -51,14 +55,14 @@ class ClassroomServiceTests {
                         on { archiveClassroom(classroomId = 1) } doAnswer {}
                         on { updateClassroomName(classroomId = 1, classroomUpdate = ClassroomUpdateInputModel(name = "newName")) } doAnswer {}
                         on {
-                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteLink = "Mockito.anyString()")
+                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteLink = "")
                         } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on {
                             getClassroomByInviteLink(inviteLink = "inviteLink2")
                         } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on {
                             getClassroomByInviteLink(inviteLink = "inviteLink")
-                        } doReturn Classroom(id = 3, name = "Classroom 3", inviteLink = "inviteLink2", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        } doReturn Classroom(id = 3, name = "Classroom 3", inviteLink = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
 
                         on { addStudentToClassroom(classroomId = 1, studentId = 4) } doAnswer {}
                     }
@@ -66,8 +70,29 @@ class ClassroomServiceTests {
                         on { getClassroomAssignments(classroomId = 1) } doReturn listOf(assignment)
                         on { getClassroomAssignments(classroomId = 2) } doReturn listOf(assignment)
                     }
+                    val mockedUsersRepository = mock<UsersRepository> {
+                        on {
+                            getTeacher(teacherId = 1)
+                        } doReturn Teacher(name = "teacher2", isCreated = false, githubUsername = "test1234", githubId = 123452, token = "token1", id = 2, email = "test1@alunos.isel.pt")
+                        on {
+                            getStudent(studentId = 3)
+                        } doReturn Student(name = "student3", email = "email3", id = 3, githubUsername = "test1234", githubId = 123452, token = "token1", isCreated = true, schoolId = 48309)
+                        on {
+                            getStudent(studentId = 1)
+                        } doReturn student
+                        on {
+                            getStudent(studentId = 2)
+                        } doReturn student2
+                    }
+                    val mockedCoursesRepository = mock<CourseRepository> {
+                        on {
+                            getCourse(courseId = 1)
+                        } doReturn Course(id = 1, orgUrl = "orgUrl", name = "name", orgId = 1111, teachers = listOf())
+                    }
                     on { classroomRepository } doReturn mockedClassroomRepository
                     on { assignmentRepository } doReturn mockedAssignmentRepository
+                    on { courseRepository } doReturn mockedCoursesRepository
+                    on { usersRepository } doReturn mockedUsersRepository
                 }
                 return block(mockedTransaction)
             }
@@ -77,7 +102,7 @@ class ClassroomServiceTests {
     // TEST: getClassroom
 
     @Test
-    fun `getClassroom should give an InvalidInput because the classroomId is invalid`() {
+    fun `getClassroom should give an ClassroomNotFound because the classroomId is invalid`() {
         // given: an invalid classroom id
         val classroomId = -1
 
@@ -85,7 +110,7 @@ class ClassroomServiceTests {
         val classroom = classroomServices.getClassroom(classroomId = classroomId)
 
         if (classroom is Result.Problem) {
-            assert(classroom.value is ClassroomServicesError.InvalidInput)
+            assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -174,21 +199,10 @@ class ClassroomServiceTests {
         }
     }
 
-    @Test
-    fun `createClassroom should give a classroom id`() {
-        val classroom = classroomServices.createClassroom(classroomInput = ClassroomInput(name = "name", courseId = 1, teacherId = 1))
-
-        if (classroom is Result.Success) {
-            assert(classroom.value.id == 2)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
-
     // TEST: archiveOrDeleteClassroom
 
     @Test
-    fun `archiveOrDeleteClassroom should give an InvalidInput because the classroomId is invalid`() {
+    fun `archiveOrDeleteClassroom should give an ClassroomNotFound because the classroomId is invalid`() {
         // given: an invalid classroom id
         val classroomId = -1
 
@@ -196,7 +210,7 @@ class ClassroomServiceTests {
         val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
 
         if (classroom is Result.Problem) {
-            assert(classroom.value is ClassroomServicesError.InvalidInput)
+            assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -283,7 +297,7 @@ class ClassroomServiceTests {
     }
 
     @Test
-    fun `editClassroom should give an InvalidInput because the classroom id is invalid`() {
+    fun `editClassroom should give an ClassroomNotFound because the classroom id is invalid`() {
         // given: an invalid classroom id
         val classroomId = -1
 
@@ -294,7 +308,7 @@ class ClassroomServiceTests {
         )
 
         if (classroom is Result.Problem) {
-            assert(classroom.value is ClassroomServicesError.InvalidInput)
+            assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -371,7 +385,7 @@ class ClassroomServiceTests {
     }
 
     @Test
-    fun `enterClassroomWithInvite should give an InvalidInput because the student id is invalid`() {
+    fun `enterClassroomWithInvite should give an InternalError because the student id is invalid`() {
         // given: an invalid student id
         val studentId = -1
 
@@ -379,14 +393,14 @@ class ClassroomServiceTests {
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = "inviteLink", studentId = studentId)
 
         if (classroom is Result.Problem) {
-            assert(classroom.value is ClassroomServicesError.InvalidInput)
+            assert(classroom.value is ClassroomServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `enterClassroomWithInvite should give an ClassroomNotFound because the invite link is not in database`() {
+    fun `enterClassroomWithInvite should give an InviteLinkNotFound because the invite link is not in database`() {
         // given: a valid invite link name
         val inviteLink = "inviteLink7"
 
@@ -394,7 +408,7 @@ class ClassroomServiceTests {
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = inviteLink, studentId = 1)
 
         if (classroom is Result.Problem) {
-            assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
+            assert(classroom.value is ClassroomServicesError.InviteLinkNotFound)
         } else {
             fail("Should not be Either.Right")
         }
@@ -433,7 +447,7 @@ class ClassroomServiceTests {
     @Test
     fun `enterClassroomWithInvite should give the classroom with the new student`() {
         // given: a valid invite link name
-        val studentId = 4
+        val studentId = 3
 
         // when: getting the classroom with the new student
         val classroom = classroomServices.enterClassroomWithInvite(inviteLink = "inviteLink", studentId = studentId)

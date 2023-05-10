@@ -1,9 +1,11 @@
 package com.isel.leic.ps.ionClassCode.services
 
+import com.isel.leic.ps.ionClassCode.domain.Otp
 import com.isel.leic.ps.ionClassCode.domain.Outbox
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.input.OutboxInput
 import com.isel.leic.ps.ionClassCode.repository.CooldownRepository
+import com.isel.leic.ps.ionClassCode.repository.OtpRepository
 import com.isel.leic.ps.ionClassCode.repository.OutboxRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
@@ -39,14 +41,23 @@ class OutboxServicesTests {
                     }
                     val mockedUsersRepository = mock<UsersRepository> {
                         on { getUserById(userId = 1) } doReturn Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 1, schoolId = null)
+                        on { getStudent(studentId = 1) } doReturn Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 1, schoolId = null)
+                        on { getStudent(studentId = 2) } doReturn Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 2, schoolId = null)
                     }
                     val mockedCooldownRepository = mock<CooldownRepository> {
-                        on { getCooldownRequestRemainingTime(userId = 1) } doReturn 1
+                        on { getCooldownRequestRemainingTime(userId = 1) } doReturn null
+                        on { getCooldownRequestRemainingTime(userId = 2) } doReturn null
                         on { createCooldownRequest(userId = 2, endTime = Timestamp(System.currentTimeMillis() + 500000)) } doReturn 1
+                    }
+                    val mockedOtpRepository = mock<OtpRepository> {
+                        on { getOtpRequest(userId = 1) } doReturn Otp(userId = 1, otp = 2, expiredAt = Timestamp.from(Instant.from(Instant.MAX)))
+                        on { getOtpRequest(userId = 2) } doReturn Otp(userId = 1, otp = 2, expiredAt = Timestamp.from(Instant.from(Instant.MIN)))
+                        on { addTryToOtpRequest(userId = 2, 1) } doReturn true
                     }
                     on { outboxRepository } doReturn mockedOutboxRepository
                     on { usersRepository } doReturn mockedUsersRepository
                     on { cooldownRepository } doReturn mockedCooldownRepository
+                    on { otpRepository } doReturn mockedOtpRepository
                 }
                 return block(mockedTransaction)
             }
@@ -107,7 +118,7 @@ class OutboxServicesTests {
     }
 
     @Test
-    fun `checkOtp should give an OtpNotFound because the user is not in database`() {
+    fun `checkOtp should give an InternalError because the user is not in database`() {
         // given: an invalid otp
         val userId = 123
 
@@ -118,7 +129,7 @@ class OutboxServicesTests {
         )
 
         if (outboxOtp is Result.Problem) {
-            assert(outboxOtp.value is OutboxServicesError.OtpNotFound)
+            assert(outboxOtp.value is OutboxServicesError.InternalError)
         } else {
             fail("Should not be Either.Right")
         }
@@ -143,7 +154,7 @@ class OutboxServicesTests {
     }
 
     @Test
-    fun `checkOtp should give an OtpDifferent because the otp is expired`() {
+    fun `checkOtp should give an OtpDifferent because the otp is different`() {
         // given: an valid otp and user id
         val userId = 2
         val otp = 1
@@ -172,7 +183,6 @@ class OutboxServicesTests {
             userId = userId,
             otp = otp,
         )
-
         if (outboxOtp is Result.Success) {
             assert(outboxOtp.value == Unit)
         } else {

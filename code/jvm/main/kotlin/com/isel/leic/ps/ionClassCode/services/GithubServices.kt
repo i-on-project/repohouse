@@ -73,15 +73,6 @@ class GithubServices(
         return okHttp.makeCallToList(request)
     }
 
-    suspend fun getUserOrgs(token: String): List<GitHubOrgsModel> {
-        val orgsRequest = Request.Builder().url("")
-            .addHeader("Authorization", "Bearer $token")
-            .addHeader("Accept", "application/json")
-            .build()
-
-        return okHttp.makeCallToList(orgsRequest)
-    }
-
     /**
      * Method to get the repositories from GitHub based on the organization and respective repository name
      */

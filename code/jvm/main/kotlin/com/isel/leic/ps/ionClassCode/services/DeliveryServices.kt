@@ -114,6 +114,7 @@ class DeliveryServices(
         if (deliveryInfo.isNotValid()) return Result.Problem(DeliveryServicesError.InvalidInput)
         return transactionManager.run {
             it.usersRepository.getTeacher(userId) ?: return@run Result.Problem(DeliveryServicesError.InternalError)
+            it.assignmentRepository.getAssignmentById(deliveryInfo.assignmentId) ?: return@run Result.Problem(DeliveryServicesError.AssignmentNotFound)
             val delivery = it.deliveryRepository.getDeliveryById(deliveryId) ?: return@run Result.Problem(DeliveryServicesError.DeliveryNotFound)
             val isArchived = checkIfArchived(it, delivery.assignmentId)
             if (isArchived is Result.Problem) return@run isArchived
