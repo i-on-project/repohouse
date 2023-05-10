@@ -10,7 +10,7 @@ plugins {
 
 sourceSets {
     main {
-        java.srcDirs("code/jvm/main/kotlin")
+        java.srcDirs("main/kotlin")
         resources.srcDirs("code/jvm/main/resources")
     }
     test {
