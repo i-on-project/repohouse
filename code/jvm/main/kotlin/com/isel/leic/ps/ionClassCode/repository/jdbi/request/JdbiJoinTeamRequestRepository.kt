@@ -16,7 +16,7 @@ class JdbiJoinTeamRequestRepository(
     /**
      * Method to create a Join Team Request
      */
-    override fun createJoinTeamRequest(request: JoinTeamInput,creator:Int): JoinTeam {
+    override fun createJoinTeamRequest(request: JoinTeamInput, creator: Int): JoinTeam {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite,state)

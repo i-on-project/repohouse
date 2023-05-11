@@ -27,7 +27,7 @@
 ## Reunião com o professor - 4 Abril
 - 
 
-## 10 Abril - ? Abril - João
+## 10 Abril - João
 - Aprender como usar o mockito para testes
 - Testes ao services
 

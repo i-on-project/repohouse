@@ -62,27 +62,28 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
-
-tasks.named("check") {
-    dependsOn("ktlintCheck")
+task<Copy>("extractUberJar") {
+    dependsOn("assemble")
+    from(zipTree("$buildDir/libs/${rootProject.name}-$version.jar"))
+    into("build/dependency")
 }
 
 task<Exec>("dbDockerUp") {
     commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-docker")
 }
-
 task<Exec>("dbDockerWait") {
     commandLine("docker", "exec", "db-docker", "/app/bin/wait-for-postgres.sh", "localhost")
     dependsOn("dbDockerUp")
 }
-
 task<Exec>("dbDockerDown") {
     commandLine("docker-compose", "down")
 }
-
 task<Exec>("composeUp") {
-    commandLine("POSTGRES_USER=${System.getenv("POSTGRES_USER")}", "POSTGRES_PASSWORD=${System.getenv("POSTGRES_PASSWORD")}" , "docker-compose", "up", "--build", "--force-recreate")
+    commandLine("docker-compose", "up", "--build", "--force-recreate")
     dependsOn("extractUberJar")
+}
+task<Exec>("composeDown") {
+    commandLine("docker-compose", "down")
 }
 
 tasks.named("check") {

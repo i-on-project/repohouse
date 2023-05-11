@@ -27,7 +27,6 @@ data class Student(
     val schoolId: Int?,
 ) : User()
 
-
 data class StudentWithoutToken(
     val name: String,
     val email: String,
@@ -86,5 +85,3 @@ data class PendingTeacher(
     override val isCreated: Boolean = false,
     val githubToken: String,
 ) : User()
-
-

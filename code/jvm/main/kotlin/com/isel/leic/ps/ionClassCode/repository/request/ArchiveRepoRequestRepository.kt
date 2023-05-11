@@ -7,7 +7,7 @@ import com.isel.leic.ps.ionClassCode.domain.requests.ArchiveRepo
  * Repository functions for Archive Repo Repository
  */
 interface ArchiveRepoRequestRepository {
-    fun createArchiveRepoRequest(request: ArchiveRepoInput,creator:Int): ArchiveRepo
+    fun createArchiveRepoRequest(request: ArchiveRepoInput, creator: Int): ArchiveRepo
     fun getArchiveRepoRequests(): List<ArchiveRepo>
     fun getArchiveRepoRequestById(id: Int): ArchiveRepo?
     fun getArchiveRepoRequestsByUser(userId: Int): List<ArchiveRepo>

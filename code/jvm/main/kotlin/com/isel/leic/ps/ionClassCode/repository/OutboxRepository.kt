@@ -10,7 +10,7 @@ interface OutboxRepository {
     fun createOutboxRequest(outbox: OutboxInput): Outbox
     fun getOutboxPendingRequests(): List<Outbox>
     fun getOutboxRequest(userId: Int): Outbox?
-    fun updateOutboxStateRequest(userId: Int,state:String)
+    fun updateOutboxStateRequest(userId: Int, state: String)
     fun updateOutboxSentTimeRequest(userId: Int)
     fun deleteOutboxRequest(userId: Int)
 }

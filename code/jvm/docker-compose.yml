@@ -5,8 +5,8 @@ services:
     container_name: db-docker
     hostname: db-docker
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile-db
+      context: ../..
+      dockerfile: ./files/Dockerfile-db
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD${POSTGRES_PASSWORD}
@@ -20,8 +20,8 @@ services:
     container_name: spring-service
     hostname: spring-service
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile-Spring
+      context: ../..
+      dockerfile: ./files/Dockerfile-Spring
     environment:
       PORT: 8081
       JDBC_DATABASE_URL: "jdbc:postgresql://db-docker:5432/db?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
@@ -37,13 +37,13 @@ services:
       - "8080:8080"
       - "8088:8088"
     volumes:
-      - ./docker/nginx:/etc/nginx
+      - ./nginx:/etc/nginx
     depends_on:
       - spring-service
 
   ubuntu:
     container_name: ubuntu
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile-ubuntu
+      context: ../..
+      dockerfile: ./files/Dockerfile-ubuntu
     tty: true

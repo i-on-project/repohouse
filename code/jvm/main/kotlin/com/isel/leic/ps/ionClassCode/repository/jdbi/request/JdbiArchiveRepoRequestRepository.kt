@@ -16,7 +16,7 @@ class JdbiArchiveRepoRequestRepository(
     /**
      * Method to create an Archive Repo Request
      */
-    override fun createArchiveRepoRequest(request: ArchiveRepoInput,creator:Int): ArchiveRepo {
+    override fun createArchiveRepoRequest(request: ArchiveRepoInput, creator: Int): ArchiveRepo {
         val requestId = handle.createUpdate(
             """
            INSERT INTO request (creator, composite, state)
