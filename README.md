@@ -38,25 +38,24 @@ The i-on initiative aims in systems open source software for academic purposes.
 
 ## Functionalities
 
-- [x] Associate a GitHub repository to a Course
-- [x] Create Classrooms, included in a Course
-- [x] Invite Codes to Students to join a Classroom
-- [x] Create Assignments, included in a Classroom
-- [x] Create Teams associated with an Assignment
-- [x] Create a GitHub repository and a GitHub Team for each Assignment Team
-- [x] Define a set o rules for the teams
-- [x] Define various Deliveries for an Assignment, with tag control and deadline
-- [x] Check for each Delivery, the Teams that have delivered and the ones that have not
-- [x] Post feedback to the Teams, based on labels 
-- [x] Accept other GitHub users to join as Teachers
-
+- [ ] Associate a GitHub repository to a Course
+- [ ] Create Classrooms, included in a Course
+- [ ] Invite Codes to Students to join a Classroom
+- [ ] Create Assignments, included in a Classroom
+- [ ] Create Teams associated with an Assignment
+- [ ] Create a GitHub repository and a GitHub Team for each Assignment Team
+- [ ] Define a set o rules for the teams
+- [ ] Define various Deliveries for an Assignment, with tag control and deadline
+- [ ] Check for each Delivery, the Teams that have delivered and the ones that have not
+- [ ] Post feedback to the Teams, based on labels 
+- [ ] Accept other GitHub users to join as Teachers
+ 
 ## Repository Organization
 
 The repository is organized as follows:
 
-- [docs/](docs) : Project documentation, namely images, diagrams and reports.
 - [code/](code) : Source code to all the components of the project
-
+- [docs/](docs) : Project documentation, namely images, diagrams and reports.
 
 ## Installation
 

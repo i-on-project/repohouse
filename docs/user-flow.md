@@ -1,48 +1,70 @@
-# Fluxo de experiência
+# User Flow
 
-> O fluxo de experiência é fundamental para o sucesso de uma aplicação, pois uma boa usabilidade pode garantir a satisfação e fidelidade dos utilizadores.
-> Permite ajudar a identificar possíveis problemas na experiência do utilizador, permitindo que sejam feitas melhorias na interface ou no *design* da aplicação.
+> The experience flow is critical to the success of an application,
+> as good usability can ensure user satisfaction and loyalty.\
+> It can help identify possible problems in the user experience,
+> allowing improvements to be made to the interface or the *design* of the application.
 
-## Fluxo
+## Flow
 
-O fluxo da aplicação é iniciada por ambas as categorias de utilizadores _'Docente'_ e _'Aluno'_, onde os mesmos, através da página principal, se deslocam para o local de autenticação para ser feita a destinação entre qual o papel do utilizador na aplicação, feito no momento de registo do utilizador.
+The flow of the application is initiated by both user categories _'Docente'_
+and _'Aluno'_, where they, through the main page,
+move to the authentication location to be assigned between what the user's role in the application is,
+done at the time of user registration.
 
-Todo o processo de registo e autorização é realizado por **OAuth 2.0** conectada à API do GitHub.
-Este troço de fluxo pode ser saltado após haver a informação em **cache** sobre o utilizador em questão.
+The entire registration and authorization process is done by **OAuth 2.0** connected to the GitHub API.
+This section of flow can be skipped after there is the information in **cache** about the user in question.
 
-A aplicação é dividida numa componente *web* e uma componente *mobile*, onde a componente *web* é possível de ser acedida por qualquer utilizador, enquanto a componente móvel só é possivel ser utilizada por _'Docentes'_.
+The application is divided into a *web* component and a *mobile* component,
+where the *web* component can be accessed by any user, 
+while the mobile component can only be used by _'Docentes'_.
+
 ![Web User Flow](../docs/img/web-user-flow.png)*Web User Flow*
 
 ![Mobile User Flow](../docs/img/mobile-user-flow.png)*Mobile User Flow*
 
-### Docente
-Entrando na aplicação como _'Docente'_, a experiência de utilização passa por um menu inicial onde o docente poderá ter acesso a todas as turmas que leciona, onde é permitido a navegação para o conteúdo de cada uma.
+### Teacher
 
-Em cada turma tem-se acesso aos enunciados já publicados, por publicar e até mesmo criar, para os alunos terem acesso à sua publicação e à lista de grupos, criados por parte dos alunos, obtendo depois tanto as informações dos mesmos como o conteúdo realizado através dos repositórios.
+Entering the application as _'Docente'_,
+the user experience goes through an initial menu where the teacher can access all the classes he teaches,
+where navigation to the contents of each class is allowed.
 
-![Detailed Web Teacher Flow](../docs/img/web-teacher-flow.png)*Detailed Web Teacher Flow*
 
-Para um docente realizar o seu registro na aplicação, após integração com o Github, o mesmo deve submeter o seu nome e email, para que outro docente o verifique como um professor, para permitir assim ter uma aplicação confiável em relação aos seus utilizadores.
+In each class you have access to the published, unpublished and even created statements, 
+so that students can access their publication and the list of groups, created by the students, 
+and then obtain both their information and the content made through the repositories.
 
-Todas as operações que necessitam de operações de escrita, são realizadas através da componente *mobile*, onde o docente armazena o seu token que permite realizar os pedidos sobre a API do GitHub.
+![Detailed Web Teacher Flow](../docs/img/web-teacher-flow.png) *Detailed Web Teacher Flow*
 
-Qualquer pedido que necessite de autenticação realizada pela componente *web*, quer por parte do docente como pelos alunos, é adicionada a uma lista de tarefas onde só é depois realizadas pela componente móvel através do token do docente armazenado no dispositivo móvel.
-Este componente serve também para a sincronização entre os dados da aplicação e o GitHub.
+For a teacher to register in the application, after integration with GitHub, they must submit their name and email,
+so that another teacher can verify them as a teacher, to allow them to have an application that is trusted by its users.
 
-![Detailed Mobile Teacher Flow](../docs/img/mobile-flow.png)*Detailed Mobile Teacher Flow*
 
-### Aluno
+All the operations that require write operations are done through the *mobile* component,
+where the teacher stores his token that allows him to make requests over the GitHub API.
 
-Um utilizador identificado como _'Aluno'_, poderá ter duas categorias de experiência de utilização, uma comum e usual:
+Any request that requires authentication performed by the *web* component, either by the teacher or by the students, 
+is added to a task list 
+where it is then only performed by the mobile component through the teacher's token stored in the mobile device.
+This component also serves for synchronization between the application data and GitHub.
 
-Onde o aluno ao iniciar a aplicação, terá acesso a todas as disciplinas às quais se encontra inscrito, onde poderá depois em cada uma delas verificar poderá ter acesso à uma secção com todos os trabalhos já expostos pelo docente, podendo depois ir ao detalhe de cada um; como pode ter acesso ao repositório de GitHub, sobre o qual onde devem ser realizados os trabalhos.
+![Detailed Mobile Teacher Flow](../docs/img/mobile-flow.png) *Detailed Mobile Teacher Flow*
 
-![Detailed User Flow](../docs/img/web-student-flow.png)*Detailed User Flow*
+### Student
 
-E outra maneira de experiência de utilização que um aluno poderá presenciar, é através de um convite para a integração de uma disciplina, onde o mesmo poderá criar ou integrar-se num grupo e ser encaminhado para o mesmo, aonde irá então ter acesso ao seu repositório.
+A user identified as _'Aluno'_, may have two categories of user experience, a common and usual one:
 
-O aluno ao iniciar a aplicação através de um convite, terá acesso a uma página onde irá ser questionado sobre a intenção de intregrar a disciplina, caso o deseje e após a sua autenticação caso seja necessária, será reencaminhado para uma página onde poderá criar um grupo ou integrar-se a um, ao qual após a sua escolha, será reencaminhado para o repositório da disciplina.
+Where the student when starting the application, will have access to all the disciplines to which he is enrolled, where he can then in each of them check can have access to a section with all the works already exposed by the teacher, and can then go to the detail of each one; as can have access to the GitHub repository, on which where the works should be performed.
 
-![Detailed User Invite Flow](../docs/img/web-invite-student-flow.png)*Detailed User Invite Flow*
+![Detailed User Flow](../docs/img/web-student-flow.png) *Detailed User Flow*
 
-Se o mesmo já se tiver inscrito em um grupo e pretender recuar no fluxo de utilização, o mesmo será reencaminhado para o início do fluxo anterior, para a página das suas disciplinas.
+And another way of user experience that a student can experience is through an invitation to join a course, 
+where he can create or join a group and be directed to it, where he will then have access to its repository.
+
+When the student starts the application through an invitation, he will access a page where he will be asked if he wants to join the course, and after authentication if required, will be redirected to a page where he can create a group or join one, and after his choice, will be redirected to the course repository.
+
+![Detailed User Invite Flow](../docs/img/web-invite-student-flow.png) *Detailed User Invite Flow*
+
+
+If you have already signed in to a group and want to backtrack in the user flow, 
+you will be redirected to the beginning of the previous flow, to your course page.

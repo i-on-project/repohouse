@@ -104,7 +104,4 @@ All web API routes are prefixed with `/api/web`.
 ``` 
  * = Only for teachers.    
  ** = Only for students.
- ```
-
-
-
+```

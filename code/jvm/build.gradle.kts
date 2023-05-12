@@ -11,10 +11,10 @@ plugins {
 sourceSets {
     main {
         java.srcDirs("main/kotlin")
-        resources.srcDirs("code/jvm/main/resources")
+        resources.srcDirs("main/resources")
     }
     test {
-        java.srcDirs("code/jvm/test/kotlin")
+        java.srcDirs("test/kotlin")
     }
 }
 group = "com.isel.leic.ps.ion_repohouse"
@@ -62,6 +62,7 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
 task<Copy>("extractUberJar") {
     dependsOn("assemble")
     from(zipTree("$buildDir/libs/${rootProject.name}-$version.jar"))
@@ -88,6 +89,8 @@ task<Exec>("composeDown") {
 
 tasks.named("check") {
     dependsOn("ktlintCheck")
+    // TODO: need to fix this
     dependsOn("dbDockerWait")
     finalizedBy("dbDockerDown")
 }
+
