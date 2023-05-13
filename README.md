@@ -1,19 +1,19 @@
 
 <div align="center" style="margin-bottom: 30px">
     <div style="margin-bottom: 30px; margin-top: 30px" >
-        <img align="center" src="docs/img/logo/project-logo.png" width="75%" >
+        <img align="center" src="docs/img/logo/project-logo.png" width="75%"  alt="project logo">
     </div>
     <a href="../../graphs/contributors">
-        <img src="https://img.shields.io/github/contributors/i-on-project/repohouse" />
+        <img src="https://img.shields.io/github/contributors/i-on-project/repohouse"  alt="contributors"/>
         </a>
     <a href="../../stargazers">
-        <img src="https://img.shields.io/github/stars/i-on-project/repohouse" />
+        <img src="https://img.shields.io/github/stars/i-on-project/repohouse"  alt="stargazers"/>
     </a>
     <a href="../../issues">
-        <img src="https://img.shields.io/github/issues/i-on-project/repohouse" />
+        <img src="https://img.shields.io/github/issues/i-on-project/repohouse"  alt="issues"/>
     </a>
     <a href="../../pulls">
-        <img src="https://img.shields.io/github/issues-pr/i-on-project/repohouse" />
+        <img src="https://img.shields.io/github/issues-pr/i-on-project/repohouse"  alt="pulls"/>
     </a>
 </div>
 
@@ -34,7 +34,9 @@ The i-on initiative aims in systems open source software for academic purposes.
 - [Repository Organization](#repository-organization)
 - [Installation](#installation)
 - [Usage](#usage)
+- [License](#license)
 - [Project Status](#project-status)
+
 
 ## Functionalities
 
@@ -65,6 +67,11 @@ TODO: Add installation instructions
 ## Usage
 
 TODO: Add usage instructions
+
+
+## License
+
+This project is licensed under the Apache License 2.0 — see the [LICENSE](LICENSE) file for details.
 
 
 ## Project Status
