@@ -17,6 +17,10 @@ class FakeSessionStore(alreadyLoggedIn: Boolean): SessionStore {
         classCodeTokenStorage = token
     }
 
+    override suspend fun storeSecret(secret: String) {
+        TODO("Not yet implemented")
+    }
+
     override fun getGithubToken(): Flow<String> {
         val token = gitHubTokenStorage ?: ""
         return flowOf(token)
@@ -25,6 +29,14 @@ class FakeSessionStore(alreadyLoggedIn: Boolean): SessionStore {
     override fun getSessionCookie(): Flow<String> {
         val token = classCodeTokenStorage ?: ""
         return flowOf(token)
+    }
+
+    override fun getSecret(): Flow<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun cleanSecret() {
+        TODO("Not yet implemented")
     }
 
     override suspend fun cleanTokens() {

@@ -1,5 +1,6 @@
 package isel.ps.classcode.presentation.login
 
+import android.app.Activity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,9 @@ import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.Base64
 
 class LoginViewModel(private val loginServices: LoginServices, private val connectivityObserver: ConnectivityObserver) : ViewModel() {
 
@@ -22,15 +26,19 @@ class LoginViewModel(private val loginServices: LoginServices, private val conne
     val error: HandleClassCodeResponseError?
         get() = _error
 
-
     lateinit var status: ConnectivityObserver
 
-    fun getAccessToken(code: String, githubId: String) = viewModelScope.launch {
+    fun getAccessToken(code: String, state: String) = viewModelScope.launch {
         status = connectivityObserver
         status.observer().onEach {  }
-        when (val res = loginServices.getTheTokens(code = code, githubId = githubId)) {
+        when (val res = loginServices.getTheAccessToken(code = code, state = state)) {
             is Either.Right -> { _finished = true }
             is Either.Left -> { _error = res.value }
         }
     }
+
+    fun startOAuth(activity: Activity) = viewModelScope.launch {
+        loginServices.startOauth(activity = activity)
+    }
+
 }

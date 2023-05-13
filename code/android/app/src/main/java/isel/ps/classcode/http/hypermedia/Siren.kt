@@ -19,7 +19,7 @@ val SirenMediaType = "$APPLICATION_TYPE/$SIREN_SUBTYPE".toMediaType()
  * Class whose instances represent links as they are represented in Siren.
  */
 data class SirenLink(
-    @JsonProperty("href") val href: URI,
+    @JsonProperty("href") val href: String,
     @JsonProperty("rel") val rel: List<String>,
     @JsonProperty("needAuthentication") val needAuthentication: Boolean? = null,
 )

@@ -2,7 +2,6 @@ package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Teacher
-import com.isel.leic.ps.ionClassCode.domain.Tokens
 import com.isel.leic.ps.ionClassCode.domain.User
 import com.isel.leic.ps.ionClassCode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
@@ -16,10 +15,10 @@ import org.springframework.stereotype.Component
  * Alias for the response of the services
  */
 typealias UserAuthenticationResult = Result<UserServicesError, User>
-typealias StoreAccessTokenResult = Result<UserServicesError, Unit>
+typealias StoreChallengeInfoResult = Result<UserServicesError, Unit>
 typealias UserByGithubIdResult = Result<UserServicesError, User>
 typealias UserCoursesResponse = Result<UserServicesError, List<Course>>
-typealias GetAccessTokenResult = Result<UserServicesError, Tokens>
+typealias VerifySecretResult = Result<UserServicesError, Unit>
 
 /**
  * Error codes for the services
@@ -30,6 +29,8 @@ sealed class UserServicesError {
     object InvalidToken : UserServicesError()
     object InternalError : UserServicesError()
     object NotTeacher : UserServicesError()
+    object InvalidData : UserServicesError()
+    object InvalidSecret : UserServicesError()
 }
 
 /**
@@ -58,30 +59,22 @@ class UserServices(
     /**
      * Method to store the access token encrypted
      */
-    fun storeAccessTokenEncrypted(token: String, githubId: Long): StoreAccessTokenResult {
-        if (token.isEmpty()) return Result.Problem(UserServicesError.InvalidToken)
+    fun storeChallengeInfo(challengeMethod: String, challenge: String, state: String): StoreChallengeInfoResult {
+        if (challengeMethod.isEmpty() || challenge.isEmpty()) return Result.Problem(UserServicesError.InvalidData)
+        if (challengeMethod != "s256" && challengeMethod != "plain") return Result.Problem(UserServicesError.InvalidData)
         return transactionManager.run {
-            val user = it.usersRepository.getUserByGithubId(githubId)
-            if (user !is Teacher) return@run Result.Problem(UserServicesError.InternalError)
-            it.usersRepository.storeAccessTokenEncrypted(token, githubId)
+            it.usersRepository.storeChallengeInfo(challengeMethod = challengeMethod, challenge = challenge, state = state)
             return@run Result.Success(Unit)
         }
     }
 
-    /**
-     * Method to get the access token encrypted and the classcode user token
-     */
-
-    fun getTokens(githubId: Long): GetAccessTokenResult {
+    fun verifySecret(secret: String, state: String): VerifySecretResult {
+        if (secret.isEmpty() || state.isEmpty()) return Result.Problem(value = UserServicesError.InvalidData)
         return transactionManager.run {
-            val user = it.usersRepository.getUserByGithubId(githubId) ?: return@run Result.Problem(UserServicesError.UserNotFound)
-            if (user !is Teacher) return@run Result.Problem(UserServicesError.NotTeacher)
-            val accessToken = it.usersRepository.getAccessTokenEncrypted(githubId)
-            if (accessToken == null) {
-                return@run Result.Problem(UserServicesError.InternalError)
+            return@run if (it.usersRepository.verifySecret(secret = secret, state = state)) {
+                Result.Success(value = Unit)
             } else {
-                it.usersRepository.deleteAccessTokenEncrypted(githubId)
-                return@run Result.Success(Tokens(accessToken, user.token))
+                Result.Problem(value = UserServicesError.InvalidSecret)
             }
         }
     }
@@ -150,6 +143,8 @@ class UserServices(
             UserServicesError.InvalidToken -> Problem.unauthenticated
             UserServicesError.NotTeacher -> Problem.notTeacher
             UserServicesError.InternalError -> Problem.internalError
+            UserServicesError.InvalidData -> Problem.invalidInput
+            UserServicesError.InvalidSecret -> Problem.unauthorized
         }
     }
 }

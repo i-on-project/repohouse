@@ -43,8 +43,8 @@ class UserServiceTests {
                                     githubUsername = "username",
                                     githubId = 12345,
                                     token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
-                                    schoolId = null
-                                )
+                                    schoolId = null,
+                                ),
                             )
                         } doReturn PendingStudent(
                             name = "name",
@@ -53,7 +53,7 @@ class UserServiceTests {
                             token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
                             githubId = 12345,
                             isCreated = false,
-                            id = 1
+                            id = 1,
                         )
 
                         on {
@@ -64,8 +64,8 @@ class UserServiceTests {
                                     schoolId = 1238,
                                     githubId = 12345,
                                     token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
-                                    name = "name"
-                                )
+                                    name = "name",
+                                ),
                             )
                         } doReturn Student(
                             email = "test@alunos.isel.pt",
@@ -75,8 +75,12 @@ class UserServiceTests {
                             token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
                             name = "student",
                             id = 1,
-                            isCreated = true
+                            isCreated = true,
                         )
+
+                        on {
+                            storeChallengeInfo(challenge = "challenge", challengeMethod = "s256", state = "state")
+                        } doAnswer {}
 
                         on {
                             updateStudentSchoolId(userId = 5, schoolId = 1256)
@@ -90,8 +94,8 @@ class UserServiceTests {
                                     githubUsername = "username",
                                     githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
                                     githubId = 12346,
-                                    token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="
-                                )
+                                    token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                                ),
                             )
                         } doReturn PendingTeacher(
                             name = "name",
@@ -101,7 +105,7 @@ class UserServiceTests {
                             githubId = 12346,
                             token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
                             isCreated = false,
-                            githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="
+                            githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
                         )
 
                         on {
@@ -112,8 +116,8 @@ class UserServiceTests {
                                     token = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
                                     githubId = 12346,
                                     githubUsername = "username",
-                                    githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4="
-                                )
+                                    githubToken = "3z5rC7Zs6q3KT4TLw3H9ZuBNIP5R_EFNqNG4TTHReN4=",
+                                ),
                             )
                         } doReturn Teacher(
                             email = "test@alunos.isel.pt",
@@ -122,7 +126,7 @@ class UserServiceTests {
                             githubId = 12346,
                             githubUsername = "username",
                             id = 1,
-                            isCreated = true
+                            isCreated = true,
                         )
 
                         on {
@@ -135,7 +139,7 @@ class UserServiceTests {
                             isCreated = false,
                             email = "test3@alunos.isel.pt",
                             id = 4,
-                            schoolId = 1235
+                            schoolId = 1235,
                         )
 
                         on {
@@ -147,7 +151,7 @@ class UserServiceTests {
                             githubId = 123452,
                             token = "token1",
                             id = 2,
-                            email = "test1@alunos.isel.pt"
+                            email = "test1@alunos.isel.pt",
                         )
 
                         on {
@@ -160,7 +164,7 @@ class UserServiceTests {
                             isCreated = false,
                             email = "test3@alunos.isel.pt",
                             id = 4,
-                            schoolId = 1235
+                            schoolId = 1235,
                         )
 
                         on {
@@ -173,8 +177,12 @@ class UserServiceTests {
                             isCreated = false,
                             email = "test3@alunos.isel.pt",
                             id = 1,
-                            schoolId = 1235
+                            schoolId = 1235,
                         )
+
+                        on {
+                            verifySecret(secret = "secret", state = "state")
+                        } doReturn true
 
                         on {
                             getUserByGithubId(githubId = 12555L)
@@ -185,7 +193,7 @@ class UserServiceTests {
                             githubId = 1234,
                             token = "token1",
                             id = 2,
-                            email = "test1@alunos.isel.pt"
+                            email = "test1@alunos.isel.pt",
                         )
 
                         on {
@@ -197,7 +205,7 @@ class UserServiceTests {
                             githubId = 1234,
                             token = "token1",
                             id = 2,
-                            email = "test1@alunos.isel.pt"
+                            email = "test1@alunos.isel.pt",
                         )
 
                         on {
@@ -227,10 +235,6 @@ class UserServiceTests {
                         on {
                             checkIfSchoolIdExists(schoolId = 1235)
                         } doReturn true
-
-                        on {
-                            getAccessTokenEncrypted(githubId = 12555)
-                        } doReturn "token"
                     }
                     val mockedCourseRepository = mock<CourseRepository> {
                         on { getAllStudentCourses(userId = 1) } doReturn listOf(Course(id = 1, orgUrl = "orgUrl", name = "name", teachers = listOf(), orgId = 1L))
@@ -407,45 +411,119 @@ class UserServiceTests {
         }
     }
 
-    @Test
-    fun `storeAccessTokenEncrypted should return`() {
-        val result = userServices.storeAccessTokenEncrypted(token = "KSDJksBANDPASS80H", 12555)
-
-        if (result is Result.Success) {
-            assert(true)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
+    // TEST: verifySecret
 
     @Test
-    fun `storeAccessTokenEncrypted should return InvalidToken if token is invalid`() {
-        val result = userServices.storeAccessTokenEncrypted(token = "", 12345)
+    fun `verifySecret should give an InvalidData because the secret is invalid`() {
+        // given: an invalid secret
+        val secret = ""
+
+        // when: getting an error because of an invalid secret
+        val result = userServices.verifySecret(secret = secret, state = "state")
 
         if (result is Result.Problem) {
-            assert(result.value is UserServicesError.InvalidToken)
+            assert(result.value is UserServicesError.InvalidData)
         } else {
-            fail("Should not be Either.Left")
+            fail("Should not be Either.Right")
         }
     }
 
     @Test
-    fun `getTokens should return if githubId is valid`() {
-        val result = userServices.getTokens(githubId = 12555)
+    fun `verifySecret should give an InvalidData because the state is invalid`() {
+        // given: an invalid state
+        val state = ""
 
-        if (result is Result.Success) {
-            assert(result.value.classCodeToken == "token1")
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
-
-    @Test
-    fun `getTokens should return UserNotFound if githubId is valid`() {
-        val result = userServices.getTokens(githubId = 12345)
+        // when: getting an error because of an invalid state
+        val result = userServices.verifySecret(secret = "secret", state = state)
 
         if (result is Result.Problem) {
-            assert(result.value is UserServicesError.UserNotFound)
+            assert(result.value is UserServicesError.InvalidData)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `verifySecret should give an true because the secret is valid`() {
+        // when: getting true
+        val result = userServices.verifySecret(secret = "secret", state = "state")
+
+        if (result is Result.Success) {
+            assert(result.value == Unit)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    // storeAuthInfo
+
+    @Test
+    fun `storeAuthInfo should give an InvalidData because the challengeMethod is invalid`() {
+        // given: an invalid challengeMethod
+        val challengeMethod = ""
+
+        // when: getting an error because of an invalid challengeMethod
+        val result = userServices.storeChallengeInfo(challengeMethod = challengeMethod, state = "state", challenge = "challenge")
+
+        if (result is Result.Problem) {
+            assert(result.value is UserServicesError.InvalidData)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `storeAuthInfo should give an InvalidData because the state is invalid`() {
+        // given: an invalid state
+        val state = ""
+
+        // when: getting an error because of an invalid state
+        val result = userServices.storeChallengeInfo(challengeMethod = "challengeMethod", state = state, challenge = "challenge")
+
+        if (result is Result.Problem) {
+            assert(result.value is UserServicesError.InvalidData)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `storeAuthInfo should give an InvalidData because the challenge is invalid`() {
+        // given: an invalid challenge
+        val challenge = ""
+
+        // when: getting an error because of an invalid challenge
+        val result = userServices.storeChallengeInfo(challengeMethod = "challengeMethod", state = "state", challenge = challenge)
+
+        if (result is Result.Problem) {
+            assert(result.value is UserServicesError.InvalidData)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `storeAuthInfo should give an InvalidData because the challengeMethod have invalid format`() {
+        // given: an invalid challengeMethod
+        val challengeMethod = "heelo"
+
+        // when: getting an error because of an invalid challengeMethod
+        val result = userServices.storeChallengeInfo(challengeMethod = challengeMethod, state = "state", challenge = "challenge")
+
+        if (result is Result.Problem) {
+            assert(result.value is UserServicesError.InvalidData)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `storeAuthInfo should be able to store the info`() {
+        // when: getting unit
+        val result = userServices.storeChallengeInfo(challengeMethod = "s256", state = "state", challenge = "challenge")
+
+        if (result is Result.Success) {
+            assert(result.value == Unit)
         } else {
             fail("Should not be Either.Right")
         }

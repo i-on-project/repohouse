@@ -10,6 +10,8 @@ import com.isel.leic.ps.ionClassCode.domain.input.TeacherInput
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
+import java.security.MessageDigest
+import java.util.Base64
 
 /**
  * Implementation of the User methods
@@ -34,7 +36,7 @@ class JdbiUsersRepository(
     }
 
     /**
-     * Method to verify if a GitHub usernmae exists
+     * Method to verify if a GitHub username exists
      */
     override fun checkIfGithubUsernameExists(githubUsername: String): Boolean {
         return handle.createQuery(
@@ -91,6 +93,38 @@ class JdbiUsersRepository(
             .bind("github_token", githubToken)
             .mapTo<Int>()
             .firstOrNull() != null
+    }
+    data class ChallengeInfo(
+        val challenge: String,
+        val challengeMethod: String,
+    )
+    override fun verifySecret(secret: String, state: String): Boolean {
+        val query = handle.createQuery(
+            """
+            SELECT challenge, challenge_method FROM storechallengeinfo
+            WHERE state = :state
+            """,
+        )
+            .bind("state", state)
+            .mapTo<ChallengeInfo>()
+            .firstOrNull() ?: return false
+        handle.createUpdate(
+            """
+            DELETE FROM storechallengeinfo
+            WHERE state = :state
+            """,
+        )
+            .bind("state", state)
+            .execute()
+        return if (query.challengeMethod == "plain") {
+            secret == query.challenge
+        } else {
+            val secretBytes = secret.toByteArray()
+            val messageDigest = MessageDigest.getInstance("SHA-256")
+            val digest = messageDigest.digest(secretBytes)
+            val challenge = Base64.getUrlEncoder().withoutPadding().encodeToString(digest)
+            challenge == query.challenge
+        }
     }
 
     /**
@@ -322,58 +356,24 @@ class JdbiUsersRepository(
     }
 
     /**
-     * Method to store the access token. If already exists don´t do anything
+     * Method to store some auth info
      */
 
-    override fun storeAccessTokenEncrypted(token: String, githubId: Long) {
-        handle.createQuery(
-            """
-            SELECT access_token FROM accesstoken
-            WHERE github_id = :github_id
-            """,
-        )
-            .bind("github_id", githubId)
-            .mapTo<String>()
-            .firstOrNull()
-            ?: handle.createUpdate(
-                """
-            INSERT INTO accesstoken (github_id, access_token)
-            VALUES (:github_id, :access_token)
-            """,
-            )
-                .bind("access_token", token)
-                .bind("github_id", githubId)
-                .execute()
-    }
-
-    /**
-     * Get the encrypted token associated with the github id
-     */
-
-    override fun getAccessTokenEncrypted(githubId: Long): String? {
-        return handle.createQuery(
-            """
-            SELECT access_token FROM accesstoken
-            WHERE github_id = :github_id
-            """,
-        )
-            .bind("github_id", githubId)
-            .mapTo<String>()
-            .firstOrNull()
-    }
-    override fun deleteAccessTokenEncrypted(githubId: Long) {
+    override fun storeChallengeInfo(challengeMethod: String, challenge: String, state: String) {
         handle.createUpdate(
             """
-            delete FROM accesstoken
-            WHERE github_id = :github_id
+               INSERT INTO storechallengeinfo (state, challenge, challenge_method) 
+               values (:state, :challenge, :challengeMethod)
             """,
         )
-            .bind("github_id", githubId)
+            .bind("state", state)
+            .bind("challengeMethod", challengeMethod)
+            .bind("challenge", challenge)
             .execute()
     }
 
     /**
-     * Method to get a studen by is school id
+     * Method to get a student by is school id
      */
     override fun getStudentSchoolId(id: Int): Int? {
         return handle.createQuery(
@@ -503,7 +503,7 @@ class JdbiUsersRepository(
                 DELETE FROM apply
                 WHERE pending_teacher_id IN (SELECT id FROM pendingteacher
                 WHERE created_at < now() - interval '1 day')
-            """
+            """,
         ).execute()
 
         handle.createUpdate(

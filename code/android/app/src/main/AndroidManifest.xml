@@ -19,7 +19,8 @@
         <activity
             android:name=".presentation.login.LoginActivity"
             android:noHistory="true"
-            android:exported="true" >
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -31,53 +32,16 @@
 
 
         <activity
-        android:name=".presentation.errorCallback.UserNotFoundErrorActivity"
-        android:exported="true" >
+        android:name=".presentation.errorCallback.SomethingWentWrongActivity"
+        android:exported="true"
+        >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="classcode"
                     android:host="callback"
-                    android:pathPrefix="/user_not_present/" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".presentation.errorCallback.StudentErrorActivity"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="classcode"
-                    android:host="callback"
-                    android:pathPrefix="/student/" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".presentation.errorCallback.PendingTeacherErrorActivity"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="classcode"
-                    android:host="callback"
-                    android:pathPrefix="/pendingTeacher/" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".presentation.errorCallback.PendingStudentErrorActivity"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="classcode"
-                    android:host="callback"
-                    android:pathPrefix="/pendingStudent/"/>
+                    android:pathPrefix="/error" />
             </intent-filter>
         </activity>
 
