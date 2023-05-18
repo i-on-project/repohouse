@@ -275,25 +275,3 @@ INSERT INTO otp(user_id, otp, expired_at, tries)
 VALUES (5, 123456, NOW() + INTERVAL '1 day', 0);
 
 COMMIT TRANSACTION;
-
-insert into users(id, email, is_created, github_username, github_id, token, name)
-values (9, 'jdiogo2302@gmail.com', true, 'JoaoMagalhaes23', '73882045', 'token1234', 'Joao Magalhaes');
-insert into teacher(id, github_token)
-values (9, 'token1234');
-
-INSERT INTO teacher_course (teacher, course)
-VALUES (9, 1);
-INSERT INTO teacher_course (teacher, course)
-VALUES (9, 2);
-INSERT INTO teacher_course (teacher, course)
-VALUES (9, 3);
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
-VALUES (4, 'DAW-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/a/123', false, 1, 9);
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
-VALUES (5, 'PDM-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/b/123', false, 2, 9);
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
-VALUES (6, 'TVS-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/c/123', false, 1, 9);
-INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (5, 4, 2, 3, CURRENT_TIMESTAMP, 'description4', 'title4');
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (6, 'team6', false, 5);
