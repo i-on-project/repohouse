@@ -73,6 +73,34 @@ fun ClassCodeErrorView(
                     text = { Text(text = " ${error.type}: ${error.title} \n ${error.detail}") },
                 )
             }
+
+            is HandleClassCodeResponseError.LinkNotFound -> {
+                val error = handleClassCodeResponseError.error
+                AlertDialog(
+                    onDismissRequest = onDismissRequest,
+                    confirmButton = {
+                        IconButton(onClick = onDismissRequest) {
+                            Icon(imageVector = Icons.Default.Done, contentDescription = stringResource(id = R.string.checked_icon))
+                        } },
+                    icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = stringResource(id = R.string.warning_icon)) },
+                    title = { Text(text = "Error in the the process of getting a link") },
+                    text = { Text(text = error) },
+                )
+            }
+
+            is HandleClassCodeResponseError.Fail -> {
+                val error = handleClassCodeResponseError.error
+                AlertDialog(
+                    onDismissRequest = onDismissRequest,
+                    confirmButton = {
+                        IconButton(onClick = onDismissRequest) {
+                            Icon(imageVector = Icons.Default.Done, contentDescription = stringResource(id = R.string.checked_icon))
+                        } },
+                    icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = stringResource(id = R.string.warning_icon)) },
+                    title = { Text(text = "Something just failed") },
+                    text = { Text(text = error) },
+                )
+            }
         }
     }
 }

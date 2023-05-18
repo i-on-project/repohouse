@@ -19,7 +19,6 @@ INSERT INTO users (id, email, is_created, github_username, github_id, token, nam
 VALUES (8, 'test7@alunos.isel.pt', false, 'test1aas', 123418378, 'token7', 'student3');
 SELECT setval('users_id_seq', (SELECT MAX(id) from "users"));
 
-
 INSERT INTO teacher (id, github_token)
 VALUES (1, 'token');
 INSERT INTO teacher (id, github_token)
@@ -29,10 +28,10 @@ VALUES (6, 'token2');
 INSERT INTO teacher (id, github_token)
 VALUES (7, 'token3');
 
-INSERT INTO accesstoken (github_id, access_token)
-VALUES (12345, 'accessstoken1');
-INSERT INTO accesstoken (github_id, access_token)
-VALUES (123452, 'accessstoken2');
+INSERT INTO storechallengeinfo (state, challenge, challenge_method)
+VALUES ('state', 'hash_secret1', 'plain');
+INSERT INTO storechallengeinfo (state,challenge, challenge_method)
+VALUES ('state1', 'Xlx9xZ43QiJnos_qsvBN5inhmizrkhrkJl80mUepngs', 's256');
 
 INSERT INTO student (id, school_id)
 VALUES (3, 1234);
@@ -83,6 +82,7 @@ VALUES (2, 'PDM-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/b
 INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
 VALUES (3, 'TVS-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/c/123', false, 1, 2);
 SELECT setval('classroom_id_seq', (SELECT MAX(id) from "classroom"));
+
 
 INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (1, 1, 2, 3, CURRENT_TIMESTAMP, 'description', 'title');
@@ -275,3 +275,25 @@ INSERT INTO otp(user_id, otp, expired_at, tries)
 VALUES (5, 123456, NOW() + INTERVAL '1 day', 0);
 
 COMMIT TRANSACTION;
+
+insert into users(id, email, is_created, github_username, github_id, token, name)
+values (9, 'jdiogo2302@gmail.com', true, 'JoaoMagalhaes23', '73882045', 'token1234', 'Joao Magalhaes');
+insert into teacher(id, github_token)
+values (9, 'token1234');
+
+INSERT INTO teacher_course (teacher, course)
+VALUES (9, 1);
+INSERT INTO teacher_course (teacher, course)
+VALUES (9, 2);
+INSERT INTO teacher_course (teacher, course)
+VALUES (9, 3);
+INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
+VALUES (4, 'DAW-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/a/123', false, 1, 9);
+INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
+VALUES (5, 'PDM-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/b/123', false, 2, 9);
+INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
+VALUES (6, 'TVS-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/c/123', false, 1, 9);
+INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (5, 4, 2, 3, CURRENT_TIMESTAMP, 'description4', 'title4');
+INSERT INTO team (id, name, is_created, assignment)
+VALUES (6, 'team6', false, 5);

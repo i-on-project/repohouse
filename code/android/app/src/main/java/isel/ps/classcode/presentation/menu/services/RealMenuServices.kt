@@ -1,20 +1,23 @@
 package isel.ps.classcode.presentation.menu.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.CLASSCODE_MENU_URL
+import isel.ps.classcode.CLASSCODE_LINK_BUILDER
 import isel.ps.classcode.GITHUB_API_BASE_URL
 import isel.ps.classcode.GITHUB_USERINFO_URI
+import isel.ps.classcode.MENU_KEY
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.UserInfo
 import isel.ps.classcode.domain.deserialization.ClassCodeMenuDto
 import isel.ps.classcode.domain.deserialization.ClassCodeMenuDtoType
 import isel.ps.classcode.domain.deserialization.UserInfoDeserialization
+import isel.ps.classcode.http.NavigationRepository
 import isel.ps.classcode.http.handleResponseGitHub
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
+import isel.ps.classcode.presentation.bootUp.services.RealBootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
 import okhttp3.OkHttpClient
@@ -24,7 +27,7 @@ import okhttp3.Request
  * Implementation of the [MenuServices] interface that will be used for the real app
  */
 
-class RealMenuServices(private val sessionStore: SessionStore, private val objectMapper: ObjectMapper, private val httpClient: OkHttpClient) : MenuServices {
+class RealMenuServices(private val sessionStore: SessionStore, private val objectMapper: ObjectMapper, private val httpClient: OkHttpClient, private val navigationRepo: NavigationRepository, private val bootUpServices: RealBootUpServices) : MenuServices {
     override suspend fun getUserInfo(): Either<HandleGitHubResponseError, UserInfo> {
         val accessToken = sessionStore.getGithubToken().first()
         val request = Request.Builder()
@@ -45,9 +48,10 @@ class RealMenuServices(private val sessionStore: SessionStore, private val objec
     }
 
     override suspend fun getCourses(): Either<HandleClassCodeResponseError, List<Course>> {
+        val uri = navigationRepo.ensureLink(key = MENU_KEY, fetchLink = { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
         val cookie = sessionStore.getSessionCookie()
         val request = Request.Builder()
-            .url(CLASSCODE_MENU_URL)
+            .url(CLASSCODE_LINK_BUILDER(uri.href))
             .addHeader("Cookie", cookie.first())
             .build()
         val result = request.send(httpClient) { response ->

@@ -1,5 +1,6 @@
 package isel.ps.classcode.presentation.login.services
 
+import android.app.Activity
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 
@@ -8,11 +9,15 @@ import isel.ps.classcode.presentation.utils.Either
  */
 class FakeLoginServices: LoginServices {
 
-    override suspend fun getTheTokens(
+    override suspend fun getTheAccessToken(
         code: String,
-        githubId: String
+        state: String
     ): Either<HandleClassCodeResponseError, Unit> {
-        return Either.Right(Unit)
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun startOauth(activity: Activity): Either<HandleClassCodeResponseError, Unit> {
+        TODO("Not yet implemented")
     }
 
 

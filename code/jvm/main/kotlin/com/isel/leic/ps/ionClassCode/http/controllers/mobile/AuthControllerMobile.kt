@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.http.controllers.mobile
 
-import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
 import com.isel.leic.ps.ionClassCode.domain.Teacher
+import com.isel.leic.ps.ionClassCode.domain.input.ChallengeInput
 import com.isel.leic.ps.ionClassCode.http.GITHUB_BASE_URL
 import com.isel.leic.ps.ionClassCode.http.MOBILE_GITHUB_OAUTH_URI
 import com.isel.leic.ps.ionClassCode.http.Status
@@ -14,12 +14,12 @@ import com.isel.leic.ps.ionClassCode.http.controllers.web.STATE_COOKIE_NAME
 import com.isel.leic.ps.ionClassCode.http.controllers.web.STATE_COOKIE_PATH
 import com.isel.leic.ps.ionClassCode.http.model.output.OAuthState
 import com.isel.leic.ps.ionClassCode.http.model.output.OutputModel
+import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.infra.LinkRelation
 import com.isel.leic.ps.ionClassCode.infra.siren
 import com.isel.leic.ps.ionClassCode.services.GithubServices
 import com.isel.leic.ps.ionClassCode.services.UserServices
 import com.isel.leic.ps.ionClassCode.utils.Result
-import com.isel.leic.ps.ionClassCode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
 import okhttp3.internal.EMPTY_REQUEST
 import org.slf4j.LoggerFactory
@@ -28,6 +28,8 @@ import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -44,41 +46,18 @@ class AuthControllerMobile(
      * Teacher authentication with the respective scope.
      */
     @GetMapping(Uris.MOBILE_AUTH_PATH)
-    fun auth(): ResponseEntity<*> {
+    fun auth(
+        @RequestParam challengeMethod: String,
+        @RequestParam challenge: String,
+    ): ResponseEntity<*> {
         val state = generateUserState()
+        userServices.storeChallengeInfo(challengeMethod = challengeMethod, challenge = challenge, state = state.value)
         return ResponseEntity
             .status(Status.REDIRECT)
             .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
             .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${MOBILE_GITHUB_OAUTH_URI(MOBILE_GITHUB_TEACHER_SCOPE, state.value)}")
             .body(EMPTY_REQUEST)
     }
-
-    @GetMapping(Uris.MOBILE_GET_ACCESS_TOKEN_PATH)
-    fun getAccessToken(
-        @RequestParam code: String,
-        @RequestParam githubId: Long,
-    ): ResponseEntity<*> {
-        return when (val tokens = userServices.getTokens(githubId = githubId)) {
-            is Result.Success -> {
-                val decryptedToken = AESDecrypt.decryptAccessToken(accessToken = tokens.value.accessToken, code = code)
-                val cookie = generateSessionCookie(tokens.value.classCodeToken)
-                siren(
-                    value = AccessTokenResponse(accessToken = decryptedToken),
-                    headers = HttpHeaders().apply {
-                        add(HttpHeaders.SET_COOKIE, cookie.toString())
-                    },
-                ) {
-                    clazz("accessToken")
-                    link(rel = LinkRelation("self"), href = Uris.MOBILE_GET_ACCESS_TOKEN_PATH)
-                }
-            }
-            is Result.Problem -> {
-                userServices.problem(error = tokens.value)
-            }
-        }
-    }
-
-    data class AccessTokenResponse(val accessToken: String) : OutputModel
 
     /**
      * Callback from the OAuth2 provider.
@@ -97,55 +76,56 @@ class AuthControllerMobile(
                 .header(HttpHeaders.LOCATION, "classcode://callback/error")
                 .body(EMPTY_REQUEST)
         }
-        val accessToken = githubServices.fetchAccessToken(code = code)
-        val userGithubInfo = githubServices.fetchUserInfo(accessToken = accessToken.access_token)
-        logger.info("User info: $userGithubInfo")
-        return when (val userInfo = userServices.getUserByGithubId(githubId = userGithubInfo.id)) {
-            is Result.Success -> {
-                if (userInfo.value.isCreated) {
-                    when (userInfo.value) {
-                        is Teacher -> {
-                            val encryptedToken = AESEncrypt.encryptAccessToken(accessToken = accessToken.access_token, code = code)
-                            userServices.storeAccessTokenEncrypted(token = encryptedToken, githubId = userInfo.value.githubId)
-                            ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "classcode://callback?code=$code&github_id=${userInfo.value.githubId}")
-                                .body(EMPTY_REQUEST)
-                        }
+        return ResponseEntity
+            .status(Status.REDIRECT)
+            .header(HttpHeaders.LOCATION, "classcode://callback?code=$code&state=$state")
+            .body(EMPTY_REQUEST)
+    }
+    data class AccessTokenResponse(val accessToken: String) : OutputModel
 
-                        else -> {
-                            ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "classcode://callback/student")
-                                .body(EMPTY_REQUEST)
+    @PostMapping(Uris.MOBILE_GET_ACCESS_TOKEN_PATH)
+    suspend fun getAccessToken(
+        @RequestBody challengeInfo: ChallengeInput,
+    ): ResponseEntity<*> {
+        logger.info("Challenge info: $challengeInfo")
+        when (val res = userServices.verifySecret(secret = challengeInfo.secret, state = challengeInfo.state)) {
+            is Result.Problem -> {
+                return userServices.problem(error = res.value)
+            }
+            is Result.Success -> {
+                val accessToken = githubServices.fetchAccessToken(code = challengeInfo.code)
+                val userGithubInfo = githubServices.fetchUserInfo(accessToken = accessToken.access_token)
+                return when (val userInfo = userServices.getUserByGithubId(githubId = userGithubInfo.id)) {
+                    is Result.Success -> {
+                        if (userInfo.value.isCreated) {
+                            when (userInfo.value) {
+                                is Teacher -> {
+                                    val cookie = generateSessionCookie(userInfo.value.token)
+                                    siren(
+                                        value = AccessTokenResponse(accessToken = accessToken.access_token),
+                                        headers = HttpHeaders().apply {
+                                            add(HttpHeaders.SET_COOKIE, cookie.toString())
+                                        },
+                                    ) {
+                                        clazz("accessToken")
+                                        link(rel = LinkRelation("self"), href = Uris.MOBILE_GET_ACCESS_TOKEN_PATH)
+                                    }
+                                }
+                                else -> {
+                                    Problem.unauthorized
+                                }
+                            }
+                        } else {
+                            Problem.unauthorized
                         }
                     }
-                } else {
-                    when (userInfo.value) {
-                        is PendingTeacher -> {
-                            ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "classcode://callback/pendingTeacher")
-                                .body(EMPTY_REQUEST)
-                        }
-
-                        else -> {
-                            ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "classcode://callback/pendingStudent")
-                                .body(EMPTY_REQUEST)
-                        }
+                    is Result.Problem -> {
+                        Problem.userNotFound
                     }
                 }
             }
-            is Result.Problem ->
-                ResponseEntity
-                    .status(Status.REDIRECT)
-                    .header(HttpHeaders.LOCATION, "classcode://callback/user_not_present/")
-                    .body(EMPTY_REQUEST)
         }
     }
-
     companion object {
         private val logger = LoggerFactory.getLogger(AuthControllerMobile::class.java)
     }

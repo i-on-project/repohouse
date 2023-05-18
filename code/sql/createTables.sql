@@ -11,9 +11,10 @@ CREATE TABLE Users(
     name text not null
 );
 
-CREATE TABLE AccessToken(
-    github_id bigint unique not null,
-    access_token text not null
+CREATE TABLE StoreChallengeInfo(
+    state text primary key,
+    challenge text not null,
+    challenge_method text not null check (challenge_method in ('plain', 's256'))
 );
 
 CREATE TABLE PendingTeacher(

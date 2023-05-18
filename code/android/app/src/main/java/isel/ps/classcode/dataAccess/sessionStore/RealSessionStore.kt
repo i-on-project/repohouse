@@ -27,6 +27,7 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
         val classCodeCookieKey = stringPreferencesKey("classCode_cookie")
         val githubIv = stringPreferencesKey("github_iv")
         val classCodeIv = stringPreferencesKey("classCode_iv")
+        val secretKey = stringPreferencesKey("secret")
     }
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sessionManager")
     private val dataStore = context.dataStore
@@ -36,6 +37,12 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
         dataStore.edit { preferences ->
             preferences[githubTokenKey] = encryptedToken.data
             preferences[githubIv] = encryptedToken.iv
+        }
+    }
+
+    override suspend fun storeSecret(secret: String) {
+        dataStore.edit { preferences ->
+            preferences[secretKey] = secret
         }
     }
 
@@ -80,6 +87,22 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
             ), typeOfData = TypeOfData.CLASSCODE_COOKIE
             ).data
         }
+    override fun getSecret(): Flow<String> =
+        dataStore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[secretKey] ?: ""
+        }
+
+    override suspend fun cleanSecret() {
+        dataStore.edit { preferences ->
+            preferences.remove(secretKey)
+        }
+    }
 
     override suspend fun cleanTokens() {
         dataStore.edit { preferences ->

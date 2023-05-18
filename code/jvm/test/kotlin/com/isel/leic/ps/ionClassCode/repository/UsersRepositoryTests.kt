@@ -279,32 +279,33 @@ class UsersRepositoryTests {
     }
 
     @Test
-    fun `store teacher access token`() = testWithHandleAndRollback { handle ->
+    fun `verify if secret exists, plain`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        userRepo.storeAccessTokenEncrypted(token = "token1234", githubId = 1234187)
-        val token = userRepo.getAccessTokenEncrypted(githubId = 1234187)
-        assert(token == "token1234")
+        val secret = userRepo.verifySecret(state = "state", secret = "hash_secret1")
+        assert(secret)
     }
 
     @Test
-    fun `get teacher access token`() = testWithHandleAndRollback { handle ->
+    fun `verify if secret exists, s256`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val token = userRepo.getAccessTokenEncrypted(githubId = 12345)
-        assert(token == "accessstoken1")
+        val secret = userRepo.verifySecret(state = "state1", secret = "hash_secret1")
+        assert(secret)
     }
 
     @Test
-    fun `can not get teacher access token`() = testWithHandleAndRollback { handle ->
+    fun `insert storage info`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        val token = userRepo.getAccessTokenEncrypted(githubId = 99999)
-        assert(token == null)
+        userRepo.storeChallengeInfo(state = "state2", challengeMethod = "s256", challenge = "challenge")
     }
 
     @Test
-    fun `delete teacher access token`() = testWithHandleAndRollback { handle ->
+    fun `insert storage info should be error because of invalid method`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
-        userRepo.deleteAccessTokenEncrypted(githubId = 12345)
-        val token = userRepo.getAccessTokenEncrypted(githubId = 12345)
-        assert(token == null)
+        try {
+            userRepo.storeChallengeInfo(state = "state1", challengeMethod = "hello", challenge = "challenge")
+            fail("Should throw exception")
+        } catch (e: Exception) {
+            assert(true)
+        }
     }
 }

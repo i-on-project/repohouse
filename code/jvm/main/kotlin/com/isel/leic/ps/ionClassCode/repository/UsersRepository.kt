@@ -17,8 +17,7 @@ interface UsersRepository {
     fun checkIfGithubIdExists(githubId: Long): Boolean
     fun checkIfTokenExists(token: String): Boolean
     fun checkIfGithubTokenExists(githubToken: String): Boolean
-    fun getAccessTokenEncrypted(githubId: Long): String?
-    fun deleteAccessTokenEncrypted(githubId: Long)
+    fun verifySecret(secret: String, state: String): Boolean
     fun checkIfSchoolIdExists(schoolId: Int): Boolean
     fun createPendingStudent(student: StudentInput): PendingStudent
     fun createStudent(student: StudentInput): Student?
@@ -32,7 +31,7 @@ interface UsersRepository {
     fun getUserById(userId: Int): User?
     fun getUserByEmail(email: String): User?
     fun getUserByToken(token: String): User?
-    fun storeAccessTokenEncrypted(token: String, githubId: Long)
+    fun storeChallengeInfo(challengeMethod: String, challenge: String, state: String)
     fun getUserByGithubId(githubId: Long): User?
     fun getPendingStudentByGithubId(githubId: Long): PendingStudent?
     fun getPendingTeacherByGithubId(githubId: Long): PendingTeacher?

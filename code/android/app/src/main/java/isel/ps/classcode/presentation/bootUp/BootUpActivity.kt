@@ -1,8 +1,6 @@
 package isel.ps.classcode.presentation.bootUp
 
-import android.app.Activity
 import android.app.KeyguardManager
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.biometrics.BiometricManager
 import android.hardware.biometrics.BiometricPrompt
@@ -14,39 +12,35 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.TAG
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
+import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.login.LoginActivity
 import isel.ps.classcode.presentation.menu.MenuActivity
 import isel.ps.classcode.ui.theme.ClasscodeTheme
+
 private const val BIOMETRIC_TAG = "BIOMETRIC"
 class BootUpActivity : ComponentActivity() {
 
+    private val bootUpServices: BootUpServices by lazy { (application as DependenciesContainer).bootUpServices }
+
     private val sessionStore: SessionStore by lazy { (application as DependenciesContainer).sessionStore }
     private var cancellationSignal: CancellationSignal? = null
-    companion object {
-        fun navigate(origin: Activity) {
-            with(origin) {
-                val intent = Intent(this, BootUpActivity::class.java)
-                startActivity(intent)
-            }
-        }
-    }
 
     @Suppress("UNCHECKED_CAST")
     private val vm by viewModels<BootUpViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return BootUpViewModel(sessionStore = sessionStore) as T
+                return BootUpViewModel(sessionStore = sessionStore, bootUpServices = bootUpServices) as T
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        vm.getHome()
         vm.checkIfTokenExists()
         setContent {
             ClasscodeTheme {
@@ -107,7 +101,7 @@ class BootUpActivity : ComponentActivity() {
             Log.d(BIOMETRIC_TAG, "Fingerprint authentication has not been enabled in settings")
             return false
         }
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.USE_BIOMETRIC) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.USE_BIOMETRIC) != PackageManager.PERMISSION_GRANTED) {
             Log.d(BIOMETRIC_TAG, "Fingerprint authentication permission is not enabled")
             return false
         }
