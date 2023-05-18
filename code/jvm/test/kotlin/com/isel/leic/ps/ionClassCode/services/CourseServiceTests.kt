@@ -61,19 +61,67 @@ class CourseServiceTests {
                         on { getCourseUserClassrooms(courseId = 1, userId = 2, student = true) } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteLink = "inviteLink"))
                         on { getStudentInCourse(courseId = 1) } doReturn listOf(student)
                         on { getCourseByOrg(orgUrl = "orgUrl") } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 1111)
-                        on { getCourseByOrg(orgUrl = "orgUrl3") } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(
-                            teacherWithoutToken,
-                            TeacherWithoutToken(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, isCreated = false)), isArchived = false, orgId = 2222)
+                        on { getCourseByOrg(orgUrl = "orgUrl3") } doReturn Course(
+                            id = 2,
+                            orgUrl = "orgUrl1",
+                            name = "courseName1",
+                            teachers = listOf(
+                                teacherWithoutToken,
+                                TeacherWithoutToken(
+                                    name = "teacher1",
+                                    email = "teacher@gmail",
+                                    id = 3,
+                                    githubUsername = "githubUsername2",
+                                    githubId = 202,
+                                    isCreated = false
+                                )
+                            ),
+                            isArchived = false,
+                            orgId = 2222
+                        )
                         on {
                             addTeacherToCourse(teacherId = 1, courseId = 2)
-                        } doReturn Course(id = 2, orgUrl = "orgUrl", name = "courseName", teachers = listOf(
-                            teacherWithoutToken,
-                            TeacherWithoutToken(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, isCreated = false)), isArchived = false, orgId = 2222)
+                        } doReturn Course(
+                            id = 2,
+                            orgUrl = "orgUrl",
+                            name = "courseName",
+                            teachers = listOf(
+                                teacherWithoutToken,
+                                TeacherWithoutToken(
+                                    name = "teacher1",
+                                    email = "teacher@gmail",
+                                    id = 3,
+                                    githubUsername = "githubUsername2",
+                                    githubId = 202,
+                                    isCreated = false
+                                )
+                            ),
+                            isArchived = false,
+                            orgId = 2222
+                        )
                         on {
-                            addTeacherToCourse(teacherId = 1, courseId = 1)
-                        } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(
-                            teacherWithoutToken,
-                            TeacherWithoutToken(name = "teacher1", email = "teacher@gmail", id = 3, githubUsername = "githubUsername2", githubId = 202, isCreated = false)), isArchived = false, orgId = 2222)
+                            addTeacherToCourse(
+                                teacherId = 1,
+                                courseId = 1
+                            )
+                        } doReturn Course(
+                            id = 1,
+                            orgUrl = "orgUrl",
+                            name = "courseName",
+                            teachers = listOf(
+                                teacherWithoutToken,
+                                TeacherWithoutToken(
+                                    name = "teacher1",
+                                    email = "teacher@gmail",
+                                    id = 3,
+                                    githubUsername = "githubUsername2",
+                                    githubId = 202,
+                                    isCreated = false
+                                )
+                            ),
+                            isArchived = false,
+                            orgId = 2222
+                        )
                         on { checkIfCourseNameExists(name = "courseName") } doReturn true
                         on {
                             getCourseAllClassrooms(courseId = 1)
@@ -84,9 +132,16 @@ class CourseServiceTests {
                         on { archiveCourse(courseId = 2) } doAnswer { }
                         on { deleteCourse(courseId = 2) } doAnswer { }
                         on { isStudentInCourse(studentId = 1, courseId = 1) } doReturn true
-                        on { leaveCourse(courseId = 1, studentId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(
-                            teacherWithoutToken
-                        ), isArchived = false, orgId = 1111)
+                        on { leaveCourse(courseId = 1, studentId = 1) } doReturn Course(
+                            id = 1,
+                            orgUrl = "orgUrl",
+                            name = "courseName",
+                            teachers = listOf(
+                                teacherWithoutToken
+                            ),
+                            isArchived = false,
+                            orgId = 1111
+                        )
                     }
                     on { usersRepository } doReturn mockedUsersRepository
                     on { courseRepository } doReturn mockedCourseRepository
@@ -167,7 +222,7 @@ class CourseServiceTests {
         val userId = 2
 
         // when: getting an error because the user id that doesn't exist in database
-        val course = courseService.getCourseById(courseId = courseId, userId = userId , true)
+        val course = courseService.getCourseById(courseId = courseId, userId = userId, true)
 
         if (course is Result.Success) {
             assert(course.value.id == courseId)

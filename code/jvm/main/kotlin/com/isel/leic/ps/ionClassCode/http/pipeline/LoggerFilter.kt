@@ -19,7 +19,6 @@ class LoggerFilter(
 
     override fun doFilter(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val reqModel = RequestModel(method = request.method, uri = request.requestURI)
-        val x = WebUtils.getCookie(request, "userState")
         logRequest(request = reqModel, logger = logger)
         chain.doFilter(request, response)
         val resModel = ResponseModel(status = response.status, uri = request.requestURI)

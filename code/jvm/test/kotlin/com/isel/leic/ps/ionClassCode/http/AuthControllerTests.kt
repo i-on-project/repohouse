@@ -2,7 +2,6 @@ package com.isel.leic.ps.ionClassCode.http
 
 import com.isel.leic.ps.ionClassCode.http.controllers.web.POSITION_COOKIE_NAME
 import com.isel.leic.ps.ionClassCode.http.controllers.web.STATE_COOKIE_NAME
-import com.isel.leic.ps.ionClassCode.http.controllers.web.STATE_COOKIE_PATH
 import com.isel.leic.ps.ionClassCode.http.controllers.web.STUDENT_COOKIE_NAME
 import com.isel.leic.ps.ionClassCode.http.controllers.web.TEACHER_COOKIE_NAME
 import org.junit.jupiter.api.Test
@@ -29,7 +28,7 @@ class AuthControllerTests {
             .expectCookie()
             .httpOnly(STATE_COOKIE_NAME, true)
             .expectCookie()
-            .path(STATE_COOKIE_NAME, STATE_COOKIE_PATH)
+            .path(STATE_COOKIE_NAME, Uris.API)
             .expectCookie()
             .exists(POSITION_COOKIE_NAME)
             .expectCookie()
@@ -55,7 +54,7 @@ class AuthControllerTests {
             .expectCookie()
             .httpOnly(STATE_COOKIE_NAME, true)
             .expectCookie()
-            .path(STATE_COOKIE_NAME, STATE_COOKIE_PATH)
+            .path(STATE_COOKIE_NAME, Uris.API)
             .expectCookie()
             .exists(POSITION_COOKIE_NAME)
             .expectCookie()

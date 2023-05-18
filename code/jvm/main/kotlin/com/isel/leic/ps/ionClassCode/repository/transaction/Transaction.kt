@@ -21,7 +21,6 @@ import com.isel.leic.ps.ionClassCode.repository.request.LeaveCourseRepository
 import com.isel.leic.ps.ionClassCode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.request.RequestRepository
 
-
 /**
  * Transction interface holding all repositories
  */

@@ -6,7 +6,12 @@ import com.isel.leic.ps.ionClassCode.http.GITHUB_BASE_URL
 import com.isel.leic.ps.ionClassCode.http.MOBILE_GITHUB_OAUTH_URI
 import com.isel.leic.ps.ionClassCode.http.Status
 import com.isel.leic.ps.ionClassCode.http.Uris
-import com.isel.leic.ps.ionClassCode.http.controllers.web.*
+import com.isel.leic.ps.ionClassCode.http.controllers.web.AUTHORIZATION_COOKIE_NAME
+import com.isel.leic.ps.ionClassCode.http.controllers.web.FULL_DAY
+import com.isel.leic.ps.ionClassCode.http.controllers.web.HALF_HOUR
+import com.isel.leic.ps.ionClassCode.http.controllers.web.MOBILE_GITHUB_TEACHER_SCOPE
+import com.isel.leic.ps.ionClassCode.http.controllers.web.STATE_COOKIE_NAME
+import com.isel.leic.ps.ionClassCode.http.controllers.web.STATE_COOKIE_PATH
 import com.isel.leic.ps.ionClassCode.http.model.output.OAuthState
 import com.isel.leic.ps.ionClassCode.http.model.output.OutputModel
 import com.isel.leic.ps.ionClassCode.infra.LinkRelation

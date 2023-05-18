@@ -19,7 +19,9 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            "process.env.NGROK_URI": JSON.stringify(process.env.NGROK_URI)
+            /** For testing production, comment the line to not use **/
+            "process.env.NGROK_URI": JSON.stringify("http://localhost:3000"),
+            //"process.env.NGROK_URI": JSON.stringify(process.env.NGROK_URI)
         }),
     ],
     module: {

@@ -8,7 +8,7 @@ data class JoinTeamInput(
     val teamId: Int,
     override val composite: Int? = null,
 ) : RequestInputInterface {
-    fun isNotValid(): Boolean{
+    fun isNotValid(): Boolean {
         return composite != null && composite <= 0
     }
 }

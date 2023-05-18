@@ -124,7 +124,7 @@ class UsersRepositoryTests {
     fun `can not get a pending user`() = testWithHandleAndRollback { handle ->
         val userRepo = JdbiUsersRepository(handle = handle)
         val pendingUser = userRepo.getPendingStudentByGithubId(githubId = 1234)
-        assert(pendingUser == null )
+        assert(pendingUser == null)
     }
 
     @Test
