@@ -6,7 +6,11 @@ import com.isel.leic.ps.ionClassCode.domain.input.FeedbackInput
 import com.isel.leic.ps.ionClassCode.domain.input.RepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.TeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.UpdateCreateTeamStatusInput
-import com.isel.leic.ps.ionClassCode.domain.input.request.*
+import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam

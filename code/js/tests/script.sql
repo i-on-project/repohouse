@@ -12,10 +12,10 @@ declare
     team_id integer;
     delivery_id integer;
 begin
+
     select id from users where name = 'i-on-ClassCode-Teacher' into teacher_id;
 
     select id from users where name = 'i-on-ClassCode-Student' into student_id;
-
 
     insert into course (org_url, org_id, name, is_archived)
     values ('i-on-ClassCode', 1, 'ClassCode', false);
@@ -57,5 +57,3 @@ begin
 end $$;
 
 call playwright();
-
-delete from feedback where description = 'Demo';

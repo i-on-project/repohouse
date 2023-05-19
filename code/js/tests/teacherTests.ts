@@ -219,7 +219,8 @@ test('Post feedback', async ({ page }) => {
     await page.getByRole('option', { name: 'Info' }).click();
     await page.getByLabel('Description').fill('Demo');
     await page.getByRole('button', { name: 'Send Feedback' }).click();
-    await page.goto('http://localhost:3000/courses/10/classrooms/10/assignments/11/teams/11');
+    await page.waitForLoadState('load');
+    await page.waitForTimeout(500);
     await expect(page.getByRole('heading', { name: 'info - Demo' }).first()).toBeVisible();
 });
 

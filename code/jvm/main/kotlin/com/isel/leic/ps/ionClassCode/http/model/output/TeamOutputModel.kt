@@ -13,7 +13,7 @@ import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
 data class TeamOutputModel(
     val team: Team,
     val students: List<StudentWithoutToken>,
-    val repos: Repo?,
+    val repo: Repo?,
     val feedbacks: List<Feedback>,
 )
 

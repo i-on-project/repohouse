@@ -61,7 +61,8 @@ export function ShowTeamFetch({
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + teamId, {replace: true})
+            // TODO: Redirect to the same page
+            navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + teamId)
         }
     }, [setError, label, description,navigate]);
 
@@ -90,7 +91,7 @@ export function ShowTeamFetch({
                     >
                         {"Team " + content.properties.team.name}
                     </Typography>
-                    {content.properties.repos.length == 0 ?
+                    {content.properties.repo == null ?
                         <Typography
                             variant="h5"
                             sx={typographyStyle}
@@ -99,13 +100,11 @@ export function ShowTeamFetch({
                         </Typography>
                     :
                         <List>
-                            {content.properties.repos.map((repo) =>
-                                    <ListItem>
-                                        <a href={repo.url} target="_blank" rel="noreferrer">
-                                            {repo.name}
-                                        </a>
-                                    </ListItem>
-                            )}
+                            <ListItem>
+                                <a href={content.properties.repo.url} target="_blank" rel="noreferrer">
+                                    {content.properties.repo.name}
+                                </a>
+                            </ListItem>
                         </List>
                     }
                     <Box sx={alignHorizontalyBoxStyle}>

@@ -8,7 +8,7 @@ import {FeedbackDomain} from "../Feedback";
 export interface Team{
     team: TeamDomain,
     students: Student[],
-    repos: RepoDomain[],
+    repo: RepoDomain,
     feedbacks: FeedbackDomain[],
 }
 
@@ -33,7 +33,7 @@ export class Team {
         if (team == null) throw new Error("TeamDto properties is null")
         this.team = team.team
         this.students = team.students
-        this.repos = team.repos
+        this.repo = team.repo
         this.feedbacks = team.feedbacks
     }
 }

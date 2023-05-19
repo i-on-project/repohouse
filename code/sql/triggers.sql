@@ -8,7 +8,7 @@ declare
     teacherId integer;
 begin
     if (new.is_created = true) then
-        delete from teacher where id = new.id;
+        delete from teacher where email = new.email;
         delete from users where id = new.id;
         insert into users (email, is_created,github_id,github_username,token,name) values (new.email, new.is_created,new.github_id,new.github_username,new.token,new.name) returning id into teacherId;
         insert into teacher (id,github_token) values (teacherId,new.github_token);
@@ -17,6 +17,7 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS CreateTeacherTrigger ON pendingteacher;
 CREATE trigger CreateTeacherTrigger
 after update on pendingteacher
 for each row execute procedure CreateTeacher();
@@ -47,7 +48,7 @@ begin
 END
 $$ LANGUAGE plpgsql;
 
-
+DROP TRIGGER IF EXISTS UpdateApplyRequestsTrigger ON apply;
 CREATE trigger UpdateApplyRequestsTrigger
 after update on apply
 for each row execute procedure UpdateApplyRequests();
@@ -77,6 +78,7 @@ begin
 END
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS DeleteTeachersTrigger ON teacher;
 CREATE trigger DeleteTeachersTrigger
 after delete on teacher
 for each row execute procedure DeleteTeachers();
@@ -96,6 +98,7 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS Sync ON delivery;
 CREATE trigger Sync
     after update on delivery
     for each row execute procedure SyncClassroom();

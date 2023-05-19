@@ -2,10 +2,10 @@ package com.isel.leic.ps.ionClassCode.http.model.output
 
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Delivery
+import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.TeamNotCreated
 import com.isel.leic.ps.ionClassCode.domain.UserJoinTeam
-import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 
 /**
  * Represents a Assigment Output Model.
