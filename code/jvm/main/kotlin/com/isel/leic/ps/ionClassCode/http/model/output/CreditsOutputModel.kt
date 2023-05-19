@@ -9,7 +9,7 @@ data class CreditsOutputModel(
         CreditsStudent("André Santos", 48309, "A48309@alunos.isel.pt", "https://github.com/AndreSantos0"),
         CreditsStudent("Ricardo Henriques", 48322, "A48322@alunos.isel.pt", "https://github.com/Henriquess19"),
         CreditsStudent("João Magalhães", 48348, "A48348@alunos.isel.pt", "https://github.com/JoaoMagalhaes23"),
-        ),
+    ),
 ) : OutputModel
 
 /**

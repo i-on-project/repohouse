@@ -6,7 +6,6 @@ import com.isel.leic.ps.ionClassCode.utils.testWithHandleAndRollback
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
-
 class ApplyRepositoryTests {
 
     @Test

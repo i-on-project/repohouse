@@ -11,7 +11,7 @@ class RepoRepositoryTests {
     @Test
     fun `can create a repo`() = testWithHandleAndRollback { handle ->
         val repoRepo = JdbiRepoRepository(handle = handle)
-        val teamId = 1
+        val teamId = 3
         val created = repoRepo.createRepo(repo = RepoInput(name = "name", url = "status", teamId = teamId))
         val repo = repoRepo.getRepoById(repoId = created.id)
         assert(repo != null)
@@ -30,23 +30,23 @@ class RepoRepositoryTests {
     fun `can update repo status`() = testWithHandleAndRollback { handle ->
         val repoRepo = JdbiRepoRepository(handle = handle)
         val repoId = 1
-        repoRepo.updateRepoStatus(repoId = repoId, status = true)
+        repoRepo.updateRepoStatus(repoId = repoId, url = "url")
         val repo = repoRepo.getRepoById(repoId = repoId) ?: fail("Repo not found")
         assert(repo.isCreated)
     }
 
     @Test
-    fun `can get repos by teamId`() = testWithHandleAndRollback { handle ->
+    fun `can get repo by teamId`() = testWithHandleAndRollback { handle ->
         val repoRepo = JdbiRepoRepository(handle = handle)
         val teamId = 1
-        val list = repoRepo.getReposByTeam(teamId = teamId)
-        assert(list.size == 1)
+        val repo = repoRepo.getRepoByTeam(teamId = teamId)
+        assert(repo != null)
     }
 
     @Test
     fun `can delete a repo`() = testWithHandleAndRollback { handle ->
         val repoRepo = JdbiRepoRepository(handle = handle)
-        val repoId = 3
+        val repoId = 4
         repoRepo.deleteRepo(repoId = repoId)
         val repo = repoRepo.getRepoById(repoId = repoId)
         assert(repo == null)

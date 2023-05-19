@@ -3,6 +3,9 @@ package com.isel.leic.ps.ionClassCode.http.model.output
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Delivery
 import com.isel.leic.ps.ionClassCode.domain.Team
+import com.isel.leic.ps.ionClassCode.domain.TeamNotCreated
+import com.isel.leic.ps.ionClassCode.domain.UserJoinTeam
+import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 
 /**
  * Represents a Assigment Output Model.
@@ -54,6 +57,19 @@ data class TeacherAssignmentModel(
     override val deliveries: List<Delivery>,
     val teams: List<Team>,
 ) : AssignmentModel()
+
+data class CreateTeamComposite(
+    val compositeState: String,
+    val createTeam: TeamNotCreated,
+    val joinTeam: UserJoinTeam,
+    val createRepo: RepoNotCreated,
+)
+
+data class TeacherAssignmentTeams(
+    val assignment: Assignment,
+    val teamsCreated: List<Team>,
+    val createTeamComposites: List<CreateTeamComposite>,
+)
 
 /**
  * Represents an Assigment Model for the student.

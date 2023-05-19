@@ -4,7 +4,6 @@ import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.User
 import com.isel.leic.ps.ionClassCode.domain.input.FeedbackInput
-import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ionClassCode.http.Uris
@@ -48,7 +47,7 @@ class TeamController(
     ): ResponseEntity<*> {
         return when (val team = teamService.getTeamInfo(teamId)) {
             is Result.Problem -> teamService.problem(team.value)
-            is Result.Success -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repos, team.value.feedbacks)) {
+            is Result.Success -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repo, team.value.feedbacks)) {
                 clazz("team")
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
             }
@@ -105,10 +104,9 @@ class TeamController(
         @PathVariable courseId: Int,
         @PathVariable classroomId: Int,
         @PathVariable assignmentId: Int,
-        @RequestBody createTeamInfo: CreateTeamInput,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val create = teamService.createTeamRequest(createTeamInfo, user.id, assignmentId, classroomId)) {
+        return when (val create = teamService.createTeamRequest(user.id, assignmentId, classroomId)) {
             is Result.Problem -> teamService.problem(create.value)
             is Result.Success -> siren(RequestCreatedOutputModel(create.value.id, true)) {
                 clazz("createTeam")

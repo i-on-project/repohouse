@@ -14,6 +14,8 @@
     <string name="assignment_icon">Assignment icon</string>
     <string name="filter_icon">Filter icon</string>
     <string name="checked_icon">Checked icon</string>
+    <string name="refreshed_icon">Refreshed icon</string>
+    <string name="closed_icon">Closed icon</string>
     <string name="warning_icon">Warning icon</string>
     <string name="logout_icon">Logout icon</string>
     <string name="logout">Logout</string>

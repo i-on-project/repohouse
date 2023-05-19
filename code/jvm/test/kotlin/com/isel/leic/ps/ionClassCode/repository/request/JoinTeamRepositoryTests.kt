@@ -19,7 +19,7 @@ class JoinTeamRepositoryTests {
     fun `getJoinTeamRequests should return all joinTeam requests`() = testWithHandleAndRollback { handle ->
         val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
         val requests = joinTeamReq.getJoinTeamRequests()
-        assert(requests.size == 2)
+        assert(requests.size == 1)
     }
 
     @Test
@@ -36,6 +36,14 @@ class JoinTeamRepositoryTests {
         val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
         val userId = 5
         val requests = joinTeamReq.getJoinTeamRequestsByUser(userId = userId)
-        assert(requests.size == 2)
+        assert(requests.size == 1)
+    }
+
+    @Test
+    fun `getJoinTeamRequestByCompositeId should return joinTeam requests for a user`() = testWithHandleAndRollback { handle ->
+        val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
+        val compositeId = 15
+        val request = joinTeamReq.getJoinTeamRequestByCompositeId(compositeId = compositeId)
+        assert(request?.id == 9)
     }
 }

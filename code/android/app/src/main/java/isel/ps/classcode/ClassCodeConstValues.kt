@@ -1,6 +1,6 @@
 package isel.ps.classcode
 
-val API_HOME = "https://3fcf-95-95-191-117.ngrok-free.app"
+val API_HOME = "https://5f83-95-95-191-117.ngrok-free.app"
 
 
 val CLASSCODE_LINK_BUILDER: (String) -> String = { link ->

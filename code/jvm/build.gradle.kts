@@ -93,4 +93,3 @@ tasks.named("check") {
     dependsOn("dbDockerWait")
     finalizedBy("dbDockerDown")
 }
-

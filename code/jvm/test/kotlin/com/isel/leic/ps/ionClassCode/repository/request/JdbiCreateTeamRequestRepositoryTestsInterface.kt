@@ -11,7 +11,7 @@ class JdbiCreateTeamRequestRepositoryTestsInterface {
     @Test
     fun `createCreateTeamRequest should create a new createTeam request`() = testWithHandleAndRollback { handle ->
         val createTeamReq = JdbiCreateTeamRequestRepository(handle = handle)
-        val request = CreateTeamInput()
+        val request = CreateTeamInput(teamId = 3, composite = 15)
         createTeamReq.createCreateTeamRequest(request = request, creator = 3)
     }
 
@@ -19,7 +19,7 @@ class JdbiCreateTeamRequestRepositoryTestsInterface {
     fun `getCreateTeamRequests should return all createTeams requests`() = testWithHandleAndRollback { handle ->
         val createTeamReq = JdbiCreateTeamRequestRepository(handle = handle)
         val requests = createTeamReq.getCreateTeamRequests()
-        assert(requests.size == 2)
+        assert(requests.size == 1)
     }
 
     @Test
@@ -36,6 +36,14 @@ class JdbiCreateTeamRequestRepositoryTestsInterface {
         val createTeamReq = JdbiCreateTeamRequestRepository(handle = handle)
         val userId = 4
         val requests = createTeamReq.getCreateTeamRequestsByUser(userId = userId)
-        assert(requests.size == 2)
+        assert(requests.size == 1)
+    }
+
+    @Test
+    fun `getCreateTeamRequestByCompositeId should return createTeams requests for a composite`() = testWithHandleAndRollback { handle ->
+        val createTeamReq = JdbiCreateTeamRequestRepository(handle = handle)
+        val compositeId = 15
+        val request = createTeamReq.getCreateTeamRequestByCompositeId(compositeId = compositeId)
+        assert(request?.id == 7)
     }
 }

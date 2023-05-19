@@ -52,7 +52,7 @@ class CourseActivity: ComponentActivity() {
                         course = course,
                         onBackRequest = { finish() },
                         onClassroomSelected = { classroom ->
-                            ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto())
+                            ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto(courseName = course.name))
                         },
                         classrooms = vm.classrooms,
                         error = vm.error,

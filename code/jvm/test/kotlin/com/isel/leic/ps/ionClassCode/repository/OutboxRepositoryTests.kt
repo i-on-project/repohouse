@@ -35,7 +35,7 @@ class OutboxRepositoryTests {
         val outboxRepo = JdbiOutboxRepository(handle = handle)
         val userId = 3
         val status = "Sent"
-        outboxRepo.updateOutboxStateRequest(userId = userId, state =status)
+        outboxRepo.updateOutboxStateRequest(userId = userId, state = status)
         val request = outboxRepo.getOutboxRequest(userId = userId) ?: fail("Request not found")
         assert(request.status == status)
     }

@@ -28,7 +28,8 @@ DELETE FROM OTP;
 DELETE FROM outbox;
 DELETE From cooldown;
 DELETE FROM Users;
-DELETE FROM StoreChallengeInfo;
+DELETE FROM ChallengeInfo;
+
 
 
 COMMIT TRANSACTION;

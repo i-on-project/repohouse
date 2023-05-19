@@ -2,7 +2,6 @@ package com.isel.leic.ps.ionClassCode.repository.jdbi.request
 
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.requests.Composite
-import com.isel.leic.ps.ionClassCode.domain.requests.Request
 import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -42,26 +41,13 @@ class JdbiCompositeRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-
-        request.requests.forEach { id ->
-            handle.createUpdate(
-                """
-                    UPDATE request
-                    SET composite = :compositeId
-                    WHERE id = :id
-                    """,
-            )
-                .bind("id", id)
-                .bind("compositeId", compositeId)
-                .execute()
-        }
-        return Composite(compositeId, creator, requests = request.requests)
+        return Composite(compositeId, creator)
     }
 
     /**
      * Method to change a Composite Request state
      */
-    override fun changeStateCompositeRequest(id: Int, state: String) {
+    override fun updateCompositeState(requestId: Int, state: String) {
         handle.createUpdate(
             """
             UPDATE request
@@ -69,7 +55,7 @@ class JdbiCompositeRequestRepository(
             WHERE id = :id
             """,
         )
-            .bind("id", id)
+            .bind("id", requestId)
             .bind("state", state)
             .execute()
     }
@@ -86,74 +72,65 @@ class JdbiCompositeRequestRepository(
             .mapTo<Int>()
             .list()
         return compositeIds.map { id ->
-            val compositeRequest = handle.createQuery(
+            handle.createQuery(
                 """SELECT * FROM request WHERE id = :id""",
             )
                 .bind("id", id)
-                .mapTo<Request>()
+                .mapTo<Composite>()
                 .first()
-            val requests = handle.createQuery(
-                """SELECT * FROM request WHERE composite = :id""",
-            )
-                .bind("id", id)
-                .mapTo<Request>()
-                .list()
-
-            Composite(id = id, creator = compositeRequest.creator, state = compositeRequest.state, requests = requests.map { it.id })
         }
+    }
+
+    override fun getCompositeRequestsThatAreNotAccepted(): List<Composite> {
+        return handle.createQuery(
+            """
+           SELECT r.id, r.creator, r.state, r.composite FROM composite JOIN request r on composite.id = r.id
+           WHERE state != 'Accepted'
+           """,
+        )
+            .mapTo<Composite>()
+            .list()
     }
 
     /**
      * Method to get a Composite Request by is id
      */
-    override fun getCompositeRequestById(id: Int): Composite? {
-        val compositeRequest = handle.createQuery(
+    override fun getCompositeRequestsById(compositeId: Int): List<Int>? {
+        return handle.createQuery(
             """
-          SELECT * FROM request
-          WHERE id = :id
+          SELECT id FROM request
+          WHERE composite = :id
           """,
         )
-            .bind("id", id)
-            .mapTo<Request>()
-            .firstOrNull() ?: return null
+            .bind("id", compositeId)
+            .mapTo<Int>()
+            .list()
+    }
 
-        val requests = handle.createQuery(
+    override fun getCompositeRequestById(compositeId: Int): Composite? {
+        return handle.createQuery(
             """
           SELECT * FROM request
           WHERE composite = :id
           """,
         )
-            .bind("id", id)
-            .mapTo<Request>()
-            .list()
-
-        return Composite(id = id, creator = compositeRequest.creator, state = compositeRequest.state, requests = requests.map { it.id })
+            .bind("id", compositeId)
+            .mapTo<Composite>()
+            .firstOrNull()
     }
 
     /**
      * Method to get all Composite Request's by a user
      */
     override fun getCompositeRequestsByUser(userId: Int): List<Composite> {
-        val compositeRequests = handle.createQuery(
+        return handle.createQuery(
             """
             SELECT c.id, creator, composite, state FROM composite AS c JOIN request as r ON c.id = r.id
             WHERE creator = :userId
             """,
         )
             .bind("userId", userId)
-            .mapTo<Request>()
+            .mapTo<Composite>()
             .list()
-        return compositeRequests.map { compositeRequest ->
-            val ids = handle.createQuery(
-                """
-                SELECT id FROM request
-                WHERE composite = :compositeId
-                """,
-            )
-                .bind("compositeId", compositeRequest.id)
-                .mapTo<Int>()
-                .list()
-            Composite(id = compositeRequest.id, creator = compositeRequest.creator, state = compositeRequest.state, requests = ids)
-        }
     }
 }

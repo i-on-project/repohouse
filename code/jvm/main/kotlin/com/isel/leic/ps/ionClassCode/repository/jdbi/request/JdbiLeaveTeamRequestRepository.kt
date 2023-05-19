@@ -16,7 +16,7 @@ class JdbiLeaveTeamRequestRepository(
     /**
      * Method to create a Leave Team Request
      */
-    override fun createLeaveTeamRequest(request: LeaveTeamInput,creator:Int): LeaveTeam {
+    override fun createLeaveTeamRequest(request: LeaveTeamInput, creator: Int): LeaveTeam {
         val id = handle.createUpdate(
             """
                 INSERT INTO request (creator, composite,state)

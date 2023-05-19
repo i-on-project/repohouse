@@ -1,6 +1,14 @@
 package com.isel.leic.ps.ionClassCode.services
 
-import com.isel.leic.ps.ionClassCode.http.*
+import com.isel.leic.ps.ionClassCode.http.GITHUB_ACCESS_TOKEN_URI
+import com.isel.leic.ps.ionClassCode.http.GITHUB_API_BASE_URL
+import com.isel.leic.ps.ionClassCode.http.GITHUB_BASE_URL
+import com.isel.leic.ps.ionClassCode.http.GITHUB_USERINFO_URI
+import com.isel.leic.ps.ionClassCode.http.GITHUB_USERMAILS_URI
+import com.isel.leic.ps.ionClassCode.http.GITHUB_USER_ORGS
+import com.isel.leic.ps.ionClassCode.http.OkHttp
+import com.isel.leic.ps.ionClassCode.http.makeCallToList
+import com.isel.leic.ps.ionClassCode.http.makeCallToObject
 import com.isel.leic.ps.ionClassCode.http.model.github.Collaborator
 import com.isel.leic.ps.ionClassCode.http.model.github.Commit
 import com.isel.leic.ps.ionClassCode.http.model.github.RepoOrg
@@ -11,10 +19,10 @@ import com.isel.leic.ps.ionClassCode.http.model.output.ClientToken
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubUserInfo
+import java.sql.Timestamp
 import okhttp3.Request
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.stereotype.Component
-import java.sql.Timestamp
 
 /**
  * Service to get the repositories from GitHub

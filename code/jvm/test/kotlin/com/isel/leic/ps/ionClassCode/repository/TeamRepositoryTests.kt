@@ -30,7 +30,7 @@ class TeamRepositoryTests {
     fun `can update team status`() = testWithHandleAndRollback { handle ->
         val teamRepo = JdbiTeamRepository(handle = handle)
         val teamId = 1
-        teamRepo.updateTeamStatus(id = teamId, status = true)
+        teamRepo.updateTeamStatus(id = teamId)
         val team = teamRepo.getTeamById(id = teamId) ?: fail("Team not found")
         assert(team.isCreated)
     }

@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi.request
 
+import com.isel.leic.ps.ionClassCode.domain.UserJoinTeam
 import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.repository.request.JoinTeamRepository
@@ -86,5 +87,32 @@ class JdbiJoinTeamRequestRepository(
             .bind("userId", userId)
             .mapTo<JoinTeam>()
             .list()
+    }
+
+    override fun getJoinTeamRequestByCompositeId(compositeId: Int): UserJoinTeam? {
+        return handle.createQuery(
+            """
+            SELECT x.name, x.id, x.creator, x.state, x.composite FROM (
+                SELECT u.name, r2.id, r2.creator, r2.state, r2.composite FROM users as u JOIN request r2 on u.id = r2.creator
+                WHERE r2.composite = :compositeId
+            ) as x JOIN jointeam j on j.id = x.id
+            """,
+        )
+            .bind("compositeId", compositeId)
+            .mapTo<UserJoinTeam>()
+            .firstOrNull()
+    }
+
+    override fun updateJoinTeamState(requestId: Int, state: String) {
+        handle.createUpdate(
+            """
+            UPDATE request
+            SET state = :state
+            WHERE id = :id
+            """,
+        )
+            .bind("id", requestId)
+            .bind("state", state)
+            .execute()
     }
 }

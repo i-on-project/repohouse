@@ -11,7 +11,7 @@ CREATE TABLE Users(
     name text not null
 );
 
-CREATE TABLE StoreChallengeInfo(
+CREATE TABLE ChallengeInfo(
     state text primary key,
     challenge text not null,
     challenge_method text not null check (challenge_method in ('plain', 's256'))
@@ -112,7 +112,7 @@ CREATE TABLE Request(
     id serial primary key,
     creator int not null,
     composite integer default null,
-    state text not null check ( state in ('Pending', 'Accepted', 'Rejected') ),
+    state text not null check ( state in ('Pending', 'Accepted', 'Rejected', 'Not_Concluded') ),
     foreign key (creator) references Users(id)
 );
 
@@ -125,13 +125,6 @@ ALTER TABLE Request
     ADD CONSTRAINT fk_composite
         FOREIGN KEY (composite)
             REFERENCES Composite(id);
-
-CREATE TABLE CreateRepo(
-    id int primary key,
-    team_id int not null,
-    foreign key (id) references Request(id),
-    foreign key (team_id) references Team(id)
-);
 
 CREATE TABLE ArchiveRepo(
    id int primary key,
@@ -156,7 +149,9 @@ CREATE TABLE JoinTeam(
 
 CREATE TABLE CreateTeam(
      id int primary key,
-     foreign key (id) references Request(id)
+     team_id int unique not null,
+     foreign key (id) references Request(id),
+     foreign key (team_id) references Team(id)
 );
 
 CREATE TABLE LeaveTeam(
@@ -194,7 +189,7 @@ CREATE TABLE Repo(
     name text not null,
     url text unique default null,
     is_created boolean not null,
-    team_id int not null,
+    team_id int unique not null,
     foreign key (team_id) references Team(id)
 );
 
@@ -237,6 +232,13 @@ CREATE TABLE OTP(
     expired_at timestamp not null,
     tries int not null,
     foreign key (user_id) references users(id)
+);
+
+CREATE TABLE CreateRepo(
+    id int primary key,
+    repo_id int unique not null,
+    foreign key (id) references Request(id),
+    foreign key (repo_id) references Repo(id)
 );
 
 COMMIT;

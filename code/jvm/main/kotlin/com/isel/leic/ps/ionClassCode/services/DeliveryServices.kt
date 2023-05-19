@@ -147,7 +147,7 @@ class DeliveryServices(
             val courseName = course.name
             val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId)
             teams.forEach { team ->
-                val repo = it.repoRepository.getReposByTeam(team.id).first() // TODO: Check if there is only one repo - just after mobile implementation
+                val repo = it.repoRepository.getRepoByTeam(team.id) ?: return@run Result.Problem(DeliveryServicesError.InternalError)
                 val studentsList = it.teamRepository.getStudentsFromTeam(team.id)
                 val tagsList = it.tagRepository.getTagsByDelivery(deliveryId)
                 var studentsToAdd = listOf<Collaborator>()

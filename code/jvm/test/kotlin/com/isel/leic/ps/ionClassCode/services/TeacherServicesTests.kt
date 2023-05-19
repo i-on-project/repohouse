@@ -17,6 +17,7 @@ import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.tokenHash.GenericTokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
+import javax.crypto.IllegalBlockSizeException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import javax.crypto.IllegalBlockSizeException
 
 @SpringBootTest
 class TeacherServicesTests {
@@ -54,14 +54,7 @@ class TeacherServicesTests {
                         on { checkIfGithubIdExists(githubId = 4545) } doReturn true
                         on { checkIfGithubTokenExists(githubToken = AESEncrypt.encrypt("token1")) } doReturn true
                         on { checkIfTokenExists(token = GenericTokenHash("SHA256").getTokenHash("token1")) } doReturn true
-                        on { createPendingTeacher(teacher = TeacherInput(
-                            name = "name",
-                            email = "test@alunos.isel.pt",
-                            githubUsername = "username",
-                            githubToken = AESEncrypt.encrypt("token123"),
-                            githubId = 12346,
-                            token = GenericTokenHash("SHA256").getTokenHash("token123"),
-                        )) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false, githubToken = "token1")
+                        on { createPendingTeacher(teacher = TeacherInput(name = "name", email = "test@alunos.isel.pt", githubUsername = "username", githubToken = AESEncrypt.encrypt("token123"), githubId = 12346, token = GenericTokenHash("SHA256").getTokenHash("token123"))) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false, githubToken = "token1")
                         on { getPendingTeacherByGithubId(githubId = 12346) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", isCreated = false, githubToken = "token1")
                         on { createTeacher(teacher = TeacherInput(name = "test14", email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", githubToken = "token1")) } doReturn Teacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", isCreated = false)
                     }
@@ -173,11 +166,11 @@ class TeacherServicesTests {
         // given: a valid teacher id
         val teacherId = 1
 
-        // when: getting the github token of a teacher
+        // when: getting the GitHub token of a teacher
         try {
-           teacherServices.getTeacherGithubToken(teacherId = teacherId)
+            teacherServices.getTeacherGithubToken(teacherId = teacherId)
         } catch (e: IllegalBlockSizeException) {
-           assert(true)
+            assert(true)
         }
     }
 

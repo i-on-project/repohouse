@@ -4,8 +4,10 @@ import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.AssignmentInput
 import com.isel.leic.ps.ionClassCode.http.model.input.AssignmentInputModel
+import com.isel.leic.ps.ionClassCode.http.model.output.CreateTeamComposite
 import com.isel.leic.ps.ionClassCode.http.model.output.StudentAssignmentModel
 import com.isel.leic.ps.ionClassCode.http.model.output.TeacherAssignmentModel
+import com.isel.leic.ps.ionClassCode.http.model.output.TeacherAssignmentTeams
 import com.isel.leic.ps.ionClassCode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component
  */
 typealias StudentAssignmentResponse = Result<AssignmentServicesError, StudentAssignmentModel>
 typealias TeacherAssignmentResponse = Result<AssignmentServicesError, TeacherAssignmentModel>
+typealias TeacherAssignmentTeamsResponse = Result<AssignmentServicesError, TeacherAssignmentTeams>
 typealias AssignmentCreatedResponse = Result<AssignmentServicesError, Assignment>
 typealias AssignmentDeletedResponse = Result<AssignmentServicesError, Boolean>
 typealias AssignmentStudentTeamResponse = Result<AssignmentServicesError, List<Team>>
@@ -79,6 +82,29 @@ class AssignmentServices(
                 val deliveries = it.deliveryRepository.getDeliveriesByAssignment(assignmentId)
                 val teams = it.teamRepository.getTeamsFromAssignment(assignmentId)
                 Result.Success(TeacherAssignmentModel(assignment, deliveries, teams))
+            }
+        }
+    }
+
+    /**
+     * Method that gets an assigment for a teacher
+     */
+    fun getTeacherAssignmentInfoTeams(assignmentId: Int): TeacherAssignmentTeamsResponse {
+        if (assignmentId < 0) return Result.Problem(value = AssignmentServicesError.InvalidInput)
+        return transactionManager.run {
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId = assignmentId)
+            if (assignment == null) {
+                Result.Problem(value = AssignmentServicesError.AssignmentNotFound)
+            } else {
+                val teams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
+                val filteredCreatedTeam = teams.filter { team -> team.isCreated }
+                val compositeRequestsFromCompositesNotAccepted = it.compositeRepository.getCompositeRequestsThatAreNotAccepted().map { composite ->
+                    val createTeam = it.createTeamRepository.getCreateTeamRequestByCompositeId(compositeId = composite.id) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
+                    val joinTeam = it.joinTeamRepository.getJoinTeamRequestByCompositeId(compositeId = composite.id) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
+                    val repoRequest = it.createRepoRepository.getCreateRepoRequestByCompositeId(compositeId = composite.id) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
+                    CreateTeamComposite(createTeam = createTeam, joinTeam = joinTeam, createRepo = repoRequest, compositeState = composite.state)
+                }
+                Result.Success(TeacherAssignmentTeams(assignment = assignment, teamsCreated = filteredCreatedTeam, createTeamComposites = compositeRequestsFromCompositesNotAccepted))
             }
         }
     }

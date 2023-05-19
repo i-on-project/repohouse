@@ -17,7 +17,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
     override fun createRepo(repo: RepoInput): Repo {
         val id = handle.createUpdate(
             """
-                INSERT INTO REPO (name,url,team_id,is_created) 
+                INSERT INTO REPO (name, url, team_id, is_created) 
                 VALUES (:name, :url, :teamId, false)
                 RETURNING id
                 """,
@@ -28,7 +28,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Repo(id, repo.url ?: "", repo.name , false)
+        return Repo(id, repo.url ?: "", repo.name, false)
     }
 
     /**
@@ -48,16 +48,16 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
     /**
      * Method to update a Repo status
      */
-    override fun updateRepoStatus(repoId: Int, status: Boolean) {
+    override fun updateRepoStatus(repoId: Int, url: String) {
         handle.createUpdate(
             """
                 UPDATE REPO
-                SET is_created = :status
+                SET is_created = true, url = :url
                 WHERE id = :repoId
                 """,
         )
             .bind("repoId", repoId)
-            .bind("status", status)
+            .bind("url", url)
             .execute()
     }
 
@@ -79,7 +79,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
     /**
      * Method to get all Repos from a team
      */
-    override fun getReposByTeam(teamId: Int): List<Repo> {
+    override fun getRepoByTeam(teamId: Int): Repo? {
         return handle.createQuery(
             """
                 SELECT * FROM REPO
@@ -88,6 +88,6 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
         )
             .bind("teamId", teamId)
             .mapTo<Repo>()
-            .list()
+            .firstOrNull()
     }
 }

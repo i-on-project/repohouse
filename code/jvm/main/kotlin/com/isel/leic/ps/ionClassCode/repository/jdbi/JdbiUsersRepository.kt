@@ -101,7 +101,7 @@ class JdbiUsersRepository(
     override fun verifySecret(secret: String, state: String): Boolean {
         val query = handle.createQuery(
             """
-            SELECT challenge, challenge_method FROM storechallengeinfo
+            SELECT challenge, challenge_method FROM challengeinfo
             WHERE state = :state
             """,
         )
@@ -110,7 +110,7 @@ class JdbiUsersRepository(
             .firstOrNull() ?: return false
         handle.createUpdate(
             """
-            DELETE FROM storechallengeinfo
+            DELETE FROM challengeinfo
             WHERE state = :state
             """,
         )
@@ -362,7 +362,7 @@ class JdbiUsersRepository(
     override fun storeChallengeInfo(challengeMethod: String, challenge: String, state: String) {
         handle.createUpdate(
             """
-               INSERT INTO storechallengeinfo (state, challenge, challenge_method) 
+               INSERT INTO challengeinfo (state, challenge, challenge_method) 
                values (:state, :challenge, :challengeMethod)
             """,
         )
