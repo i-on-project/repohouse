@@ -13,7 +13,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
 
     ports:
-      - "5432:5432"
+      - "5555:5432"
 
   spring-service:
     container_name: spring-service
@@ -23,7 +23,7 @@ services:
       dockerfile: code/jvm/docker/files/Dockerfile-Spring
     environment:
       PORT: 8081
-      JDBC_DATABASE_URL: "jdbc:postgresql://db-docker:5432/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
+      JDBC_DATABASE_URL: "jdbc:postgresql://db-docker:5555/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       CLASSCODE_ENCRYPTION_KEY: ${CLASSCODE_ENCRYPTION_KEY}
