@@ -1,5 +1,7 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
+import { Path } from 'pathlib';
+
 test('Login Created Teacher', async ({ page }) => {
     test.setTimeout(120000)
     await page.goto('http://localhost:3000/');
@@ -24,7 +26,7 @@ test('Login Created Teacher', async ({ page }) => {
         await page.waitForTimeout(500);
     }
     await expect(page.url()).toBe('http://localhost:3000/menu');
-    console.log(await page.context().cookies());
+    Path("cookies.json").write_text(await page.context().cookies())
 });
 
 test('Login Created Student', async ({ page }) => {
