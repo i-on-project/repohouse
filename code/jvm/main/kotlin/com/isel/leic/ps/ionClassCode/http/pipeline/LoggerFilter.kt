@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.springframework.stereotype.Component
-import org.springframework.web.util.WebUtils
 
 /**
  * Filter only use to log incoming requests and responses to those requests
@@ -19,7 +18,6 @@ class LoggerFilter(
 
     override fun doFilter(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val reqModel = RequestModel(method = request.method, uri = request.requestURI)
-        val x = WebUtils.getCookie(request, "userState")
         logRequest(request = reqModel, logger = logger)
         chain.doFilter(request, response)
         val resModel = ResponseModel(status = response.status, uri = request.requestURI)

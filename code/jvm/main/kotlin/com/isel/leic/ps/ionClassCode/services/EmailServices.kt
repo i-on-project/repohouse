@@ -8,6 +8,7 @@ import com.sendgrid.SendGrid
 import com.sendgrid.helpers.mail.Mail
 import com.sendgrid.helpers.mail.objects.Content
 import com.sendgrid.helpers.mail.objects.Email
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import java.io.IOException
 
@@ -29,14 +30,17 @@ sealed class EmailServiceError {
  */
 @Component
 class EmailService {
-    companion object {
-        private val SENDGRID_API_KEY: String = System.getenv("SENDGRID_CLASSCODE_API_KEY")
-        val sendGrid = SendGrid(SENDGRID_API_KEY)
-        val FROM = Email("i-on-classcode@outlook.pt")
-        const val SUBJECT = "i-on ClassCode - OTP"
-        const val CONTENT_TYPE = "text/plain"
-        const val ENDPOINT = "mail/send"
-        const val BASE_URI = "https://api.sendgrid.com"
+
+    private lateinit var sendGrid: SendGrid
+    private val from = Email("i-on-classcode@outlook.pt")
+    private val subject = "i-on ClassCode - OTP"
+    private val contentType = "text/plain"
+    private val endpoint = "mail/send"
+    private val baseUri = "https://api.sendgrid.com"
+
+    @PostConstruct
+    fun init() {
+        sendGrid = SendGrid(System.getenv("SENDGRID_CLASSCODE_API_KEY"))
     }
 
     /**
@@ -48,16 +52,16 @@ class EmailService {
         }
         val to = Email(email)
         val content = Content(
-            CONTENT_TYPE,
+            contentType,
             "Welcome to i-on ClassCode, $name! \nPlease verify your identity through" +
                 " the following otp:\n $otp",
         )
-        val mail = Mail(FROM, SUBJECT, to, content)
+        val mail = Mail(from, subject, to, content)
         val request = Request()
         return try {
             request.method = Method.POST
-            request.baseUri = BASE_URI
-            request.endpoint = ENDPOINT
+            request.baseUri = baseUri
+            request.endpoint = endpoint
             request.body = mail.build()
 
             Result.Success(sendGrid.api(request))

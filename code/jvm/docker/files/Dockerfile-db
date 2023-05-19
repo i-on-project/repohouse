@@ -1,12 +1,14 @@
-FROM postgres
+FROM postgres:latest
 
 USER postgres
 WORKDIR /app
 
-COPY code/jvm/sql/createTables.sql /docker-entrypoint-initdb.d/createTables.sql
-COPY code/jvm/sql/triggers.sql /docker-entrypoint-initdb.d/triggers.sql
+COPY ./code/sql/createTables.sql /docker-entrypoint-initdb.d/1_create.sql
+COPY ./code/sql/triggers.sql /docker-entrypoint-initdb.d/2_triggers.sql
+COPY ./code/sql/insert.sql /docker-entrypoint-initdb.d/3_insert-test-data.sql
 
-COPY --chown=postgres:postgres ./docker/scripts/wait-for-postgres.sh ./bin/wait-for-postgres.sh
+COPY --chown=postgres:postgres ./code/jvm/docker/scripts/wait-for-postgres.sh ./bin/wait-for-postgres.sh
 RUN chmod +x ./bin/wait-for-postgres.sh
 
+# Expose PostgreSQL default port
 EXPOSE 5432

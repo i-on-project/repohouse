@@ -33,3 +33,4 @@ test('go back to homepage through title', async ({ page }) => {
     await page.getByText('ClassCode').first().click();
     await expect(page.getByRole('heading', { name: 'ClassCode' })).toBeVisible();
 });
+

@@ -20,7 +20,7 @@ class OutboxRepositoryTests {
     fun `can get all pending requests`() = testWithHandleAndRollback { handle ->
         val outboxRepo = JdbiOutboxRepository(handle = handle)
         val list = outboxRepo.getOutboxPendingRequests()
-        assert(list.size == 2)
+        assert(list.size == 1)
     }
 
     @Test

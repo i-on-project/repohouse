@@ -26,7 +26,7 @@ data class GitHubUserInfo(
     val login: String,
     val id: Long,
     val url: String,
-    val name: String
+    val name: String?
 )
 
 /**

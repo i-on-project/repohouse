@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi.transaction
 
+import com.isel.leic.ps.ionClassCode.repository.ApplyRepository
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.CooldownRepository
@@ -12,6 +13,7 @@ import com.isel.leic.ps.ionClassCode.repository.RepoRepository
 import com.isel.leic.ps.ionClassCode.repository.TagRepository
 import com.isel.leic.ps.ionClassCode.repository.TeamRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
+import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiApplyRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiAssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiCooldownRepository
@@ -24,7 +26,6 @@ import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiTagRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiUsersRepository
-import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiApplyRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCompositeRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCreateRepoRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCreateTeamRequestRepository
@@ -32,7 +33,6 @@ import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiJoinTeamRequest
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiLeaveCourseRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiLeaveTeamRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiRequestRepository
-import com.isel.leic.ps.ionClassCode.repository.ApplyRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository

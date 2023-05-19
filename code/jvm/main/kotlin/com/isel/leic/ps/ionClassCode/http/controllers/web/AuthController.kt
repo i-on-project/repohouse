@@ -58,7 +58,8 @@ const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
 
-val NGROK_URI = System.getenv("NGROK_URI") ?: "http://localhost:3000"
+const val TEST = true
+val URI = if (TEST) "http://localhost:3000" else System.getenv("NGROK_URI") ?: "http://localhost:3000"
 
 /**
  * This controller is responsible for the authentication of the users.
@@ -142,7 +143,7 @@ class AuthController(
         if (state != userState) {
             return ResponseEntity
                 .status(Status.REDIRECT)
-                .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/error/callback")
+                .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
                 .body(EMPTY_REQUEST)
         }
         val accessToken = githubServices.fetchAccessToken(code)
@@ -156,7 +157,7 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "$NGROK_URI/menu/callback/student?githubId=${userInfo.value.githubId}&userId=${userInfo.value.id}")
+                                .header(HttpHeaders.LOCATION, "$URI/menu/callback/student?githubId=${userInfo.value.githubId}&userId=${userInfo.value.id}")
                                 .body(EMPTY_REQUEST)
                         }
                         userInfo.value is Teacher && position == TEACHER_COOKIE_NAME -> {
@@ -164,14 +165,14 @@ class AuthController(
                                 is Result.Problem ->
                                     ResponseEntity
                                         .status(Status.REDIRECT)
-                                        .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/error/callback")
+                                        .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
                                         .body(EMPTY_REQUEST)
                                 is Result.Success -> {
                                     val cookie = generateSessionCookie(userInfo.value.token)
                                     ResponseEntity
                                         .status(Status.REDIRECT)
                                         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                        .header(HttpHeaders.LOCATION, "$NGROK_URI/menu/callback/teacher?githubId=${userInfo.value.githubId}&userId=${userInfo.value.id}")
+                                        .header(HttpHeaders.LOCATION, "$URI/menu/callback/teacher?githubId=${userInfo.value.githubId}&userId=${userInfo.value.id}")
                                         .body(EMPTY_REQUEST)
                                 }
                             }
@@ -183,7 +184,7 @@ class AuthController(
                             response.setHeader(HttpHeaders.SET_COOKIE, githubIdCookie.toString())
                             return ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/fail/callback")
+                                .header(HttpHeaders.LOCATION, "$URI/auth/fail/callback")
                                 .body(EMPTY_REQUEST)
                         }
                     }
@@ -193,14 +194,14 @@ class AuthController(
                         ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                            .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/status")
+                            .header(HttpHeaders.LOCATION, "$URI/auth/status")
                             .body(EMPTY_REQUEST)
                     } else {
                         val cookie = generateGithubIdCookie(userGithubInfo.id)
                         ResponseEntity
                             .status(Status.REDIRECT)
                             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                            .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/verify")
+                            .header(HttpHeaders.LOCATION, "$URI/auth/verify")
                             .body(EMPTY_REQUEST)
                     }
                 }
@@ -215,7 +216,7 @@ class AuthController(
                                 githubUsername = userGithubInfo.login,
                                 githubId = userGithubInfo.id,
                                 token = generateRandomToken(),
-                                name = userGithubInfo.name,
+                                name = userGithubInfo.name ?: userGithubInfo.login,
                                 githubToken = accessToken.access_token,
                             ),
                         )
@@ -225,13 +226,13 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/create/callback/teacher")
+                                .header(HttpHeaders.LOCATION, "$URI/auth/create/callback/teacher")
                                 .body(EMPTY_REQUEST)
                         }
                         is Result.Problem ->
                             ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/error/callback")
+                                .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
                                 .body(EMPTY_REQUEST)
                     }
                 } else {
@@ -242,7 +243,7 @@ class AuthController(
                                 githubUsername = userGithubInfo.login,
                                 githubId = userGithubInfo.id,
                                 token = generateRandomToken(),
-                                name = userGithubInfo.name,
+                                name = userGithubInfo.name ?: userGithubInfo.login,
                             ),
                         )
                     ) {
@@ -251,13 +252,13 @@ class AuthController(
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/create/callback/student")
+                                .header(HttpHeaders.LOCATION, "$URI/auth/create/callback/student")
                                 .body(EMPTY_REQUEST)
                         }
                         is Result.Problem ->
                             ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "$NGROK_URI/auth/error/callback")
+                                .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
                                 .body(EMPTY_REQUEST)
                     }
                 }
@@ -448,6 +449,7 @@ class AuthController(
         val state = UUID.randomUUID().toString()
         val cookie = ResponseCookie.from(STATE_COOKIE_NAME, state)
             .path(STATE_COOKIE_PATH)
+            .path("/api")
             .maxAge(HALF_HOUR)
             .httpOnly(true)
             .secure(true)
@@ -462,24 +464,11 @@ class AuthController(
      */
     private fun generateSessionCookie(token: String): ResponseCookie {
         return ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, AESEncrypt.encrypt(token))
-            .httpOnly(true)
-            .sameSite("Strict")
-            .secure(true)
+            .path("/api")
             .maxAge(FULL_DAY)
-            .path("/api")
-            .build()
-    }
-
-    /**
-     * Delete a session cookie.
-     */
-    private fun deleteSessionCookie(): ResponseCookie {
-        return ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, "")
             .httpOnly(true)
-            .sameSite("Strict")
             .secure(true)
-            .maxAge(0)
-            .path("/api")
+            .sameSite("Strict")
             .build()
     }
 
@@ -510,15 +499,28 @@ class AuthController(
     }
 
     /**
+     * Delete a session cookie.
+     */
+    private fun deleteSessionCookie(): ResponseCookie {
+        return ResponseCookie.from(AUTHORIZATION_COOKIE_NAME, "")
+            .path("/api")
+            .maxAge(0)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .build()
+    }
+
+    /**
      * Delete a user GitHub id cookie.
      */
     private fun deleteGithubIdCookie(): ResponseCookie {
         return ResponseCookie.from(GITHUB_ID_COOKIE_NAME, "")
-            .httpOnly(true)
-            .sameSite("Strict")
-            .secure(true)
-            .maxAge(0)
             .path("/api")
+            .maxAge(0)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
             .build()
     }
 

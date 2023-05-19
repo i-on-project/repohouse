@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
@@ -59,6 +60,15 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.withType<BootJar> {
+    enabled = true
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes["Main-Class"] = "com.isel.leic.ps.ion_repohouse.IonRepohouseApplicationKt"
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -70,15 +80,18 @@ task<Copy>("extractUberJar") {
 }
 
 task<Exec>("dbDockerUp") {
-    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-docker")
+    commandLine("docker-compose", "up", "-d", "db-docker")
 }
+
 task<Exec>("dbDockerWait") {
-    commandLine("docker", "exec", "db-docker", "/app/bin/wait-for-postgres.sh", "localhost")
+    commandLine("docker", "exec", "db-docker", "/app/bin/wait-for-postgres.sh", "localhost", "psql -U postgres -d classcode")
     dependsOn("dbDockerUp")
 }
+
 task<Exec>("dbDockerDown") {
     commandLine("docker-compose", "down")
 }
+
 task<Exec>("composeUp") {
     commandLine("docker-compose", "up", "--build", "--force-recreate")
     dependsOn("extractUberJar")
@@ -89,7 +102,6 @@ task<Exec>("composeDown") {
 
 tasks.named("check") {
     dependsOn("ktlintCheck")
-    // TODO: need to fix this
     dependsOn("dbDockerWait")
     finalizedBy("dbDockerDown")
 }
