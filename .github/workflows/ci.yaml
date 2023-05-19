@@ -2,6 +2,12 @@ name: Continuous Integration
 
 on: [push]
 
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: classcode
+  JDBC_DATABASE_URL: "jdbc:postgresql://localhost:5555/classcode?user=postgres&password=postgres"
+
 jobs:
   build:
     name: Continuous Integration
@@ -13,9 +19,4 @@ jobs:
         with:
           java-version: 17
       - name: Build with Gradle
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: classcode
-          JDBC_DATABASE_URL: "jdbc:postgresql://localhost:5555/${POSTGRES_DB}?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}"
         run: code/jvm/gradlew -p code/jvm check
