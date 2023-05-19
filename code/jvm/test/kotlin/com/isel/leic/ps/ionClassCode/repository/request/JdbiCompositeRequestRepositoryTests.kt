@@ -12,31 +12,26 @@ class JdbiCompositeRequestRepositoryTests {
     @Test
     fun `createCompositeRequest should create a new composite request`() = testWithHandleAndRollback { handle ->
         val compositeRep = JdbiCompositeRequestRepository(handle = handle)
-        val requestRepo = JdbiRequestRepository(handle = handle)
-        val request = CompositeInput(requests = listOf(3, 4), composite = null)
-        val composite = compositeRep.createCompositeRequest(request = request, creator = 1)
-        val r = requestRepo.getRequestById(id = 3) ?: fail("Request not found")
-        val r1 = requestRepo.getRequestById(id = 4) ?: fail("Request not found")
-        assert(composite.id == r.composite)
-        assert(composite.id == r1.composite)
+        val request = CompositeInput(composite = null)
+        compositeRep.createCompositeRequest(request = request, creator = 1)
     }
 
     @Test
-    fun `getCompositeRequestById should return the specific composite request`() = testWithHandleAndRollback { handle ->
+    fun `getCompositeRequestById should return the list of ids`() = testWithHandleAndRollback { handle ->
         val compositeRep = JdbiCompositeRequestRepository(handle = handle)
-        val id = 15
-        val creator = 4
-        val request = compositeRep.getCompositeRequestById(id = id) ?: fail("Request not found")
-        assert(request.creator == creator)
+        val compositeId = 15
+        val request = compositeRep.getCompositeRequestsById(compositeId = compositeId) ?: fail("Request not found")
+        assert(request.size == 3)
     }
 
     @Test
     fun `changeStateCompositeRequest should change the status specific composite request`() = testWithHandleAndRollback { handle ->
         val compositeRep = JdbiCompositeRequestRepository(handle = handle)
+        val requestRepo = JdbiRequestRepository(handle = handle)
         val id = 15
         val state = "Rejected"
-        compositeRep.changeStateCompositeRequest(id = id, state = state)
-        val request = compositeRep.getCompositeRequestById(id = id) ?: fail("Request not found")
+        compositeRep.updateCompositeState(requestId = id, state = state)
+        val request = requestRepo.getRequestById(id = id) ?: fail("Request not found")
         assert(request.state == state)
     }
 

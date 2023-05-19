@@ -28,21 +28,31 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Team(id, team.name, false, team.assignmentId)
+        val teamName = "${team.name} - $id"
+        handle.createUpdate(
+            """
+                UPDATE team set name = :name
+                WHERE id = :id
+                RETURNING name
+            """,
+        )
+            .bind("id", id)
+            .bind("name", teamName)
+        return Team(id, teamName, false, team.assignmentId)
     }
 
     /**
      * Method to update a Team status
      */
-    override fun updateTeamStatus(id: Int, status: Boolean) {
+    override fun updateTeamStatus(id: Int) {
         handle.createUpdate(
             """
-            UPDATE team SET is_created = :status
+            UPDATE team SET is_created = :is_created
             WHERE id = :id
             """,
         )
             .bind("id", id)
-            .bind("status", status)
+            .bind("is_created", true)
             .execute()
     }
 
@@ -76,6 +86,18 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .bind("teamId", teamId)
             .mapTo<Student>()
             .list()
+    }
+
+    override fun addStudentToTeam(teamId: Int, studentId: Int) {
+        handle.createUpdate(
+            """
+            INSERT INTO student_team (student, team)
+            VALUES (:student_id, :team_id)
+            """,
+        )
+            .bind("student_id", studentId)
+            .bind("team_id", teamId)
+            .execute()
     }
 
     /**

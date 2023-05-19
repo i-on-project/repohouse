@@ -2,7 +2,6 @@ package com.isel.leic.ps.ionClassCode.http.controllers.mobile
 
 import com.isel.leic.ps.ionClassCode.domain.User
 import com.isel.leic.ps.ionClassCode.http.Uris
-import com.isel.leic.ps.ionClassCode.http.model.output.TeacherAssignmentOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.infra.LinkRelation
@@ -26,41 +25,19 @@ class AssigmentControllerMobile(
         @PathVariable classroomId: Int,
         @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
-        return when (val assignment = assigmentService.getTeacherAssignmentInfo(assignmentId = assignmentId)) {
+        return when (val assignment = assigmentService.getTeacherAssignmentInfoTeams(assignmentId = assignmentId)) {
             is Result.Problem -> problem(error = assignment.value)
             is Result.Success -> {
                 assignment.value
                 siren(
-                    value = TeacherAssignmentOutputModel(
-                        assignment = assignment.value.assignment,
-                        deliveries = assignment.value.deliveries,
-                        teams = assignment.value.teams,
-                    ),
+                    value = assignment.value,
                 ) {
-                    clazz("assignment")
+                    clazz(value = "assignment")
                     link(
-                        rel = LinkRelation("self"),
+                        rel = LinkRelation(value = "self"),
                         href = Uris.assigmentUri(courseId = courseId, classroomId = classroomId, assignmentId = assignmentId),
                         needAuthentication = true,
                     )
-                    link(rel = LinkRelation("course"), href = Uris.courseUri(courseId = courseId), needAuthentication = true)
-                    link(
-                        rel = LinkRelation("classroom"),
-                        href = Uris.classroomUri(courseId = courseId, classroomId = classroomId),
-                        needAuthentication = true,
-                    )
-                    link(
-                        rel = LinkRelation("assigments"),
-                        href = Uris.assignmentsUri(courseId = courseId, classroomId = classroomId),
-                        needAuthentication = true,
-                    )
-                    assignment.value.teams.forEach {
-                        link(
-                            rel = LinkRelation("team"),
-                            href = Uris.teamUri(courseId = courseId, classroomId = classroomId, assignmentId = assignmentId, teamId = it.id),
-                            needAuthentication = true,
-                        )
-                    }
                 }
             }
         }

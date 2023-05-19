@@ -13,7 +13,7 @@ import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
 data class TeamOutputModel(
     val team: Team,
     val students: List<StudentWithoutToken>,
-    val repos: List<Repo>,
+    val repos: Repo?,
     val feedbacks: List<Feedback>,
 )
 
@@ -30,7 +30,7 @@ data class TeamsOutputModel(
 data class TeamModel(
     val team: Team,
     val students: List<StudentWithoutToken>,
-    val repos: List<Repo>,
+    val repo: Repo?,
     val feedbacks: List<Feedback>,
 )
 
@@ -41,4 +41,8 @@ data class TeamRequestsModel(
     val team: Team,
     val joinTeam: List<JoinTeam>,
     val leaveTeam: List<LeaveTeam>,
+)
+
+data class UpdateCreateTeamStatusOutput(
+    val result: Boolean,
 )

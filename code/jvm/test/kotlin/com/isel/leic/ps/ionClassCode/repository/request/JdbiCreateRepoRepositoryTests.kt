@@ -11,7 +11,7 @@ class JdbiCreateRepoRepositoryTests {
     @Test
     fun `createCreateRepoRequest should create a new createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
-        val request = CreateRepoInput(teamId = 1)
+        val request = CreateRepoInput(repoId = 3, composite = 15)
         createRepoReq.createCreateRepoRequest(request = request, creator = 3)
     }
 
@@ -19,7 +19,7 @@ class JdbiCreateRepoRepositoryTests {
     fun `getCreateRepoRequests should return all createRepo requests`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val requests = createRepoReq.getCreateRepoRequests()
-        assert(requests.size == 2)
+        assert(requests.size == 1)
     }
 
     @Test
@@ -36,6 +36,14 @@ class JdbiCreateRepoRepositoryTests {
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
         val userId = 3
         val requests = createRepoReq.getCreateRepoRequestsByUser(userId = userId)
-        assert(requests.size == 2)
+        assert(requests.size == 1)
+    }
+
+    @Test
+    fun `getCreateRepoRequestByCompositeId should return createRepo requests for a composite`() = testWithHandleAndRollback { handle ->
+        val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
+        val compositeId = 15
+        val request = createRepoReq.getCreateRepoRequestByCompositeId(compositeId = compositeId)
+        assert(request?.id == 5)
     }
 }

@@ -9,7 +9,7 @@ import com.isel.leic.ps.ionClassCode.domain.input.RepoInput
 interface RepoRepository {
     fun createRepo(repo: RepoInput): Repo
     fun deleteRepo(repoId: Int)
-    fun updateRepoStatus(repoId: Int, status: Boolean)
+    fun updateRepoStatus(repoId: Int, url: String)
     fun getRepoById(repoId: Int): Repo?
-    fun getReposByTeam(teamId: Int): List<Repo>
+    fun getRepoByTeam(teamId: Int): Repo?
 }

@@ -22,7 +22,6 @@ import com.isel.leic.ps.ionClassCode.services.UserServices
 import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
 import okhttp3.internal.EMPTY_REQUEST
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
@@ -87,7 +86,6 @@ class AuthControllerMobile(
     suspend fun getAccessToken(
         @RequestBody challengeInfo: ChallengeInput,
     ): ResponseEntity<*> {
-        logger.info("Challenge info: $challengeInfo")
         when (val res = userServices.verifySecret(secret = challengeInfo.secret, state = challengeInfo.state)) {
             is Result.Problem -> {
                 return userServices.problem(error = res.value)
@@ -125,9 +123,6 @@ class AuthControllerMobile(
                 }
             }
         }
-    }
-    companion object {
-        private val logger = LoggerFactory.getLogger(AuthControllerMobile::class.java)
     }
 }
 private fun generateUserState(): OAuthState {

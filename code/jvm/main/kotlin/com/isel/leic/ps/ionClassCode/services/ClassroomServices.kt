@@ -164,9 +164,11 @@ class ClassroomServices(
             val classroom = it.classroomRepository.getClassroomByInviteLink(inviteLink) ?: return@run Result.Problem(ClassroomServicesError.InviteLinkNotFound)
             if (classroom.isArchived) return@run Result.Problem(ClassroomServicesError.ClassroomArchived)
             val prevStudents = it.classroomRepository.getStudentsByClassroom(classroom.id)
-            if (prevStudents.any { prevStudent -> prevStudent.id == studentId }) return@run Result.Problem(
-                ClassroomServicesError.AlreadyInClassroom
-            )
+            if (prevStudents.any { prevStudent -> prevStudent.id == studentId }) {
+                return@run Result.Problem(
+                    ClassroomServicesError.AlreadyInClassroom,
+                )
+            }
             it.classroomRepository.addStudentToClassroom(classroom.id, studentId)
             val assignments = it.assignmentRepository.getClassroomAssignments(classroom.id)
             val students = it.classroomRepository.getStudentsByClassroom(classroom.id)
@@ -209,6 +211,7 @@ class ClassroomServices(
         return Result.Success(true)
     }
 
+    // TODO() : Repos are not an array, but a single one
     /**
      * Method to get the local copy of the classroom to path in the personal computer
      */
@@ -221,7 +224,8 @@ class ClassroomServices(
             it.assignmentRepository.getClassroomAssignments(classroomId).forEach { assigment ->
                 it.deliveryRepository.getDeliveriesByAssignment(assigment.id).forEach { delivery ->
                     it.deliveryRepository.getTeamsByDelivery(delivery.id).forEach { team ->
-                        it.repoRepository.getReposByTeam(team.id).forEach { repo ->
+                        val repo = it.repoRepository.getRepoByTeam(team.id)
+                        if (repo?.url != null) {
                             reposArray[repo.name] = repo.url
                         }
                     }

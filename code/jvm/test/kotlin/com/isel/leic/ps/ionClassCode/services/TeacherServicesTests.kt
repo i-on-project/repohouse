@@ -63,7 +63,7 @@ class TeacherServicesTests {
                                     githubToken = AESEncrypt.encrypt("token123"),
                                     githubId = 12346,
                                     token = GenericTokenHash("SHA256").getTokenHash("token123"),
-                                )
+                                ),
                             )
                         } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false, githubToken = "token1")
                         on { getPendingTeacherByGithubId(githubId = 12346) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", isCreated = false, githubToken = "token1")

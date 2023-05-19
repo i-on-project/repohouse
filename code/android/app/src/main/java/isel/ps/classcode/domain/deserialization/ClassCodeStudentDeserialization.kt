@@ -12,6 +12,5 @@ data class ClassCodeStudentDeserialization(
     @JsonProperty("githubUsername") val githubUsername: String,
     @JsonProperty("githubId") val githubId: Long,
     @JsonProperty("isCreated") val isCreated: Boolean,
-    @JsonProperty("token") val token: String,
     @JsonProperty("schoolId") val schoolId: Int?
 )

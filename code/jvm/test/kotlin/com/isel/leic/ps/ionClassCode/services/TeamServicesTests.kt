@@ -3,9 +3,11 @@ package com.isel.leic.ps.ionClassCode.services
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Feedback
+import com.isel.leic.ps.ionClassCode.domain.Repo
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.FeedbackInput
+import com.isel.leic.ps.ionClassCode.domain.input.RepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.TeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
@@ -60,10 +62,11 @@ class TeamServicesTests {
                     val mockedTeamRepository = mock<TeamRepository> {
                         on { getTeamById(id = 1) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
                         on { getStudentsFromTeam(teamId = 1) } doReturn listOf(Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 3, schoolId = null))
-                        on { createTeam(team = TeamInput(name = "Classroom2 - 1 - 1", 1, false)) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
+                        on { createTeam(team = TeamInput(name = "Classroom2 - 1", 1, false)) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
                     }
                     val mockedRepoRepository = mock<RepoRepository> {
-                        on { getReposByTeam(teamId = 1) } doReturn listOf()
+                        on { getRepoByTeam(teamId = 1) } doReturn Repo(id = 1, name = "Repo1", url = "url", isCreated = false)
+                        on { createRepo(repo = RepoInput(name = "Classroom2 - 1 - 1", url = null, teamId = 1)) } doReturn Repo(id = 1, name = "Classroom2 - 1 - 1", url = null, isCreated = false)
                     }
 
                     val mockedFeedbackRepository = mock<FeedbackRepository> {
@@ -77,12 +80,12 @@ class TeamServicesTests {
                     }
 
                     val mockedCompositeRepository = mock<CompositeRepository> {
-                        on { createCompositeRequest(request = CompositeInput(requests = listOf(1)), creator = 1) } doReturn Composite(id = 1, creator = 1, requests = listOf(1))
+                        on { createCompositeRequest(request = CompositeInput(composite = null), creator = 1) } doReturn Composite(id = 1, creator = 1)
                     }
 
                     val mockedCreateTeamRepository = mock<CreateTeamRepository> {
-                        on { createCreateTeamRequest(request = CreateTeamInput(), creator = 1) } doReturn CreateTeam(id = 1, creator = 1)
-                        on { createCreateTeamRequest(request = CreateTeamInput(), creator = 2) } doReturn CreateTeam(id = 2, creator = 2)
+                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 1, composite = 1), creator = 1) } doReturn CreateTeam(id = 1, creator = 1, composite = 1, teamId = 1)
+                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 2, composite = 2), creator = 2) } doReturn CreateTeam(id = 2, creator = 2, composite = 2, teamId = 2)
                     }
 
                     val mockedJoinTeamRepoRepository = mock<JoinTeamRepository> {
@@ -107,7 +110,7 @@ class TeamServicesTests {
                     }
 
                     val mockedCreateRepoRepository = mock<CreateRepoRepository> {
-                        on { createCreateRepoRequest(request = CreateRepoInput(teamId = 1), creator = 2) } doReturn CreateRepo(id = 1, creator = 2, teamId = 1)
+                        on { createCreateRepoRequest(request = CreateRepoInput(repoId = 1, composite = 1), creator = 2) } doReturn CreateRepo(id = 1, creator = 2, repoId = 1)
                     }
                     val mockedOutboxRepository = mock<OutboxRepository> {}
                     val mockedUsersRepository = mock<UsersRepository> {
@@ -119,7 +122,7 @@ class TeamServicesTests {
                             isCreated = false,
                             email = "test3@alunos.isel.pt",
                             id = 1,
-                            schoolId = 1235
+                            schoolId = 1235,
                         )
                     }
                     on { teamRepository } doReturn mockedTeamRepository
@@ -197,9 +200,6 @@ class TeamServicesTests {
 
         // when: getting an error because of an invalid creator
         val team = teamServices.createTeamRequest(
-            createTeamInfo = CreateTeamInput(
-                composite = null,
-            ),
             creator = creator,
             assignmentId = 1,
             classroomId = 1,
@@ -213,37 +213,12 @@ class TeamServicesTests {
     }
 
     @Test
-    fun `createTeamRequest should give an InvalidData because the composite is invalid`() {
-        // given: an invalid creator
-        val composite = -1
-
-        // when: getting an error because of an invalid composite
-        val team = teamServices.createTeamRequest(
-            createTeamInfo = CreateTeamInput(
-                composite = composite,
-            ),
-            assignmentId = 1,
-            classroomId = 1,
-            creator = 1,
-        )
-
-        if (team is Result.Problem) {
-            assert(team.value is TeamServicesError.InvalidData)
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
     fun `createTeamRequest should give an AssignmentNotFound because the assignmentId is invalid`() {
         // given: an invalid assignment id
         val assignmentId = -1
 
         // when: getting an error because of an invalid assignment id
         val team = teamServices.createTeamRequest(
-            createTeamInfo = CreateTeamInput(
-                composite = 1,
-            ),
             assignmentId = assignmentId,
             classroomId = 1,
             creator = 1,
@@ -263,9 +238,6 @@ class TeamServicesTests {
 
         // when: getting an error because of an invalid classroom id
         val team = teamServices.createTeamRequest(
-            createTeamInfo = CreateTeamInput(
-                composite = 1,
-            ),
             assignmentId = 1,
             classroomId = classroomId,
             creator = 1,
@@ -285,9 +257,6 @@ class TeamServicesTests {
 
         // when: getting an error because the classroom id is not in database
         val team = teamServices.createTeamRequest(
-            createTeamInfo = CreateTeamInput(
-                composite = 1,
-            ),
             assignmentId = 1,
             classroomId = classroomId,
             creator = 1,
@@ -307,9 +276,6 @@ class TeamServicesTests {
 
         // when: getting an error because the classroom id is archived
         val team = teamServices.createTeamRequest(
-            createTeamInfo = CreateTeamInput(
-                composite = null,
-            ),
             assignmentId = 1,
             classroomId = classroomId,
             creator = 1,
@@ -324,11 +290,8 @@ class TeamServicesTests {
 
     @Test
     fun `createTeamRequest should give the id of the request`() {
-        // when: getting an error because the team was not create
+        // when: getting a success
         val team = teamServices.createTeamRequest(
-            createTeamInfo = CreateTeamInput(
-                composite = null,
-            ),
             assignmentId = 1,
             classroomId = 2,
             creator = 1,
@@ -779,7 +742,6 @@ class TeamServicesTests {
 
     @Test
     fun `updateTeamRequestStatus should update the status`() {
-
         // when: getting the flag was updated
         val team = teamServices.updateTeamRequestStatus(
             requestId = 1,

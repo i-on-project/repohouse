@@ -67,9 +67,9 @@ inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper
  * Handle the response from the ClassCode API.
  */
 
-inline fun <reified R : Any> handleSirenResponseClassCode(response: Response, type: JavaType, jsonMapper: ObjectMapper): Either<HandleClassCodeResponseError, R> {
+inline fun <reified R : Any> handleSirenResponseClassCode(response: Response, type: JavaType? = null, jsonMapper: ObjectMapper): Either<HandleClassCodeResponseError, R> {
     val body = response.body?.string()
-    return if (response.isSuccessful) {
+    return if (response.isSuccessful && type != null) {
         try {
             Either.Right(value = jsonMapper.readValue(body, type))
         } catch (e: StreamReadException) {

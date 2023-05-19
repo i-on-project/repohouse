@@ -13,6 +13,7 @@ import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.dto.LocalClassroomDto
 import isel.ps.classcode.presentation.classroom.services.ClassroomServices
+import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class ClassroomActivity : ComponentActivity() {
@@ -46,18 +47,26 @@ class ClassroomActivity : ComponentActivity() {
             vm.getAssignments(classroomId =  classroom.id, courseId = classroom.courseId)
         }
         setContent {
+            val assignments = vm.assignments
             ClasscodeTheme {
-                if (classroom != null) {
+                if (classroom != null && assignments != null) {
                     ClassroomScreen(
                         classroom = classroom,
-                        teams = vm.teams,
-                        assignments = vm.assignments,
+                        teamsCreated = vm.teamsCreated,
+                        assignments = assignments,
+                        assignment = vm.assignment,
                         onTeamSelected = { },
+                        createTeamComposite = vm.createTeamComposite,
                         onAssignmentChange = { assignment -> vm.getTeams(courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id) },
                         onBackRequest = { finish() },
-                        error = vm.error,
+                        error = vm.errorClassCode,
                         onDismissRequest = { finish() },
+                        onCreateTeamComposite = { createTeamComposite ->
+                            TODO()
+                        }
                     )
+                } else {
+                    LoadingAnimationCircle()
                 }
             }
         }
@@ -70,6 +79,7 @@ class ClassroomActivity : ComponentActivity() {
                 intent.getParcelableExtra(CLASSROOM_EXTRA, LocalClassroomDto::class.java)
             else
                 intent.getParcelableExtra(CLASSROOM_EXTRA)
+        vm.courseName = classroomExtra?.courseName
         return classroomExtra?.toClassroom()
     }
 }

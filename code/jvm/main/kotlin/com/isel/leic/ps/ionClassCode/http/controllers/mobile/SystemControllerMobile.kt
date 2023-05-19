@@ -39,5 +39,6 @@ class SystemControllerMobile {
         block.link(rel = LinkRelation("course"), href = Uris.MOBILE_COURSE_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("classroom"), href = Uris.MOBILE_CLASSROOM_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("assignment"), href = Uris.MOBILE_ASSIGMENT_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("createTeam"), href = Uris.MOBILE_TEAM_CREATE_TEAM_PATH, needAuthentication = true)
     }
 }

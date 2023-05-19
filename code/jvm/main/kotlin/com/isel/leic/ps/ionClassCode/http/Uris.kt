@@ -129,4 +129,7 @@ object Uris {
     const val MOBILE_CLASSROOM_PATH = "$MOBILE_CLASSROOMS_PATH/{classroomId}"
     const val MOBILE_ASSIGMENTS_PATH = "$MOBILE_CLASSROOM_PATH/assignments"
     const val MOBILE_ASSIGMENT_PATH = "$MOBILE_ASSIGMENTS_PATH/{assignmentId}"
+    const val MOBILE_TEAMS_PATH = "$MOBILE_ASSIGMENT_PATH/teams"
+    const val MOBILE_TEAM_PATH = "$MOBILE_TEAMS_PATH/{teamId}"
+    const val MOBILE_TEAM_CREATE_TEAM_PATH = "$MOBILE_TEAM_PATH/create"
 }

@@ -5,22 +5,30 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.ASSIGNMENT_KEY
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
 import isel.ps.classcode.CLASSROOM_KEY
+import isel.ps.classcode.CREATE_TEAM_KEY
+import isel.ps.classcode.GITHUB_ADD_TEAM
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.Assignment
+import isel.ps.classcode.domain.CreateTeamComposite
 import isel.ps.classcode.domain.Team
+import isel.ps.classcode.domain.Teams
 import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithAssignmentsDto
 import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithAssignmentsDtoType
 import isel.ps.classcode.domain.deserialization.ClassCodeTeacherAssignmentDto
 import isel.ps.classcode.domain.deserialization.ClassCodeTeacherAssignmentDtoType
 import isel.ps.classcode.http.NavigationRepository
+import isel.ps.classcode.http.handleResponseGitHub
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 
 /**
  * Implementation of the [ClassroomServices] interface that will in the real app
@@ -52,7 +60,7 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
         classroomId: Int,
         courseId: Int,
         assignmentId: Int
-    ): Either<HandleClassCodeResponseError, List<Team>> {
+    ): Either<HandleClassCodeResponseError, Teams> {
         val ensureLink = navigationRepo.ensureLink(key = ASSIGNMENT_KEY, fetchLink =  { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
         val uri =  UriTemplate.fromTemplate(ensureLink.href)
             .set("courseId", courseId)
@@ -69,10 +77,84 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
         }
         return when (result) {
             is Either.Right -> {
-                Either.Right(value = result.value.properties.teams.map { Team(classCodeTeamDeserialization = it) })
+                val teamsCreated = result.value.properties.teamsCreated.map { Team(classCodeTeamDeserialization = it) }
+                val createTeamComposite = result.value.properties.createTeamComposites.map { CreateTeamComposite(deserialization = it) }
+                Either.Right(value = Teams(teamsCreated = teamsCreated, createTeamComposite = createTeamComposite))
             }
             is Either.Left -> Either.Left(value = result.value)
         }
     }
 
+    override suspend fun createTeamInGitHub(
+        orgName: String,
+        teamName: String
+    ): Either<HandleGitHubResponseError, Unit> {
+        val accessToken = sessionStore.getGithubToken().first()
+        val request = Request.Builder()
+            .url(GITHUB_ADD_TEAM(orgName))
+            .post(
+                objectMapper.writeValueAsString(
+                    mapOf(
+                        "name" to teamName,
+                    )
+                ).toRequestBody()
+            )
+            .addHeader("Authorization", "Bearer $accessToken")
+            .build()
+        val result = request.send(httpClient) { response ->
+            if (response.isSuccessful) {
+                Either.Right(value = Unit)
+            } else {
+                handleResponseGitHub(response = response, jsonMapper = objectMapper)
+            }
+        }
+        return when (result) {
+            is Either.Right -> {
+                Either.Right(value = Unit)
+            }
+            is Either.Left -> Either.Left(value = result.value)
+        }
+    }
+
+    override suspend fun changeCreateTeamStatus(
+        classroomId: Int,
+        courseId: Int,
+        assignmentId: Int,
+        teamId: Int,
+        state: String
+    ): Either<HandleClassCodeResponseError, Unit> {
+        val ensureLink = navigationRepo.ensureLink(key = CREATE_TEAM_KEY, fetchLink =  { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
+        val mediaType = "application/vnd.siren+json; charset=utf-8".toMediaType()
+        val uri =  UriTemplate.fromTemplate(ensureLink.href)
+            .set("courseId", courseId)
+            .set("classroomId", classroomId)
+            .set("assignmentId", assignmentId)
+            .set("teamId", teamId)
+            .expand()
+        val cookie = sessionStore.getSessionCookie()
+        val request = Request.Builder()
+            .url(CLASSCODE_LINK_BUILDER(uri))
+            .post(
+                objectMapper.writeValueAsString(
+                    mapOf(
+                        "state" to state,
+                    )
+                ).toRequestBody(mediaType)
+            )
+            .addHeader("Cookie", cookie.first())
+            .build()
+        val result = request.send(httpClient) { response ->
+            if(response.isSuccessful) {
+                Either.Right(value = Unit)
+            } else {
+                handleSirenResponseClassCode<Unit>(response = response, type = ClassCodeTeacherAssignmentDtoType, jsonMapper = objectMapper)
+            }
+        }
+        return when (result) {
+            is Either.Right -> {
+                Either.Right(value = Unit)
+            }
+            is Either.Left -> Either.Left(value = result.value)
+        }
+    }
 }

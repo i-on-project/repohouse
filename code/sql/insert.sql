@@ -28,9 +28,9 @@ VALUES (6, 'token2');
 INSERT INTO teacher (id, github_token)
 VALUES (7, 'token3');
 
-INSERT INTO storechallengeinfo (state, challenge, challenge_method)
+INSERT INTO challengeinfo (state, challenge, challenge_method)
 VALUES ('state', 'hash_secret1', 'plain');
-INSERT INTO storechallengeinfo (state,challenge, challenge_method)
+INSERT INTO challengeinfo (state,challenge, challenge_method)
 VALUES ('state1', 'Xlx9xZ43QiJnos_qsvBN5inhmizrkhrkJl80mUepngs', 's256');
 
 INSERT INTO student (id, school_id)
@@ -134,11 +134,11 @@ INSERT INTO feedback (description, label, team_id)
 VALUES ('description2', 'label2', 1);
 
 INSERT INTO repo (id, name, url, is_created, team_id)
-VALUES (1, 'repo1', 'https://repo.github.com/a/123', false, 1);
+VALUES (1, 'repo1', null, false, 1);
 INSERT INTO repo (id, name, url, is_created, team_id)
-VALUES (2, 'repo2', 'https://repo.github.com/ab/123', false, 2);
+VALUES (2, 'repo2', null, false, 2);
 INSERT INTO repo (id, name, url, is_created, team_id)
-VALUES (3, 'repo3', 'https://repo.github.com/abc/123', false, 4);
+VALUES (3, 'repo3', null, false, 4);
 SELECT setval('repo_id_seq', (SELECT MAX(id) from "repo"));
 
 INSERT INTO tags (name, is_delivered, tag_date, delivery_id, repo_id)
@@ -161,15 +161,9 @@ VALUES (3, 1, null, 'Pending');
 INSERT INTO request(id, creator, composite, state)
 VALUES (4, 1, null, 'Pending');
 INSERT INTO request(id, creator, composite, state)
-VALUES (5, 3, null, 'Pending');
-INSERT INTO request(id, creator, composite, state)
 VALUES (6, 3, null, 'Pending');
 INSERT INTO request(id, creator, composite, state)
-VALUES (7, 4, null, 'Pending');
-INSERT INTO request(id, creator, composite, state)
 VALUES (8, 4, null, 'Pending');
-INSERT INTO request(id, creator, composite, state)
-VALUES (9, 5, null, 'Pending');
 INSERT INTO request(id, creator, composite, state)
 VALUES (10, 5, null, 'Pending');
 INSERT INTO request(id, creator, composite, state)
@@ -209,20 +203,7 @@ VALUES (3, 1);
 INSERT INTO archiverepo(id, repo_id)
 VALUES (4, 1);
 
-INSERT INTO createrepo(id, team_id)
-VALUES (5, 1);
-INSERT INTO createrepo(id, team_id)
-VALUES (6, 1);
 
-INSERT INTO createteam(id)
-VALUES (7);
-INSERT INTO createteam(id)
-VALUES (8);
-
-INSERT INTO jointeam(id, team_id, assigment_id)
-VALUES (9, 1,1);
-INSERT INTO jointeam(id, team_id, assigment_id)
-VALUES (10, 1,1);
 
 INSERT INTO leavecourse(id, course_id)
 VALUES (11, 1);
@@ -236,6 +217,21 @@ VALUES (14, 1);
 
 INSERT INTO composite(id)
 VALUES (15);
+
+INSERT INTO request(id, creator, composite, state)
+VALUES (7, 4, 15, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (9, 5, 15, 'Pending');
+INSERT INTO request(id, creator, composite, state)
+VALUES (5, 3, 15, 'Pending');
+INSERT INTO createteam(id, team_id)
+VALUES (7, 1);
+INSERT INTO jointeam(id, team_id, assigment_id)
+VALUES (9, 1,1);
+INSERT INTO createrepo(id, repo_id)
+VALUES (5, 1);
+
+
 INSERT INTO composite(id)
 VALUES (16);
 INSERT INTO composite(id)
@@ -264,7 +260,7 @@ VALUES (29, 4, 20, 'Pending');
 INSERT INTO request(id, creator, composite, state)
 VALUES (30, 4, 20, 'Pending');
 INSERT INTO request(id, creator, composite, state)
-VALUES (31, 4, 15, 'Pending');
+VALUES (31, 4, 16, 'Pending');
 INSERT INTO request(id, creator, composite, state)
 VALUES (32, 4, 16, 'Pending');
 SELECT setval('request_id_seq', (SELECT MAX(id) from "request"));

@@ -5,7 +5,7 @@ package com.isel.leic.ps.ionClassCode.domain.requests
  */
 data class CreateRepo(
     override val id: Int,
-    val teamId: Int,
+    val repoId: Int,
     override val creator: Int,
     override val state: String = "Pending",
     override val composite: Int? = null

@@ -3,15 +3,26 @@ package com.isel.leic.ps.ionClassCode.services
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Delivery
+import com.isel.leic.ps.ionClassCode.domain.Repo
+import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
+import com.isel.leic.ps.ionClassCode.domain.Team
+import com.isel.leic.ps.ionClassCode.domain.TeamNotCreated
+import com.isel.leic.ps.ionClassCode.domain.UserJoinTeam
 import com.isel.leic.ps.ionClassCode.domain.input.AssignmentInput
+import com.isel.leic.ps.ionClassCode.domain.requests.Composite
 import com.isel.leic.ps.ionClassCode.http.model.input.AssignmentInputModel
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.DeliveryRepository
+import com.isel.leic.ps.ionClassCode.repository.RepoRepository
 import com.isel.leic.ps.ionClassCode.repository.TeamRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
+import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
+import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
+import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository
+import com.isel.leic.ps.ionClassCode.repository.request.JoinTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
@@ -69,8 +80,40 @@ class AssignmentServiceTests {
                         on { getDeliveriesByAssignment(assignmentId = 4) } doReturn listOf(Delivery(id = 1, assignmentId = 1, dueDate = Timestamp.from(Instant.now()), tagControl = "tagControl", lastSync = Timestamp.from(Instant.now())))
                     }
 
+                    val mockedRepoRepository = mock<RepoRepository> {
+                        on { getRepoByTeam(teamId = 2) } doReturn Repo(id = 2, name = "repo2", isCreated = false, url = "url")
+                        on { getRepoByTeam(teamId = 3) } doReturn Repo(id = 3, name = "repo3", isCreated = false, url = "url")
+                        on { getRepoByTeam(teamId = 4) } doReturn Repo(id = 4, name = "repo4", isCreated = false, url = "url")
+                    }
+                    val mockedCompositeRepository = mock<CompositeRepository> {
+                        on { getCompositeRequestsThatAreNotAccepted() } doReturn listOf(Composite(id = 1, composite = null, creator = 1))
+                    }
+                    val mockedCreateTeamRepository = mock<CreateTeamRepository> {
+                        on { getCreateTeamRequestByCompositeId(compositeId = 1) } doReturn TeamNotCreated(teamId = 1, name = "team1", id = 1, composite = 1, creator = 1)
+                    }
+                    val mockedJoinTeamRepository = mock<JoinTeamRepository> {
+                        on { getJoinTeamRequestByCompositeId(compositeId = 1) } doReturn UserJoinTeam(name = "user3", id = 3, composite = 3, creator = 3)
+                    }
+                    val mockedCreateRepoRepository = mock<CreateRepoRepository> {
+                        on { getCreateRepoRequestByCompositeId(compositeId = 1) } doReturn RepoNotCreated(repoId = 4, name = "repo4", id = 4, composite = 4, creator = 4)
+                    }
+
                     val mockedTeamsRepository = mock<TeamRepository> {
-                        on { getTeamsFromAssignment(assignmentId = 1) } doReturn listOf()
+                        on { getTeamsFromAssignment(assignmentId = 1) } doReturn listOf(
+                            Team(id = 1, name = "team1", isCreated = false, assignment = 1),
+                        )
+                        on { getTeamsFromAssignment(assignmentId = 2) } doReturn listOf(
+                            Team(id = 2, name = "team2", isCreated = false, assignment = 2),
+                        )
+                        on { getTeamsFromAssignment(assignmentId = 3) } doReturn listOf(
+                            Team(id = 3, name = "team3", isCreated = false, assignment = 3),
+                        )
+                        on { getTeamsFromAssignment(assignmentId = 4) } doReturn listOf(
+                            Team(id = 4, name = "team4", isCreated = false, assignment = 4),
+                        )
+                        on { getTeamsFromAssignment(assignmentId = 5) } doReturn listOf(
+                            Team(id = 5, name = "team5", isCreated = false, assignment = 5),
+                        )
                         on { getTeamsFromStudent(studentId = 1) } doReturn listOf()
                     }
                     on { classroomRepository } doReturn mockedClassroomRepository
@@ -78,6 +121,11 @@ class AssignmentServiceTests {
                     on { usersRepository } doReturn mockedUsersRepository
                     on { deliveryRepository } doReturn mockedDeliveriesRepository
                     on { teamRepository } doReturn mockedTeamsRepository
+                    on { repoRepository } doReturn mockedRepoRepository
+                    on { joinTeamRepository } doReturn mockedJoinTeamRepository
+                    on { createTeamRepository } doReturn mockedCreateTeamRepository
+                    on { createRepoRepository } doReturn mockedCreateRepoRepository
+                    on { compositeRepository } doReturn mockedCompositeRepository
                 }
                 return block(mockedTransaction)
             }
@@ -353,7 +401,7 @@ class AssignmentServiceTests {
     @Test
     fun `getAssigmentInfo should give an AssignmentNotFound because assignment id is not in database`() {
         // given: a valid assignment id
-        val assignmentId = 5
+        val assignmentId = 10
 
         // when: getting an error because the assignment id is not in database
         val assignment = assignmentServices.getTeacherAssignmentInfo(assignmentId = assignmentId)
@@ -400,7 +448,7 @@ class AssignmentServiceTests {
     @Test
     fun `getStudentAssignmentInfo should give an AssignmentNotFound because assignment id is not in database`() {
         // given: a valid assignment id
-        val assignmentId = 5
+        val assignmentId = 10
 
         // when: getting an error because the assignment id is not in database
         val assignment = assignmentServices.getStudentAssignmentInfo(assignmentId = assignmentId, studentId = 3)
@@ -447,7 +495,7 @@ class AssignmentServiceTests {
     @Test
     fun `deleteAssignment should give an AssignmentNotFound because assignment id is not in database`() {
         // given: a valid assignment id
-        val assignmentId = 5
+        val assignmentId = 10
 
         // when: getting an error because the assignment id is not in database
         val assignment = assignmentServices.deleteAssignment(assignmentId = assignmentId)
@@ -552,9 +600,9 @@ class AssignmentServiceTests {
     }
 
     @Test
-    fun `getAssignmentStudentTeams should give an AssignmentNotFound because assignmed id is not in database`() {
+    fun `getAssignmentStudentTeams should give an AssignmentNotFound because assignment id is not in database`() {
         // given: a valid assignment id
-        val assignmentId = 5
+        val assignmentId = 10
 
         // when: getting a list of teams
         val assignment = assignmentServices.getAssignmentStudentTeams(assignmentId = assignmentId, studentId = 3)
@@ -575,6 +623,53 @@ class AssignmentServiceTests {
             assert(assignment.value.isEmpty())
         } else {
             fail("Should not be Either.Left")
+        }
+    }
+
+    // TEST: getTeacherAssignmentInfoTeams
+
+    @Test
+    fun `getTeacherAssignmentInfoTeams should give an AssignmentNotFound because assignmed id is invalid`() {
+        // given: a valid assignment id
+        val assignmentId = -1
+
+        // when: getting an error
+        val assignment = assignmentServices.getTeacherAssignmentInfoTeams(assignmentId = assignmentId)
+
+        if (assignment is Result.Problem) {
+            assert(assignment.value is AssignmentServicesError.InvalidInput)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `getTeacherAssignmentInfoTeams should give an AssignmentNotFound because assignmed id is not in database`() {
+        // given: a valid assignment id
+        val assignmentId = 10
+
+        // when: getting an error
+        val assignment = assignmentServices.getTeacherAssignmentInfoTeams(assignmentId = assignmentId)
+
+        if (assignment is Result.Problem) {
+            assert(assignment.value is AssignmentServicesError.AssignmentNotFound)
+        } else {
+            fail("Should not be Either.Right")
+        }
+    }
+
+    @Test
+    fun `can get the list of teams should be as success`() {
+        // given: a valid assignment id
+        val assignmentId = 4
+
+        // when: getting an error
+        val assignment = assignmentServices.getTeacherAssignmentInfoTeams(assignmentId = assignmentId)
+
+        if (assignment is Result.Success) {
+            assert(assignment.value.createTeamComposites != null)
+        } else {
+            fail("Should not be Either.Right")
         }
     }
 }

@@ -19,10 +19,10 @@ import com.isel.leic.ps.ionClassCode.http.model.output.ClientToken
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubUserEmail
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubUserInfo
+import java.sql.Timestamp
 import okhttp3.Request
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.stereotype.Component
-import java.sql.Timestamp
 
 /**
  * Service to get the repositories from GitHub
