@@ -4,7 +4,8 @@ USER postgres
 WORKDIR /app
 
 COPY ./code/sql/createTables.sql /docker-entrypoint-initdb.d/1_create.sql
-COPY ./code/sql/insert.sql /docker-entrypoint-initdb.d/2_insert-test-data.sql
+COPY ./code/sql/triggers.sql /docker-entrypoint-initdb.d/2_triggers.sql
+COPY ./code/sql/insert.sql /docker-entrypoint-initdb.d/3_insert-test-data.sql
 
 COPY --chown=postgres:postgres ./code/jvm/docker/scripts/wait-for-postgres.sh ./bin/wait-for-postgres.sh
 RUN chmod +x ./bin/wait-for-postgres.sh
