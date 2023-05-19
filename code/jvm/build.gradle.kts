@@ -103,6 +103,5 @@ task<Exec>("composeDown") {
 tasks.named("check") {
     dependsOn("ktlintCheck")
     dependsOn("dbDockerWait")
-    dependsOn("test")
     finalizedBy("dbDockerDown")
 }
