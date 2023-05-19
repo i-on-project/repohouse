@@ -59,7 +59,7 @@ const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
 
 const val TEST = true
-val URI = if (TEST) "http://localhost:3000" else System.getenv("NGROK_URI")?: "http://localhost:3000"
+val URI = if (TEST) "http://localhost:3000" else System.getenv("NGROK_URI") ?: "http://localhost:3000"
 
 /**
  * This controller is responsible for the authentication of the users.

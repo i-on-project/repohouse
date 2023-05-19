@@ -24,6 +24,7 @@ test('Login Created Teacher', async ({ page }) => {
         await page.waitForTimeout(500);
     }
     await expect(page.url()).toBe('http://localhost:3000/menu');
+    console.log(await page.context().cookies());
 });
 
 test('Login Created Student', async ({ page }) => {
