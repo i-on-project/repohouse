@@ -1,8 +1,8 @@
 package com.isel.leic.ps.ionClassCode.repository
 
-import com.isel.leic.ps.ionClassCode.domain.input.ApplyInput
 import com.isel.leic.ps.ionClassCode.domain.Apply
 import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
+import com.isel.leic.ps.ionClassCode.domain.input.ApplyInput
 
 /**
  * Repository functions for the Apply Request Model

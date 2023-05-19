@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.http
 
-import com.isel.leic.ps.ionClassCode.http.controllers.web.URI
 import com.isel.leic.ps.ionClassCode.http.controllers.web.TEST
+import com.isel.leic.ps.ionClassCode.http.controllers.web.URI
 
 const val GITHUB_BASE_URL = "https://github.com"
 const val GITHUB_API_BASE_URL = "https://api.github.com"

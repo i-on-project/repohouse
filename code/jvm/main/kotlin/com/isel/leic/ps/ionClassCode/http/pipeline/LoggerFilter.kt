@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.springframework.stereotype.Component
-import org.springframework.web.util.WebUtils
 
 /**
  * Filter only use to log incoming requests and responses to those requests

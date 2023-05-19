@@ -1,8 +1,8 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi
 
-import com.isel.leic.ps.ionClassCode.domain.input.ApplyInput
 import com.isel.leic.ps.ionClassCode.domain.Apply
 import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
+import com.isel.leic.ps.ionClassCode.domain.input.ApplyInput
 import com.isel.leic.ps.ionClassCode.repository.ApplyRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo

@@ -38,7 +38,6 @@ class EmailService {
     private val endpoint = "mail/send"
     private val baseUri = "https://api.sendgrid.com"
 
-
     @PostConstruct
     fun init() {
         sendGrid = SendGrid(System.getenv("SENDGRID_CLASSCODE_API_KEY"))

@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.utils.cypher
 
 import java.security.MessageDigest
-import java.util.*
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec

@@ -8,7 +8,6 @@ import org.jdbi.v3.core.kotlin.mapTo
 import java.sql.Timestamp
 import java.time.Instant
 
-
 /**
  * Implementation of the Outbox methods
  */
@@ -65,7 +64,7 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
     /**
      * Method to update a Outbox state
      */
-    override fun updateOutboxStateRequest(userId: Int, state:String) {
+    override fun updateOutboxStateRequest(userId: Int, state: String) {
         handle.createUpdate(
             """
             UPDATE Outbox
@@ -73,7 +72,7 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             WHERE user_id = :id
             """,
         )
-            .bind("state",state)
+            .bind("state", state)
             .bind("id", userId)
             .execute()
     }
@@ -89,7 +88,7 @@ class JdbiOutboxRepository(private val handle: Handle) : OutboxRepository {
             WHERE user_id = :id
             """,
         )
-            .bind("sent_at",Timestamp.from(Instant.now()))
+            .bind("sent_at", Timestamp.from(Instant.now()))
             .bind("id", userId)
             .execute()
     }

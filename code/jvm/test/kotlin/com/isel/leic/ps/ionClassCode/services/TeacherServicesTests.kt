@@ -54,14 +54,18 @@ class TeacherServicesTests {
                         on { checkIfGithubIdExists(githubId = 4545) } doReturn true
                         on { checkIfGithubTokenExists(githubToken = AESEncrypt.encrypt("token1")) } doReturn true
                         on { checkIfTokenExists(token = GenericTokenHash("SHA256").getTokenHash("token1")) } doReturn true
-                        on { createPendingTeacher(teacher = TeacherInput(
-                            name = "name",
-                            email = "test@alunos.isel.pt",
-                            githubUsername = "username",
-                            githubToken = AESEncrypt.encrypt("token123"),
-                            githubId = 12346,
-                            token = GenericTokenHash("SHA256").getTokenHash("token123"),
-                        )) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false, githubToken = "token1")
+                        on {
+                            createPendingTeacher(
+                                teacher = TeacherInput(
+                                    name = "name",
+                                    email = "test@alunos.isel.pt",
+                                    githubUsername = "username",
+                                    githubToken = AESEncrypt.encrypt("token123"),
+                                    githubId = 12346,
+                                    token = GenericTokenHash("SHA256").getTokenHash("token123"),
+                                )
+                            )
+                        } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123, token = "token", isCreated = false, githubToken = "token1")
                         on { getPendingTeacherByGithubId(githubId = 12346) } doReturn PendingTeacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", isCreated = false, githubToken = "token1")
                         on { createTeacher(teacher = TeacherInput(name = "test14", email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", githubToken = "token1")) } doReturn Teacher(name = "test14", id = 1, email = "test@alunos.isel.pt", githubUsername = "test123", githubId = 123456, token = "token", isCreated = false)
                     }
@@ -175,9 +179,9 @@ class TeacherServicesTests {
 
         // when: getting the github token of a teacher
         try {
-           teacherServices.getTeacherGithubToken(teacherId = teacherId)
+            teacherServices.getTeacherGithubToken(teacherId = teacherId)
         } catch (e: IllegalBlockSizeException) {
-           assert(true)
+            assert(true)
         }
     }
 

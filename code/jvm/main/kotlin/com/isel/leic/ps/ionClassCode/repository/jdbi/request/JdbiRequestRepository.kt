@@ -16,7 +16,7 @@ class JdbiRequestRepository(
     /**
      * Method to create a Request
      */
-    override fun createRequest(request: RequestInput, creator:Int): Request {
+    override fun createRequest(request: RequestInput, creator: Int): Request {
         val id = handle.createUpdate(
             """
             INSERT INTO request (creator, composite, state)

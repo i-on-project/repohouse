@@ -28,7 +28,7 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Repo(id, repo.url ?: "", repo.name , false)
+        return Repo(id, repo.url ?: "", repo.name, false)
     }
 
     /**

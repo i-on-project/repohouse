@@ -3,7 +3,6 @@ package com.isel.leic.ps.ionClassCode.repository
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.input.AssignmentInput
 
-
 /**
  * Repository functions for Assigment Repository
  */
