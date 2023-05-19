@@ -2,3 +2,5 @@ node_modules/
 /test-results/
 /playwright-report/
 /playwright/.cache/
+/tests/student_cookies.json
+/tests/teacher_cookies.json

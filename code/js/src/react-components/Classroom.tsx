@@ -94,7 +94,7 @@ export function ShowClassroomFetch({
                         <Box sx={alignHorizontalyBoxStyle}>
                             { !content.properties.isArchived ? (
                                 <>
-                                    <Button variant="outlined" onClick={handleCreateAssigment}>Create Assigment</Button>
+                                    <Button variant="outlined" onClick={handleCreateAssigment}>Create Assignment</Button>
                                     <Button variant="outlined" onClick={handleArchiveClassroom}>Archive Classroom</Button>
                                 </>
                             ):null}

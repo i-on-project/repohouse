@@ -129,6 +129,19 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .list()
     }
 
+    override fun getTeamsDeliveredByDelivery(deliveryId: Int): List<Team> {
+        return handle.createQuery(
+            """
+                SELECT distinct (team.id), team.name, team.is_created, team.assignment FROM team
+                JOIN tags t on :deliveryId = t.delivery_id
+                WHERE t.is_delivered = true
+                """,
+        )
+            .bind("deliveryId", deliveryId)
+            .mapTo<Team>()
+            .list()
+    }
+
     /**
      * Method to update a Delivery sync time
      */

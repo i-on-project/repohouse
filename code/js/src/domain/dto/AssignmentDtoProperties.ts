@@ -62,15 +62,15 @@ export class AssignmentBody{
         classroomId: number,
         maxNumberElems: number,
         maxNumberGroups: number,
-        description: string,
         title: string,
+        description: string,
         dueDate: Date,
     ) {
         this.classroomId = classroomId
         this.maxNumberElems = maxNumberElems
         this.maxNumberGroups = maxNumberGroups
-        this.description = description
         this.title = title
+        this.description = description
         this.dueDate = dueDate
     }
 

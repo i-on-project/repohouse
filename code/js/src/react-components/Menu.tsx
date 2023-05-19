@@ -120,7 +120,7 @@ export function ShowMenuFetch({
                               justifyContent="center"
                         >
                             {content.properties.courses.map( course => (
-                                <Grid item xs={5} md={2.75}>
+                                <Grid item xs={5} md={2.75} key={course.id}>
                                     <CourseDetailsBox course={course} />
                                 </Grid>
                             ))}

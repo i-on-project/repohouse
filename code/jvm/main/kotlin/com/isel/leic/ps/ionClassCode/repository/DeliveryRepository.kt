@@ -16,5 +16,6 @@ interface DeliveryRepository {
     fun updateDueDateFromDelivery(deliveryId: Int, dueDate: Timestamp) //
     fun updateTagControlFromDelivery(deliveryId: Int, tagControl: String)
     fun getTeamsByDelivery(deliveryId: Int): List<Team>
+    fun getTeamsDeliveredByDelivery(deliveryId: Int): List<Team>
     fun updateSyncTimeFromDelivery(deliveryId: Int)
 }

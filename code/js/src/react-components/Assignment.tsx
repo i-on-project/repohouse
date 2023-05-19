@@ -270,7 +270,7 @@ function ShowTeacherAssignmentFetch({
                     <Box sx={alignHorizontalyBoxStyle}>
                         <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/create"}>Create Delivery</Link>
                         {content.properties.deliveries.length == 0 ? (
-                            <Button onClick={handleDeleteAssigment}>Delete Assigment</Button>
+                            <Button onClick={handleDeleteAssigment}>Delete Assignment</Button>
                         ) : null}
                     </Box>
                     {content.properties.deliveries.map((delivery,index) => (

@@ -28,9 +28,6 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  globalTeardown: require.resolve('./tests/globalTeardown.ts'),
-
-
   /* Configure projects for major browsers */
   projects: [
     {

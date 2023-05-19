@@ -78,9 +78,9 @@ class DeliveryServices(
     fun getDeliveryInfo(deliveryId: Int): DeliveryResponse {
         return transactionManager.run {
             val delivery = it.deliveryRepository.getDeliveryById(deliveryId) ?: return@run Result.Problem(DeliveryServicesError.DeliveryNotFound)
-            val teamsDelivered = it.deliveryRepository.getTeamsByDelivery(deliveryId)
-            val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
             val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId)
+            val teamsDelivered = it.deliveryRepository.getTeamsDeliveredByDelivery(deliveryId)
+            val teamsDeliveredIds = teamsDelivered.map { team -> team.id }
             Result.Success(
                 DeliveryModel(
                     delivery = delivery,

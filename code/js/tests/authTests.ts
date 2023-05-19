@@ -1,9 +1,8 @@
 // @ts-check
-import { test, expect } from '@playwright/test';
-import { Path } from 'pathlib';
+import { test, expect, chromium } from '@playwright/test';
+import * as fs from 'fs';
 
 test('Login Created Teacher', async ({ page }) => {
-    test.setTimeout(120000)
     await page.goto('http://localhost:3000/');
     await page.getByRole('button', { name: 'Open settings' }).click();
     const page1Promise = page.waitForEvent('popup');
@@ -26,11 +25,12 @@ test('Login Created Teacher', async ({ page }) => {
         await page.waitForTimeout(500);
     }
     await expect(page.url()).toBe('http://localhost:3000/menu');
-    Path("cookies.json").write_text(await page.context().cookies())
+    const cookieJson = JSON.stringify(await page.context().cookies())
+    fs.writeFileSync('./tests/teacher_cookies.json', cookieJson)
+
 });
 
 test('Login Created Student', async ({ page }) => {
-    test.setTimeout(120000)
     await page.goto('http://localhost:3000/');
     await page.getByRole('button', { name: 'Open settings' }).click();
     const page1Promise = page.waitForEvent('popup');
@@ -53,14 +53,35 @@ test('Login Created Student', async ({ page }) => {
         await page.waitForTimeout(500);
     }
     await expect(page.url()).toBe('http://localhost:3000/menu');
+    const cookieJson = JSON.stringify(await page.context().cookies())
+    fs.writeFileSync('./tests/student_cookies.json', cookieJson)
 });
 
-/**
-test('Pending Teacher Page', async ({ page }) => {
-    console.log('To be implemented');
+
+test('Check if teacher cookies exist', async ({ page }) => {
+    const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
+    if (cookies == null) {
+        console.log('No cookies found - run the teacher tests first')
+        test.fail()
+    }
+    const deserializedCookies = JSON.parse(cookies)
+    await page.context().addCookies(deserializedCookies);
+    await page.goto('http://localhost:3000/');
+    await page.waitForLoadState('load');
+    await page.waitForTimeout(500);
+    await expect(page.url()).toBe('http://localhost:3000/menu');
 });
 
-test('Pending Student Page', async ({ page }) => {
-    console.log('To be implemented');
+test('Check if student cookies exist', async ({ page }) => {
+    const cookies = fs.readFileSync('./tests/student_cookies.json', 'utf8')
+    if (cookies == null) {
+        console.log('No cookies found - run the login tests first')
+        test.fail()
+    }
+    const deserializedCookies = JSON.parse(cookies)
+    await page.context().addCookies(deserializedCookies);
+    await page.goto('http://localhost:3000/');
+    await page.waitForLoadState('load');
+    await page.waitForTimeout(500);
+    await expect(page.url()).toBe('http://localhost:3000/menu');
 });
-**/
