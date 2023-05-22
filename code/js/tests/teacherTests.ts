@@ -5,7 +5,7 @@ import * as fs from 'fs';
 test('In menu page', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -20,7 +20,7 @@ test('Pending teachers page', async ({ page }) => {
     test.setTimeout(60000)
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -38,7 +38,7 @@ test('Pending teachers page', async ({ page }) => {
 test('Course page', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -53,7 +53,7 @@ test('Course page', async ({ page }) => {
 test('Create Course', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -70,7 +70,7 @@ test('Create Course', async ({ page }) => {
 test('Classroom page', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -87,7 +87,7 @@ test('Classroom page', async ({ page }) => {
 test('Create Classroom', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -107,7 +107,7 @@ test('Create Classroom', async ({ page }) => {
 test('Archive Classroom', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -124,7 +124,7 @@ test('Archive Classroom', async ({ page }) => {
 test('Assignment page', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -142,7 +142,7 @@ test('Assignment page', async ({ page }) => {
 test('Create Assignment', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -163,7 +163,7 @@ test('Create Assignment', async ({ page }) => {
 test('Archive Assignment', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -183,7 +183,7 @@ test('Archive Assignment', async ({ page }) => {
 test('Team page', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -201,7 +201,7 @@ test('Team page', async ({ page }) => {
 test('Post feedback', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -227,7 +227,7 @@ test('Post feedback', async ({ page }) => {
 test('Delivery page', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
@@ -250,7 +250,7 @@ test('Delivery page', async ({ page }) => {
 test('Create Delivery', async ({ page }) => {
     const cookies = fs.readFileSync('./tests/teacher_cookies.json', 'utf8')
     if (cookies == null) {
-        console.log('No cookies found - run the teacher tests first')
+        console.log('No cookies found - run the auth tests first')
         test.fail()
     }
     const deserializedCookies = JSON.parse(cookies)
