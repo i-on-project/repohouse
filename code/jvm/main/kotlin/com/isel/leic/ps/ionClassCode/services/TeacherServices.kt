@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component
 /**
  * Alias for the response of the services
  */
-typealias TeacherCreationResult = Result<TeacherServicesError, Teacher>
 typealias PendingTeacherCreationResult = Result<TeacherServicesError, PendingTeacher>
 typealias TeacherPendingResponse = Result<TeacherServicesError, List<TeacherPending>>
 typealias TeachersApproveResponse = Result<TeacherServicesError, List<TeacherPending>>
@@ -54,20 +53,12 @@ class TeacherServices(
     /**
      * Method to create a request to create a user as a teacher
      */
-    fun createTeacher(githubId: Long): TeacherCreationResult {
+    fun confirmPendingTeacher(githubId: Long): PendingTeacherCreationResult {
         return transactionManager.run {
-            val teacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: return@run Result.Problem(TeacherServicesError.TeacherNotFound)
-            val teacherRes = it.usersRepository.createTeacher(
-                TeacherInput(
-                    name = teacher.name,
-                    email = teacher.email,
-                    githubUsername = teacher.githubUsername,
-                    githubId = teacher.githubId,
-                    token = teacher.token,
-                    githubToken = teacher.githubToken,
-                ),
-            )
-            return@run if (teacherRes == null) Result.Problem(TeacherServicesError.InternalError) else Result.Success(teacherRes)
+            val pendingTeacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: return@run Result.Problem(TeacherServicesError.TeacherNotFound)
+            val updatedPendingTeacher = it.usersRepository.acceptPendingTeacher(pendingTeacher)
+            it.applyRequestRepository.createApplyRequest(ApplyInput(updatedPendingTeacher.id))
+            return@run Result.Success(updatedPendingTeacher)
         }
     }
 
@@ -94,7 +85,6 @@ class TeacherServices(
                     githubToken = githubToken,
                 ),
             )
-            it.applyRequestRepository.createApplyRequest(ApplyInput(teacherRes.id))
             return@run Result.Success(teacherRes)
         }
     }

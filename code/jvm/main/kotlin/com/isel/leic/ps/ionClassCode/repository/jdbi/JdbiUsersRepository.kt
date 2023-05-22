@@ -246,6 +246,20 @@ class JdbiUsersRepository(
         )
     }
 
+    override fun acceptPendingTeacher(pendingTeacher: PendingTeacher):PendingTeacher {
+        handle.createUpdate(
+            """
+            UPDATE pendingteacher
+            SET is_created = true
+            WHERE id = :id
+            """,
+        )
+            .bind("id", pendingTeacher.id)
+            .execute()
+
+        return pendingTeacher.copy(isCreated = true)
+    }
+
     /**
      * Method to get all students
      */
