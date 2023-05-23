@@ -46,6 +46,9 @@ class AssignmentServices(
     val transactionManager: TransactionManager,
 ) {
 
+    /**
+     * Method that creates an assignment
+     */
     fun createAssignment(assignmentInfo: AssignmentInputModel, userId: Int): AssignmentCreatedResponse {
         if (assignmentInfo.isNotValid()) return Result.Problem(AssignmentServicesError.InvalidInput)
         return transactionManager.run {

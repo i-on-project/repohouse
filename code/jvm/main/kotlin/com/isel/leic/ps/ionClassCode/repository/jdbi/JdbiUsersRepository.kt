@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi
 
+import com.isel.leic.ps.ionClassCode.domain.ChallengeInfo
 import com.isel.leic.ps.ionClassCode.domain.PendingStudent
 import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
 import com.isel.leic.ps.ionClassCode.domain.Student
@@ -94,10 +95,10 @@ class JdbiUsersRepository(
             .mapTo<Int>()
             .firstOrNull() != null
     }
-    data class ChallengeInfo(
-        val challenge: String,
-        val challengeMethod: String,
-    )
+
+    /**
+     * Method to verify a secret
+     */
     override fun verifySecret(secret: String, state: String): Boolean {
         val query = handle.createQuery(
             """
@@ -246,6 +247,9 @@ class JdbiUsersRepository(
         )
     }
 
+    /**
+     * Method to accept a pending teacher request
+     */
     override fun acceptPendingTeacher(pendingTeacher: PendingTeacher):PendingTeacher {
         handle.createUpdate(
             """
@@ -327,6 +331,9 @@ class JdbiUsersRepository(
         return helper(handle = handle, id = id)
     }
 
+    /**
+     * Method to get a pending teacher by is GitHub id
+     */
     override fun getPendingTeacherByGithubId(githubId: Long): PendingTeacher? {
         return handle.createQuery(
             """
@@ -340,6 +347,9 @@ class JdbiUsersRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to get a pending student by is GitHub id
+     */
     override fun getPendingStudentByGithubId(githubId: Long): PendingStudent? {
         return handle.createQuery(
             """
@@ -535,6 +545,9 @@ class JdbiUsersRepository(
         ).execute()
     }
 
+    /**
+     * Method to get a teacher GitHub token
+     */
     override fun updateTeacherGithubToken(id: Int, token: String) {
         handle.createUpdate(
             """

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component
 class AuthorizationHeaderProcessor(
     private val userService: UserServices
 ) {
+    /**
+     * Processes the request header and returns the user if the token is valid.
+     */
     fun process(token: String?): User? {
         if (token == null) return null
         return when (val authorization = userService.checkAuthentication(token)) {

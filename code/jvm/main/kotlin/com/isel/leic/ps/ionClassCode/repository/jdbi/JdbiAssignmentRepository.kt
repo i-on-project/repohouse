@@ -12,6 +12,9 @@ import java.sql.Timestamp
  */
 class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepository {
 
+    /**
+     * Method to create an Assigment
+     */
     override fun createAssignment(assignment: AssignmentInput): Assignment {
         val id = handle.createUpdate(
             """

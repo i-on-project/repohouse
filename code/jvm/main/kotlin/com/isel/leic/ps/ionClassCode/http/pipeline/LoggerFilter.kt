@@ -16,6 +16,12 @@ class LoggerFilter(
     private val logger: Logger,
 ) : HttpFilter() {
 
+    /**
+     * Logs the request and response.
+     * @param request Request
+     * @param response Response
+     * @param chain Filter Chain
+     */
     override fun doFilter(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val reqModel = RequestModel(method = request.method, uri = request.requestURI)
         logRequest(request = reqModel, logger = logger)

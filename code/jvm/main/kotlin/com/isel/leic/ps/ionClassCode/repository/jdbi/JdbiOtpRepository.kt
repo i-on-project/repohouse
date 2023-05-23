@@ -14,6 +14,9 @@ const val INTERVAL = "10 MINUTES"
  */
 class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
 
+    /**
+     * Method to create an Otp Request
+     */
     override fun createOtpRequest(otp: OtpInput): Otp {
         handle.createUpdate(
             """
@@ -31,6 +34,9 @@ class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
         return Otp(otp.userId, otp.otp, toTimestamp(), 0)
     }
 
+    /**
+     * Method to get an Otp Request by user id
+     */
     override fun getOtpRequest(userId: Int): Otp? {
         return handle.createQuery(
             """
@@ -43,6 +49,9 @@ class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
             .firstOrNull()
     }
 
+    /**
+     * Method to add a try to an Otp Request
+     */
     override fun addTryToOtpRequest(userId: Int, tries: Int): Boolean {
         return handle.createUpdate(
             """
@@ -56,6 +65,9 @@ class JdbiOtpRepository(private val handle: Handle) : OtpRepository {
             .execute() > 0
     }
 
+    /**
+     * Method to delete an Otp Request
+     */
     override fun deleteOtpRequest(userId: Int) {
         handle.createUpdate(
             """

@@ -4,7 +4,7 @@ package com.isel.leic.ps.ionClassCode.domain.input
  * Student Input Interface
  */
 data class StudentInput(
-    val name: String, //
+    val name: String,
     val email: String,
     val githubUsername: String,
     val schoolId: Int? = null,

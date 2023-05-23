@@ -130,6 +130,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to update the GitHub token of a teacher
+     */
     fun updateTeacherGithubToken(teacherId: Int, token: String): UpdateTeacherGithubTokenResult {
         val githubTokenHash = AESEncrypt.encrypt(token)
         return transactionManager.run {
@@ -155,6 +158,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to get all the organizations of a teacher
+     */
     suspend fun getTeacherOrgs(teacherId: Int, githubToken: String): TeacherOrgsResponse {
         val orgs = githubServices.fetchTeacherOrgs(githubToken).map { GitHubOrgsModel(it.login, it.url.replace("api.github.com/orgs", "github.com"), it.avatar_url, it.id) }
         return transactionManager.run {
@@ -169,6 +175,9 @@ class TeacherServices(
         }
     }
 
+    /**
+     * Method to get all teachers that need approval
+     */
     private fun getTeachersNeedingApproval(transaction: Transaction): List<TeacherPending> {
         val requestsPending = transaction.applyRequestRepository.getApplyRequests().filter { request ->
             request.state == "Pending"

@@ -88,6 +88,9 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .list()
     }
 
+    /**
+     * Method to add a Student to a Team
+     */
     override fun addStudentToTeam(teamId: Int, studentId: Int) {
         handle.createUpdate(
             """

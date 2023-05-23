@@ -34,6 +34,9 @@ class OkHttp(
     private val jsonMapper: ObjectMapper,
 ) : Caller {
 
+    /**
+     * Sends a request and returns the response body as a string.
+     */
     private suspend fun send(request: Request): String? {
         val response = suspendCoroutine { continuation ->
             okHttpClient.newCall(request = request).enqueue(object : Callback {
@@ -50,6 +53,9 @@ class OkHttp(
         return response.body?.string()
     }
 
+    /**
+     * Makes a call to the given request and maps the response to the given class.
+     */
     override suspend fun <T : Any> makeCallToObject(request: Request, kClass: Class<T>): T {
         val body = send(request)
         try {
@@ -59,6 +65,9 @@ class OkHttp(
         }
     }
 
+    /**
+     * Makes a call to the given request and maps the response to a list of the given class.
+     */
     override suspend fun <T : Any> makeCallToList(request: Request, kClass: Class<T>): List<T> {
         val body = send(request)
         val listType = jsonMapper.typeFactory.constructCollectionType(ArrayList::class.java, kClass)

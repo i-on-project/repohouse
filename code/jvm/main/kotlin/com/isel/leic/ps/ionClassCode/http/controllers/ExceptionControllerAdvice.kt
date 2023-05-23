@@ -14,15 +14,27 @@ import org.springframework.web.server.UnsupportedMediaTypeStatusException
 @ControllerAdvice
 class ExceptionControllerAdvice {
 
+    /**
+     * Handles the [AuthenticationFailed] exception.
+     */
     @ExceptionHandler
     fun handleUnauthorized(e: AuthenticationFailed) = Problem.unauthenticated
 
+    /**
+     * Handles the [HttpRequestMethodNotSupportedException] exception.
+     */
     @ExceptionHandler
     fun handleMethodNotAllowed(e: HttpRequestMethodNotSupportedException) = Problem.methodNotAllowed
 
+    /**
+     * Handles the [HttpMessageNotReadableException] exception.
+     */
     @ExceptionHandler
     fun handleBodyParseFail(e: HttpMessageNotReadableException) = Problem.invalidInput
 
+    /**
+     * Handles the [UnsupportedMediaTypeStatusException] exception.
+     */
     @ExceptionHandler
     fun handleUnsupportedMediaType(e: UnsupportedMediaTypeStatusException) = Problem.unsupportedMediaType
 }
