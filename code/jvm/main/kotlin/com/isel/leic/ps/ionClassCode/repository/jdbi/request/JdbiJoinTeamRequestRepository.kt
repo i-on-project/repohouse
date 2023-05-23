@@ -89,6 +89,9 @@ class JdbiJoinTeamRequestRepository(
             .list()
     }
 
+    /**
+     * Method to get a Join Team Request by is composite id
+     */
     override fun getJoinTeamRequestByCompositeId(compositeId: Int): UserJoinTeam? {
         return handle.createQuery(
             """
@@ -103,6 +106,9 @@ class JdbiJoinTeamRequestRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to update a Join Team Request state
+     */
     override fun updateJoinTeamState(requestId: Int, state: String) {
         handle.createUpdate(
             """

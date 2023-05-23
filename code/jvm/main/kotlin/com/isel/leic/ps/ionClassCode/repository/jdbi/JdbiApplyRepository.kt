@@ -75,6 +75,9 @@ class JdbiApplyRepository(
             .list()
     }
 
+    /**
+     * Method to get a Pending Teacher by a Apply Request
+     */
     override fun getPendingTeacherByApply(applyId: Int): PendingTeacher? {
         return handle.createQuery(
             """
@@ -88,6 +91,9 @@ class JdbiApplyRepository(
             .firstOrNull()
     }
 
+    /**
+     * Method to change an Apply Request state
+     */
     override fun changeApplyRequestState(id: Int, state: String): Boolean {
         return handle.createUpdate(
             """

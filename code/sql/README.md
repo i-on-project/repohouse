@@ -54,8 +54,7 @@ The database triggers are defined in the [triggers](triggers.sql) script.
 
 The script when executed creates all the necessary triggers to the database, namely:
 
-- CreateTeacher — Creates a teacher after a pending teacher is accepted
-- UpdateApplyRequests — Updates the pending teacher requests depending on the action taken on the Apply Request (accept or reject) 
+- UpdateApplyRequests — Creates a teacher after an 'Apply' request is accepted
 - DeleteTeachers — Deletes all information related to a teacher when the teacher is deleted
 - SyncClassroom — Syncs the classroom information after a delivery in it is updated
 

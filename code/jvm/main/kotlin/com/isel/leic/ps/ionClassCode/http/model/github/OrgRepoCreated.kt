@@ -128,7 +128,7 @@ data class SecretScanning(
 )
 
 /**
- * Represents a Advanced Security GitHub model.
+ * Represents an Advanced Security GitHub model.
  */
 data class AdvancedSecurity(
     val enabled: String

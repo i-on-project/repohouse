@@ -15,6 +15,10 @@ class AESDecrypt {
 
         private val encryptionKey: String = System.getenv("CLASSCODE_ENCRYPTION_KEY")
         private val cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING")
+
+        /**
+         * Decrypts a string.
+         */
         fun decrypt(encryptedText: String): String {
             val key = SecretKeySpec(encryptionKey.toByteArray(), "AES")
             val iv = ByteArray(cipher.blockSize)
@@ -24,6 +28,9 @@ class AESDecrypt {
             return String(decryptedBytes)
         }
 
+        /**
+         * Decrypts an access token using a code.
+         */
         fun decryptAccessToken(accessToken: String, code: String): String {
             val digest = MessageDigest.getInstance("SHA-256")
             val keyBytes = digest.digest(code.toByteArray())

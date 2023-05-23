@@ -26,12 +26,19 @@ class Problem {
         private const val BASE_URL = "https://github.com/i-on-project/repohouse/tree/main/docs/problems"
         private const val MEDIA_TYPE = "application/problem+json"
 
+
+        /**
+         * Creates a [ResponseEntity] with the corresponding [HttpStatus] and [ErrorMessageModel].
+         */
         private fun response(status: HttpStatus, problem: ErrorMessageModel): ResponseEntity<ErrorMessageModel> =
             ResponseEntity
                 .status(status)
                 .header("Content-Type", MEDIA_TYPE)
                 .body(problem)
 
+        /**
+         * Value that represents an internal server error.
+         */
         val internalError = response(
             HttpStatus.INTERNAL_SERVER_ERROR,
             ErrorMessageModel(
@@ -41,6 +48,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a resource already exists.
+         */
         val alreadyExists = response(
             HttpStatus.CONFLICT,
             ErrorMessageModel(
@@ -50,6 +60,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents an operation not allowed.
+         */
         val methodNotAllowed = response(
             HttpStatus.METHOD_NOT_ALLOWED,
             ErrorMessageModel(
@@ -59,6 +72,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a media type not supported.
+         */
         val unsupportedMediaType = response(
             HttpStatus.METHOD_NOT_ALLOWED,
             ErrorMessageModel(
@@ -68,6 +84,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a state mismatch.
+         */
         val stateMismatch = response(
             HttpStatus.UNAUTHORIZED,
             ErrorMessageModel(
@@ -77,6 +96,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents an invalid input.
+         */
         val invalidInput = response(
             HttpStatus.BAD_REQUEST,
             ErrorMessageModel(
@@ -86,6 +108,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents an invalid operation.
+         */
         val invalidOperation = response(
             HttpStatus.BAD_REQUEST,
             ErrorMessageModel(
@@ -95,6 +120,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a resource not found.
+         */
         val notFound = response(
             HttpStatus.NOT_FOUND,
             ErrorMessageModel(
@@ -104,6 +132,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a conflict.
+         */
         val conflict = response(
             HttpStatus.CONFLICT,
             ErrorMessageModel(
@@ -113,6 +144,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents an unauthorized action.
+         */
         val unauthorized = response(
             HttpStatus.UNAUTHORIZED,
             ErrorMessageModel(
@@ -122,6 +156,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a user not found.
+         */
         val userNotFound = response(
             HttpStatus.NOT_FOUND,
             ErrorMessageModel(
@@ -131,6 +168,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a course not found.
+         */
         val courseNotFound = response(
             HttpStatus.NOT_FOUND,
             ErrorMessageModel(
@@ -140,6 +180,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a user not in course.
+         */
         val userNotInCourse = response(
             HttpStatus.CONFLICT,
             ErrorMessageModel(
@@ -149,6 +192,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a user not being a student.
+         */
         val notStudent = response(
             HttpStatus.UNAUTHORIZED,
             ErrorMessageModel(
@@ -158,6 +204,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a user not being a teacher.
+         */
         val notTeacher = response(
             HttpStatus.UNAUTHORIZED,
             ErrorMessageModel(
@@ -167,6 +216,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a user not being authenticated.
+         */
         val unauthenticated = response(
             HttpStatus.UNAUTHORIZED,
             ErrorMessageModel(
@@ -176,6 +228,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a resource no longer being available.
+         */
         val gone = response(
             HttpStatus.GONE,
             ErrorMessageModel(
@@ -185,6 +240,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a request not being valid.
+         */
         val badRequest = response(
             HttpStatus.BAD_REQUEST,
             ErrorMessageModel(
@@ -194,6 +252,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a request to a forbidden resource.
+         */
         val forbidden = response(
             HttpStatus.FORBIDDEN,
             ErrorMessageModel(
@@ -203,6 +264,9 @@ class Problem {
             ),
         )
 
+        /**
+         * Value that represents a cooldown from making many requests.
+         */
         fun cooldown(time: Int) = response(
             HttpStatus.REQUEST_TIMEOUT,
             ErrorMessageModel(

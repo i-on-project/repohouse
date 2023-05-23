@@ -42,6 +42,9 @@ class SystemController {
         }
     }
 
+    /**
+     * All the system links
+     */
     private fun <T> allSystemLinks(block: SirenBuilderScope<T>) {
         block.link(rel = LinkRelation("home"), href = Uris.HOME)
         block.link(rel = LinkRelation("credits"), href = Uris.CREDITS)
@@ -66,6 +69,9 @@ class SystemController {
         block.link(rel = LinkRelation("localCopy"), href = Uris.LOCAL_COPY_PATH, needAuthentication = true)
     }
 
+    /**
+     * All the system actions
+     */
     private fun <T> allSystemActions(block: SirenBuilderScope<T>) {
         block.action(title = "approveTeacher", href = Uris.TEACHERS_APPROVAL_PATH, method = HttpMethod.POST, type = "application/x-www-form-urlencoded", block = {
             rangeField(name = "approved")

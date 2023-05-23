@@ -211,7 +211,6 @@ class ClassroomServices(
         return Result.Success(true)
     }
 
-    // TODO() : Repos are not an array, but a single one
     /**
      * Method to get the local copy of the classroom to path in the personal computer
      */
@@ -290,6 +289,9 @@ class ClassroomServices(
         file.delete()
     }
 
+    /**
+     * Method to add the logic to the shell file
+     */
     private fun shellFileReposLogic(file: File): File {
         file.appendText("for repoKey in ${'$'}{!repos[@]}\n")
         file.appendText("do\n")

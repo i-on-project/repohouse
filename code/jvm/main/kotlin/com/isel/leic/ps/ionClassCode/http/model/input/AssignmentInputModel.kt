@@ -2,6 +2,9 @@ package com.isel.leic.ps.ionClassCode.http.model.input
 
 import java.sql.Timestamp
 
+/**
+ * Represents a Assignment Input Model.
+ */
 data class AssignmentInputModel(
     val classroomId: Int,
     val maxNumberElems: Int,

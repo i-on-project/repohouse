@@ -12,6 +12,10 @@ import java.sql.Timestamp
  * This code was made by the teacher Pedro Felix in DAW class.
  * https://github.com/isel-leic-daw/s2223i-51d-51n-public/blob/main/code/tic-tac-tow-service/src/main/kotlin/pt/isel/daw/tictactow/infra/Siren.kt
  */
+
+/**
+ * Represents a Siren Model.
+ */
 data class SirenModel<T>(
     @get:JsonProperty("class")
     val clazz: List<String>,
@@ -21,18 +25,28 @@ data class SirenModel<T>(
     val actions: List<ActionModel>,
 )
 
+
+/**
+ * Represents a Link Model related to a Siren Model.
+ */
 data class LinkModel(
     val rel: List<String>,
     val href: String,
     val needAuthentication: Boolean,
 )
 
+/**
+ * Represents a Entity Model related to a Siren Model.
+ */
 data class EntityModel<T>(
     val properties: T,
     val links: List<LinkModel>,
     val rel: List<String>,
 )
 
+/**
+ * Represents a Action Model related to a Siren Model.
+ */
 data class ActionModel(
     val title: String,
     val href: String,
@@ -41,12 +55,18 @@ data class ActionModel(
     val fields: List<FieldModel>,
 )
 
+/**
+ * Represents a Field Model related to a Siren Model.
+ */
 data class FieldModel(
     val name: String,
     val type: String,
     val value: Any? = null,
 )
 
+/**
+ * Represents a builder scope for a Siren Model.
+ */
 class SirenBuilderScope<T>(
     private val properties: T,
 ) {
@@ -90,6 +110,9 @@ class SirenBuilderScope<T>(
     )
 }
 
+/**
+ * Represents a builder scope for a Entity Model.
+ */
 class EntityBuilderScope<T>(
     val properties: T,
     val rel: List<String>,
@@ -113,6 +136,9 @@ class EntityBuilderScope<T>(
     )
 }
 
+/**
+ * Represents a builder scope for a Action Model.
+ */
 class ActionBuilderScope(
     private val name: String,
     private val hrefTemplate: String,
@@ -144,12 +170,18 @@ class ActionBuilderScope(
     fun build() = ActionModel(name, hrefTemplate, method.name(), type, fields)
 }
 
+/**
+ * Represents a function that returns a Siren Model.
+ */
 fun <T> siren(value: T, block: SirenBuilderScope<T>.() -> Unit): ResponseEntity<SirenModel<T>> {
     val scope = SirenBuilderScope(value)
     scope.block()
     return ResponseEntity.ok(scope.build())
 }
 
+/**
+ * Represents a function that returns a Siren Model with a specific status code.
+ */
 fun <T> siren(value: T, headers: HttpHeaders = HttpHeaders(), statusCode: HttpStatus = HttpStatus.OK, block: SirenBuilderScope<T>.() -> Unit): ResponseEntity<SirenModel<T>> {
     val scope = SirenBuilderScope(value)
     scope.block()

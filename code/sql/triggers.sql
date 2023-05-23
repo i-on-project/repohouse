@@ -1,38 +1,28 @@
 SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 BEGIN TRANSACTION;
 
-CREATE OR REPLACE FUNCTION CreateTeacher()
-    RETURNS trigger
-AS $$
-declare
-    teacherId integer;
-begin
-    if (new.is_created = true) then
-        delete from teacher where email = new.email;
-        delete from users where id = new.id;
-        insert into users (email, is_created,github_id,github_username,token,name) values (new.email, new.is_created,new.github_id,new.github_username,new.token,new.name) returning id into teacherId;
-        insert into teacher (id,github_token) values (teacherId,new.github_token);
-    end if;
-    return new;
-end;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS CreateTeacherTrigger ON pendingteacher;
-CREATE trigger CreateTeacherTrigger
-after update on pendingteacher
-for each row execute procedure CreateTeacher();
-
 CREATE OR REPLACE FUNCTION UpdateApplyRequests( )
 RETURNS trigger
 AS $$
 declare
     teacherId integer;
+    userId integer;
 begin
     if (new.state = 'Accepted') then
         select apply.pending_teacher_id from apply where id = new.id into teacherId;
         if (teacherId is not null) then
-            update pendingteacher set is_created = true where id = teacherId;
-            delete from apply where id = new.id;
+            insert into users (email, github_username,is_created, github_id, token, name) VALUES (
+                (select email from pendingteacher where id = teacherId),
+                (select github_username from pendingteacher where id = teacherId),
+                true,
+                (select github_id from pendingteacher where id = teacherId),
+                (select token from pendingteacher where id = teacherId),
+                (select name from pendingteacher where id = teacherId)
+            ) returning users.id into userId;
+            insert into teacher (id,github_token) values (
+                 userId,
+                (select pendingteacher.github_token from pendingteacher where id = teacherId)
+            );
             return new;
         end if;
     else if (new.state = 'Rejected') then
@@ -63,7 +53,7 @@ begin
     delete from cooldown where user_id = old.id;
     delete from student_team where team in (select id from team where assignment in (select id from assignment where classroom_id in (select id from classroom where teacher_id = old.id)));
     delete from feedback where team_id in (select id from team where assignment in (select id from assignment where classroom_id in (select id from classroom where teacher_id = old.id)));
-    delete from createrepo where team_id in (select id from team where assignment in (select id from assignment where classroom_id in (select id from classroom where teacher_id = old.id)));
+    delete from createrepo where repo_id in (select id from repo where team_id in (select id from team where assignment in (select id from assignment where classroom_id in (select id from classroom where teacher_id = old.id))));
     delete from tags where repo_id in (select id from repo where team_id in (select id from team where assignment in (select id from assignment where classroom_id in (select id from classroom where teacher_id = old.id))));
     delete from repo where team_id in (select id from team where assignment in (select id from assignment where classroom_id in (select id from classroom where teacher_id = old.id)));
     delete from leaveteam where team_id in (select id from team where assignment in (select id from assignment where classroom_id in (select id from classroom where teacher_id = old.id)));
@@ -106,3 +96,4 @@ CREATE trigger Sync
 
 COMMIT TRANSACTION;
 
+update apply set state = 'Accepted' where id = 1;

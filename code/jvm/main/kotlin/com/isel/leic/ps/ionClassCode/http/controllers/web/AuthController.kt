@@ -266,6 +266,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Get the register info of a user.
+     */
     @GetMapping(Uris.AUTH_REGISTER_PATH)
     fun getRegisterInfo(
         @CookieValue userGithubId: String,
@@ -281,15 +284,18 @@ class AuthController(
         }
     }
 
+    /**
+     * Register a teacher.
+     */
     @PostMapping(Uris.AUTH_REGISTER_TEACHER_PATH)
-    fun createTeacher(
+    fun registerTeacher(
         @CookieValue userGithubId: String,
         @CookieValue position: String,
     ): ResponseEntity<*> {
         if (position != TEACHER_COOKIE_NAME) return Problem.badRequest
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
-        return when (val teacher = teacherServices.createTeacher(githubId)) {
-            is Result.Success -> siren(StatusOutputModel("User Register", "Verify the status of your account")) {
+        return when (val teacher = teacherServices.confirmPendingTeacher(githubId)) {
+            is Result.Success -> siren(StatusOutputModel("Teacher Request Register", "Need to wait for other Teacher to confirm your request.")) {
                 clazz("registerTeacher")
                 action(title = "registerTeacher", href = Uris.AUTH_REGISTER_TEACHER_PATH, method = HttpMethod.POST, type = "application/json", block = {})
             }
@@ -337,6 +343,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Get the status of the user registration.
+     */
     @GetMapping(Uris.AUTH_STATUS_PATH)
     fun getStatus(
         @CookieValue position: String,
@@ -445,6 +454,9 @@ class AuthController(
         }
     }
 
+    /**
+     * Create a user state cookie.
+     */
     private fun generateUserState(): OAuthState {
         val state = UUID.randomUUID().toString()
         val cookie = ResponseCookie.from(STATE_COOKIE_NAME, state)

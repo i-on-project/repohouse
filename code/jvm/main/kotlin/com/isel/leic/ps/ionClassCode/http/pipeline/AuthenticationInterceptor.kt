@@ -21,6 +21,13 @@ class AuthenticationInterceptor(
     private val authorizationHeaderProcessor: AuthorizationHeaderProcessor
 ) : HandlerInterceptor {
 
+    /**
+     * Intercepts the request and validates the authorization header.
+     * @param request Request
+     * @param response Response
+     * @param handler Handler
+     * @return True if the request is valid, false otherwise.
+     */
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         if (handler is HandlerMethod && handler.methodParameters.any { it.parameterType == User::class.java }) {
             val tokenEncrypted = WebUtils.getCookie(request, AUTHORIZATION_COOKIE_NAME)?.value

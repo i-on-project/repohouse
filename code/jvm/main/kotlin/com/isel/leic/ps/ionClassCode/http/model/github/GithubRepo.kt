@@ -114,6 +114,9 @@ data class License(
     val node_id: String,
 )
 
+/**
+ * GitHub OrganizationRepository model.
+ */
 data class RepoOrg(
     val name: String,
     val full_name: String,
@@ -125,40 +128,65 @@ data class RepoOrg(
     val tags_url: String,
 )
 
+/**
+ * GitHub Organization model.
+ */
 data class RepoReponse(
     val name: String,
     val collaborators: List<Collaborator>,
     val tags: List<Tag>
 )
 
+/**
+ * GitHub Collaborator model.
+ */
 data class Collaborator(
     val login: String,
     val id: Int,
     val permissions: Permissions
 )
+
+/**
+ * GitHub Tag model.
+ */
 data class Tag(
     val name: String,
     val date: Timestamp
 )
 
+/**
+ * GitHub Tags model.
+ */
 data class Tags(
     val name: String,
     val commit: CommitTag
 )
 
+/**
+ * GitHub Tag Commit model.
+ */
 data class CommitTag(
     val sha: String,
     val url: String
 )
 
+/**
+ * GitHub Commit model.
+ */
 data class Commit(
     val commit: CommitInfo
 )
 
+/**
+ * GitHub Commit Info model.
+ */
 data class CommitInfo(
     val author: Author
 )
 
+/**
+ * GitHub Author model.
+ */
 data class Author(
     val name: String,
     val email: String,

@@ -43,6 +43,9 @@ data class TeamRequestsModel(
     val leaveTeam: List<LeaveTeam>,
 )
 
+/**
+ * Represents an Update Create Team Status Output.
+ */
 data class UpdateCreateTeamStatusOutput(
     val result: Boolean,
 )

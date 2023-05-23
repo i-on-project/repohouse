@@ -129,6 +129,9 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
             .list()
     }
 
+    /**
+     * Method to get all teams that have delivered by a Delivery
+     */
     override fun getTeamsDeliveredByDelivery(deliveryId: Int): List<Team> {
         return handle.createQuery(
             """

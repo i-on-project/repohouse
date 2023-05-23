@@ -205,6 +205,9 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .list()
     }
 
+    /**
+     * Method to get all Classroom's courses
+     */
     override fun getAllCourseClassrooms(courseId: Int): List<Classroom> {
         return handle.createQuery(
             """

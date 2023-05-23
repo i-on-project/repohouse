@@ -16,8 +16,14 @@ import org.springframework.web.method.support.ModelAndViewContainer
 @Component
 class UserArgumentResolver : HandlerMethodArgumentResolver {
 
+    /**
+     * Checks if the parameter is of type User.
+     */
     override fun supportsParameter(parameter: MethodParameter) = parameter.parameterType == User::class.java
 
+    /**
+     * Resolves the user from the request.
+     */
     override fun resolveArgument(
         parameter: MethodParameter,
         mavContainer: ModelAndViewContainer?,

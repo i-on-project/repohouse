@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.domain.input
 
 /**
- * Outbox Input Interface
+ * One Time Password Input Interface
  */
 data class OtpInput(
     val userId: Int,

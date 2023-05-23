@@ -22,6 +22,7 @@ interface UsersRepository {
     fun createPendingStudent(student: StudentInput): PendingStudent
     fun createStudent(student: StudentInput): Student?
     fun createPendingTeacher(teacher: TeacherInput): PendingTeacher
+    fun acceptPendingTeacher(pendingTeacher: PendingTeacher): PendingTeacher
     fun createTeacher(teacher: TeacherInput): Teacher?
     fun updateStudentSchoolId(userId: Int, schoolId: Int)
     fun getStudent(studentId: Int): Student?

@@ -15,12 +15,18 @@ interface AssigmentOutputModel {
     val deliveries: List<Delivery>
 }
 
+/**
+ * Represents a Teacher Assigment Output Model.
+ */
 data class TeacherAssignmentOutputModel(
     override val assignment: Assignment,
     override val deliveries: List<Delivery>,
     val teams: List<Team>,
 ) : AssigmentOutputModel
 
+/**
+ * Represents a Student Assigment Output Model.
+ */
 data class StudentAssignmentOutputModel(
     override val assignment: Assignment,
     override val deliveries: List<Delivery>,
@@ -58,6 +64,9 @@ data class TeacherAssignmentModel(
     val teams: List<Team>,
 ) : AssignmentModel()
 
+/**
+ * Represents a Create Team Composite.
+ */
 data class CreateTeamComposite(
     val compositeState: String,
     val createTeam: TeamNotCreated,
@@ -65,6 +74,9 @@ data class CreateTeamComposite(
     val createRepo: RepoNotCreated,
 )
 
+/**
+ * Represents an Assigment Model for the teacher assignment teams.
+ */
 data class TeacherAssignmentTeams(
     val assignment: Assignment,
     val teamsCreated: List<Team>,

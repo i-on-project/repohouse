@@ -203,6 +203,9 @@ class TeamServices(
         }
     }
 
+    /**
+     * Method to update the requests of a composite request
+     */
     fun updateCreateTeamCompositeRequest(body: UpdateCreateTeamStatusInput, teamId: Int): TeamUpdateStatusResponse {
         return transactionManager.run {
             it.createTeamRepository.updateCreateTeamRequestState(requestId = body.createTeam.requestId, state = body.createTeam.state, githubTeamId = body.createTeam.gitHubTeamId)
@@ -223,7 +226,7 @@ class TeamServices(
     }
 
     /**
-     * Method to post a feedback to a team
+     * Method to post feedback to a team
      */
     fun postFeedback(feedbackInfo: FeedbackInput, classroomId: Int): TeamFeedbackResponse {
         if (feedbackInfo.isNotValid()) return Result.Problem(TeamServicesError.InvalidData)
