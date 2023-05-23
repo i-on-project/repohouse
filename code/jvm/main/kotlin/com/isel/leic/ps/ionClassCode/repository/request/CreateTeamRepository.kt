@@ -16,5 +16,5 @@ interface CreateTeamRepository {
     fun getCreateTeamRequestsByUser(userId: Int): List<CreateTeam>
     fun getCreateTeamRequestByCompositeId(compositeId: Int): TeamNotCreated?
     fun getCreateTeamRequestByTeamId(teamId: Int): TeamNotCreated?
-    fun updateCreateTeamRequestState(requestId: Int, state: String)
+    fun updateCreateTeamRequestState(requestId: Int, state: String, githubTeamId: Int?)
 }

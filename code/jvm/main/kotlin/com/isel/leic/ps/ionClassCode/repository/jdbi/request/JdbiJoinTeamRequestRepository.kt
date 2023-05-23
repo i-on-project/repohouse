@@ -92,8 +92,8 @@ class JdbiJoinTeamRequestRepository(
     override fun getJoinTeamRequestByCompositeId(compositeId: Int): UserJoinTeam? {
         return handle.createQuery(
             """
-            SELECT x.name, x.id, x.creator, x.state, x.composite FROM (
-                SELECT u.name, r2.id, r2.creator, r2.state, r2.composite FROM users as u JOIN request r2 on u.id = r2.creator
+            SELECT x.github_username, x.id, x.creator, x.state, x.composite FROM (
+                SELECT u.github_username, r2.id, r2.creator, r2.state, r2.composite FROM users as u JOIN request r2 on u.id = r2.creator
                 WHERE r2.composite = :compositeId
             ) as x JOIN jointeam j on j.id = x.id
             """,

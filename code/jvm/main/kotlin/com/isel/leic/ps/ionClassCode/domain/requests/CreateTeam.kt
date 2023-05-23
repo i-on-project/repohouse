@@ -9,4 +9,5 @@ data class CreateTeam(
     override val state: String = "Pending",
     override val composite: Int,
     val teamId: Int,
+    val githubTeamId: Int?
 ) : RequestInterface

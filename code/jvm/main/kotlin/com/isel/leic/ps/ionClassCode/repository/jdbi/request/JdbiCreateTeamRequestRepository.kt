@@ -44,7 +44,7 @@ class JdbiCreateTeamRequestRepository(
             .mapTo<Int>()
             .first()
 
-        return CreateTeam(id = id, creator = creator, composite = request.composite, teamId = request.teamId)
+        return CreateTeam(id = id, creator = creator, composite = request.composite, teamId = request.teamId, githubTeamId = null)
     }
 
     /**
@@ -67,7 +67,7 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequestById(id: Int): CreateTeam? {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, r.composite, c.team_id FROM createteam as c JOIN request r on r.id = c.id
+            SELECT c.id, r.creator, r.state, r.composite, c.team_id, c.github_team_id FROM createteam as c JOIN request r on r.id = c.id
             WHERE c.id = :id
             """,
         )
@@ -80,8 +80,8 @@ class JdbiCreateTeamRequestRepository(
         return teamIds.map { team ->
             val request = handle.createQuery(
                 """
-                SELECT x.team_id, x.name, r.creator, r.state, r.composite FROM (
-                    SELECT c.id, t.name, c.team_id FROM createteam as c JOIN team t on c.team_id = t.id
+                SELECT x.team_id, x.name, r.creator, r.state, r.composite, x.github_team_id FROM (
+                    SELECT c.id, t.name, c.team_id, c.github_team_id FROM createteam as c JOIN team t on c.team_id = t.id
                     WHERE c.team_id = :teamId
                 ) as x JOIN request r on r.id = x.id
                 """,
@@ -89,7 +89,7 @@ class JdbiCreateTeamRequestRepository(
                 .bind("teamId", team.id)
                 .mapTo<CreateTeam>()
                 .first()
-            TeamNotCreated(teamId = team.id, name = team.name, id = request.id, state = request.state, creator = request.creator, composite = request.composite)
+            TeamNotCreated(teamId = team.id, name = team.name, id = request.id, state = request.state, creator = request.creator, githubTeamId = request.githubTeamId,composite = request.composite)
         }
     }
 
@@ -99,7 +99,7 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequestsByUser(userId: Int): List<CreateTeam> {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, r.composite, c.team_id FROM createteam as c JOIN request r on r.id = c.id
+            SELECT c.id, r.creator, r.state, r.composite, c.team_id, c.github_team_id FROM createteam as c JOIN request r on r.id = c.id
             WHERE r.creator = :userId
             """,
         )
@@ -111,8 +111,8 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequestByCompositeId(compositeId: Int): TeamNotCreated? {
         return handle.createQuery(
             """
-            SELECT x.team_id, x.name, r.id, r.creator, r.state, r.composite FROM (
-                SELECT c.id, t.name, c.team_id FROM createteam as c JOIN team t on c.team_id = t.id
+            SELECT x.team_id, x.name, r.id, r.creator, r.state, r.composite, x.github_team_id FROM (
+                SELECT c.id, t.name, c.team_id, c.github_team_id FROM createteam as c JOIN team t on c.team_id = t.id
             ) as x JOIN request r on r.id = x.id
             WHERE r.composite = :compositeId
             """,
@@ -125,8 +125,8 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequestByTeamId(teamId: Int): TeamNotCreated? {
         return handle.createQuery(
             """
-            SELECT x.team_id, x.name, r.creator, r.state, r.composite FROM (
-                SELECT c.id, t.name, c.team_id FROM createteam as c JOIN team t on c.team_id = t.id
+            SELECT x.team_id, x.name, r.creator, r.state, r.composite, x.github_team_id FROM (
+                SELECT c.id, t.name, c.team_id, c.github_team_id FROM createteam as c JOIN team t on c.team_id = t.id
                 WHERE c.team_id = :teamId
             ) as x JOIN request r on r.id = x.id
             """,
@@ -136,7 +136,7 @@ class JdbiCreateTeamRequestRepository(
             .firstOrNull()
     }
 
-    override fun updateCreateTeamRequestState(requestId: Int, state: String) {
+    override fun updateCreateTeamRequestState(requestId: Int, state: String, githubTeamId: Int?) {
         handle.createUpdate(
             """
             UPDATE request SET state = :state
@@ -145,6 +145,15 @@ class JdbiCreateTeamRequestRepository(
         )
             .bind("requestId", requestId)
             .bind("state", state)
+            .execute()
+        handle.createUpdate(
+            """
+            UPDATE createteam SET github_team_id = :githubTeamId
+            WHERE id = :requestId
+            """,
+        )
+            .bind("requestId", requestId)
+            .bind("githubTeamId", githubTeamId)
             .execute()
     }
 }

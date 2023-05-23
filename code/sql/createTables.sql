@@ -150,6 +150,7 @@ CREATE TABLE JoinTeam(
 CREATE TABLE CreateTeam(
      id int primary key,
      team_id int unique not null,
+     github_team_id int default null,
      foreign key (id) references Request(id),
      foreign key (team_id) references Team(id)
 );

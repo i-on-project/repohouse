@@ -119,7 +119,6 @@ class TeamServices(
                     false,
                 ),
             )
-            val name = "${classroom.name} - $assignmentId - ${team.id}"
             val repo = it.repoRepository.createRepo(repo = RepoInput(name = "${classroom.name} - $assignmentId - ${team.id}", url = null, teamId = team.id))
             val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(), creator = creator)
             val createTeam = it.createTeamRepository.createCreateTeamRequest(request = CreateTeamInput(teamId = team.id, composite = composite.id), creator = creator)
@@ -206,8 +205,7 @@ class TeamServices(
 
     fun updateCreateTeamCompositeRequest(body: UpdateCreateTeamStatusInput, teamId: Int): TeamUpdateStatusResponse {
         return transactionManager.run {
-            it.compositeRepository.updateCompositeState(requestId = body.composite.requestId, state = body.composite.state)
-            it.createTeamRepository.updateCreateTeamRequestState(requestId = body.createTeam.requestId, state = body.createTeam.state)
+            it.createTeamRepository.updateCreateTeamRequestState(requestId = body.createTeam.requestId, state = body.createTeam.state, githubTeamId = body.createTeam.gitHubTeamId)
             if (body.createTeam.state == "Accepted") {
                 it.teamRepository.updateTeamStatus(id = teamId)
             }
@@ -216,9 +214,10 @@ class TeamServices(
                 it.teamRepository.addStudentToTeam(teamId = teamId, studentId = body.joinTeam.userId)
             }
             it.createRepoRepository.updateCreateRepoState(requestId = body.createRepo.requestId, state = body.createRepo.state)
-            if (body.createRepo.state == "Accepted") {
+            if (body.createRepo.state == "Accepted" && body.createRepo.url != null) {
                 it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url)
             }
+            it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
             return@run Result.Success(value = true)
         }
     }

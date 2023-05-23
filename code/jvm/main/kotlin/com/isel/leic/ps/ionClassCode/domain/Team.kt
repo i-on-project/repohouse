@@ -17,10 +17,11 @@ data class TeamNotCreated(
     val creator: Int,
     val state: String = "Pending",
     val composite: Int,
+    val githubTeamId: Int?,
 )
 
 data class UserJoinTeam(
-    val name: String,
+    val githubUsername: String,
     val id: Int,
     val creator: Int,
     val state: String = "Pending",

@@ -42,14 +42,16 @@ class ClassroomActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val classroom = getClassroomExtra()
+        val pair = getClassroomExtra()
+        val classroom = pair.first
+        val courseName = pair.second
         if (classroom != null) {
             vm.getAssignments(classroomId =  classroom.id, courseId = classroom.courseId)
         }
         setContent {
             val assignments = vm.assignments
             ClasscodeTheme {
-                if (classroom != null && assignments != null) {
+                if (classroom != null && assignments != null && courseName != null) {
                     ClassroomScreen(
                         classroom = classroom,
                         teamsCreated = vm.teamsCreated,
@@ -61,8 +63,12 @@ class ClassroomActivity : ComponentActivity() {
                         onBackRequest = { finish() },
                         error = vm.errorClassCode,
                         onDismissRequest = { finish() },
-                        onCreateTeamComposite = { createTeamComposite ->
-                            TODO()
+                        onCreateTeamComposite = { createTeamComposite, wasAccepted, assignment ->
+                            if (wasAccepted) {
+                                vm.createTeamCompositeAccepted(team = createTeamComposite, courseName = courseName, courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id)
+                            } else {
+                                vm.createTeamCompositeRejected(team = createTeamComposite, classroomId = classroom.id, assignmentId = assignment.id, courseId = classroom.courseId)
+                            }
                         }
                     )
                 } else {
@@ -73,13 +79,12 @@ class ClassroomActivity : ComponentActivity() {
     }
 
     @Suppress("deprecation")
-    private fun getClassroomExtra(): Classroom? {
+    private fun getClassroomExtra(): Pair<Classroom?, String?> {
         val classroomExtra: LocalClassroomDto? =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 intent.getParcelableExtra(CLASSROOM_EXTRA, LocalClassroomDto::class.java)
             else
                 intent.getParcelableExtra(CLASSROOM_EXTRA)
-        vm.courseName = classroomExtra?.courseName
-        return classroomExtra?.toClassroom()
+        return Pair(classroomExtra?.toClassroom(), classroomExtra?.courseName)
     }
 }

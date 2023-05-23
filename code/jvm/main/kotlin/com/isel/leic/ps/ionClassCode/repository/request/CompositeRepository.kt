@@ -8,7 +8,7 @@ import com.isel.leic.ps.ionClassCode.domain.requests.Composite
  */
 interface CompositeRepository {
     fun createCompositeRequest(request: CompositeInput, creator: Int): Composite
-    fun updateCompositeState(requestId: Int, state: String)
+    fun updateCompositeState(compositeId: Int)
     fun getCompositeRequests(): List<Composite>
     fun getCompositeRequestsThatAreNotAccepted(): List<Composite>
     fun getCompositeRequestsById(compositeId: Int): List<Int>?

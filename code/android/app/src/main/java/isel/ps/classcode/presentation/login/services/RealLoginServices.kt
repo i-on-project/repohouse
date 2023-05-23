@@ -9,6 +9,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.AUTH_KEY
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
+import isel.ps.classcode.MEDIA_TYPE
 import isel.ps.classcode.R
 import isel.ps.classcode.TAG
 import isel.ps.classcode.TOKEN_KEY
@@ -22,7 +23,6 @@ import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -46,10 +46,9 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
         sessionStore.cleanSecret()
         val uri = navigationRepo.ensureLink(key = TOKEN_KEY, fetchLink = { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
         val requestBody = ChallengeInfoInput(code = code, state = state, secret = secret)
-        val mediaType = "application/vnd.siren+json; charset=utf-8".toMediaType()
         val request = Request.Builder()
             .url(CLASSCODE_LINK_BUILDER(uri.href))
-            .post(objectMapper.writeValueAsString(requestBody).toRequestBody(mediaType))
+            .post(objectMapper.writeValueAsString(requestBody).toRequestBody(MEDIA_TYPE))
             .build()
         val result = request.send(httpClient) { response ->
             val headerName = "Set-Cookie"
@@ -74,12 +73,14 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
         val challenge = generateCodeChallenge(secret = secret)
         val ensureLink = navigationRepo.ensureLink(key = AUTH_KEY, fetchLink =  { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
         return try {
-            val uri = Uri.parse("${CLASSCODE_LINK_BUILDER(ensureLink.href)}?challenge=$challenge&challengeMethod=s256")
-            val customIntent = CustomTabsIntent.Builder().build().intent.apply {
-                addFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                data = uri
-            }
-            activity.startActivity(customIntent)
+            val uri = Uri.parse(CLASSCODE_LINK_BUILDER(ensureLink.href)).buildUpon().apply {
+                appendQueryParameter("challenge", challenge)
+                appendQueryParameter("challengeMethod", "s256")
+            }.build()
+            val customTabsIntent = CustomTabsIntent.Builder().build()
+            //customTabsIntent.intent.setPackage(null)
+            customTabsIntent.intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
+            customTabsIntent.launchUrl(activity, uri)
             Either.Right(value = Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open URL", e)
