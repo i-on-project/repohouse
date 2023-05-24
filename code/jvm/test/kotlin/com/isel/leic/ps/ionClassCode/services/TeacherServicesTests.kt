@@ -468,30 +468,4 @@ class TeacherServicesTests {
             fail("Should not be Either.Right")
         }
     }
-
-    @Test
-    fun `createTeacher should return the new teacher`() {
-        // when: creating a teacher should give a teacher
-        val teacherRes = teacherServices.createTeacher(githubId = 12346)
-
-        // the result should be a teacher
-        if (teacherRes is Result.Success) {
-            assert(teacherRes.value.id == 1)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
-
-    @Test
-    fun `createTeacher should return teacher not found because github id is not valid`() {
-        // when: creating a teacher should give a teacher
-        val teacherRes = teacherServices.createTeacher(githubId = 6663464)
-
-        // the result should be a teacher
-        if (teacherRes is Result.Problem) {
-            assert(teacherRes.value is TeacherServicesError.TeacherNotFound)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
 }

@@ -5,7 +5,7 @@ import {Box, TextField, Typography } from "@mui/material"
 import { Button } from "react-bootstrap"
 import { Navigate } from "react-router-dom"
 import { AuthServices } from "../../services/AuthServices"
-import { ErrorAlert } from "../error/ErrorAlert"
+import { ErrorAlertForm } from "../error/ErrorAlert"
 import { OTPBody } from "../../domain/dto/PendingUserDtoProperties"
 import { SirenEntity } from "../../http/Siren"
 import {homeBoxStyle, typographyStyle} from "../../utils/Style";
@@ -48,7 +48,6 @@ export function ShowVerifyFetch({
     },[setError])
 
 
-
     if (redirect) {
         return <Navigate to={"/auth/student"}/>
     }
@@ -65,7 +64,7 @@ export function ShowVerifyFetch({
             <TextField label={"OTP"} required type={"number"} onChange={(event) => setOtp(Number(event.target.value))}/>
             <Button onClick={handleResend}>Resend</Button>
             <Button onClick={handleSubmit}>Verify</Button>
-            <ErrorAlert error={serror} onClose={() => { setError(null) }}/>
+            { serror ? <ErrorAlertForm title={serror.title} detail={serror.detail} onClose={() => { setError(null) }}/> : null }
         </Box>
     )
 }

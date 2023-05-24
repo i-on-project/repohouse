@@ -92,10 +92,10 @@ export function ShowDeliveryFetch({
                     </Typography>
                     {user == AuthState.Teacher ? (
                         <Box sx={alignHorizontalyBoxStyle}>
-                            <Button onClick={handleSyncDelivery}>Sync</Button>
-                            <Button onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + content.properties.delivery.id + "/edit",{state:content.properties.delivery})}> Edit </Button>
+                            <Button variant="contained" onClick={handleSyncDelivery}>Sync</Button>
+                            <Button variant="contained" onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + content.properties.delivery.id + "/edit",{state:content.properties.delivery})}> Edit </Button>
                             {content.properties.teamsDelivered.length == 0 && content.properties.teamsNotDelivered.length == 0 ? (
-                                <Button onClick={handleDeleteDelivery}>Delete</Button>
+                                <Button variant="contained" onClick={handleDeleteDelivery}>Delete</Button>
                             ) : null}
                         </Box>
                     ): null}

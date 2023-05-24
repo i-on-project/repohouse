@@ -250,7 +250,7 @@ class JdbiUsersRepository(
     /**
      * Method to accept a pending teacher request
      */
-    override fun acceptPendingTeacher(pendingTeacher: PendingTeacher):PendingTeacher {
+    override fun acceptPendingTeacher(pendingTeacher: PendingTeacher): PendingTeacher {
         handle.createUpdate(
             """
             UPDATE pendingteacher
@@ -337,9 +337,9 @@ class JdbiUsersRepository(
     override fun getPendingTeacherByGithubId(githubId: Long): PendingTeacher? {
         return handle.createQuery(
             """
-            SELECT  id,name,email,github_username,is_created,github_id,token,github_token FROM pendingteacher
+            SELECT id,name,email,github_username,is_created,github_id,token,github_token FROM pendingteacher
             WHERE github_id = :github_id 
-            Order By created_at DESC limit 1
+            Order By id DESC limit 1
             """,
         )
             .bind("github_id", githubId)
@@ -355,6 +355,7 @@ class JdbiUsersRepository(
             """
             SELECT id,name,email,github_username,is_created,github_id,token FROM pendingstudent
             WHERE github_id = :github_id
+            Order By id DESC limit 1
             """,
         )
             .bind("github_id", githubId)
