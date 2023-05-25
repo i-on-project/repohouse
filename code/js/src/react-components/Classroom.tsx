@@ -10,11 +10,10 @@ import {AuthState, useLoggedIn} from "./auth/Auth";
 import {ClassroomBody} from "../domain/dto/ClassroomDtoProperties";
 import {ErrorAlert} from "./error/ErrorAlert";
 import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../utils/Style";
-import {mainTheme} from "../utils/Theme";
 
 export function ShowClassroomFetch({
-                                  classroomServices,courseId,classroomId
-                              }: {
+    classroomServices,courseId,classroomId
+}: {
     classroomServices: ClassroomServices;
     courseId: number;
     classroomId: number;
@@ -94,11 +93,11 @@ export function ShowClassroomFetch({
                         <Box sx={alignHorizontalyBoxStyle}>
                             { !content.properties.isArchived ? (
                                 <>
-                                    <Button variant="outlined" onClick={handleCreateAssigment}>Create Assignment</Button>
-                                    <Button variant="outlined" onClick={handleArchiveClassroom}>Archive Classroom</Button>
+                                    <Button variant="contained" onClick={handleCreateAssigment}>Create Assignment</Button>
+                                    <Button variant="contained" onClick={handleArchiveClassroom}>Archive Classroom</Button>
                                 </>
                             ):null}
-                            <Button variant="outlined" onClick={handleLocalCopy}>Local Copy</Button>
+                            <Button variant="contained" onClick={handleLocalCopy}>Local Copy</Button>
                         </Box>
                     ):null}
                     <Grid
@@ -206,8 +205,8 @@ export function ShowClassroomFetch({
 }
 
 export function ShowCreateClassroom({
-                                  classroomServices,courseId
-                              }: {
+    classroomServices,courseId
+}: {
     classroomServices: ClassroomServices;
     courseId: number;
 }) {
@@ -219,8 +218,6 @@ export function ShowCreateClassroom({
         if (name == "") return
         const body = new ClassroomBody(name)
         const result = await classroomServices.createClassroom(courseId,body);
-        console.log("result")
-        console.log(result)
         if (result instanceof ErrorMessageModel) {
             setError(result);
         }

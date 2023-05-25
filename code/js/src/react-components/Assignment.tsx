@@ -31,11 +31,11 @@ import {mainTheme} from "../utils/Theme";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export function ShowAssignmentFetch({
-                                  assignmentServices,
-                                    courseId,
-                                    classroomId,
-                                    assignmentId
-                              }: {
+    assignmentServices,
+    courseId,
+    classroomId,
+    assignmentId
+}: {
     assignmentServices: AssignmentServices;
     courseId: number;
     classroomId: number;
@@ -63,8 +63,8 @@ export function ShowAssignmentFetch({
 }
 
 function ShowStudentAssignmentFetch({
-                                        assignmentServices,courseId,classroomId,assignmentId
-                                    }: {
+    assignmentServices,courseId,classroomId,assignmentId
+}: {
     assignmentServices: AssignmentServices;
     courseId: number;
     classroomId: number;
@@ -91,7 +91,6 @@ function ShowStudentAssignmentFetch({
     if (content instanceof ErrorMessageModel && !error) {
         setError(content);
     }
-
 
     return (
         <Box sx={homeBoxStyle}>
@@ -226,13 +225,15 @@ function ShowTeacherAssignmentFetch({
             setError(response)
         }
         if (response instanceof SirenEntity) {
-            console.log(response)
             if (response.properties.deleted) {
                 navigate("/courses/" + courseId + "/classrooms/" + classroomId)
             }
         }
     }, [setError])
 
+    const handleCreateDelivery = useCallback(async () => {
+       navigate("/courses/"+ courseId + "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/create")
+    }, [])
 
     if (!content) {
         return (
@@ -248,8 +249,6 @@ function ShowTeacherAssignmentFetch({
     if (content instanceof ErrorMessageModel && !error) {
         setError(content);
     }
-
-
 
     return (
         <Box sx={homeBoxStyle}>
@@ -268,9 +267,9 @@ function ShowTeacherAssignmentFetch({
                         {content.properties.assignment.description}
                     </Typography>
                     <Box sx={alignHorizontalyBoxStyle}>
-                        <Link to={"/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId + "/deliveries/create"}>Create Delivery</Link>
+                        <Button variant="contained" onClick={handleCreateDelivery}>Create Delivery</Button>
                         {content.properties.deliveries.length == 0 ? (
-                            <Button onClick={handleDeleteAssigment}>Delete Assignment</Button>
+                            <Button variant="contained" onClick={handleDeleteAssigment}>Delete Assignment</Button>
                         ) : null}
                     </Box>
                     {content.properties.deliveries.map((delivery,index) => (
@@ -300,7 +299,14 @@ function ShowTeacherAssignmentFetch({
                                     variant="h6"
                                     sx={typographyStyle}
                                 >
-                                    {delivery.tagControl + " -  " + delivery.dueDate}
+                                    {delivery.tagControl + " -  " + new Date(delivery.dueDate).toLocaleString(
+                                        "en-GB",
+                                        {
+                                            month: "long",
+                                            day: "2-digit",
+                                            year: "numeric",
+                                        }
+                                    )}
                                 </Typography>
                         </Box>
                     ))}
@@ -406,7 +412,7 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
 }
 
 function ShowCreateAssignmentPost({
-                                      assignmentServices, assignment, courseId,classroomId,error
+    assignmentServices, assignment, courseId,classroomId,error
 }: {
     assignmentServices: AssignmentServices,
     assignment: AssignmentBody,

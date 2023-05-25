@@ -1,0 +1,1 @@
+This error occurs when a user tries too many times to insert a one-time-password during registration and it´s now in cooldown.

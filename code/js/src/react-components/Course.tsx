@@ -7,9 +7,6 @@ import {
     List,
     ListItem,
     Typography,
-    Card,
-    CardActionArea,
-    CardContent,
     CircularProgress,
     Backdrop,
     Box, IconButton, Accordion, AccordionSummary, AccordionDetails, Grid, Button, ListItemAvatar, ListItemText, Avatar
@@ -32,7 +29,7 @@ import {
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { ClassroomDtoProperties } from "../domain/dto/ClassroomDtoProperties"
 import { Teacher } from "../domain/User"
-import {mainTheme} from "../utils/Theme";
+import { mainTheme } from "../utils/Theme";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 
@@ -46,7 +43,6 @@ export function ShowCourseFetch({
         return await courseServices.course({courseId: courseId})
     })
     const [error, setError] = useState(false)
-    const [isOpened, setIsOpened] = useState(false)
     const navigate = useNavigate()
     const user = useLoggedIn()
 
@@ -56,7 +52,7 @@ export function ShowCourseFetch({
             setError(true)
         }
         if (result instanceof SirenEntity) {
-            navigate("/menu")
+            navigate("/menu", { replace : true })
         }
     }, [setError])
 
@@ -66,7 +62,7 @@ export function ShowCourseFetch({
     }, [])
 
     const handleCreateClassroom = useCallback(async () => {
-        navigate("/courses/" + courseId + "/classrooms/create");
+        navigate("/courses/" + courseId + "/classrooms/create", { replace : true });
     }, [navigate])
 
     if (content instanceof ErrorMessageModel || error) {
@@ -208,12 +204,11 @@ export function ShowCourseCreateFetch({
 
 export function ShowCourseCreatePost({ courseServices }: { courseServices: CourseServices }) {
     const location = useLocation()
-    const [error, setError] = useState(false)
     const content = useAsync(async () => {
         return await courseServices.createCourse(location.state.body) 
     })
 
-    if (content instanceof ErrorMessageModel || error) {
+    if (content instanceof ErrorMessageModel) {
         return <Error title="Communication with the server has failed" detail="Please try again."/>
     }
 
@@ -228,21 +223,13 @@ export function ShowCourseCreatePost({ courseServices }: { courseServices: Cours
         )
     }
 
-    if (content instanceof ErrorMessageModel) {
-        setError(true)
-    }
-
     if (content instanceof SirenEntity) {
-        return <Navigate to={"/courses/" + content.properties.course.id} />
+        return <Navigate to={"/courses/" + content.properties.course.id} replace={true} />
     }
 }
 
 
 function OrgsDetailsBox({ org, onClick } : { org: GitHubOrg, onClick: (org: GitHubOrg) => void }) {
-
-    const handleGithubClick = useCallback((url) => {
-        window.open(url, "_blank")
-    }, [])
 
     return (
         <Box

@@ -1,7 +1,6 @@
 package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
-import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.ApplyInput
 import com.isel.leic.ps.ionClassCode.domain.input.TeacherInput
 import com.isel.leic.ps.ionClassCode.http.model.input.TeachersPendingInputModel

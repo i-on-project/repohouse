@@ -49,8 +49,6 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.4")
     // for SendGrid
     implementation("com.sendgrid:sendgrid-java:4.9.3")
-    // testImplementation("org.testng:testng:7.1.0")
-    // for https
 }
 
 tasks.withType<KotlinCompile> {

@@ -29,7 +29,7 @@ sealed class OutboxServicesError {
     object OtpNotFound : OutboxServicesError()
     object OtpExpired : OutboxServicesError()
     object OtpDifferent : OutboxServicesError()
-    object EmailNotSent : OutboxServicesError()
+    object ResendCooldown : OutboxServicesError()
     object ErrorCreatingRequest : OutboxServicesError()
     object InvalidInput : OutboxServicesError()
     object InternalError : OutboxServicesError()
@@ -101,13 +101,19 @@ class OutboxServices(
     fun resendEmail(userId: Int): UpdateOutboxResponse {
         if (userId <= 0) return Result.Problem(OutboxServicesError.InternalError)
         return transactionManager.run {
-            val outbox = it.outboxRepository.getOutboxRequest(userId) ?: return@run Result.Problem(OutboxServicesError.OtpNotFound)
+            val outbox = it.outboxRepository.getOutboxRequest(userId)
+            if (outbox == null) {
+                val otp = createRandomOtp()
+                it.otpRepository.createOtpRequest(OtpInput(userId, otp))
+                it.outboxRepository.createOutboxRequest(OutboxInput(userId))
+                return@run Result.Success(Unit)
+            }
             if (outbox.sentAt == null) {
                 /** Not yet sent, needs to wait */
                 return@run Result.Success(Unit)
             }
-            if (outbox.sentAt.before((System.currentTimeMillis() + EMAIL_RESEND_TIME).toTimestamp())) {
-                return@run Result.Problem(OutboxServicesError.EmailNotSent)
+            if (!outbox.sentAt.before((System.currentTimeMillis() - EMAIL_RESEND_TIME).toTimestamp())) {
+                return@run Result.Problem(OutboxServicesError.ResendCooldown)
             }
             /** Changes state, so next verification can be sent */
             it.outboxRepository.updateOutboxStateRequest(outbox.userId, "Pending")
@@ -143,7 +149,7 @@ class OutboxServices(
             OutboxServicesError.OtpDifferent -> Problem.invalidInput
             OutboxServicesError.OtpNotFound -> Problem.notFound
             OutboxServicesError.UserNotFound -> Problem.notFound
-            OutboxServicesError.EmailNotSent -> Problem.internalError
+            OutboxServicesError.ResendCooldown -> Problem.resendCooldown
             OutboxServicesError.ErrorCreatingRequest -> Problem.internalError
             OutboxServicesError.InvalidInput -> Problem.invalidInput
             OutboxServicesError.InternalError -> Problem.internalError

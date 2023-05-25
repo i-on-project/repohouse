@@ -36,7 +36,7 @@ val GITHUB_ACCESS_TOKEN_URI: (code: String) -> String = { code ->
 }
 
 const val GITHUB_USER_ORGS = "/user/orgs"
-val GITHUB_ORG_REPOS_URI: (orgName: String, perPage: Int, page: Int) -> String = { org, perPage, page -> "/orgs/$org/repos?type=all" }
+val GITHUB_ORG_REPOS_URI: (orgName: String, perPage: Int, page: Int) -> String = { org, _, _ -> "/orgs/$org/repos?type=all" }
 val GITHUB_ORG_CREATE_REPO_URI: (orgName: String) -> String = { org -> "/orgs/$org/repos" }
 val GITHUB_ORG_TEAMS_URI: (orgName: String) -> String = { org -> "/orgs/$org/teams" }
 val GITHUB_ORG_TEAM_URI: (orgName: String, teamName: String) -> String = { org, team -> "/orgs/$org/teams/$team" }

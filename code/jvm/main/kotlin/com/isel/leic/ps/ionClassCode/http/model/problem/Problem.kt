@@ -26,7 +26,6 @@ class Problem {
         private const val BASE_URL = "https://github.com/i-on-project/repohouse/tree/main/docs/problems"
         private const val MEDIA_TYPE = "application/problem+json"
 
-
         /**
          * Creates a [ResponseEntity] with the corresponding [HttpStatus] and [ErrorMessageModel].
          */
@@ -66,7 +65,7 @@ class Problem {
         val methodNotAllowed = response(
             HttpStatus.METHOD_NOT_ALLOWED,
             ErrorMessageModel(
-                URI("$BASE_URL/internal-server-error"),
+                URI("$BASE_URL/method-not-allowed"),
                 "Method not supported.",
                 "Consult the API documentation for supported methods.",
             ),
@@ -76,9 +75,9 @@ class Problem {
          * Value that represents a media type not supported.
          */
         val unsupportedMediaType = response(
-            HttpStatus.METHOD_NOT_ALLOWED,
+            HttpStatus.UNSUPPORTED_MEDIA_TYPE,
             ErrorMessageModel(
-                URI("$BASE_URL/internal-server-error"),
+                URI("$BASE_URL/unsupported-media-type"),
                 "Media Type not supported",
                 "Consult the API documentation for supported media types",
             ),
@@ -193,6 +192,18 @@ class Problem {
         )
 
         /**
+         * Value that represents a teacher already in a course.
+         */
+        val teacherInCourse = response(
+            HttpStatus.CONFLICT,
+            ErrorMessageModel(
+                URI("$BASE_URL/teacher-in-course"),
+                "Teacher in course.",
+                "This teacher is already in this course.",
+            ),
+        )
+
+        /**
          * Value that represents a user not being a student.
          */
         val notStudent = response(
@@ -253,18 +264,6 @@ class Problem {
         )
 
         /**
-         * Value that represents a request to a forbidden resource.
-         */
-        val forbidden = response(
-            HttpStatus.FORBIDDEN,
-            ErrorMessageModel(
-                URI("$BASE_URL/forbidden"),
-                "Forbidden.",
-                "The resource you are trying to access is forbidden.",
-            ),
-        )
-
-        /**
          * Value that represents a cooldown from making many requests.
          */
         fun cooldown(time: Int) = response(
@@ -273,6 +272,18 @@ class Problem {
                 URI("$BASE_URL/too-many-requests"),
                 "In Cooldown.",
                 "You have to wait $time seconds for another request.",
+            ),
+        )
+
+        /**
+         * Value that represents an email resend cooldown.
+         */
+        val resendCooldown = response(
+            HttpStatus.REQUEST_TIMEOUT,
+            ErrorMessageModel(
+                URI("$BASE_URL/resend-cooldown"),
+                "In Cooldown.",
+                "You have to wait 5 minutes before resending another email.",
             ),
         )
     }
