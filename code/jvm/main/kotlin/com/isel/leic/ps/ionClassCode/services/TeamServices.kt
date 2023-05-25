@@ -14,7 +14,11 @@ import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
+import com.isel.leic.ps.ionClassCode.http.model.output.CreateTeamComposite
+import com.isel.leic.ps.ionClassCode.http.model.output.RequestsHistory
+import com.isel.leic.ps.ionClassCode.http.model.output.RequestsThatNeedApproval
 import com.isel.leic.ps.ionClassCode.http.model.output.TeamModel
+import com.isel.leic.ps.ionClassCode.http.model.output.TeamRequestsForMobileModel
 import com.isel.leic.ps.ionClassCode.http.model.output.TeamRequestsModel
 import com.isel.leic.ps.ionClassCode.http.model.problem.ErrorMessageModel
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
@@ -29,6 +33,7 @@ import org.springframework.stereotype.Component
 typealias TeamResponse = Result<TeamServicesError, TeamModel>
 typealias TeamsResponse = Result<TeamServicesError, List<TeamModel>>
 typealias TeamRequestsResponse = Result<TeamServicesError, TeamRequestsModel>
+typealias TeamRequestsMobileResponse = Result<TeamServicesError, TeamRequestsForMobileModel>
 typealias TeamCreateRequestResponse = Result<TeamServicesError, CreateTeam>
 typealias TeamLeaveRequestResponse = Result<TeamServicesError, LeaveTeam>
 typealias TeamJoinRequestResponse = Result<TeamServicesError, JoinTeam>
@@ -40,6 +45,7 @@ typealias TeamUpdateStatusResponse = Result<TeamServicesError, Boolean>
  * Error codes for the services
  */
 sealed class TeamServicesError {
+    object TeamNotAccepted : TeamServicesError()
     object RequestNotFound : TeamServicesError()
     object TeamNotFound : TeamServicesError()
     object RequestNotRejected : TeamServicesError()
@@ -106,7 +112,7 @@ class TeamServices(
      * Method to create a request to create a team
      * Needs a teacher to approve the request
      */
-    fun createTeamRequest(creator: Int, assignmentId: Int, classroomId: Int): TeamCreateRequestResponse {
+    fun createTeamRequest(creator: Int, creatorGitHubUserName: String, assignmentId: Int, classroomId: Int): TeamCreateRequestResponse {
         return transactionManager.run {
             it.usersRepository.getStudent(creator) ?: return@run Result.Problem(value = TeamServicesError.InternalError)
             val classroom = it.classroomRepository.getClassroomById(classroomId) ?: return@run Result.Problem(value = TeamServicesError.ClassroomNotFound)
@@ -121,9 +127,9 @@ class TeamServices(
             )
             val repo = it.repoRepository.createRepo(repo = RepoInput(name = "${classroom.name} - $assignmentId - ${team.id}", url = null, teamId = team.id))
             val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(), creator = creator)
-            val createTeam = it.createTeamRepository.createCreateTeamRequest(request = CreateTeamInput(teamId = team.id, composite = composite.id), creator = creator)
-            it.createRepoRepository.createCreateRepoRequest(request = CreateRepoInput(repoId = repo.id, composite = composite.id), creator = creator)
-            it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(teamId = team.id, assignmentId = assignmentId, composite = composite.id), creator = creator)
+            val createTeam = it.createTeamRepository.createCreateTeamRequest(request = CreateTeamInput(teamId = team.id, composite = composite.id, teamName = team.name), creator = creator)
+            it.createRepoRepository.createCreateRepoRequest(request = CreateRepoInput(repoId = repo.id, composite = composite.id, repoName = repo.name), creator = creator)
+            it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(teamId = team.id, assignmentId = assignmentId, composite = composite.id, creatorGitHubUserName = creatorGitHubUserName), creator = creator)
             return@run Result.Success(value = createTeam)
         }
     }
@@ -209,18 +215,14 @@ class TeamServices(
     fun updateCreateTeamCompositeRequest(body: UpdateCreateTeamStatusInput, teamId: Int): TeamUpdateStatusResponse {
         return transactionManager.run {
             it.createTeamRepository.updateCreateTeamRequestState(requestId = body.createTeam.requestId, state = body.createTeam.state, githubTeamId = body.createTeam.gitHubTeamId)
-            if (body.createTeam.state == "Accepted") {
-                it.teamRepository.updateTeamStatus(id = teamId)
-            }
             it.joinTeamRepository.updateJoinTeamState(requestId = body.joinTeam.requestId, state = body.joinTeam.state)
-            if (body.joinTeam.state == "Accepted") {
-                it.teamRepository.addStudentToTeam(teamId = teamId, studentId = body.joinTeam.userId)
-            }
             it.createRepoRepository.updateCreateRepoState(requestId = body.createRepo.requestId, state = body.createRepo.state)
-            if (body.createRepo.state == "Accepted" && body.createRepo.url != null) {
-                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url)
+            val compositeState = it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
+            if (compositeState == "Accepted") {
+                it.teamRepository.updateTeamStatus(id = teamId)
+                it.teamRepository.addStudentToTeam(teamId = teamId, studentId = body.joinTeam.userId)
+                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?:"")
             }
-            it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
             return@run Result.Success(value = true)
         }
     }
@@ -260,6 +262,46 @@ class TeamServices(
     }
 
     /**
+     * Method to get all the requests of a team
+     */
+    fun getTeamsRequestsForMobile(teamId: Int): TeamRequestsMobileResponse {
+        return transactionManager.run {
+            when (it.teamRepository.getTeamById(id = teamId)) {
+                null -> Result.Problem(value = TeamServicesError.TeamNotFound)
+                else -> {
+                    val createTeam = it.createTeamRepository.getCreateTeamRequestByTeamId(teamId = teamId) ?: return@run Result.Problem(value = TeamServicesError.TeamNotFound)
+                    if (createTeam.state != "Accepted") return@run Result.Problem(value = TeamServicesError.TeamNotAccepted)
+                    val joinTeamRequests = it.joinTeamRepository.getJoinTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId}
+                    val leaveTeamRequests = it.leaveTeamRepository.getLeaveTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId}
+                    val createRepo = it.createRepoRepository.getCreateRepoRequestByCompositeId(compositeId = createTeam.composite) ?: return@run Result.Problem(value = TeamServicesError.InternalError)
+                    val joinTeam = joinTeamRequests.find { request -> request.composite == createTeam.composite } ?: return@run Result.Problem(value = TeamServicesError.InternalError)
+                    val archiveRepo = it.archiveRepoRepository.getArchiveRepoRequestsByTeam(teamId = teamId)
+                    Result.Success(TeamRequestsForMobileModel(
+                        needApproval =  RequestsThatNeedApproval(
+                            joinTeam = joinTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
+                            leaveTeam = leaveTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
+                        ),
+                        requestsHistory = RequestsHistory(
+                            createTeamComposite = CreateTeamComposite(createTeam = createTeam, joinTeam = joinTeam, createRepo = createRepo, compositeState = "Accepted"),
+                            joinTeam = joinTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
+                            leaveTeam = leaveTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
+                            archiveRepo = if (archiveRepo != null && archiveRepo.state == "Accepted") archiveRepo else null
+                        )
+                    ))
+                }
+            }
+        }
+    }
+
+    fun updateRequestState(requestId: Int, state: String): TeamUpdateRequestResponse {
+        if (requestId < 0 || state.isEmpty()) return Result.Problem(TeamServicesError.InvalidData)
+        return transactionManager.run {
+            it.requestRepository.changeStateRequest(id = requestId, state = state)
+            Result.Success(true)
+        }
+    }
+
+    /**
      * Function to handle the errors
      */
     fun problem(error: TeamServicesError): ResponseEntity<ErrorMessageModel> {
@@ -272,6 +314,7 @@ class TeamServices(
             is TeamServicesError.AssignmentNotFound -> Problem.notFound
             is TeamServicesError.InvalidData -> Problem.invalidInput
             is TeamServicesError.InternalError -> Problem.internalError
+            is TeamServicesError.TeamNotAccepted -> Problem.invalidOperation
         }
     }
 }

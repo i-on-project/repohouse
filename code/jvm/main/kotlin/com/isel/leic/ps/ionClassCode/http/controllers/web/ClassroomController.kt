@@ -103,7 +103,7 @@ class ClassroomController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        return when (val archive = classroomServices.archiveOrDeleteClassroom(classroomId)) {
+        return when (val archive = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId, creator = user.id)) {
             is Result.Problem -> classroomServices.problem(archive.value)
             is Result.Success ->
                 if (archive.value is ClassroomArchivedResult.ClassroomArchived) {

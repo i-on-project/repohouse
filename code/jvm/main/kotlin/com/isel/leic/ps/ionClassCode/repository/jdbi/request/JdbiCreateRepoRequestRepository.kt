@@ -1,6 +1,5 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi.request
 
-import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateRepo
 import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
@@ -42,7 +41,7 @@ class JdbiCreateRepoRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return CreateRepo(id, request.repoId, creator)
+        return CreateRepo(id = id, repoId = request.repoId, creator = creator, repoName = request.repoName, composite = request.composite)
     }
 
     /**
@@ -51,7 +50,9 @@ class JdbiCreateRepoRequestRepository(
     override fun getCreateRepoRequests(): List<CreateRepo> {
         return handle.createQuery(
             """
-            SELECT c.id, c.repo_id,r.creator, r.state, r.composite FROM createrepo as c JOIN request as r ON r.id = c.id
+            SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name as repo_name FROM
+            (SELECT c.id, c.repo_id, r.name FROM createrepo c JOIN repo r on r.id = c.repo_id) AS x 
+            JOIN request as r ON r.id = x.id
             """,
         )
             .mapTo<CreateRepo>()
@@ -64,43 +65,28 @@ class JdbiCreateRepoRequestRepository(
     override fun getCreateRepoRequestById(id: Int): CreateRepo? {
         return handle.createQuery(
             """
-            SELECT createrepo.id, createrepo.repo_id,request.creator, request.state, request.composite FROM createrepo 
-            JOIN request  ON request.id = createrepo.id
-            WHERE createrepo.id = :id
-            """,
+            SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name as repo_name FROM 
+            (SELECT c.id, c.repo_id, r.name FROM createrepo c JOIN repo r on r.id = c.repo_id) AS x 
+            JOIN request r ON r.id = x.id
+             WHERE r.id = :id
+            """
         )
             .bind("id", id)
             .mapTo<CreateRepo>()
             .firstOrNull()
     }
 
-    /**
-     * Method to get all Create Repo Request's by a user
-     */
-    override fun getCreateRepoRequestsByUser(userId: Int): List<CreateRepo> {
+    override fun getCreateRepoRequestByCompositeId(compositeId: Int): CreateRepo? {
         return handle.createQuery(
             """
-            SELECT createrepo.id, createrepo.repo_id, creator, state, composite FROM createrepo
-            JOIN request ON request.id = createrepo.id
-            WHERE request.creator = :userId
-            """,
-        )
-            .bind("userId", userId)
-            .mapTo<CreateRepo>()
-            .list()
-    }
-
-    override fun getCreateRepoRequestByCompositeId(compositeId: Int): RepoNotCreated? {
-        return handle.createQuery(
-            """
-            SELECT x.repo_id, x.name, x.id, r.creator, r.state, r.composite FROM (
-                SELECT c.id, c.repo_id, r2.name FROM createrepo as c JOIN repo r2 on c.repo_id = r2.id
+            SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name  as repo_name FROM (
+                SELECT c.id, c.repo_id, r.name FROM createrepo as c JOIN repo r on c.repo_id = r.id
             ) AS x JOIN request r on x.id = r.id
             WHERE composite = :compositeId
                         """,
         )
             .bind("compositeId", compositeId)
-            .mapTo<RepoNotCreated>()
+            .mapTo<CreateRepo>()
             .firstOrNull()
     }
 

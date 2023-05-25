@@ -2,6 +2,8 @@ package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.ArchiveRepoInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomInviteModel
@@ -10,12 +12,12 @@ import com.isel.leic.ps.ionClassCode.http.model.output.LocalCopy
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import java.io.File
 
 /**
  * Alias for the response of the services
@@ -107,7 +109,7 @@ class ClassroomServices(
      * Method that archives or deletes a classroom
      * If the classroom has no assignments it is deleted
      */
-    fun archiveOrDeleteClassroom(classroomId: Int): ClassroomArchivedResponse {
+    fun archiveOrDeleteClassroom(classroomId: Int, creator: Int): ClassroomArchivedResponse {
         return transactionManager.run {
             when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {
                 null -> Result.Problem(ClassroomServicesError.ClassroomNotFound)
@@ -118,6 +120,11 @@ class ClassroomServices(
                         it.classroomRepository.deleteClassroom(classroomId)
                         Result.Success(ClassroomArchivedResult.ClassroomDeleted)
                     } else {
+                        val repoIds = it.classroomRepository.getAllReposInClassroom(classroomId = classroomId)
+                        val composite = it.compositeRepository.createCompositeRequest(creator = creator, request = CompositeInput())
+                        repoIds.forEach { repoId ->
+                            it.archiveRepoRepository.createArchiveRepoRequest(request = ArchiveRepoInput(repoId = repoId, composite = composite.id), creator = creator)
+                        }
                         it.classroomRepository.archiveClassroom(classroomId)
                         Result.Success(ClassroomArchivedResult.ClassroomArchived)
                     }

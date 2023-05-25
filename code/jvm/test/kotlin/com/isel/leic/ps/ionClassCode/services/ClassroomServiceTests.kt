@@ -15,6 +15,8 @@ import com.isel.leic.ps.ionClassCode.repository.UsersRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
+import java.sql.Timestamp
+import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -24,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import java.sql.Timestamp
-import java.time.Instant
 
 @SpringBootTest
 class ClassroomServiceTests {
@@ -207,7 +207,7 @@ class ClassroomServiceTests {
         val classroomId = -1
 
         // when: getting an error because of an invalid classroom id
-        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
+        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId, creator = 1)
 
         if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
@@ -222,7 +222,7 @@ class ClassroomServiceTests {
         val classroomId = 4
 
         // when: getting an error because classroom id does not exists
-        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
+        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId, creator = 1)
 
         if (classroom is Result.Problem) {
             assert(classroom.value is ClassroomServicesError.ClassroomNotFound)
@@ -237,7 +237,7 @@ class ClassroomServiceTests {
         val classroomId = 2
 
         // when: getting a ClassroomArchived
-        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
+        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId, creator = 1)
 
         if (classroom is Result.Success) {
             assert(classroom.value is ClassroomArchivedResult.ClassroomArchived)
@@ -252,7 +252,7 @@ class ClassroomServiceTests {
         val classroomId = 1
 
         // when: getting a ClassroomArchived
-        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
+        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId, creator = 1)
 
         if (classroom is Result.Success) {
             assert(classroom.value is ClassroomArchivedResult.ClassroomArchived)
@@ -267,7 +267,7 @@ class ClassroomServiceTests {
         val classroomId = 3
 
         // when: getting a ClassroomDeleted
-        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId)
+        val classroom = classroomServices.archiveOrDeleteClassroom(classroomId = classroomId, creator = 1)
 
         if (classroom is Result.Success) {
             assert(classroom.value is ClassroomArchivedResult.ClassroomDeleted)

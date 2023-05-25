@@ -2,10 +2,10 @@ package com.isel.leic.ps.ionClassCode.http.model.output
 
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Delivery
-import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 import com.isel.leic.ps.ionClassCode.domain.Team
-import com.isel.leic.ps.ionClassCode.domain.TeamNotCreated
-import com.isel.leic.ps.ionClassCode.domain.UserJoinTeam
+import com.isel.leic.ps.ionClassCode.domain.requests.CreateRepo
+import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
+import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 
 /**
  * Represents a Assigment Output Model.
@@ -69,9 +69,9 @@ data class TeacherAssignmentModel(
  */
 data class CreateTeamComposite(
     val compositeState: String,
-    val createTeam: TeamNotCreated,
-    val joinTeam: UserJoinTeam,
-    val createRepo: RepoNotCreated,
+    val createTeam: CreateTeam,
+    val joinTeam: JoinTeam,
+    val createRepo: CreateRepo,
 )
 
 /**

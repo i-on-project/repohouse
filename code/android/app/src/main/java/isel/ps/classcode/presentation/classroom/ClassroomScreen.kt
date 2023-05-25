@@ -51,13 +51,14 @@ import isel.ps.classcode.R
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.CreateTeamComposite
-import isel.ps.classcode.domain.RepoNotCreated
+import isel.ps.classcode.domain.CreateRepo
 import isel.ps.classcode.domain.Team
-import isel.ps.classcode.domain.TeamNotCreated
-import isel.ps.classcode.domain.UserJoinTeam
+import isel.ps.classcode.domain.CreateTeam
+import isel.ps.classcode.domain.JoinTeam
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.course.ChosenIcon
 import isel.ps.classcode.presentation.views.ClassCodeErrorView
+import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
 import java.sql.Timestamp
 
@@ -74,7 +75,7 @@ fun ClassroomScreen(
     createTeamComposite: List<CreateTeamComposite>? = null,
     onTeamSelected: (Team) -> Unit,
     onCreateTeamComposite: (CreateTeamComposite, Boolean, Assignment) -> Unit,
-    assignments: List<Assignment>,
+    assignments: List<Assignment>?,
     assignment: Assignment?,
     onAssignmentChange: (Assignment) -> Unit,
     onBackRequest: () -> Unit,
@@ -103,27 +104,47 @@ fun ClassroomScreen(
                 .padding(top = it.calculateTopPadding(), start = 24.dp, end = 24.dp)
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
-            if (error != null) {
-                ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
-            } else {
-                ShowClassroom(classroom = classroom)
-                if (assignment != null) {
-                    FilterButtons(typeOfTeam = typeOfTeam, onTypeOfTeamChange = { type -> typeOfTeam = type }, assignment = assignment, assignments = assignments, onAssignmentChange = onAssignmentChange)
-                    if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
-                        if (teamsCreated != null)
-                            ShowTeams(teamsCreated = teamsCreated, onTeamSelected = onTeamSelected)
-                    } else {
-                        if (createTeamComposite != null)
-                            ShowCreateTeamComposite(createTeamComposite = createTeamComposite, assignment = assignment, onCreateTeamComposite = onCreateTeamComposite)
+            if (assignments != null) {
+                if (error != null) {
+                    ClassCodeErrorView(
+                        handleClassCodeResponseError = error,
+                        onDismissRequest = onDismissRequest
+                    )
+                } else {
+                    ShowClassroom(classroom = classroom)
+                    if (assignment != null) {
+                        FilterButtons(
+                            typeOfTeam = typeOfTeam,
+                            onTypeOfTeamChange = { type -> typeOfTeam = type },
+                            assignment = assignment,
+                            assignments = assignments,
+                            onAssignmentChange = onAssignmentChange
+                        )
+                        if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
+                            if (teamsCreated != null)
+                                ShowTeams(
+                                    teamsCreated = teamsCreated,
+                                    onTeamSelected = onTeamSelected
+                                )
+                        } else {
+                            if (createTeamComposite != null)
+                                ShowCreateTeamComposite(
+                                    createTeamComposite = createTeamComposite,
+                                    assignment = assignment,
+                                    onCreateTeamComposite = onCreateTeamComposite
+                                )
+                        }
                     }
                 }
+            } else {
+                LoadingAnimationCircle()
             }
         }
     }
 }
 
 @Composable
-fun ShowCreateTeamComposite(
+private fun ShowCreateTeamComposite(
     createTeamComposite: List<CreateTeamComposite>,
     assignment: Assignment,
     onCreateTeamComposite: (CreateTeamComposite, Boolean, Assignment) -> Unit,
@@ -154,7 +175,7 @@ fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, assignment
             .padding(8.dp)
     ) {
         Column(modifier = Modifier.weight(0.85f)) {
-            Text(text = "${createTeamComposite.compositeState} - ${createTeamComposite.createTeam.name}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+            Text(text = "${createTeamComposite.compositeState} - ${createTeamComposite.createTeam.teamName}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
             ShowRequestsStates(createTeamState = createTeamComposite.createTeam.state, joinTeamState = createTeamComposite.joinTeam.state, createRepoState = createTeamComposite.createRepo.state)
         }
@@ -243,25 +264,26 @@ fun ShowRequestsStates(createTeamState: String, joinTeamState: String, createRep
 fun Aaaa() {
     val createTeamComposite = CreateTeamComposite(
         compositeState = "Accepted",
-        createTeam = TeamNotCreated(
-            id = 1,
+        createTeam = CreateTeam(
+            teamId = 1,
             gitHubTeamId = null,
-            name = "Team test",
+            teamName = "Team test",
             requestId = 1,
             creator = 1,
             state = "Accepted",
             composite = 1
         ),
-        joinTeam = UserJoinTeam(
-            name = "user",
+        joinTeam = JoinTeam(
+            githubUsername = "user",
             requestId = 2,
             creator = 1,
             state = "Accepted",
             composite = 1,
+            teamId = 1
         ),
-        createRepo = RepoNotCreated(
+        createRepo = CreateRepo(
             repoId = 1,
-            name = "Accepted",
+            repoName = "Accepted",
             requestId = 3,
             creator = 1,
             state = "Accepted",

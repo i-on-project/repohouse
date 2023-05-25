@@ -13,7 +13,7 @@ import isel.ps.classcode.MEDIA_TYPE
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.CreateTeamComposite
-import isel.ps.classcode.domain.RepoNotCreated
+import isel.ps.classcode.domain.CreateRepo
 import isel.ps.classcode.domain.Team
 import isel.ps.classcode.domain.Teams
 import isel.ps.classcode.domain.UpdateCreateTeamStatusInput
@@ -130,7 +130,7 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
             .post(
                 objectMapper.writeValueAsString(
                     mapOf(
-                        "name" to createTeamComposite.createTeam.name,
+                        "name" to createTeamComposite.createTeam.teamName,
                     )
                 ).toRequestBody(MEDIA_TYPE)
             )
@@ -167,7 +167,7 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
         }
     }
 
-    override suspend fun createRepoInGitHub(orgName: String, teamId: Int?, repo: RepoNotCreated): ResultFromRequest<String> {
+    override suspend fun createRepoInGitHub(orgName: String, teamId: Int?, repo: CreateRepo): ResultFromRequest<String> {
         if (teamId == null) return ResultFromRequest(isCompleted = false)
         val accessToken = sessionStore.getGithubToken().first()
         val requestCreateTeam = Request.Builder()
@@ -175,7 +175,7 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
             .post(
                 objectMapper.writeValueAsString(
                     mapOf(
-                        "name" to repo.name,
+                        "name" to repo.repoName,
                         "team_id" to teamId,
                     )
                 ).toRequestBody(MEDIA_TYPE)

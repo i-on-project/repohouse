@@ -23,6 +23,9 @@ import isel.ps.classcode.presentation.login.services.RealLoginServices
 import isel.ps.classcode.presentation.menu.services.FakeMenuServices
 import isel.ps.classcode.presentation.menu.services.MenuServices
 import isel.ps.classcode.presentation.menu.services.RealMenuServices
+import isel.ps.classcode.presentation.team.services.FakeTeamServices
+import isel.ps.classcode.presentation.team.services.RealTeamServices
+import isel.ps.classcode.presentation.team.services.TeamServices
 import okhttp3.OkHttpClient
 
 const val TAG = "Classcode"
@@ -37,7 +40,8 @@ data class Dependencies(
     override val menuServices: MenuServices,
     override val courseServices: CourseServices,
     override val classroomServices: ClassroomServices,
-    override val bootUpServices: BootUpServices
+    override val bootUpServices: BootUpServices,
+    override val teamServices: TeamServices
 ) : DependenciesContainer
 
 class ClassCodeApplication : DependenciesContainer, Application() {
@@ -52,6 +56,7 @@ class ClassCodeApplication : DependenciesContainer, Application() {
     override val menuServices: MenuServices by lazy { dependencies.menuServices }
     override val courseServices: CourseServices by lazy { dependencies.courseServices }
     override val classroomServices: ClassroomServices by lazy { dependencies.classroomServices }
+    override val teamServices: TeamServices by lazy { dependencies.teamServices }
 }
 
 /**
@@ -64,6 +69,7 @@ interface DependenciesContainer {
     val menuServices: MenuServices
     val courseServices: CourseServices
     val classroomServices: ClassroomServices
+    val teamServices: TeamServices
 }
 
 private fun dependencies(isRealImplementation: Boolean = false, context: Context, cryptoManager: CryptoManager, objectMapper: ObjectMapper, httpClient: OkHttpClient, navigationRepo: NavigationRepository): Dependencies {
@@ -104,6 +110,13 @@ private fun dependencies(isRealImplementation: Boolean = false, context: Context
                 sessionStore = sessionStore,
                 navigationRepo = navigationRepo,
                 bootUpServices = bootUpServices
+            ),
+            teamServices = RealTeamServices(
+                httpClient = httpClient,
+                objectMapper = objectMapper,
+                sessionStore = sessionStore,
+                navigationRepo = navigationRepo,
+                bootUpServices = bootUpServices
             )
         )
     } else {
@@ -113,7 +126,8 @@ private fun dependencies(isRealImplementation: Boolean = false, context: Context
             bootUpServices = FakeBootUpServices(),
             menuServices = FakeMenuServices(),
             courseServices = FakeCourseServices(),
-            classroomServices = FakeClassroomServices()
+            classroomServices = FakeClassroomServices(),
+            teamServices = FakeTeamServices()
         )
     }
 }

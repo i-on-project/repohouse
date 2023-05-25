@@ -128,7 +128,7 @@ ALTER TABLE Request
 
 CREATE TABLE ArchiveRepo(
    id int primary key,
-   repo_id int not null,
+   repo_id int unique not null,
    foreign key (id) references Request(id)
 );
 

@@ -1,7 +1,6 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi.request
 
 import com.isel.leic.ps.ionClassCode.domain.Team
-import com.isel.leic.ps.ionClassCode.domain.TeamNotCreated
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
 import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository
@@ -44,7 +43,7 @@ class JdbiCreateTeamRequestRepository(
             .mapTo<Int>()
             .first()
 
-        return CreateTeam(id = id, creator = creator, composite = request.composite, teamId = request.teamId, githubTeamId = null)
+        return CreateTeam(id = id, creator = creator, composite = request.composite, teamId = request.teamId, githubTeamId = null, teamName = request.teamName)
     }
 
     /**
@@ -53,8 +52,9 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequests(): List<CreateTeam> {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, r.composite, c.team_id FROM createteam as c JOIN request r on r.id = c.id
-            where r.state = 'Pending'
+            SELECT r.id, r.creator, r.state, r.composite, x.team_id, x.name as team_name, x.github_team_id FROM 
+            (SELECT c.id, c.team_id, t.name, c.github_team_id FROM createteam c JOIN team t on t.id = c.team_id) as x  
+            JOIN request r on r.id = x.id
             """,
         )
             .mapTo<CreateTeam>()
@@ -67,8 +67,10 @@ class JdbiCreateTeamRequestRepository(
     override fun getCreateTeamRequestById(id: Int): CreateTeam? {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, r.composite, c.team_id, c.github_team_id FROM createteam as c JOIN request r on r.id = c.id
-            WHERE c.id = :id
+            SELECT r.id, r.creator, r.state, r.composite, x.team_id, x.name as team_name, x.github_team_id FROM 
+            (SELECT c.id, c.team_id, t.name, c.github_team_id FROM createteam c JOIN team t on t.id = c.team_id) as x 
+            JOIN request r on r.id = x.id
+            WHERE x.id = :id
             """,
         )
             .bind("id", id)
@@ -76,11 +78,11 @@ class JdbiCreateTeamRequestRepository(
             .firstOrNull()
     }
 
-    override fun getCreateTeamRequests(teamIds: List<Team>): List<TeamNotCreated> {
+    override fun getCreateTeamRequests(teamIds: List<Team>): List<CreateTeam> {
         return teamIds.map { team ->
-            val request = handle.createQuery(
+            handle.createQuery(
                 """
-                SELECT x.team_id, x.name, r.creator, r.state, r.composite, x.github_team_id FROM (
+                SELECT r.id, r.creator, r.state, r.composite, x.team_id, x.name as team_name, x.github_team_id FROM (
                     SELECT c.id, t.name, c.team_id, c.github_team_id FROM createteam as c JOIN team t on c.team_id = t.id
                     WHERE c.team_id = :teamId
                 ) as x JOIN request r on r.id = x.id
@@ -89,50 +91,34 @@ class JdbiCreateTeamRequestRepository(
                 .bind("teamId", team.id)
                 .mapTo<CreateTeam>()
                 .first()
-            TeamNotCreated(teamId = team.id, name = team.name, id = request.id, state = request.state, creator = request.creator, githubTeamId = request.githubTeamId,composite = request.composite)
         }
     }
 
-    /**
-     * Method to get all Create Team Request's by a user
-     */
-    override fun getCreateTeamRequestsByUser(userId: Int): List<CreateTeam> {
+    override fun getCreateTeamRequestByCompositeId(compositeId: Int): CreateTeam? {
         return handle.createQuery(
             """
-            SELECT c.id, r.creator, r.state, r.composite, c.team_id, c.github_team_id FROM createteam as c JOIN request r on r.id = c.id
-            WHERE r.creator = :userId
-            """,
-        )
-            .bind("userId", userId)
-            .mapTo<CreateTeam>()
-            .list()
-    }
-
-    override fun getCreateTeamRequestByCompositeId(compositeId: Int): TeamNotCreated? {
-        return handle.createQuery(
-            """
-            SELECT x.team_id, x.name, r.id, r.creator, r.state, r.composite, x.github_team_id FROM (
+            SELECT r.id, r.creator, r.state, r.composite, x.team_id, x.name as team_name, x.github_team_id FROM (
                 SELECT c.id, t.name, c.team_id, c.github_team_id FROM createteam as c JOIN team t on c.team_id = t.id
             ) as x JOIN request r on r.id = x.id
             WHERE r.composite = :compositeId
             """,
         )
             .bind("compositeId", compositeId)
-            .mapTo<TeamNotCreated>()
+            .mapTo<CreateTeam>()
             .firstOrNull()
     }
 
-    override fun getCreateTeamRequestByTeamId(teamId: Int): TeamNotCreated? {
+    override fun getCreateTeamRequestByTeamId(teamId: Int): CreateTeam? {
         return handle.createQuery(
             """
-            SELECT x.team_id, x.name, r.creator, r.state, r.composite, x.github_team_id FROM (
+            SELECT r.id, r.creator, r.state, r.composite, x.team_id, x.name as team_name, x.github_team_id FROM (
                 SELECT c.id, t.name, c.team_id, c.github_team_id FROM createteam as c JOIN team t on c.team_id = t.id
                 WHERE c.team_id = :teamId
             ) as x JOIN request r on r.id = x.id
             """,
         )
             .bind("teamId", teamId)
-            .mapTo<TeamNotCreated>()
+            .mapTo<CreateTeam>()
             .firstOrNull()
     }
 

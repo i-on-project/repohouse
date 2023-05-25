@@ -12,6 +12,8 @@
     <string name="credits_icon">Credits icon</string>
     <string name="archived_icon">Archived icon</string>
     <string name="assignment_icon">Assignment icon</string>
+    <string name="history_icon">History icon</string>
+    <string name="pending_icon">Pending icon</string>
     <string name="filter_icon">Filter icon</string>
     <string name="checked_icon">Checked icon</string>
     <string name="refreshed_icon">Refreshed icon</string>

@@ -4,6 +4,7 @@ import com.isel.leic.ps.ionClassCode.domain.Feedback
 import com.isel.leic.ps.ionClassCode.domain.Repo
 import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.Team
+import com.isel.leic.ps.ionClassCode.domain.requests.ArchiveRepo
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
 
@@ -43,9 +44,27 @@ data class TeamRequestsModel(
     val leaveTeam: List<LeaveTeam>,
 )
 
+data class RequestsThatNeedApproval(
+    val joinTeam: List<JoinTeam>,
+    val leaveTeam: List<LeaveTeam>,
+)
+
+data class RequestsHistory(
+    val createTeamComposite: CreateTeamComposite,
+    val joinTeam: List<JoinTeam>,
+    val leaveTeam: List<LeaveTeam>,
+    val archiveRepo: ArchiveRepo?,
+)
+
+data class TeamRequestsForMobileModel(
+    val needApproval: RequestsThatNeedApproval,
+    val requestsHistory: RequestsHistory
+)
+
 /**
  * Represents an Update Create Team Status Output.
  */
 data class UpdateCreateTeamStatusOutput(
     val result: Boolean,
 )
+

@@ -43,14 +43,16 @@ suspend fun <T> Request.send(okHttpClient: OkHttpClient, handler: (Response) -> 
  * Handle the response from the GitHub API.
  */
 
-inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper: ObjectMapper): Either<HandleGitHubResponseError, R> {
+inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper: ObjectMapper, ignoreBody: Boolean = false): Either<HandleGitHubResponseError, R> {
     val body = response.body?.string()
     return if (response.isSuccessful) {
-        try {
-            Either.Right(value = jsonMapper.readValue(body, R::class.java))
-        }
-        catch (e: StreamReadException) {
-            Either.Left(value = HandleGitHubResponseError.FailDeserialize(error = "Failed to deserialize response body: $body"))
+        if (ignoreBody) Either.Right(value = Unit as R)
+        else {
+            try {
+                Either.Right(value = jsonMapper.readValue(body, R::class.java))
+            } catch (e: StreamReadException) {
+                Either.Left(value = HandleGitHubResponseError.FailDeserialize(error = "Failed to deserialize response body: $body"))
+            }
         }
     }
     else {

@@ -11,7 +11,7 @@ class JdbiCreateTeamRequestRepositoryTestsInterface {
     @Test
     fun `createCreateTeamRequest should create a new createTeam request`() = testWithHandleAndRollback { handle ->
         val createTeamReq = JdbiCreateTeamRequestRepository(handle = handle)
-        val request = CreateTeamInput(teamId = 3, composite = 15)
+        val request = CreateTeamInput(teamId = 3, composite = 15, teamName = "aaa")
         createTeamReq.createCreateTeamRequest(request = request, creator = 3)
     }
 
@@ -29,14 +29,6 @@ class JdbiCreateTeamRequestRepositoryTestsInterface {
         val creator = 4
         val request = createTeamReq.getCreateTeamRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
-    }
-
-    @Test
-    fun `getCreateTeamRequestsByUser should return createTeams requests for a user`() = testWithHandleAndRollback { handle ->
-        val createTeamReq = JdbiCreateTeamRequestRepository(handle = handle)
-        val userId = 4
-        val requests = createTeamReq.getCreateTeamRequestsByUser(userId = userId)
-        assert(requests.size == 1)
     }
 
     @Test

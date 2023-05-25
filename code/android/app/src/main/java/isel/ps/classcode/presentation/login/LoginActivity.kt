@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.connectivityObserver.NetworkConnectivityObserver
 import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.menu.MenuActivity

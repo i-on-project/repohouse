@@ -48,6 +48,9 @@
         <activity
             android:name=".presentation.menu.MenuActivity"
             android:exported="true" />
+        <activity
+            android:name=".presentation.team.TeamActivity"
+            android:exported="true" />
 
         <activity
             android:name=".presentation.course.CourseActivity"

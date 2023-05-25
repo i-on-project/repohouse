@@ -21,3 +21,7 @@ val GITHUB_CREATE_REPO: (String) -> String = {orgName ->
 val GITHUB_ADD_MEMBER_TO_TEAM: (String, String, String) -> String = { orgName, teamSlug, username ->
     "${GITHUB_ADD_TEAM(orgName)}/$teamSlug/memberships/$username"
 }
+
+val GITHUB_REMOVE_MEMBER_FROM_TEAM: (String, String, String) -> String = { orgName, teamSlug, username ->
+    "${GITHUB_ADD_TEAM(orgName)}/$teamSlug/memberships/$username"
+}

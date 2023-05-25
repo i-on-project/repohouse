@@ -11,7 +11,7 @@ class JdbiArchiveRepoRequestRepositoryTestsInterface {
     @Test
     fun `createArchiveRepoRequest should create a new archiveRepo request`() = testWithHandleAndRollback { handle ->
         val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
-        val request = ArchiveRepoInput(repoId = 1, composite = null)
+        val request = ArchiveRepoInput(repoId = 3, composite = null)
         val created = archiveReq.createArchiveRepoRequest(request = request, creator = 3)
         val archive = archiveReq.getArchiveRepoRequestById(id = created.id)
         assert(archive != null)
@@ -31,13 +31,5 @@ class JdbiArchiveRepoRequestRepositoryTestsInterface {
         val creator = 1
         val request = archiveReq.getArchiveRepoRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
-    }
-
-    @Test
-    fun `getArchiveRepoRequestsByUser should return archiveRepo requests for a user`() = testWithHandleAndRollback { handle ->
-        val archiveReq = JdbiArchiveRepoRequestRepository(handle = handle)
-        val userId = 1
-        val requests = archiveReq.getArchiveRepoRequestsByUser(userId = userId)
-        assert(requests.size == 2)
     }
 }

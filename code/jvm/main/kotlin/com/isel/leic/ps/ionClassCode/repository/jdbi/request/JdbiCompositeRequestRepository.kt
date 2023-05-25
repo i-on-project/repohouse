@@ -5,7 +5,6 @@ import com.isel.leic.ps.ionClassCode.domain.requests.Composite
 import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
-import org.slf4j.LoggerFactory
 
 /**
  * Implementation of the Composite Request methods
@@ -44,14 +43,11 @@ class JdbiCompositeRequestRepository(
             .first()
         return Composite(compositeId, creator)
     }
-    companion object{
-        private val logger = LoggerFactory.getLogger(JdbiCompositeRequestRepository::class.java)
-    }
 
     /**
      * Method to change a Composite Request state
      */
-    override fun updateCompositeState(compositeId: Int) {
+    override fun updateCompositeState(compositeId: Int): String {
         val query = handle.createQuery(
             """
            SELECT r.state FROM request as r JOIN composite c on r.composite = :compositeId
@@ -61,7 +57,6 @@ class JdbiCompositeRequestRepository(
             .mapTo<String>()
             .list()
         val state = if (query.all { it == "Accepted" }) "Accepted" else { if (query.any { it == "Not_Concluded" }) "Not_Concluded" else "Rejected" }
-        logger.info("Composite request with id $compositeId has state $state")
         handle.createUpdate(
             """
             UPDATE request
@@ -72,6 +67,7 @@ class JdbiCompositeRequestRepository(
             .bind("id", compositeId)
             .bind("state", state)
             .execute()
+        return state
     }
 
     /**
@@ -121,17 +117,6 @@ class JdbiCompositeRequestRepository(
             .list()
     }
 
-    override fun getCompositeRequestById(compositeId: Int): Composite? {
-        return handle.createQuery(
-            """
-          SELECT * FROM request
-          WHERE composite = :id
-          """,
-        )
-            .bind("id", compositeId)
-            .mapTo<Composite>()
-            .firstOrNull()
-    }
 
     /**
      * Method to get all Composite Request's by a user

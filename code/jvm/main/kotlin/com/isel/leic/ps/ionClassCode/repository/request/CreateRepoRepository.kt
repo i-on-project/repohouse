@@ -1,6 +1,5 @@
 package com.isel.leic.ps.ionClassCode.repository.request
 
-import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateRepo
 
@@ -11,7 +10,6 @@ interface CreateRepoRepository {
     fun createCreateRepoRequest(request: CreateRepoInput, creator: Int): CreateRepo
     fun getCreateRepoRequests(): List<CreateRepo>
     fun getCreateRepoRequestById(id: Int): CreateRepo?
-    fun getCreateRepoRequestsByUser(userId: Int): List<CreateRepo>
-    fun getCreateRepoRequestByCompositeId(compositeId: Int): RepoNotCreated?
+    fun getCreateRepoRequestByCompositeId(compositeId: Int): CreateRepo?
     fun updateCreateRepoState(requestId: Int, state: String)
 }

@@ -13,6 +13,7 @@ import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.dto.LocalClassroomDto
 import isel.ps.classcode.presentation.classroom.services.ClassroomServices
+import isel.ps.classcode.presentation.team.TeamActivity
 import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
@@ -43,37 +44,31 @@ class ClassroomActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val pair = getClassroomExtra()
-        val classroom = pair.first
-        val courseName = pair.second
-        if (classroom != null) {
-            vm.getAssignments(classroomId =  classroom.id, courseId = classroom.courseId)
-        }
+        val classroom = pair.first ?: return finish()
+        val courseName = pair.second ?: return finish()
+        vm.getAssignments(classroomId =  classroom.id, courseId = classroom.courseId)
         setContent {
             val assignments = vm.assignments
             ClasscodeTheme {
-                if (classroom != null && assignments != null && courseName != null) {
-                    ClassroomScreen(
-                        classroom = classroom,
-                        teamsCreated = vm.teamsCreated,
-                        assignments = assignments,
-                        assignment = vm.assignment,
-                        onTeamSelected = { },
-                        createTeamComposite = vm.createTeamComposite,
-                        onAssignmentChange = { assignment -> vm.getTeams(courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id) },
-                        onBackRequest = { finish() },
-                        error = vm.errorClassCode,
-                        onDismissRequest = { finish() },
-                        onCreateTeamComposite = { createTeamComposite, wasAccepted, assignment ->
-                            if (wasAccepted) {
-                                vm.createTeamCompositeAccepted(team = createTeamComposite, courseName = courseName, courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id)
-                            } else {
-                                vm.createTeamCompositeRejected(team = createTeamComposite, classroomId = classroom.id, assignmentId = assignment.id, courseId = classroom.courseId)
-                            }
+                ClassroomScreen(
+                    classroom = classroom,
+                    teamsCreated = vm.teamsCreated,
+                    assignments = assignments,
+                    assignment = vm.assignment,
+                    onTeamSelected = { TeamActivity.navigate(origin = this, team = it.toLocalTeamDto(courseId = classroom.courseId, courseName = courseName, classroomId = classroom.id))},
+                    createTeamComposite = vm.createTeamComposite,
+                    onAssignmentChange = { assignment -> vm.getTeams(courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id) },
+                    onBackRequest = { finish() },
+                    error = vm.errorClassCode,
+                    onDismissRequest = { finish() },
+                    onCreateTeamComposite = { createTeamComposite, wasAccepted, assignment ->
+                        if (wasAccepted) {
+                            vm.createTeamCompositeAccepted(team = createTeamComposite, courseName = courseName, courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id)
+                        } else {
+                            vm.createTeamCompositeRejected(team = createTeamComposite, classroomId = classroom.id, assignmentId = assignment.id, courseId = classroom.courseId)
                         }
-                    )
-                } else {
-                    LoadingAnimationCircle()
-                }
+                    }
+                )
             }
         }
     }

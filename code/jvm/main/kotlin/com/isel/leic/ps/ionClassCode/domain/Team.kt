@@ -9,21 +9,3 @@ data class Team(
     val isCreated: Boolean,
     val assignment: Int
 )
-
-data class TeamNotCreated(
-    val teamId: Int,
-    val name: String,
-    val id: Int,
-    val creator: Int,
-    val state: String = "Pending",
-    val composite: Int,
-    val githubTeamId: Int?,
-)
-
-data class UserJoinTeam(
-    val githubUsername: String,
-    val id: Int,
-    val creator: Int,
-    val state: String = "Pending",
-    val composite: Int,
-)

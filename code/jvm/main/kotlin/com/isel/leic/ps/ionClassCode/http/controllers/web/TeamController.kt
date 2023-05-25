@@ -106,7 +106,7 @@ class TeamController(
         @PathVariable assignmentId: Int,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.notStudent
-        return when (val create = teamService.createTeamRequest(user.id, assignmentId, classroomId)) {
+        return when (val create = teamService.createTeamRequest(user.id, user.githubUsername, assignmentId, classroomId)) {
             is Result.Problem -> teamService.problem(create.value)
             is Result.Success -> siren(RequestCreatedOutputModel(create.value.id, true)) {
                 clazz("createTeam")

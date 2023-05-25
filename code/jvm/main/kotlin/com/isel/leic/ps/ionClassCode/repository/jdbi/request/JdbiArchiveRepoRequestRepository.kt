@@ -42,8 +42,15 @@ class JdbiArchiveRepoRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-
-        return ArchiveRepo(id, creator, "Pending", request.composite, request.repoId)
+        val name = handle.createQuery(
+            """
+            SELECT name FROM repo WHERE id = :repoId
+            """,
+        )
+            .bind("repoId", request.repoId)
+            .mapTo<String>()
+            .first()
+        return ArchiveRepo(id = id, creator = creator, state = "Pending", composite = request.composite, repoId = request.repoId, repoName = name)
     }
 
     /**
@@ -52,7 +59,9 @@ class JdbiArchiveRepoRequestRepository(
     override fun getArchiveRepoRequests(): List<ArchiveRepo> {
         return handle.createQuery(
             """
-            SELECT r.id, r.creator, r.state, a.repo_id, r.composite FROM archiverepo as a JOIN request r on r.id = a.id
+            SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name AS repo_name FROM 
+            (SELECT a.id, a.repo_id, r.name FROM archiverepo a JOIN repo r on a.repo_id = r.id) as x
+            JOIN request r on r.id = x.id
             """,
         )
             .mapTo(ArchiveRepo::class.java)
@@ -65,8 +74,9 @@ class JdbiArchiveRepoRequestRepository(
     override fun getArchiveRepoRequestById(id: Int): ArchiveRepo? {
         return handle.createQuery(
             """
-            SELECT r.id, r.creator, r.state, a.repo_id, r.composite FROM archiverepo as a JOIN request r on r.id = a.id
-            WHERE a.id = :id
+            SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name AS repo_name FROM 
+            (SELECT a.id, a.repo_id, r.name FROM archiverepo a JOIN repo r on a.repo_id = r.id WHERE a.id = :id) as x 
+            JOIN request r on r.id = x.id
             """,
         )
             .bind("id", id)
@@ -74,19 +84,17 @@ class JdbiArchiveRepoRequestRepository(
             .firstOrNull()
     }
 
-    /**
-     * Method to get all Archive Repo Request's by a user
-     */
-    override fun getArchiveRepoRequestsByUser(userId: Int): List<ArchiveRepo> {
+    override fun getArchiveRepoRequestsByTeam(teamId: Int): ArchiveRepo? {
         return handle.createQuery(
             """
-            SELECT archiverepo.id, creator, state, repo_id, composite FROM archiverepo
-            JOIN request ON request.id = archiverepo.id
-            WHERE request.creator = :userId
+            SELECT x.id, creator, state, composite, x.repo_id, repo.name AS repo_name FROM 
+            (SELECT a.id, a.repo_id FROM repo AS r JOIN archiverepo AS a on a.repo_id=r.id WHERE r.team_id = :teamId) as x
+            JOIN repo ON repo.id = x.repo_id
+            JOIN request ON request.id = x.id
             """,
         )
-            .bind("userId", userId)
+            .bind("teamId", teamId)
             .mapTo<ArchiveRepo>()
-            .list()
+            .firstOrNull()
     }
 }

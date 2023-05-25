@@ -78,7 +78,6 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
                 appendQueryParameter("challengeMethod", "s256")
             }.build()
             val customTabsIntent = CustomTabsIntent.Builder().build()
-            //customTabsIntent.intent.setPackage(null)
             customTabsIntent.intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
             customTabsIntent.launchUrl(activity, uri)
             Either.Right(value = Unit)

@@ -17,6 +17,7 @@ import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.tokenHash.GenericTokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
+import javax.crypto.IllegalBlockSizeException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import javax.crypto.IllegalBlockSizeException
 
 @SpringBootTest
 class TeacherServicesTests {
@@ -466,32 +466,6 @@ class TeacherServicesTests {
             assert(teacher.value is TeacherServicesError.TokenInUse)
         } else {
             fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createTeacher should return the new teacher`() {
-        // when: creating a teacher should give a teacher
-        val teacherRes = teacherServices.createTeacher(githubId = 12346)
-
-        // the result should be a teacher
-        if (teacherRes is Result.Success) {
-            assert(teacherRes.value.id == 1)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
-
-    @Test
-    fun `createTeacher should return teacher not found because github id is not valid`() {
-        // when: creating a teacher should give a teacher
-        val teacherRes = teacherServices.createTeacher(githubId = 6663464)
-
-        // the result should be a teacher
-        if (teacherRes is Result.Problem) {
-            assert(teacherRes.value is TeacherServicesError.TeacherNotFound)
-        } else {
-            fail("Should not be Either.Left")
         }
     }
 }

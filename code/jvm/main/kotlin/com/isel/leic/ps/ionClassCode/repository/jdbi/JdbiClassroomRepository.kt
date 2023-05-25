@@ -6,9 +6,9 @@ import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
+import java.sql.Timestamp
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
-import java.sql.Timestamp
 
 /**
  * Implementation of the Classroom methods
@@ -217,6 +217,19 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
         )
             .bind("course_id", courseId)
             .mapTo<Classroom>()
+            .list()
+    }
+
+    override fun getAllReposInClassroom(classroomId: Int): List<Int> {
+        return handle.createQuery(
+            """
+            SELECT r.id FROM repo r JOIN 
+            (SELECT t.id FROM team t JOIN assignment a on t.assignment = a.id WHERE a.classroom_id = :classroomId) as x
+            on r.team_id = x.id
+            """,
+        )
+            .bind("classroomId", classroomId)
+            .mapTo<Int>()
             .list()
     }
 }
