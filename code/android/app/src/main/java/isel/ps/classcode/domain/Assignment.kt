@@ -13,15 +13,15 @@ data class Assignment(
     val maxNumberGroups: Int,
     val releaseDate: Timestamp,
     val description: String,
-    val title: String
+    val title: String,
 ) {
-    constructor(classCodeAssignmentDeserialization: ClassCodeAssignmentDeserialization): this(
+    constructor(classCodeAssignmentDeserialization: ClassCodeAssignmentDeserialization) : this(
         id = classCodeAssignmentDeserialization.id,
         classroomId = classCodeAssignmentDeserialization.classroomId,
         maxElemsPerGroup = classCodeAssignmentDeserialization.maxElemsPerGroup,
         maxNumberGroups = classCodeAssignmentDeserialization.maxNumberGroups,
         releaseDate = classCodeAssignmentDeserialization.releaseDate,
         description = classCodeAssignmentDeserialization.description,
-        title = classCodeAssignmentDeserialization.title
+        title = classCodeAssignmentDeserialization.title,
     )
 }

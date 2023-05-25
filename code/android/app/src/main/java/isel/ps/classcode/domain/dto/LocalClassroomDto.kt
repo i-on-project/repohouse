@@ -16,7 +16,7 @@ data class LocalClassroomDto(
     val inviteLink: String,
     val isArchived: Boolean,
     val courseId: Int,
-    val courseName: String
+    val courseName: String,
 ): Parcelable {
 
     /**
@@ -28,6 +28,6 @@ data class LocalClassroomDto(
         lastSync = lastSync,
         inviteLink = inviteLink,
         isArchived = isArchived,
-        courseId = courseId
+        courseId = courseId,
     )
 }

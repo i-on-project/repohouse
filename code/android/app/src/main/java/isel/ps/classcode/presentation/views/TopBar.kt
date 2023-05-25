@@ -2,9 +2,7 @@ package isel.ps.classcode.presentation.views
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Groups3
-import androidx.compose.material.icons.outlined.Unarchive
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,7 +41,7 @@ fun TopBar(
                 IconButton(onClick = onCreditsRequested) {
                     Icon(
                         imageVector = Icons.Outlined.Groups3,
-                        contentDescription = stringResource(R.string.credits_icon)
+                        contentDescription = stringResource(R.string.credits_icon),
                     )
                 }
             }
@@ -52,7 +50,7 @@ fun TopBar(
             if (onBackRequested != null) {
                 IconButton(
                     modifier = Modifier.testTag("BackButton"),
-                    onClick = onBackRequested
+                    onClick = onBackRequested,
                 ) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.arrow_back_text))
                 }
@@ -69,4 +67,3 @@ fun TopBarPreview() {
         TopBar(name = stringResource(R.string.login))
     }
 }
-

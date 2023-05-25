@@ -5,7 +5,7 @@ import isel.ps.classcode.domain.deserialization.ProblemJsonDeserialization
 /**
  * Represents a error response body from ClassCode api
  */
-data class ProblemJson (
+data class ProblemJson(
     val type: String,
     val title: String,
     val detail: String,
@@ -13,6 +13,6 @@ data class ProblemJson (
     constructor(problemJsonDeserialization: ProblemJsonDeserialization) : this(
         type = problemJsonDeserialization.type,
         title = problemJsonDeserialization.title,
-        detail = problemJsonDeserialization.detail
+        detail = problemJsonDeserialization.detail,
     )
 }

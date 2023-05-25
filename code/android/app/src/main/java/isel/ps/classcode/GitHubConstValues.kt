@@ -14,7 +14,7 @@ val GITHUB_ADD_TEAM: (String) -> String = { orgName ->
     "$GITHUB_API_BASE_URL/orgs/$orgName/teams"
 }
 
-val GITHUB_CREATE_REPO: (String) -> String = {orgName ->
+val GITHUB_CREATE_REPO: (String) -> String = { orgName ->
     "$GITHUB_API_BASE_URL/orgs/$orgName/repos"
 }
 

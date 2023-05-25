@@ -18,5 +18,5 @@ data class LocalCourseDto(
     /**
      * Function to pass a local course dto to a course.
      */
-    fun toCourseDto(): Course = Course(id = id, name = name, orgId = orgId,orgUrl = orgUrl)
+    fun toCourseDto(): Course = Course(id = id, name = name, orgId = orgId, orgUrl = orgUrl)
 }

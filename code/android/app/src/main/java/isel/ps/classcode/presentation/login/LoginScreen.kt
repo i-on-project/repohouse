@@ -30,9 +30,9 @@ import isel.ps.classcode.ui.theme.ClasscodeTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    loginHandler: () -> Unit = {  },
+    loginHandler: () -> Unit = { },
     error: HandleClassCodeResponseError? = null,
-    onDismissRequest: () -> Unit =  {}
+    onDismissRequest: () -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -42,10 +42,9 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it.calculateTopPadding())
-                .background(color = MaterialTheme.colorScheme.background)
-            ,
+                .background(color = MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (error != null) {
                 ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
@@ -54,14 +53,14 @@ fun LoginScreen(
             Image(
                 painter = painterResource(id = logo),
                 contentDescription = stringResource(id = R.string.logo),
-                modifier = Modifier.size(200.dp)
+                modifier = Modifier.size(200.dp),
             )
             OutlinedButton(
                 onClick = {
                     loginHandler()
                 },
             ) {
-                Text(text = stringResource(id = R.string.login), style = MaterialTheme.typography.titleMedium,)
+                Text(text = stringResource(id = R.string.login), style = MaterialTheme.typography.titleMedium)
             }
         }
     }

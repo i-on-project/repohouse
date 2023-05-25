@@ -6,7 +6,7 @@ import isel.ps.classcode.domain.dto.LocalTeamDto
 /**
  * Represents a team
  */
-data class Team (
+data class Team(
     val id: Int,
     val name: String,
     val isCreated: Boolean,
@@ -16,7 +16,7 @@ data class Team (
         classCodeTeamDeserialization.id,
         classCodeTeamDeserialization.name,
         classCodeTeamDeserialization.isCreated,
-        classCodeTeamDeserialization.assignment
+        classCodeTeamDeserialization.assignment,
     )
     val teamSlug = name.replace(" ", "-").lowercase()
     fun toLocalTeamDto(courseId: Int, courseName: String, classroomId: Int): LocalTeamDto = LocalTeamDto(id = id, name = name, isCreated = isCreated, assignment = assignment, courseId = courseId, courseName = courseName, classroomId = classroomId)

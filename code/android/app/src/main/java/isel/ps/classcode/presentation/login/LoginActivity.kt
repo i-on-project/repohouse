@@ -13,7 +13,6 @@ import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.menu.MenuActivity
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
-
 class LoginActivity : ComponentActivity() {
     private val loginServices: LoginServices by lazy { (application as DependenciesContainer).loginServices }
     companion object {

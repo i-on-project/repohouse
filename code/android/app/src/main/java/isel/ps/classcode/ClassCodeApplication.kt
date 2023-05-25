@@ -41,7 +41,7 @@ data class Dependencies(
     override val courseServices: CourseServices,
     override val classroomServices: ClassroomServices,
     override val bootUpServices: BootUpServices,
-    override val teamServices: TeamServices
+    override val teamServices: TeamServices,
 ) : DependenciesContainer
 
 class ClassCodeApplication : DependenciesContainer, Application() {
@@ -72,13 +72,13 @@ interface DependenciesContainer {
     val teamServices: TeamServices
 }
 
-private fun dependencies(isRealImplementation: Boolean = false, context: Context, cryptoManager: CryptoManager, objectMapper: ObjectMapper, httpClient: OkHttpClient, navigationRepo: NavigationRepository): Dependencies {
+private fun dependencies(isRealImplementation: Boolean, context: Context, cryptoManager: CryptoManager, objectMapper: ObjectMapper, httpClient: OkHttpClient, navigationRepo: NavigationRepository): Dependencies {
     val sessionStore = if (isRealImplementation) RealSessionStore(context = context, cryptoManager = cryptoManager) else FakeSessionStore(alreadyLoggedIn = true)
     return if (isRealImplementation) {
         val bootUpServices = RealBootUpServices(
             httpClient = httpClient,
             objectMapper = objectMapper,
-            navigationRepo = navigationRepo
+            navigationRepo = navigationRepo,
         )
         Dependencies(
             sessionStore = sessionStore,
@@ -88,36 +88,36 @@ private fun dependencies(isRealImplementation: Boolean = false, context: Context
                 objectMapper = objectMapper,
                 sessionStore = sessionStore,
                 navigationRepo = navigationRepo,
-                bootUpServices = bootUpServices
+                bootUpServices = bootUpServices,
             ),
             menuServices = RealMenuServices(
                 httpClient = httpClient,
                 objectMapper = objectMapper,
                 sessionStore = sessionStore,
                 navigationRepo = navigationRepo,
-                bootUpServices = bootUpServices
+                bootUpServices = bootUpServices,
             ),
             courseServices = RealCourseServices(
                 httpClient = httpClient,
                 objectMapper = objectMapper,
                 sessionStore = sessionStore,
                 navigationRepo = navigationRepo,
-                bootUpServices = bootUpServices
+                bootUpServices = bootUpServices,
             ),
             classroomServices = RealClassroomServices(
                 httpClient = httpClient,
                 objectMapper = objectMapper,
                 sessionStore = sessionStore,
                 navigationRepo = navigationRepo,
-                bootUpServices = bootUpServices
+                bootUpServices = bootUpServices,
             ),
             teamServices = RealTeamServices(
                 httpClient = httpClient,
                 objectMapper = objectMapper,
                 sessionStore = sessionStore,
                 navigationRepo = navigationRepo,
-                bootUpServices = bootUpServices
-            )
+                bootUpServices = bootUpServices,
+            ),
         )
     } else {
         Dependencies(
@@ -127,7 +127,7 @@ private fun dependencies(isRealImplementation: Boolean = false, context: Context
             menuServices = FakeMenuServices(),
             courseServices = FakeCourseServices(),
             classroomServices = FakeClassroomServices(),
-            teamServices = FakeTeamServices()
+            teamServices = FakeTeamServices(),
         )
     }
 }

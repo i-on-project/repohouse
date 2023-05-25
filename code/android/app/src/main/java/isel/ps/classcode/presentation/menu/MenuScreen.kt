@@ -22,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,9 +46,9 @@ import kotlinx.coroutines.launch
 fun MenuScreen(
     userInfo: UserInfo?,
     courses: List<Course>? = listOf(),
-    onCourseSelected: (Course) -> Unit = {  },
-    onBackRequest: suspend () -> Unit = {  },
-    onCreditsRequested: () -> Unit = {  },
+    onCourseSelected: (Course) -> Unit = { },
+    onBackRequest: suspend () -> Unit = { },
+    onCreditsRequested: () -> Unit = { },
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
@@ -59,12 +58,12 @@ fun MenuScreen(
                 name = stringResource(id = R.string.menu_top_page),
                 onBackRequested = { scope.launch { onBackRequest() } },
                 scrollBehavior = scrollBehavior,
-                onCreditsRequested = onCreditsRequested
+                onCreditsRequested = onCreditsRequested,
             )
         },
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,
@@ -75,9 +74,9 @@ fun MenuScreen(
                     top = it.calculateTopPadding() + 8.dp,
                     start = 32.dp,
                     end = 32.dp,
-                    bottom = it.calculateBottomPadding()
+                    bottom = it.calculateBottomPadding(),
                 )
-                .background(color = MaterialTheme.colorScheme.background)
+                .background(color = MaterialTheme.colorScheme.background),
         ) {
             if (userInfo != null) {
                 ShowUserInfo(userInfo = userInfo)
@@ -93,6 +92,7 @@ fun MenuScreen(
         }
     }
 }
+
 @Composable
 fun ShowUserInfo(
     modifier: Modifier = Modifier,
@@ -103,21 +103,20 @@ fun ShowUserInfo(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
     ) {
         val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
         AvatarImage(avatarUrl = userInfo.avatarUrl)
         Text(text = userInfo.name, style = MaterialTheme.typography.titleMedium, color = textColor)
     }
-
 }
 
 @Composable
-fun ShowListOfCourses(modifier: Modifier = Modifier, list: List<Course>, onCourseSelected: (Course) -> Unit = {  }) {
+fun ShowListOfCourses(modifier: Modifier = Modifier, list: List<Course>, onCourseSelected: (Course) -> Unit = { }) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         items(list.size) { index ->
             CourseCard(index = index, course = list[index], onCourseSelected = onCourseSelected)
@@ -131,26 +130,24 @@ fun CourseCard(
     modifier: Modifier = Modifier,
     course: Course,
     index: Int,
-    onCourseSelected: (Course) -> Unit = { }
-)
-{
+    onCourseSelected: (Course) -> Unit = { },
+) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant),
         elevation = CardDefaults.cardElevation(8.dp),
         shape = MaterialTheme.shapes.medium,
-        onClick = { onCourseSelected(course) }
-    )
-    {
+        onClick = { onCourseSelected(course) },
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             Text(text = "${index + 1}-", style = MaterialTheme.typography.titleMedium)
             Image(
@@ -158,7 +155,7 @@ fun CourseCard(
                 contentDescription = stringResource(id = R.string.course_image),
                 modifier = Modifier
                     .size(50.dp)
-                    .clip(RoundedCornerShape(percent = 10))
+                    .clip(RoundedCornerShape(percent = 10)),
             )
             Text(text = course.name, style = MaterialTheme.typography.titleMedium)
         }
@@ -177,7 +174,7 @@ fun AvatarImagePreview() {
 @Composable
 fun ShowUserInfoPreview() {
     ClasscodeTheme() {
-        ShowUserInfo(userInfo = UserInfo(login = "test", id = 123L,name = "Test", avatarUrl = "https://avatars.githubusercontent.com/u/73882045?v=4" ))
+        ShowUserInfo(userInfo = UserInfo(login = "test", id = 123L, name = "Test", avatarUrl = "https://avatars.githubusercontent.com/u/73882045?v=4"))
     }
 }
 
@@ -193,8 +190,8 @@ fun MenuScreenPreview() {
                 login = "test",
                 id = 123L,
                 name = "Test",
-                avatarUrl = "https://avatars.githubusercontent.com/u/73882045?v=4"
-            )
+                avatarUrl = "https://avatars.githubusercontent.com/u/73882045?v=4",
+            ),
         )
     }
 }

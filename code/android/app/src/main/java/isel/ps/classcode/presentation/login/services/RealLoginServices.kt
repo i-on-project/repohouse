@@ -54,9 +54,9 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
             val headerName = "Set-Cookie"
             val sessionCookie = response.headers[headerName] ?: return@send Storage(body = Either.Left(value = HandleClassCodeResponseError.FailToGetTheHeader(error = "Fail to get the value in header $headerName")))
             val body = handleSirenResponseClassCode<ClassCodeAuthDto>(response = response, type = ClassCodeAuthDtoType, jsonMapper = objectMapper)
-            return@send Storage(sessionCookie  = sessionCookie, body = body)
+            return@send Storage(sessionCookie = sessionCookie, body = body)
         }
-        return when(result.body) {
+        return when (result.body) {
             is Either.Left -> Either.Left(value = result.body.value)
             is Either.Right -> {
                 val authInfo = result.body.value.properties
@@ -71,7 +71,7 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
         val secret = generateSecret()
         sessionStore.storeSecret(secret = secret)
         val challenge = generateCodeChallenge(secret = secret)
-        val ensureLink = navigationRepo.ensureLink(key = AUTH_KEY, fetchLink =  { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
+        val ensureLink = navigationRepo.ensureLink(key = AUTH_KEY, fetchLink = { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
         return try {
             val uri = Uri.parse(CLASSCODE_LINK_BUILDER(ensureLink.href)).buildUpon().apply {
                 appendQueryParameter("challenge", challenge)
@@ -87,7 +87,7 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
                 .makeText(
                     activity,
                     R.string.failed_url_open,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_LONG,
                 )
                 .show()
             Either.Left(value = HandleClassCodeResponseError.Fail(error = e.message ?: "Failed to open URL"))

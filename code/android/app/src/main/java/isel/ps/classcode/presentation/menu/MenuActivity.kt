@@ -52,7 +52,7 @@ class MenuActivity : ComponentActivity() {
                     onCreditsRequested = { CreditsActivity.navigate(origin = this) },
                     onCourseSelected = { course ->
                         CourseActivity.navigate(origin = this, course = course.toLocalCourseDto())
-                    }
+                    },
                 )
             }
         }

@@ -51,7 +51,7 @@ class BootUpActivity : ComponentActivity() {
                         } else {
                             LoginActivity.navigate(origin = this)
                         }
-                    }
+                    },
                 )
             }
         }

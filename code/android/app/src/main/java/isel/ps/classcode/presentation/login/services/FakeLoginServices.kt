@@ -7,11 +7,11 @@ import isel.ps.classcode.presentation.utils.Either
 /**
  * Implementation of the [LoginServices] interface that will be used for tests
  */
-class FakeLoginServices: LoginServices {
+class FakeLoginServices : LoginServices {
 
     override suspend fun getTheAccessToken(
         code: String,
-        state: String
+        state: String,
     ): Either<HandleClassCodeResponseError, Unit> {
         TODO("Not yet implemented")
     }
@@ -19,6 +19,4 @@ class FakeLoginServices: LoginServices {
     override suspend fun startOauth(activity: Activity): Either<HandleClassCodeResponseError, Unit> {
         TODO("Not yet implemented")
     }
-
-
 }

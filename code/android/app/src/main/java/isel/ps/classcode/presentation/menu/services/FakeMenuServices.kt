@@ -4,7 +4,6 @@ import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.UserInfo
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
-import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.utils.Either
 
 /**

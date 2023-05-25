@@ -21,7 +21,7 @@ class CourseViewModel(private val courseServices: CourseServices) : ViewModel() 
         get() = _error
     fun getClassrooms(courseId: Int) {
         viewModelScope.launch {
-            when(val classrooms = courseServices.getClassrooms(courseId = courseId)) {
+            when (val classrooms = courseServices.getClassrooms(courseId = courseId)) {
                 is Either.Right -> { _classrooms = classrooms.value }
                 is Either.Left -> { _error = classrooms.value }
             }

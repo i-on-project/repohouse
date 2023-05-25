@@ -16,7 +16,7 @@ import isel.ps.classcode.presentation.classroom.ClassroomActivity
 import isel.ps.classcode.presentation.course.services.CourseServices
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
-class CourseActivity: ComponentActivity() {
+class CourseActivity : ComponentActivity() {
     private val courseServices: CourseServices by lazy { (application as DependenciesContainer).courseServices }
 
     companion object {
@@ -58,8 +58,7 @@ class CourseActivity: ComponentActivity() {
                         error = vm.error,
                         onDismissRequest = { finish() },
                     )
-                }
-                else {
+                } else {
                     // TODO(): Show a error alert dialog saying that some went wrong
                     finish()
                 }
@@ -70,11 +69,11 @@ class CourseActivity: ComponentActivity() {
     @Suppress("deprecation")
     private fun getCourseExtra(): Course? {
         val courseExtra: LocalCourseDto? =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 intent.getParcelableExtra(COURSE_EXTRA, LocalCourseDto::class.java)
-            else
+            } else {
                 intent.getParcelableExtra(COURSE_EXTRA)
+            }
         return courseExtra?.toCourseDto()
     }
-
 }

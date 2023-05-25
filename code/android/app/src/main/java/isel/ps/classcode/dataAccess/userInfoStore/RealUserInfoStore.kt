@@ -19,7 +19,7 @@ import java.io.IOException
  * It uses the preferences data store to store the user info.
  */
 
-class RealUserInfoStore(context: Context): UserInfoStore {
+class RealUserInfoStore(context: Context) : UserInfoStore {
     companion object {
         val login = stringPreferencesKey("login")
         val id = longPreferencesKey("id")
@@ -36,7 +36,6 @@ class RealUserInfoStore(context: Context): UserInfoStore {
             preferences[name] = userInfo.name
             preferences[avatarUrl] = userInfo.avatarUrl
         }
-
     }
 
     override fun getUserInfo(): Flow<UserInfo> =

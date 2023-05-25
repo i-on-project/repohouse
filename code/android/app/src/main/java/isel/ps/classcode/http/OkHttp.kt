@@ -46,16 +46,16 @@ suspend fun <T> Request.send(okHttpClient: OkHttpClient, handler: (Response) -> 
 inline fun <reified R : Any> handleResponseGitHub(response: Response, jsonMapper: ObjectMapper, ignoreBody: Boolean = false): Either<HandleGitHubResponseError, R> {
     val body = response.body?.string()
     return if (response.isSuccessful) {
-        if (ignoreBody) Either.Right(value = Unit as R)
-        else {
+        if (ignoreBody) {
+            Either.Right(value = Unit as R)
+        } else {
             try {
                 Either.Right(value = jsonMapper.readValue(body, R::class.java))
             } catch (e: StreamReadException) {
                 Either.Left(value = HandleGitHubResponseError.FailDeserialize(error = "Failed to deserialize response body: $body"))
             }
         }
-    }
-    else {
+    } else {
         try {
             val githubErrorDeserialization = jsonMapper.readValue(body, GithubErrorDeserialization::class.java)
             Either.Left(value = HandleGitHubResponseError.FailRequest(error = GitHubError(githubErrorDeserialization = githubErrorDeserialization)))
@@ -81,9 +81,9 @@ inline fun <reified R : Any> handleSirenResponseClassCode(response: Response, ty
         try {
             val problemJsonDeserialization = jsonMapper.readValue(body, ProblemJsonDeserialization::class.java)
             Either.Left(
-                    value = HandleClassCodeResponseError.FailRequest(
-                    error = ProblemJson(problemJsonDeserialization = problemJsonDeserialization)
-                )
+                value = HandleClassCodeResponseError.FailRequest(
+                    error = ProblemJson(problemJsonDeserialization = problemJsonDeserialization),
+                ),
             )
         } catch (e: StreamReadException) {
             Either.Left(value = HandleClassCodeResponseError.FailDeserialize(error = "Failed to deserialize error response body: $body"))

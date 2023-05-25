@@ -4,7 +4,6 @@ import android.app.Activity
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 
-
 /**
  * Represents the services that can be used on the login
  */

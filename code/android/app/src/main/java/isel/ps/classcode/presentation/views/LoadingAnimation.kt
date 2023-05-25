@@ -32,11 +32,10 @@ fun LoadingAnimationCircle(
         Color(0xFFF77737),
         Color(0xFFFCAF45),
         Color(0xFFFFDC80),
-        Color(0xFF5851D8)
+        Color(0xFF5851D8),
     ),
-    animationDuration: Int = 1000
+    animationDuration: Int = 1000,
 ) {
-
     val infiniteTransition = rememberInfiniteTransition()
 
     val rotateAnimation by infiniteTransition.animateFloat(
@@ -45,9 +44,9 @@ fun LoadingAnimationCircle(
         animationSpec = infiniteRepeatable(
             animation = tween(
                 durationMillis = animationDuration,
-                easing = LinearEasing
-            )
-        )
+                easing = LinearEasing,
+            ),
+        ),
     )
 
     CircularProgressIndicator(
@@ -57,10 +56,10 @@ fun LoadingAnimationCircle(
             .border(
                 width = 1.dp,
                 brush = Brush.sweepGradient(circleColors),
-                shape = CircleShape
+                shape = CircleShape,
             ),
         progress = 1f,
         strokeWidth = 1.dp,
-        color = MaterialTheme.colorScheme.background // Set background color
+        color = MaterialTheme.colorScheme.background, // Set background color
     )
 }
