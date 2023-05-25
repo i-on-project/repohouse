@@ -36,8 +36,6 @@ import com.isel.leic.ps.ionClassCode.repository.request.RequestRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
-import java.sql.Timestamp
-import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doReturn
@@ -46,6 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import java.sql.Timestamp
+import java.time.Instant
 
 @SpringBootTest
 class TeamServicesTests {
@@ -84,7 +84,7 @@ class TeamServicesTests {
                     }
 
                     val mockedCreateTeamRepository = mock<CreateTeamRepository> {
-                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 1, composite = 1, teamName = "team1"), creator = 1) } doReturn CreateTeam(id = 1, creator = 1, composite = 1, teamId = 1, githubTeamId = 1, teamName = "team1")
+                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 1, composite = 1, teamName = "Team1"), creator = 1) } doReturn CreateTeam(id = 1, creator = 1, composite = 1, teamId = 1, githubTeamId = 1, teamName = "team1")
                         on { createCreateTeamRequest(request = CreateTeamInput(teamId = 2, composite = 2, teamName = "team2"), creator = 2) } doReturn CreateTeam(id = 2, creator = 2, composite = 2, teamId = 2, githubTeamId = 2, teamName = "team2")
                     }
 

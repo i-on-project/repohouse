@@ -12,7 +12,7 @@ class JoinTeamRepositoryTests {
     fun `createJoinTeamRequest should create a new joinTeam request`() = testWithHandleAndRollback { handle ->
         val joinTeamReq = JdbiJoinTeamRequestRepository(handle = handle)
         val request = JoinTeamInput(teamId = 1, assignmentId = 1, creatorGitHubUserName = "test")
-        joinTeamReq.createJoinTeamRequest(request = request, creator = 3,)
+        joinTeamReq.createJoinTeamRequest(request = request, creator = 3)
     }
 
     @Test
@@ -30,7 +30,6 @@ class JoinTeamRepositoryTests {
         val request = joinTeamReq.getJoinTeamRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
     }
-
 
     @Test
     fun `getJoinTeamRequestByCompositeId should return joinTeam requests for a user`() = testWithHandleAndRollback { handle ->

@@ -117,7 +117,6 @@ class JdbiCompositeRequestRepository(
             .list()
     }
 
-
     /**
      * Method to get all Composite Request's by a user
      */

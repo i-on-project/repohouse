@@ -128,6 +128,9 @@ class TeamServices(
             val repo = it.repoRepository.createRepo(repo = RepoInput(name = "${classroom.name} - $assignmentId - ${team.id}", url = null, teamId = team.id))
             val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(), creator = creator)
             val createTeam = it.createTeamRepository.createCreateTeamRequest(request = CreateTeamInput(teamId = team.id, composite = composite.id, teamName = team.name), creator = creator)
+            println(team.id)
+            println(composite.id)
+            println(team.name)
             it.createRepoRepository.createCreateRepoRequest(request = CreateRepoInput(repoId = repo.id, composite = composite.id, repoName = repo.name), creator = creator)
             it.joinTeamRepository.createJoinTeamRequest(JoinTeamInput(teamId = team.id, assignmentId = assignmentId, composite = composite.id, creatorGitHubUserName = creatorGitHubUserName), creator = creator)
             return@run Result.Success(value = createTeam)
@@ -221,7 +224,7 @@ class TeamServices(
             if (compositeState == "Accepted") {
                 it.teamRepository.updateTeamStatus(id = teamId)
                 it.teamRepository.addStudentToTeam(teamId = teamId, studentId = body.joinTeam.userId)
-                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?:"")
+                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?: "")
             }
             return@run Result.Success(value = true)
         }
@@ -271,23 +274,25 @@ class TeamServices(
                 else -> {
                     val createTeam = it.createTeamRepository.getCreateTeamRequestByTeamId(teamId = teamId) ?: return@run Result.Problem(value = TeamServicesError.TeamNotFound)
                     if (createTeam.state != "Accepted") return@run Result.Problem(value = TeamServicesError.TeamNotAccepted)
-                    val joinTeamRequests = it.joinTeamRepository.getJoinTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId}
-                    val leaveTeamRequests = it.leaveTeamRepository.getLeaveTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId}
+                    val joinTeamRequests = it.joinTeamRepository.getJoinTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
+                    val leaveTeamRequests = it.leaveTeamRepository.getLeaveTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
                     val createRepo = it.createRepoRepository.getCreateRepoRequestByCompositeId(compositeId = createTeam.composite) ?: return@run Result.Problem(value = TeamServicesError.InternalError)
                     val joinTeam = joinTeamRequests.find { request -> request.composite == createTeam.composite } ?: return@run Result.Problem(value = TeamServicesError.InternalError)
                     val archiveRepo = it.archiveRepoRepository.getArchiveRepoRequestsByTeam(teamId = teamId)
-                    Result.Success(TeamRequestsForMobileModel(
-                        needApproval =  RequestsThatNeedApproval(
-                            joinTeam = joinTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
-                            leaveTeam = leaveTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
+                    Result.Success(
+                        TeamRequestsForMobileModel(
+                            needApproval = RequestsThatNeedApproval(
+                                joinTeam = joinTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
+                                leaveTeam = leaveTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
+                            ),
+                            requestsHistory = RequestsHistory(
+                                createTeamComposite = CreateTeamComposite(createTeam = createTeam, joinTeam = joinTeam, createRepo = createRepo, compositeState = "Accepted"),
+                                joinTeam = joinTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
+                                leaveTeam = leaveTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
+                                archiveRepo = if (archiveRepo != null && archiveRepo.state == "Accepted") archiveRepo else null,
+                            ),
                         ),
-                        requestsHistory = RequestsHistory(
-                            createTeamComposite = CreateTeamComposite(createTeam = createTeam, joinTeam = joinTeam, createRepo = createRepo, compositeState = "Accepted"),
-                            joinTeam = joinTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
-                            leaveTeam = leaveTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
-                            archiveRepo = if (archiveRepo != null && archiveRepo.state == "Accepted") archiveRepo else null
-                        )
-                    ))
+                    )
                 }
             }
         }

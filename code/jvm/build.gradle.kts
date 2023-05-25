@@ -81,11 +81,6 @@ task<Exec>("dbDockerUp") {
     commandLine("docker-compose", "up", "-d", "db-docker")
 }
 
-task<Exec>("dbDockerWait") {
-    commandLine("docker", "exec", "db-docker", "/app/bin/wait-for-postgres.sh", "localhost", "psql -U postgres -d classcode")
-    dependsOn("dbDockerUp")
-}
-
 task<Exec>("dbDockerDown") {
     commandLine("docker-compose", "down")
 }
@@ -100,6 +95,6 @@ task<Exec>("composeDown") {
 
 tasks.named("check") {
     dependsOn("ktlintCheck")
-    dependsOn("dbDockerWait")
+    dependsOn("dbDockerUp")
     finalizedBy("dbDockerDown")
 }

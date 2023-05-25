@@ -17,7 +17,6 @@ import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.tokenHash.GenericTokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
-import javax.crypto.IllegalBlockSizeException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -27,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import javax.crypto.IllegalBlockSizeException
 
 @SpringBootTest
 class TeacherServicesTests {

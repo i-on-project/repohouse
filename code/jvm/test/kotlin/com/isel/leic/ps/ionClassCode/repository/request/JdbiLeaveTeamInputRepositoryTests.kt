@@ -30,5 +30,4 @@ class JdbiLeaveTeamInputRepositoryTests {
         val request = leaveTeamReq.getLeaveTeamRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
     }
-
 }
