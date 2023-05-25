@@ -29,6 +29,7 @@ There is more detailed documentation about all the endpoints in [here](../../doc
   - [Run](#run)
   - [Test](#test)
 - [Docker](#docker)
+- [Nginx](#nginx)
 
 
 ### Technologies
@@ -43,6 +44,7 @@ There is more detailed documentation about all the endpoints in [here](../../doc
 - [SendGrid API](https://sendgrid.com/docs/api-reference/)
 - [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
 - [Mockito](https://site.mockito.org/)
+- [Nginx](https://www.nginx.com/)
 
 
 ### Architecture
@@ -280,5 +282,36 @@ cleaned all just with the data from the [insert.sql](../sql/insert.sql) file.
 
 ### Docker
 
-TODO - Not implemented yet
+The JVM application can use Docker to run the application.
+
+All the commands to run the application with Docker are in the [Compose](../jvm/docker-compose.yml) file.
+
+To run the application with Docker, run the following command:
+
+```
+docker-compose up
+```
+
+To stop the application with Docker, run the following command:
+
+```
+docker-compose down
+```
+
+The 'Compose' file creates:
+
+- 2 instances of the JVM application with spring 
+- 1 instance of the PostgreSQL database
+- 1 instance of NGINX to redirect the requests to the JVM application
+
+### NGINX
+
+The JVM application uses NGINX to redirect the requests to the JVM application.
+
+NGINX is a high-performance web server and reverse proxy server.
+It can serve static content, balance the load across multiple servers, and handle SSL/TLS encryption.
+
+With its efficient architecture and extensive feature set, NGINX is widely used for websites, applications, and APIs to achieve scalability and improved performance.
+
+The NGINX configuration file is in the [nginx.conf](../jvm/docker/nginx/nginx.conf) file.
 
