@@ -14,5 +14,5 @@ data class ClassCodeAssignmentDeserialization(
     @JsonProperty("maxNumberGroups")val maxNumberGroups: Int,
     @JsonProperty("releaseDate")val releaseDate: Timestamp,
     @JsonProperty("description")val description: String,
-    @JsonProperty("title")val title: String
+    @JsonProperty("title")val title: String,
 )

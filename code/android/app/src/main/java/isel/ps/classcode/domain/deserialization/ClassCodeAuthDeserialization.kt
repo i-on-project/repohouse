@@ -9,6 +9,6 @@ val ClassCodeAuthDtoType = SirenEntity.getType<ClassCodeAuthDeserialization>()
 /**
  * Class used to deserialize the ClassCodeAuth response from the database
  */
-data class ClassCodeAuthDeserialization (
+data class ClassCodeAuthDeserialization(
     @JsonProperty("accessToken") val accessToken: String,
 )

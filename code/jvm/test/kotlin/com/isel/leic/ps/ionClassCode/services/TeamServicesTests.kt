@@ -36,6 +36,8 @@ import com.isel.leic.ps.ionClassCode.repository.request.RequestRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
+import java.sql.Timestamp
+import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doReturn
@@ -44,8 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import java.sql.Timestamp
-import java.time.Instant
 
 @SpringBootTest
 class TeamServicesTests {
@@ -84,17 +84,17 @@ class TeamServicesTests {
                     }
 
                     val mockedCreateTeamRepository = mock<CreateTeamRepository> {
-                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 1, composite = 1), creator = 1) } doReturn CreateTeam(id = 1, creator = 1, composite = 1, teamId = 1)
-                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 2, composite = 2), creator = 2) } doReturn CreateTeam(id = 2, creator = 2, composite = 2, teamId = 2)
+                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 1, composite = 1, teamName = "team1"), creator = 1) } doReturn CreateTeam(id = 1, creator = 1, composite = 1, teamId = 1, githubTeamId = 1, teamName = "team1")
+                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 2, composite = 2, teamName = "team2"), creator = 2) } doReturn CreateTeam(id = 2, creator = 2, composite = 2, teamId = 2, githubTeamId = 2, teamName = "team2")
                     }
 
                     val mockedJoinTeamRepoRepository = mock<JoinTeamRepository> {
-                        on { createJoinTeamRequest(request = JoinTeamInput(assignmentId = 2, teamId = 1), creator = 1) } doReturn JoinTeam(id = 1, creator = 1, teamId = 1)
+                        on { createJoinTeamRequest(request = JoinTeamInput(assignmentId = 2, teamId = 1, creatorGitHubUserName = "user"), creator = 1) } doReturn JoinTeam(id = 1, creator = 1, teamId = 1, githubUsername = "name")
                         on { getJoinTeamRequests() } doReturn listOf()
                     }
 
                     val mockedLeaveTeamRepository = mock<LeaveTeamRepository> {
-                        on { createLeaveTeamRequest(request = LeaveTeamInput(teamId = 1), creator = 1) } doReturn LeaveTeam(id = 1, creator = 1, teamId = 1)
+                        on { createLeaveTeamRequest(request = LeaveTeamInput(teamId = 1), creator = 1) } doReturn LeaveTeam(id = 1, creator = 1, teamId = 1, githubUsername = "name")
                         on { getLeaveTeamRequests() } doReturn listOf()
                     }
 
@@ -110,7 +110,7 @@ class TeamServicesTests {
                     }
 
                     val mockedCreateRepoRepository = mock<CreateRepoRepository> {
-                        on { createCreateRepoRequest(request = CreateRepoInput(repoId = 1, composite = 1), creator = 2) } doReturn CreateRepo(id = 1, creator = 2, repoId = 1)
+                        on { createCreateRepoRequest(request = CreateRepoInput(repoId = 1, composite = 1, repoName = "repo"), creator = 2) } doReturn CreateRepo(id = 1, creator = 2, repoId = 1, composite = 1, repoName = "repo")
                     }
                     val mockedOutboxRepository = mock<OutboxRepository> {}
                     val mockedUsersRepository = mock<UsersRepository> {
@@ -203,6 +203,7 @@ class TeamServicesTests {
             creator = creator,
             assignmentId = 1,
             classroomId = 1,
+            creatorGitHubUserName = "user",
         )
 
         if (team is Result.Problem) {
@@ -222,6 +223,7 @@ class TeamServicesTests {
             assignmentId = assignmentId,
             classroomId = 1,
             creator = 1,
+            creatorGitHubUserName = "user",
         )
 
         if (team is Result.Problem) {
@@ -241,6 +243,7 @@ class TeamServicesTests {
             assignmentId = 1,
             classroomId = classroomId,
             creator = 1,
+            creatorGitHubUserName = "user",
         )
 
         if (team is Result.Problem) {
@@ -260,6 +263,7 @@ class TeamServicesTests {
             assignmentId = 1,
             classroomId = classroomId,
             creator = 1,
+            creatorGitHubUserName = "user",
         )
 
         if (team is Result.Problem) {
@@ -279,6 +283,7 @@ class TeamServicesTests {
             assignmentId = 1,
             classroomId = classroomId,
             creator = 1,
+            creatorGitHubUserName = "user",
         )
 
         if (team is Result.Problem) {
@@ -295,6 +300,7 @@ class TeamServicesTests {
             assignmentId = 1,
             classroomId = 2,
             creator = 1,
+            creatorGitHubUserName = "team1",
         )
 
         if (team is Result.Success) {
@@ -421,6 +427,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
+                creatorGitHubUserName = "user",
             ),
             creator = 1,
         )
@@ -443,6 +450,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = teamId,
                 assignmentId = 2,
+                creatorGitHubUserName = "user",
             ),
             creator = 1,
         )
@@ -465,6 +473,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = 1,
                 assignmentId = 1,
+                creatorGitHubUserName = "user",
             ),
             creator = creator,
         )
@@ -487,6 +496,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
+                creatorGitHubUserName = "user",
             ),
             creator = 1,
         )
@@ -509,6 +519,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
+                creatorGitHubUserName = "user",
             ),
             creator = 1,
         )
@@ -531,6 +542,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = 1,
                 assignmentId = assignmentId,
+                creatorGitHubUserName = "user",
             ),
             creator = 1,
         )
@@ -553,6 +565,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = teamId,
                 assignmentId = 2,
+                creatorGitHubUserName = "user",
             ),
             creator = 1,
         )
@@ -575,6 +588,7 @@ class TeamServicesTests {
                 composite = null,
                 teamId = teamId,
                 assignmentId = 2,
+                creatorGitHubUserName = "user",
             ),
             creator = 1,
         )
@@ -969,7 +983,7 @@ class TeamServicesTests {
 
     @Test
     fun `getTeamsRequests should give the team and their requests`() {
-        // given: an invalid team id
+        // given: a valid team id
         val teamId = 1
 
         // when: getting an error because the team was not found

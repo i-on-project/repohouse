@@ -16,5 +16,5 @@ data class ClassCodeClassroomWithAssignmentsDeserialization(
     @JsonProperty("isArchived")val isArchived: Boolean,
     @JsonProperty("lastSync")val lastSync: Timestamp,
     @JsonProperty("assignments")val assignments: List<ClassCodeAssignmentDeserialization>,
-    @JsonProperty("students")val students: List<ClassCodeStudentDeserialization>
+    @JsonProperty("students")val students: List<ClassCodeStudentDeserialization>,
 )

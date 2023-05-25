@@ -4,7 +4,6 @@ import isel.ps.classcode.domain.deserialization.ClassCodeClassroomDeserializatio
 import isel.ps.classcode.domain.dto.LocalClassroomDto
 import java.sql.Timestamp
 
-
 /**
  * The class that represents a classroom.
  */
@@ -16,13 +15,13 @@ data class Classroom(
     val isArchived: Boolean,
     val courseId: Int,
 ) {
-    constructor(classCodeClassroomDeserialization: ClassCodeClassroomDeserialization): this(
+    constructor(classCodeClassroomDeserialization: ClassCodeClassroomDeserialization) : this(
         id = classCodeClassroomDeserialization.id,
         name = classCodeClassroomDeserialization.name,
         lastSync = classCodeClassroomDeserialization.lastSync,
         inviteLink = classCodeClassroomDeserialization.inviteLink,
         isArchived = classCodeClassroomDeserialization.isArchived,
-        courseId = classCodeClassroomDeserialization.courseId
+        courseId = classCodeClassroomDeserialization.courseId,
     )
 
     /**
@@ -35,6 +34,6 @@ data class Classroom(
         inviteLink = inviteLink,
         isArchived = isArchived,
         courseId = courseId,
-        courseName = courseName
+        courseName = courseName,
     )
 }

@@ -47,7 +47,16 @@ class JdbiCompositeRequestRepository(
     /**
      * Method to change a Composite Request state
      */
-    override fun updateCompositeState(requestId: Int, state: String) {
+    override fun updateCompositeState(compositeId: Int): String {
+        val query = handle.createQuery(
+            """
+           SELECT r.state FROM request as r JOIN composite c on r.composite = :compositeId
+        """,
+        )
+            .bind("compositeId", compositeId)
+            .mapTo<String>()
+            .list()
+        val state = if (query.all { it == "Accepted" }) "Accepted" else { if (query.any { it == "Not_Concluded" }) "Not_Concluded" else "Rejected" }
         handle.createUpdate(
             """
             UPDATE request
@@ -55,9 +64,10 @@ class JdbiCompositeRequestRepository(
             WHERE id = :id
             """,
         )
-            .bind("id", requestId)
+            .bind("id", compositeId)
             .bind("state", state)
             .execute()
+        return state
     }
 
     /**
@@ -107,17 +117,6 @@ class JdbiCompositeRequestRepository(
             .list()
     }
 
-    override fun getCompositeRequestById(compositeId: Int): Composite? {
-        return handle.createQuery(
-            """
-          SELECT * FROM request
-          WHERE composite = :id
-          """,
-        )
-            .bind("id", compositeId)
-            .mapTo<Composite>()
-            .firstOrNull()
-    }
 
     /**
      * Method to get all Composite Request's by a user

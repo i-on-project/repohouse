@@ -1,9 +1,7 @@
 package isel.ps.classcode.dataAccess
 
-import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import androidx.annotation.RequiresApi
 import java.security.KeyStore
 import java.util.Base64
 import javax.crypto.Cipher
@@ -11,11 +9,11 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 
-
 enum class TypeOfData(val alias: String) {
     GITHUB_TOKEN(alias = "githubToken"),
-    CLASSCODE_COOKIE(alias = "classcodeCookie")
+    CLASSCODE_COOKIE(alias = "classcodeCookie"),
 }
+
 /**
  * The class that will be used to encrypt and decrypt the token. Uses a androidKeyStore.
  * The key is generated if it doesn't exist, and if it exists it is used to encrypt and decrypt the token.
@@ -32,12 +30,12 @@ class CryptoManager {
     private fun encryptCipher(alias: String): Cipher =
         Cipher.getInstance(TRANSFORMATION).apply {
             init(Cipher.ENCRYPT_MODE, getKey(alias = alias))
-    }
+        }
 
     private fun getDecryptCipherForIv(iv: ByteArray, alias: String): Cipher =
         Cipher.getInstance(TRANSFORMATION).apply {
             init(Cipher.DECRYPT_MODE, getKey(alias = alias), IvParameterSpec(iv))
-    }
+        }
 
     private fun getKey(alias: String): SecretKey {
         val existingKey = keyStore.getEntry(alias, null) as? KeyStore.SecretKeyEntry
@@ -53,7 +51,7 @@ class CryptoManager {
                     .setUserAuthenticationRequired(true) // MUDAR ISTO PARA PRECISAR DE USER AUTHENTICATION
                     .setUserAuthenticationParameters(10000, KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL)
                     .setRandomizedEncryptionRequired(true)
-                    .build()
+                    .build(),
             )
         }.generateKey()
     }

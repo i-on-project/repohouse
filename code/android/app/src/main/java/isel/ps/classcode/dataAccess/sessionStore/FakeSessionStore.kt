@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.flowOf
 /**
  *  Implementation of session store for tests
  */
-class FakeSessionStore(alreadyLoggedIn: Boolean): SessionStore {
+class FakeSessionStore(alreadyLoggedIn: Boolean) : SessionStore {
     private var gitHubTokenStorage: String? = if (alreadyLoggedIn) "githubToken" else null
     private var classCodeTokenStorage: String? = if (alreadyLoggedIn) "classcodeToken" else null
     override suspend fun storeGithubToken(token: String) {

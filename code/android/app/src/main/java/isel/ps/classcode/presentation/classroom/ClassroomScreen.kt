@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -39,21 +41,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.ps.classcode.R
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.Classroom
+import isel.ps.classcode.domain.CreateRepo
+import isel.ps.classcode.domain.CreateTeam
 import isel.ps.classcode.domain.CreateTeamComposite
+import isel.ps.classcode.domain.JoinTeam
 import isel.ps.classcode.domain.Team
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.course.ChosenIcon
 import isel.ps.classcode.presentation.views.ClassCodeErrorView
+import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
+import java.sql.Timestamp
 
 private enum class TypeOfTeam {
     TEAMS_CREATED,
@@ -67,13 +74,13 @@ fun ClassroomScreen(
     teamsCreated: List<Team>? = null,
     createTeamComposite: List<CreateTeamComposite>? = null,
     onTeamSelected: (Team) -> Unit,
-    onCreateTeamComposite: (CreateTeamComposite) -> Unit,
-    assignments: List<Assignment>,
+    onCreateTeamComposite: (CreateTeamComposite, Boolean, Assignment) -> Unit,
+    assignments: List<Assignment>?,
     assignment: Assignment?,
     onAssignmentChange: (Assignment) -> Unit,
     onBackRequest: () -> Unit,
     error: HandleClassCodeResponseError? = null,
-    onDismissRequest: () -> Unit =  {}
+    onDismissRequest: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var typeOfTeam by remember { mutableStateOf(TypeOfTeam.TEAMS_CREATED) }
@@ -87,7 +94,7 @@ fun ClassroomScreen(
         },
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) {
         Column(
             verticalArrangement = Arrangement.Top,
@@ -95,20 +102,111 @@ fun ClassroomScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = it.calculateTopPadding(), start = 24.dp, end = 24.dp)
-                .background(color = MaterialTheme.colorScheme.background)
+                .background(color = MaterialTheme.colorScheme.background),
         ) {
-            if (error != null) {
-                ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
+            if (assignments != null) {
+                if (error != null) {
+                    ClassCodeErrorView(
+                        handleClassCodeResponseError = error,
+                        onDismissRequest = onDismissRequest,
+                    )
+                } else {
+                    ShowClassroom(classroom = classroom)
+                    if (assignment != null) {
+                        FilterButtons(
+                            typeOfTeam = typeOfTeam,
+                            onTypeOfTeamChange = { type -> typeOfTeam = type },
+                            assignment = assignment,
+                            assignments = assignments,
+                            onAssignmentChange = onAssignmentChange,
+                        )
+                        if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
+                            if (teamsCreated != null) {
+                                ShowTeams(
+                                    teamsCreated = teamsCreated,
+                                    onTeamSelected = onTeamSelected,
+                                )
+                            }
+                        } else {
+                            if (createTeamComposite != null) {
+                                ShowCreateTeamComposite(
+                                    createTeamComposite = createTeamComposite,
+                                    assignment = assignment,
+                                    onCreateTeamComposite = onCreateTeamComposite,
+                                )
+                            }
+                        }
+                    }
+                }
             } else {
-                ShowClassroom(classroom = classroom)
-                if (assignment != null) {
-                    FilterButtons(typeOfTeam = typeOfTeam, onTypeOfTeamChange = { type -> typeOfTeam = type }, assignment = assignment, assignments = assignments, onAssignmentChange = onAssignmentChange)
-                    if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
-                        if (teamsCreated != null)
-                            ShowTeams(teamsCreated = teamsCreated, onTeamSelected = onTeamSelected)
-                    } else {
-                        if (createTeamComposite != null)
-                            ShowCreateTeamComposite(createTeamComposite = createTeamComposite, onCreateTeamComposite = onCreateTeamComposite)
+                LoadingAnimationCircle()
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShowCreateTeamComposite(
+    createTeamComposite: List<CreateTeamComposite>,
+    assignment: Assignment,
+    onCreateTeamComposite: (CreateTeamComposite, Boolean, Assignment) -> Unit,
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        if (createTeamComposite.isEmpty()) {
+            item {
+                Text(text = stringResource(id = R.string.create_team_composite_empty_text), style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            items(createTeamComposite.size) { index -> CreateTeamCompositeCard(createTeamComposite = createTeamComposite[index], assignment = assignment, onCreateTeamComposite = onCreateTeamComposite) }
+        }
+    }
+}
+
+@Composable
+fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, assignment: Assignment, onCreateTeamComposite: (CreateTeamComposite, Boolean, Assignment) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(15.dp))
+            .border(2.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(16.dp))
+            .padding(8.dp),
+    ) {
+        Column(modifier = Modifier.weight(0.85f)) {
+            Text(text = "${createTeamComposite.compositeState} - ${createTeamComposite.createTeam.teamName}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            ShowRequestsStates(createTeamState = createTeamComposite.createTeam.state, joinTeamState = createTeamComposite.joinTeam.state, createRepoState = createTeamComposite.createRepo.state)
+        }
+
+        Column(modifier = Modifier.weight(0.15f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+            if (createTeamComposite.compositeState == "Not_Concluded") {
+                IconButton(onClick = { onCreateTeamComposite(createTeamComposite, true, assignment) }) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(id = R.string.refreshed_icon),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+
+                    )
+                }
+            } else {
+                Column {
+                    IconButton(onClick = { onCreateTeamComposite(createTeamComposite, false, assignment) }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(id = R.string.closed_icon),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    IconButton(onClick = { onCreateTeamComposite(createTeamComposite, true, assignment) }) {
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = stringResource(id = R.string.checked_icon),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }
@@ -117,79 +215,97 @@ fun ClassroomScreen(
 }
 
 @Composable
-fun ShowCreateTeamComposite(
-    createTeamComposite: List<CreateTeamComposite>,
-    onCreateTeamComposite: (CreateTeamComposite) -> Unit
-) {
-    LazyColumn(
-        contentPadding = PaddingValues(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        items(createTeamComposite.size) { index ->
-            CreateTeamCompositeCard(createTeamComposite = createTeamComposite[index], onCreateTeamComposite = onCreateTeamComposite)
-        }
-    }
-}
-
-@Composable
-fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, onCreateTeamComposite: (CreateTeamComposite) -> Unit) {
+fun ShowRequestsStates(createTeamState: String, joinTeamState: String, createRepoState: String) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            // .height(300.dp)
-            .clip(shape = RoundedCornerShape(20.dp))
-            .padding(10.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(15.dp))
-            .border(BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant))
+            .padding(2.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text(text = createTeamComposite.compositeState, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-            if (createTeamComposite.compositeState == "Not_Concluded") {
-                IconButton(onClick = { onCreateTeamComposite(createTeamComposite) }) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = stringResource(id = R.string.refreshed_icon),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else {
-                IconButton(onClick = { onCreateTeamComposite(createTeamComposite) }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(id = R.string.closed_icon),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                IconButton(onClick = { onCreateTeamComposite(createTeamComposite) }) {
-                    Icon(
-                        imageVector = Icons.Default.Done,
-                        contentDescription = stringResource(id = R.string.checked_icon),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+        Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Create team", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Normal, modifier = Modifier.weight(0.30f))
+            if (createTeamState == "Accepted") {
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = stringResource(id = R.string.checked_icon),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(12.dp)
+                        .weight(0.5f),
+                )
             }
         }
-        TempName(name = createTeamComposite.createTeam.name, state = createTeamComposite.createTeam.state)
-        TempName(name = createTeamComposite.joinTeam.name, state = createTeamComposite.joinTeam.state)
-        TempName(name = createTeamComposite.createRepo.name, state = createTeamComposite.createRepo.state)
+        Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Add user to team", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Normal, modifier = Modifier.weight(0.30f))
+            if (joinTeamState == "Accepted") {
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = stringResource(id = R.string.checked_icon),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(12.dp)
+                        .weight(0.5f),
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Create repo", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Normal, modifier = Modifier.weight(0.30f))
+            if (createRepoState == "Accepted") {
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = stringResource(id = R.string.checked_icon),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(12.dp)
+                        .weight(0.5f),
+                )
+            }
+        }
     }
 }
 
+@Preview
 @Composable
-fun TempName(name: String, state: String) {
-    Row(horizontalArrangement = Arrangement.SpaceEvenly){
-        Text(text = name, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-        if (state == "Accepted") {
-            Icon(
-                imageVector = Icons.Default.Done,
-                contentDescription = stringResource(id = R.string.checked_icon),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+fun Aaaa() {
+    val createTeamComposite = CreateTeamComposite(
+        compositeState = "Accepted",
+        createTeam = CreateTeam(
+            teamId = 1,
+            gitHubTeamId = null,
+            teamName = "Team test",
+            requestId = 1,
+            creator = 1,
+            state = "Accepted",
+            composite = 1,
+        ),
+        joinTeam = JoinTeam(
+            githubUsername = "user",
+            requestId = 2,
+            creator = 1,
+            state = "Accepted",
+            composite = 1,
+            teamId = 1,
+        ),
+        createRepo = CreateRepo(
+            repoId = 1,
+            repoName = "Accepted",
+            requestId = 3,
+            creator = 1,
+            state = "Accepted",
+            composite = 1,
+        ),
+    )
+    val assignment = Assignment(
+        id = 1,
+        classroomId = 1,
+        maxElemsPerGroup = 2,
+        maxNumberGroups = 2,
+        releaseDate = Timestamp.valueOf("2021-06-01 00:00:00"),
+        description = "description",
+        title = "title",
+
+    )
+    CreateTeamCompositeCard(createTeamComposite = createTeamComposite, assignment = assignment, onCreateTeamComposite = { _, _, _ -> })
 }
 
 @Composable
@@ -197,10 +313,16 @@ fun ShowTeams(teamsCreated: List<Team>, onTeamSelected: (Team) -> Unit) {
     LazyColumn(
         contentPadding = PaddingValues(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        items(teamsCreated.size) { index ->
-            TeamCreatedCard(team = teamsCreated[index], onTeamSelected = onTeamSelected)
+        if (teamsCreated.isEmpty()) {
+            item {
+                Text(text = stringResource(id = R.string.no_teams_text), style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            items(teamsCreated.size) { index ->
+                TeamCreatedCard(team = teamsCreated[index], onTeamSelected = onTeamSelected)
+            }
         }
     }
 }
@@ -210,26 +332,24 @@ fun ShowTeams(teamsCreated: List<Team>, onTeamSelected: (Team) -> Unit) {
 fun TeamCreatedCard(
     modifier: Modifier = Modifier,
     team: Team,
-    onTeamSelected: (Team) -> Unit = {  }
-)
-{
+    onTeamSelected: (Team) -> Unit = { },
+) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         shape = MaterialTheme.shapes.large,
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant),
         elevation = CardDefaults.cardElevation(8.dp),
         onClick = { onTeamSelected(team) },
-    )
-    {
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             Text(text = team.name, style = MaterialTheme.typography.titleMedium)
         }
@@ -238,16 +358,20 @@ fun TeamCreatedCard(
 
 @Composable
 private fun FilterButtons(
-    modifier: Modifier = Modifier, typeOfTeam: TypeOfTeam, onTypeOfTeamChange: (TypeOfTeam) -> Unit,
-    assignment: Assignment, assignments: List<Assignment>, onAssignmentChange: (Assignment) -> Unit
+    modifier: Modifier = Modifier,
+    typeOfTeam: TypeOfTeam,
+    onTypeOfTeamChange: (TypeOfTeam) -> Unit,
+    assignment: Assignment,
+    assignments: List<Assignment>,
+    onAssignmentChange: (Assignment) -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End,
         modifier = modifier
             .padding(top = 8.dp)
-            .fillMaxWidth())
-    {
+            .fillMaxWidth(),
+    ) {
         AssignmentChooser(currentAssignment = assignment, assignments = assignments, onAssignmentChange = onAssignmentChange)
         Spacer(modifier = Modifier.padding(start = 8.dp))
         TypeOfTeamChooser(typeOfTeam = typeOfTeam, onTypeOfTeamChange = onTypeOfTeamChange)
@@ -257,27 +381,28 @@ private fun FilterButtons(
 @Composable
 fun AssignmentChooser(modifier: Modifier = Modifier, currentAssignment: Assignment, assignments: List<Assignment>, onAssignmentChange: (Assignment) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    Box (modifier = modifier) {
+    Box(modifier = modifier) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(
                 imageVector = Icons.Default.Assignment,
-                contentDescription = stringResource(id = R.string.assignment_icon)
+                contentDescription = stringResource(id = R.string.assignment_icon),
             )
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             assignments.forEach { assignment ->
                 DropdownMenuItem(
                     text = { Text(stringResource(id = R.string.dropdown_menu_item_normal)) },
                     onClick = { onAssignmentChange(assignment) },
-                    leadingIcon = { if (currentAssignment == assignment) ChosenIcon() }
+                    leadingIcon = { if (currentAssignment == assignment) ChosenIcon() },
                 )
             }
         }
     }
 }
+
 @Composable
 private fun TypeOfTeamChooser(modifier: Modifier = Modifier, typeOfTeam: TypeOfTeam, onTypeOfTeamChange: (TypeOfTeam) -> Unit) {
     Box(modifier = modifier) {
@@ -289,17 +414,18 @@ private fun TypeOfTeamChooser(modifier: Modifier = Modifier, typeOfTeam: TypeOfT
         }
     }
 }
+
 @Composable
 fun ShowClassroom(modifier: Modifier = Modifier, classroom: Classroom) {
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier
-            .padding(top = 8.dp)
+            .padding(top = 8.dp),
     ) {
-        if (classroom.isArchived)
+        if (classroom.isArchived) {
             Icon(imageVector = Icons.Default.Inventory2, contentDescription = stringResource(id = R.string.archived_icon))
+        }
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -24,8 +24,8 @@ import okhttp3.Request
 
 class RealCourseServices(private val sessionStore: SessionStore, private val objectMapper: ObjectMapper, private val httpClient: OkHttpClient, private val navigationRepo: NavigationRepository, private val bootUpServices: BootUpServices) : CourseServices {
     override suspend fun getClassrooms(courseId: Int): Either<HandleClassCodeResponseError, List<Classroom>> {
-        val ensureLink = navigationRepo.ensureLink(key = COURSE_KEY, fetchLink =  { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
-        val uri =  UriTemplate.fromTemplate(ensureLink.href)
+        val ensureLink = navigationRepo.ensureLink(key = COURSE_KEY, fetchLink = { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
+        val uri = UriTemplate.fromTemplate(ensureLink.href)
             .set("courseId", courseId).expand()
         val cookie = sessionStore.getSessionCookie()
         val request = Request.Builder()

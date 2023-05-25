@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import isel.ps.classcode.R
@@ -34,9 +33,9 @@ fun AvatarImage(modifier: Modifier = Modifier, avatarUrl: String) {
             .clip(CircleShape)
             .border(
                 BorderStroke(borderWidth, color),
-                CircleShape
+                CircleShape,
             )
             .padding(borderWidth)
-            .clip(CircleShape)
+            .clip(CircleShape),
     )
 }

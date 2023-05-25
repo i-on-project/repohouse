@@ -12,5 +12,5 @@ val ClassCodeTeacherAssignmentDtoType = SirenEntity.getType<ClassCodeTeacherAssi
 data class ClassCodeTeacherAssignmentDeserialization(
     @JsonProperty("assignment")val assignment: ClassCodeAssignmentDeserialization,
     @JsonProperty("teamsCreated")val teamsCreated: List<ClassCodeTeamDeserialization>,
-    @JsonProperty("createTeamComposites")val createTeamComposites: List<ClassCodeCreateTeamCompositeDeserialization>
+    @JsonProperty("createTeamComposites")val createTeamComposites: List<ClassCodeCreateTeamCompositeDeserialization>,
 )

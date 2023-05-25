@@ -2,18 +2,7 @@ package isel.ps.classcode.http.hypermedia
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.type.TypeFactory
-import okhttp3.MediaType.Companion.toMediaType
 import java.net.URI
-
-
-/**
- * For details regarding the Siren media type, see <a href="https://github.com/kevinswiber/siren">Siren</a>
- */
-
-private const val APPLICATION_TYPE = "application"
-private const val SIREN_SUBTYPE = "vnd.siren+json"
-
-val SirenMediaType = "$APPLICATION_TYPE/$SIREN_SUBTYPE".toMediaType()
 
 /**
  * Class whose instances represent links as they are represented in Siren.
@@ -32,7 +21,7 @@ data class SirenAction(
     val title: String? = null,
     val method: String? = null,
     val requiredAuthentication: Boolean? = null,
-    val fields: List<Field>? = null
+    val fields: List<Field>? = null,
 ) {
     /**
      * Represents action's fields
@@ -71,7 +60,7 @@ data class EmbeddedLink(
 
 data class EmbeddedEntity<T>(
     val cls: List<String>? = null,
-    val properties: T? =null,
+    val properties: T? = null,
     val actions: List<SirenAction>? = null,
     val links: List<SirenLink>? = null,
 ) : SubEntity() {

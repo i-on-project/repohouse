@@ -1,6 +1,5 @@
 package isel.ps.classcode.presentation.menu
 
-import android.app.Activity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,7 +9,6 @@ import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.UserInfo
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
-import isel.ps.classcode.presentation.login.LoginActivity
 import isel.ps.classcode.presentation.menu.services.MenuServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.launch
@@ -33,14 +31,14 @@ class MenuViewModel(private val menuServices: MenuServices) : ViewModel() {
         get() = _errorGitHub
 
     fun getUserInfo() = viewModelScope.launch {
-        when(val userInfo = menuServices.getUserInfo()) {
+        when (val userInfo = menuServices.getUserInfo()) {
             is Either.Right -> { _userInfo = userInfo.value }
             is Either.Left -> { _errorGitHub = userInfo.value }
         }
     }
 
     fun getCourses() = viewModelScope.launch {
-        when(val courses = menuServices.getCourses()) {
+        when (val courses = menuServices.getCourses()) {
             is Either.Right -> { _courses = courses.value }
             is Either.Left -> { _errorClassCode = courses.value }
         }

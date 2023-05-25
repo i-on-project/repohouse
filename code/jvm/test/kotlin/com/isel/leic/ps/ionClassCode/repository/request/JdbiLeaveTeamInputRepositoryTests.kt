@@ -31,11 +31,4 @@ class JdbiLeaveTeamInputRepositoryTests {
         assert(request.creator == creator)
     }
 
-    @Test
-    fun `getLeaveTeamRequestsByUser should return leaveTeam requests for a user`() = testWithHandleAndRollback { handle ->
-        val leaveTeamReq = JdbiLeaveTeamRequestRepository(handle = handle)
-        val userId = 5
-        val requests = leaveTeamReq.getLeaveTeamRequestsByUser(userId = userId)
-        assert(requests.size == 2)
-    }
 }

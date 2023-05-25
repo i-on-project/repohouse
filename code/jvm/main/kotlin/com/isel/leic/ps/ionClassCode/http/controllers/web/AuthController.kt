@@ -41,11 +41,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
+import java.util.*
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org user:email repo"
-const val MOBILE_GITHUB_TEACHER_SCOPE = "admin:org user:email repo"
+const val MOBILE_GITHUB_TEACHER_SCOPE = "admin:org%20user:email%20repo"
 const val GITHUB_STUDENT_SCOPE = "repo user:email"
 
 const val STUDENT_COOKIE_NAME = "Student"
@@ -352,10 +352,11 @@ class AuthController(
         @CookieValue userGithubId: String,
     ): ResponseEntity<*> {
         val githubId = AESDecrypt.decrypt(userGithubId).toLong()
-        return when (val userInfo = userServices.getUserByGithubId(githubId)) {
+        return when (val userInfo = userServices.getPendingUserByGithubId(githubId, position)) {
             is Result.Success -> {
-                if (userInfo.value.isCreated) {
-                    siren(
+                val user = userServices.getUserByGithubId(githubId)
+                if (userInfo.value.isCreated && user is Result.Success) {
+                    return siren(
                         StatusOutputModel(
                             "You are now eligible to use the application.",
                             "Return to home to authenticate yourself.",
@@ -364,8 +365,8 @@ class AuthController(
                         clazz("status")
                         link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
                     }
-                } else {
-                    when (position) {
+                } else if (userInfo.value.isCreated) {
+                    return when (position) {
                         TEACHER_COOKIE_NAME -> siren(
                             StatusOutputModel(
                                 "Needing approval.",
@@ -385,6 +386,15 @@ class AuthController(
                             link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
                         }
                     }
+                }
+                return siren(
+                    StatusOutputModel(
+                        "Requiring Confirmation.",
+                        "You must confirm your pending registration request.",
+                    ),
+                ) {
+                    clazz("status")
+                    link(rel = LinkRelation("self"), href = Uris.AUTH_STATUS_PATH)
                 }
             }
             is Result.Problem -> userServices.problem(userInfo.value)

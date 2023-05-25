@@ -26,6 +26,7 @@ import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiTagRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.JdbiUsersRepository
+import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiArchiveRepoRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCompositeRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCreateRepoRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCreateTeamRequestRepository
@@ -33,6 +34,7 @@ import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiJoinTeamRequest
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiLeaveCourseRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiLeaveTeamRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiRequestRepository
+import com.isel.leic.ps.ionClassCode.repository.request.ArchiveRepoRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository
@@ -59,7 +61,7 @@ class JdbiTransaction(
     override val courseRepository: CourseRepository by lazy { JdbiCourseRepository(handle = handle) }
     override val deliveryRepository: DeliveryRepository by lazy { JdbiDeliveryRepository(handle = handle) }
     override val applyRequestRepository: ApplyRepository by lazy { JdbiApplyRepository(handle = handle) }
-    override val archiveRepoRepository: AssignmentRepository by lazy { JdbiAssignmentRepository(handle = handle) }
+    override val archiveRepoRepository: ArchiveRepoRequestRepository by lazy { JdbiArchiveRepoRequestRepository(handle = handle) }
     override val compositeRepository: CompositeRepository by lazy { JdbiCompositeRequestRepository(handle = handle) }
     override val createRepoRepository: CreateRepoRepository by lazy { JdbiCreateRepoRequestRepository(handle = handle) }
     override val createTeamRepository: CreateTeamRepository by lazy { JdbiCreateTeamRequestRepository(handle = handle) }

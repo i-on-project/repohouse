@@ -4,14 +4,14 @@ import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Delivery
 import com.isel.leic.ps.ionClassCode.domain.Repo
-import com.isel.leic.ps.ionClassCode.domain.RepoNotCreated
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.Team
-import com.isel.leic.ps.ionClassCode.domain.TeamNotCreated
-import com.isel.leic.ps.ionClassCode.domain.UserJoinTeam
 import com.isel.leic.ps.ionClassCode.domain.input.AssignmentInput
 import com.isel.leic.ps.ionClassCode.domain.requests.Composite
+import com.isel.leic.ps.ionClassCode.domain.requests.CreateRepo
+import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
+import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.http.model.input.AssignmentInputModel
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
@@ -26,6 +26,8 @@ import com.isel.leic.ps.ionClassCode.repository.request.JoinTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
+import java.sql.Timestamp
+import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -35,8 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import java.sql.Timestamp
-import java.time.Instant
 
 @SpringBootTest
 class AssignmentServiceTests {
@@ -89,13 +89,13 @@ class AssignmentServiceTests {
                         on { getCompositeRequestsThatAreNotAccepted() } doReturn listOf(Composite(id = 1, composite = null, creator = 1))
                     }
                     val mockedCreateTeamRepository = mock<CreateTeamRepository> {
-                        on { getCreateTeamRequestByCompositeId(compositeId = 1) } doReturn TeamNotCreated(teamId = 1, name = "team1", id = 1, composite = 1, creator = 1)
+                        on { getCreateTeamRequestByCompositeId(compositeId = 1) } doReturn CreateTeam(teamId = 1, teamName = "team1", id = 1, composite = 1, creator = 1, githubTeamId = 1)
                     }
                     val mockedJoinTeamRepository = mock<JoinTeamRepository> {
-                        on { getJoinTeamRequestByCompositeId(compositeId = 1) } doReturn UserJoinTeam(name = "user3", id = 3, composite = 3, creator = 3)
+                        on { getJoinTeamRequestByCompositeId(compositeId = 1) } doReturn JoinTeam(githubUsername = "user3", id = 3, composite = 3, creator = 3, teamId = 3)
                     }
                     val mockedCreateRepoRepository = mock<CreateRepoRepository> {
-                        on { getCreateRepoRequestByCompositeId(compositeId = 1) } doReturn RepoNotCreated(repoId = 4, name = "repo4", id = 4, composite = 4, creator = 4)
+                        on { getCreateRepoRequestByCompositeId(compositeId = 1) } doReturn CreateRepo(repoId = 4, repoName = "repo4", id = 4, composite = 4, creator = 4)
                     }
 
                     val mockedTeamsRepository = mock<TeamRepository> {

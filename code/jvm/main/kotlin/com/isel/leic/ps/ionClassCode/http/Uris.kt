@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.http
 
-import org.springframework.web.util.UriTemplate
 import java.net.URI
+import org.springframework.web.util.UriTemplate
 
 /**
  * Uris used in the application.
@@ -132,4 +132,5 @@ object Uris {
     const val MOBILE_TEAMS_PATH = "$MOBILE_ASSIGMENT_PATH/teams"
     const val MOBILE_TEAM_PATH = "$MOBILE_TEAMS_PATH/{teamId}"
     const val MOBILE_TEAM_CREATE_TEAM_PATH = "$MOBILE_TEAM_PATH/create"
+    const val MOBILE_TEAM_REQUESTS_NOT_ACCEPTED_PATH = "$MOBILE_TEAM_PATH/requests"
 }

@@ -1,7 +1,5 @@
 package isel.ps.classcode.presentation.bootUp
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.content.res.Configuration.UI_MODE_TYPE_NORMAL
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -51,7 +49,7 @@ fun BootUpScreen(actionHandler: () -> Unit = { }) {
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.background),
             enter = slideInHorizontally() + fadeIn(animationSpec = tween(durationMillis = 1000, easing = LinearEasing)),
-            exit = fadeOut(animationSpec = tween(durationMillis = 1000, easing = LinearEasing))
+            exit = fadeOut(animationSpec = tween(durationMillis = 1000, easing = LinearEasing)),
         ) {
             IselLogoView()
         }
@@ -63,13 +61,13 @@ fun IselLogoView() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         @DrawableRes val logo = if (isSystemInDarkTheme()) R.drawable.logo_isel_white else R.drawable.logo_isel_black
         Image(
             painter = painterResource(id = logo),
             contentDescription = stringResource(id = R.string.logo),
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(200.dp),
         )
     }
 }

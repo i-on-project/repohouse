@@ -22,14 +22,15 @@ export function HandleAuthFail() {
         navigate("/")
     }, [navigate, setLoggedin])
 
-   return <>
+   return  <Box sx={homeBoxStyle}>
         <Typography
             variant="h6"
             gutterBottom
+            sx={typographyStyle}
         >
             You cannot login as a Student if you are a teacher or vice-versa. Please try again at <NavLink to={"/"}  onClick={handleLogout} className="navbar-brand" > Home </NavLink>
         </Typography>
-   </>
+    </Box>
 }
 
 export function HandleAuthErrorCallback() {

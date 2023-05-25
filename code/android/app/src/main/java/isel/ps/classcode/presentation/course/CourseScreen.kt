@@ -64,7 +64,7 @@ fun CourseScreen(
     onClassroomSelected: (Classroom) -> Unit,
     onBackRequest: () -> Unit,
     error: HandleClassCodeResponseError? = null,
-    onDismissRequest: () -> Unit =  {}
+    onDismissRequest: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -77,7 +77,7 @@ fun CourseScreen(
         },
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) {
         Column(
             verticalArrangement = Arrangement.Top,
@@ -85,7 +85,7 @@ fun CourseScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = it.calculateTopPadding(), start = 16.dp, end = 16.dp)
-                .background(color = MaterialTheme.colorScheme.background)
+                .background(color = MaterialTheme.colorScheme.background),
         ) {
             if (error != null) {
                 ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
@@ -109,7 +109,7 @@ fun ShowCourseInfo(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(8.dp)
+        modifier = modifier.padding(8.dp),
     ) {
         val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
         AvatarImage(avatarUrl = "https://avatars.githubusercontent.com/u/${course.orgId}?s=200&v=4")
@@ -118,12 +118,12 @@ fun ShowCourseInfo(
 }
 
 @Composable
-fun ShowListOfClassrooms(modifier: Modifier = Modifier, classrooms: List<Classroom>, onClassroomSelected: (Classroom) -> Unit = {  }) {
+fun ShowListOfClassrooms(modifier: Modifier = Modifier, classrooms: List<Classroom>, onClassroomSelected: (Classroom) -> Unit = { }) {
     var type by remember { mutableStateOf(ListFilter.NORMAL) }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = modifier,
     ) {
         ChooseListFilter(type = type, onTypeChange = { type = it })
         LazyColumn(
@@ -131,7 +131,7 @@ fun ShowListOfClassrooms(modifier: Modifier = Modifier, classrooms: List<Classro
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            val list = when(type) {
+            val list = when (type) {
                 ListFilter.ARCHIVED -> classrooms.filter { it.isArchived }
                 ListFilter.UNARCHIVED -> classrooms.filter { !it.isArchived }
                 else -> classrooms
@@ -148,27 +148,25 @@ fun ShowListOfClassrooms(modifier: Modifier = Modifier, classrooms: List<Classro
 fun ClassroomCard(
     modifier: Modifier = Modifier,
     classroom: Classroom,
-    onClassroomSelected: (Classroom) -> Unit = {  }
-)
-{
+    onClassroomSelected: (Classroom) -> Unit = { },
+) {
     val color = if (classroom.isArchived) Color.Gray else MaterialTheme.colorScheme.surfaceVariant
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = color
+            containerColor = color,
         ),
         shape = MaterialTheme.shapes.large,
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant),
         elevation = CardDefaults.cardElevation(8.dp),
         onClick = { onClassroomSelected(classroom) },
-    )
-    {
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             Text(text = classroom.name, style = MaterialTheme.typography.titleMedium)
             Text(text = classroom.lastSync.toString(), style = MaterialTheme.typography.bodySmall)
@@ -182,37 +180,38 @@ private fun ChooseListFilter(type: ListFilter, onTypeChange: (ListFilter) -> Uni
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentSize(Alignment.TopEnd)
+            .wrapContentSize(Alignment.TopEnd),
     ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(
                 imageVector = Icons.Default.FilterAlt,
-                contentDescription = stringResource(id = R.string.filter_icon)
+                contentDescription = stringResource(id = R.string.filter_icon),
             )
         }
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_normal)) },
                 onClick = { onTypeChange(ListFilter.NORMAL) },
-                leadingIcon = { if (type == ListFilter.NORMAL) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.NORMAL) ChosenIcon() },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_archived)) },
                 onClick = { onTypeChange(ListFilter.ARCHIVED) },
-                leadingIcon = { if (type == ListFilter.ARCHIVED) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.ARCHIVED) ChosenIcon() },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.dropdown_menu_item_unarchived)) },
                 onClick = { onTypeChange(ListFilter.UNARCHIVED) },
-                leadingIcon = { if (type == ListFilter.UNARCHIVED) ChosenIcon() }
+                leadingIcon = { if (type == ListFilter.UNARCHIVED) ChosenIcon() },
             )
         }
     }
 }
+
 @Composable
 fun ChosenIcon() {
     Icon(imageVector = Icons.Default.Check, contentDescription = stringResource(id = R.string.checked_icon))

@@ -21,7 +21,7 @@ import java.io.IOException
  * It uses the preferences data store to store the encrypted token and the iv(used to decrypt the token),
  * and the [CryptoManager] to encrypt and decrypt the token.
  */
-class RealSessionStore(private val cryptoManager: CryptoManager, context: Context): SessionStore {
+class RealSessionStore(private val cryptoManager: CryptoManager, context: Context) : SessionStore {
     companion object {
         val githubTokenKey = stringPreferencesKey("github_token")
         val classCodeCookieKey = stringPreferencesKey("classCode_cookie")
@@ -64,10 +64,12 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
         }.map { preferences ->
             val iv = preferences[githubIv] ?: ""
             val encryptedData = preferences[githubTokenKey] ?: ""
-            cryptoManager.decrypt(decryptionSecret = DecryptionSecret(
-                iv = iv,
-                data = encryptedData
-            ), typeOfData = TypeOfData.GITHUB_TOKEN
+            cryptoManager.decrypt(
+                decryptionSecret = DecryptionSecret(
+                    iv = iv,
+                    data = encryptedData,
+                ),
+                typeOfData = TypeOfData.GITHUB_TOKEN,
             ).data
         }
 
@@ -81,10 +83,12 @@ class RealSessionStore(private val cryptoManager: CryptoManager, context: Contex
         }.map { preferences ->
             val iv = preferences[classCodeIv] ?: ""
             val encryptedData = preferences[classCodeCookieKey] ?: ""
-            cryptoManager.decrypt(decryptionSecret = DecryptionSecret(
-                iv = iv,
-                data = encryptedData
-            ), typeOfData = TypeOfData.CLASSCODE_COOKIE
+            cryptoManager.decrypt(
+                decryptionSecret = DecryptionSecret(
+                    iv = iv,
+                    data = encryptedData,
+                ),
+                typeOfData = TypeOfData.CLASSCODE_COOKIE,
             ).data
         }
     override fun getSecret(): Flow<String> =

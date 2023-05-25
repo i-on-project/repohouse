@@ -10,5 +10,5 @@ interface ArchiveRepoRequestRepository {
     fun createArchiveRepoRequest(request: ArchiveRepoInput, creator: Int): ArchiveRepo
     fun getArchiveRepoRequests(): List<ArchiveRepo>
     fun getArchiveRepoRequestById(id: Int): ArchiveRepo?
-    fun getArchiveRepoRequestsByUser(userId: Int): List<ArchiveRepo>
+    fun getArchiveRepoRequestsByTeam(teamId: Int): ArchiveRepo?
 }

@@ -9,7 +9,7 @@ val ClassCodeCourseDtoType = SirenEntity.getType<ClassCodeCourseWithClassroomsDe
 /**
  * Class used to deserialize the ClassCodeCourse response from the database
  */
-data class ClassCodeCourseWithClassroomsDeserialization (
+data class ClassCodeCourseWithClassroomsDeserialization(
     @JsonProperty("id")val id: Int,
     @JsonProperty("orgUrl")val orgUrl: String,
     @JsonProperty("name")val name: String,

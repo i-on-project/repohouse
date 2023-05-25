@@ -31,6 +31,7 @@ sealed class CourseServicesError {
     object CourseArchived : CourseServicesError()
     object CourseNameAlreadyExists : CourseServicesError()
     object InternalError : CourseServicesError()
+    object TeacherInCourse : CourseServicesError()
 }
 
 /**
@@ -74,6 +75,8 @@ class CourseServices(
             if (it.usersRepository.getTeacher(teacherId) == null) return@run Result.Problem(CourseServicesError.InternalError)
             val courseByOrg = it.courseRepository.getCourseByOrg(courseInfo.orgUrl)
             if (courseByOrg != null) {
+                val teachers = it.courseRepository.getCourseTeachers(courseByOrg.id)
+                if (teachers.any { teacher -> teacher.id == teacherId }) return@run Result.Problem(CourseServicesError.TeacherInCourse)
                 return@run Result.Success(it.courseRepository.addTeacherToCourse(teacherId, courseByOrg.id))
             } else if (it.courseRepository.checkIfCourseNameExists(courseInfo.name)) {
                 return@run Result.Problem(CourseServicesError.CourseNameAlreadyExists)
@@ -128,6 +131,7 @@ class CourseServices(
             CourseServicesError.CourseArchived -> Problem.invalidOperation
             CourseServicesError.CourseNameAlreadyExists -> Problem.conflict
             CourseServicesError.InternalError -> Problem.internalError
+            CourseServicesError.TeacherInCourse -> Problem.teacherInCourse
         }
     }
 }

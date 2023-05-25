@@ -11,7 +11,7 @@ class JdbiCreateRepoRepositoryTests {
     @Test
     fun `createCreateRepoRequest should create a new createRepo request`() = testWithHandleAndRollback { handle ->
         val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
-        val request = CreateRepoInput(repoId = 3, composite = 15)
+        val request = CreateRepoInput(repoId = 3, composite = 15, repoName = "test")
         createRepoReq.createCreateRepoRequest(request = request, creator = 3)
     }
 
@@ -29,14 +29,6 @@ class JdbiCreateRepoRepositoryTests {
         val creator = 3
         val request = createRepoReq.getCreateRepoRequestById(id = id) ?: fail("Request not found")
         assert(request.creator == creator)
-    }
-
-    @Test
-    fun `getCreateRepoRequestsByUser should return createRepo requests for a user`() = testWithHandleAndRollback { handle ->
-        val createRepoReq = JdbiCreateRepoRequestRepository(handle = handle)
-        val userId = 3
-        val requests = createRepoReq.getCreateRepoRequestsByUser(userId = userId)
-        assert(requests.size == 1)
     }
 
     @Test

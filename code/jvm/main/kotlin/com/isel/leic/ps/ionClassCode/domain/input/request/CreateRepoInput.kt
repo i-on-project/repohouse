@@ -5,5 +5,6 @@ package com.isel.leic.ps.ionClassCode.domain.input.request
  */
 data class CreateRepoInput(
     val repoId: Int,
+    val repoName: String,
     override val composite: Int,
 ) : RequestInputInterface

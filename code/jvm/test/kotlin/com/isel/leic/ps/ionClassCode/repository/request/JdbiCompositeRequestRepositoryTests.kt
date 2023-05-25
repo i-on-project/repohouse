@@ -30,7 +30,7 @@ class JdbiCompositeRequestRepositoryTests {
         val requestRepo = JdbiRequestRepository(handle = handle)
         val id = 15
         val state = "Rejected"
-        compositeRep.updateCompositeState(requestId = id, state = state)
+        compositeRep.updateCompositeState(compositeId = id)
         val request = requestRepo.getRequestById(id = id) ?: fail("Request not found")
         assert(request.state == state)
     }

@@ -12,9 +12,6 @@ import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.security.MessageDigest
-import java.security.SecureRandom
-import java.util.Base64
 
 class LoginViewModel(private val loginServices: LoginServices, private val connectivityObserver: ConnectivityObserver) : ViewModel() {
 
@@ -30,7 +27,7 @@ class LoginViewModel(private val loginServices: LoginServices, private val conne
 
     fun getAccessToken(code: String, state: String) = viewModelScope.launch {
         status = connectivityObserver
-        status.observer().onEach {  }
+        status.observer().onEach { }
         when (val res = loginServices.getTheAccessToken(code = code, state = state)) {
             is Either.Right -> { _finished = true }
             is Either.Left -> { _error = res.value }
@@ -40,5 +37,4 @@ class LoginViewModel(private val loginServices: LoginServices, private val conne
     fun startOAuth(activity: Activity) = viewModelScope.launch {
         loginServices.startOauth(activity = activity)
     }
-
 }

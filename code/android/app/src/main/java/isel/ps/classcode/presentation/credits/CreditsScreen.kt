@@ -14,12 +14,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CreditsScreen() {
-    Column(modifier = Modifier
-        .padding(16.dp)
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background),
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         Text(text = "Credits")
     }

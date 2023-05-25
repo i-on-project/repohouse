@@ -9,6 +9,7 @@ data class ArchiveRepo(
     override val state: String = "Pending",
     override val composite: Int? = null,
     val repoId: Int,
+    val repoName: String
 ) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }

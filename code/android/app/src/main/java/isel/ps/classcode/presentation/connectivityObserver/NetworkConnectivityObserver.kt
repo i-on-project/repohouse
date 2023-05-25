@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
  * Class that implements the connectivity observer contract. This will permit the app to be notified when the connectivity status changes, based on flows
  */
 class NetworkConnectivityObserver(
-    private val context: Context
-): ConnectivityObserver {
+    private val context: Context,
+) : ConnectivityObserver {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     override fun observer(): Flow<ConnectivityObserver.Status> {
         return callbackFlow {

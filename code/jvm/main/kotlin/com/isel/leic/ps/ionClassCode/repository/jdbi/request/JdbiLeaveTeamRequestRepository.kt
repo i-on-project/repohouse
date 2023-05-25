@@ -41,7 +41,16 @@ class JdbiLeaveTeamRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return LeaveTeam(id, creator, teamId = request.teamId)
+        val githubUsername = handle.createQuery(
+            """
+                SELECT github_username FROM users
+                WHERE id = :creator
+                """,
+        )
+            .bind("creator", creator)
+            .mapTo<String>()
+            .first()
+        return LeaveTeam(id = id, creator = creator, composite = null, teamId = request.teamId, githubUsername = githubUsername)
     }
 
     /**
@@ -50,7 +59,9 @@ class JdbiLeaveTeamRequestRepository(
     override fun getLeaveTeamRequests(): List<LeaveTeam> {
         return handle.createQuery(
             """
-                SELECT l.id, r.creator, r.state, l.team_id, r.composite FROM leaveteam as l JOIN request r on r.id = l.id
+                SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username FROM
+                (SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id) as x JOIN
+                 leaveteam as l on x.id = l.id
                 """,
         )
             .mapTo<LeaveTeam>()
@@ -63,8 +74,9 @@ class JdbiLeaveTeamRequestRepository(
     override fun getLeaveTeamRequestById(id: Int): LeaveTeam? {
         return handle.createQuery(
             """
-                SELECT l.id, r.creator, r.state, l.team_id, r.composite FROM leaveteam as l JOIN request r on r.id = l.id
-                WHERE l.id = :id
+                SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username FROM 
+                (SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id WHERE r.id = :id) as x JOIN
+                leaveteam l on x.id = l.id
                 """,
         )
             .bind("id", id)
@@ -72,18 +84,16 @@ class JdbiLeaveTeamRequestRepository(
             .firstOrNull()
     }
 
-    /**
-     * Method to get all Leave Team Request's by a user
-     */
-    override fun getLeaveTeamRequestsByUser(userId: Int): List<LeaveTeam> {
-        return handle.createQuery(
+    override fun updateLeaveTeamState(requestId: Int, state: String) {
+        handle.createUpdate(
             """
-                SELECT l.id, r.creator, r.state, l.team_id, r.composite FROM leaveteam as l JOIN request r on r.id = l.id
-                WHERE r.creator = :creator
+                UPDATE request
+                SET state = :state
+                WHERE id = :requestId
                 """,
         )
-            .bind("creator", userId)
-            .mapTo<LeaveTeam>()
-            .list()
+            .bind("requestId", requestId)
+            .bind("state", state)
+            .execute()
     }
 }

@@ -1,6 +1,5 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi.request
 
-import com.isel.leic.ps.ionClassCode.domain.UserJoinTeam
 import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.repository.request.JoinTeamRepository
@@ -43,7 +42,7 @@ class JdbiJoinTeamRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return JoinTeam(id, creator, teamId = request.teamId)
+        return JoinTeam(id, creator, teamId = request.teamId, githubUsername = request.creatorGitHubUserName)
     }
 
     /**
@@ -52,7 +51,9 @@ class JdbiJoinTeamRequestRepository(
     override fun getJoinTeamRequests(): List<JoinTeam> {
         return handle.createQuery(
             """
-            SELECT j.id, r.creator, r.state, j.team_id, r.composite FROM jointeam as j JOIN request r on r.id = j.id
+            SELECT j.id, x.creator, x.state, j.team_id, x.composite, x.github_username FROM jointeam as j JOIN 
+            (SELECT r.id, r.creator, r.state, r.composite, u.github_username FROM request r JOIN users u on r.creator = u.id) AS x
+            on j.id = x.id
             """,
         )
             .mapTo<JoinTeam>()
@@ -65,7 +66,8 @@ class JdbiJoinTeamRequestRepository(
     override fun getJoinTeamRequestById(id: Int): JoinTeam? {
         return handle.createQuery(
             """
-            SELECT j.id, r.creator, r.state, j.team_id, r.composite FROM jointeam as j JOIN request r on r.id = j.id
+            SELECT j.id, x.creator, x.state, j.team_id, x.composite, x.github_username FROM jointeam as j JOIN 
+            (SELECT r.id, r.creator, r.state, r.composite, u.github_username FROM request r JOIN users u on r.creator = u.id) AS x on x.id = j.id
             WHERE j.id = :id
             """,
         )
@@ -75,34 +77,19 @@ class JdbiJoinTeamRequestRepository(
     }
 
     /**
-     * Method to get all Create Team Request's by a user
-     */
-    override fun getJoinTeamRequestsByUser(userId: Int): List<JoinTeam> {
-        return handle.createQuery(
-            """
-            SELECT j.id, r.creator, r.state, j.team_id, r.composite FROM jointeam as j JOIN request r on r.id = j.id
-            where r.creator = :userId
-            """,
-        )
-            .bind("userId", userId)
-            .mapTo<JoinTeam>()
-            .list()
-    }
-
-    /**
      * Method to get a Join Team Request by is composite id
      */
-    override fun getJoinTeamRequestByCompositeId(compositeId: Int): UserJoinTeam? {
+    override fun getJoinTeamRequestByCompositeId(compositeId: Int): JoinTeam? {
         return handle.createQuery(
             """
-            SELECT x.name, x.id, x.creator, x.state, x.composite FROM (
-                SELECT u.name, r2.id, r2.creator, r2.state, r2.composite FROM users as u JOIN request r2 on u.id = r2.creator
+            SELECT x.id, x.creator, x.state, x.composite, j.team_id, x.github_username FROM (
+                SELECT u.github_username, r2.id, r2.creator, r2.state, r2.composite FROM users as u JOIN request r2 on u.id = r2.creator
                 WHERE r2.composite = :compositeId
             ) as x JOIN jointeam j on j.id = x.id
             """,
         )
             .bind("compositeId", compositeId)
-            .mapTo<UserJoinTeam>()
+            .mapTo<JoinTeam>()
             .firstOrNull()
     }
 

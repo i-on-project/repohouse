@@ -16,7 +16,7 @@ data class Course(
         id = classCodeCourseWithoutClassroomsDeserialization.id,
         orgUrl = classCodeCourseWithoutClassroomsDeserialization.orgUrl,
         orgId = classCodeCourseWithoutClassroomsDeserialization.orgId,
-        name = classCodeCourseWithoutClassroomsDeserialization.name
+        name = classCodeCourseWithoutClassroomsDeserialization.name,
     )
 
     /**
