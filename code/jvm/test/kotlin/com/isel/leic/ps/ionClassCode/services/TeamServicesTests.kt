@@ -84,8 +84,8 @@ class TeamServicesTests {
                     }
 
                     val mockedCreateTeamRepository = mock<CreateTeamRepository> {
-                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 1, composite = 1, teamName = "team1"), creator = 1) } doReturn CreateTeam(id = 1, creator = 1, composite = 1, teamId = 1, githubTeamId = 1, teamName = "team1")
-                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 2, composite = 2, teamName = "team2"), creator = 2) } doReturn CreateTeam(id = 2, creator = 2, composite = 2, teamId = 2, githubTeamId = 2, teamName = "team2")
+                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 1, composite = 1, teamName = "Team1"), creator = 1) } doReturn CreateTeam(id = 1, creator = 1, composite = 1, teamId = 1, githubTeamId = 1, teamName = "team1")
+                        on { createCreateTeamRequest(request = CreateTeamInput(teamId = 2, composite = 2, teamName = "Team2"), creator = 2) } doReturn CreateTeam(id = 2, creator = 2, composite = 2, teamId = 2, githubTeamId = 2, teamName = "team2")
                     }
 
                     val mockedJoinTeamRepoRepository = mock<JoinTeamRepository> {

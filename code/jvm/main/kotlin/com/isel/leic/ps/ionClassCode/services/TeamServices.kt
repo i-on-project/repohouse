@@ -11,6 +11,7 @@ import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.UpdateRequestStateInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
@@ -220,7 +221,7 @@ class TeamServices(
             val compositeState = it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
             if (compositeState == "Accepted") {
                 it.teamRepository.updateTeamStatus(id = teamId)
-                it.teamRepository.addStudentToTeam(teamId = teamId, studentId = body.joinTeam.userId)
+                it.teamRepository.enterTeam(teamId = teamId, studentId = body.joinTeam.userId)
                 it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?:"")
             }
             return@run Result.Success(value = true)
@@ -293,11 +294,16 @@ class TeamServices(
         }
     }
 
-    fun updateRequestState(requestId: Int, state: String): TeamUpdateRequestResponse {
-        if (requestId < 0 || state.isEmpty()) return Result.Problem(TeamServicesError.InvalidData)
+    fun updateRequestState(body: UpdateRequestStateInput, teamId: Int): TeamUpdateRequestResponse {
+        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeValid()) return Result.Problem(value = TeamServicesError.InvalidData)
         return transactionManager.run {
-            it.requestRepository.changeStateRequest(id = requestId, state = state)
-            Result.Success(true)
+            it.requestRepository.changeStateRequest(id = body.requestId, state = body.state)
+            if (body.type.lowercase() == "leaveteam") {
+                it.teamRepository.leaveTeam(teamId = teamId, studentId = body.creator)
+            } else {
+                it.teamRepository.enterTeam(teamId = teamId, studentId = body.creator)
+            }
+            Result.Success(value = true)
         }
     }
 

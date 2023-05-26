@@ -10,7 +10,6 @@ data class LeaveTeam(
     override val composite: Int? = null,
     val teamId: Int,
     val githubUsername: String,
-
 ) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }

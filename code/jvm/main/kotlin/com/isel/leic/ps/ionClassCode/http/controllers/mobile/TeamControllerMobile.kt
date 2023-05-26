@@ -56,7 +56,7 @@ class TeamControllerMobile(
         }
     }
 
-    @PutMapping(Uris.MOBILE_TEAM_CREATE_TEAM_PATH, produces = ["application/vnd.siren+json"])
+    @PutMapping(Uris.MOBILE_TEAM_REQUESTS_NOT_ACCEPTED_PATH, produces = ["application/vnd.siren+json"])
     fun updateRequestState(
         user: User,
         @PathVariable courseId: Int,
@@ -65,7 +65,7 @@ class TeamControllerMobile(
         @PathVariable teamId: Int,
         @RequestBody body: UpdateRequestStateInput,
     ): ResponseEntity<*> {
-        return when (val result = teamServices.updateRequestState(requestId = body.requestId, state = body.state)) {
+        return when (val result = teamServices.updateRequestState(body = body, teamId = teamId)) {
             is Result.Success -> siren(value = RequestChangeStatusOutputModel(id = body.requestId, changed = result.value)) {
                 clazz(value = "updateCreateTeamStatus")
                 link(rel = LinkRelation(value = "self"), href = Uris.MOBILE_TEAM_CREATE_TEAM_PATH)
