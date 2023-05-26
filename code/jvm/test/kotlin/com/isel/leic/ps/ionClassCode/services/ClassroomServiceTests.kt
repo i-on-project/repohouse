@@ -6,12 +6,15 @@ import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
+import com.isel.leic.ps.ionClassCode.domain.requests.Composite
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.CourseRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
+import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
@@ -89,10 +92,14 @@ class ClassroomServiceTests {
                             getCourse(courseId = 1)
                         } doReturn Course(id = 1, orgUrl = "orgUrl", name = "name", orgId = 1111, teachers = listOf())
                     }
+                    val mockedCompositeRepository = mock<CompositeRepository> {
+                        on { createCompositeRequest(creator = 1, request = CompositeInput()) } doReturn Composite(id = 1, creator = 1, state = "Pending")
+                    }
                     on { classroomRepository } doReturn mockedClassroomRepository
                     on { assignmentRepository } doReturn mockedAssignmentRepository
                     on { courseRepository } doReturn mockedCoursesRepository
                     on { usersRepository } doReturn mockedUsersRepository
+                    on { compositeRepository } doReturn mockedCompositeRepository
                 }
                 return block(mockedTransaction)
             }

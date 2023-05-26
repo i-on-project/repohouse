@@ -13,7 +13,6 @@ interface TeamRepository {
     fun updateTeamClosedStatus(id: Int)
     fun getTeamById(id: Int): Team?
     fun getStudentsFromTeam(teamId: Int): List<Student>
-    fun addStudentToTeam(teamId: Int, studentId: Int)
     fun enterTeam(teamId: Int, studentId: Int)
     fun leaveTeam(teamId: Int, studentId: Int)
     fun deleteTeam(teamId: Int)
