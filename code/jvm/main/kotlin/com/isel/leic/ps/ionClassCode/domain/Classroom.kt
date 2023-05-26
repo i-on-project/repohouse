@@ -9,7 +9,8 @@ data class Classroom(
     val id: Int,
     val name: String,
     val lastSync: Timestamp,
-    val inviteLink: String,
+    val inviteCode: String,
     val isArchived: Boolean,
     val courseId: Int,
+    val teacherId: Int
 )

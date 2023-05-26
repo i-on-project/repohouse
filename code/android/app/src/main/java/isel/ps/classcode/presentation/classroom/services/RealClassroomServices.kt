@@ -227,7 +227,7 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
             } else {
                 handleSirenResponseClassCode<Unit>(
                     response = response,
-                    type = ClassCodeTeacherAssignmentDtoType,
+                    type = null,
                     jsonMapper = objectMapper,
                 )
             }

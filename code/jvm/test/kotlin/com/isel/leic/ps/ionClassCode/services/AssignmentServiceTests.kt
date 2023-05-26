@@ -62,8 +62,8 @@ class AssignmentServiceTests {
                     }
 
                     val mockedClassroomRepository = mock<ClassroomRepository> {
-                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteLink = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
-                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteCode = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                     }
 
                     val mockedUsersRepository = mock<UsersRepository> {

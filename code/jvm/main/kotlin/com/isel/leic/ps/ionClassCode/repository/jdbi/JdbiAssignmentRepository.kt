@@ -31,7 +31,7 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Assignment(id, assignment.classroomId, assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
+        return Assignment(id, assignment.classroomId, assignment.minElemsPerGroup,assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
     }
 
     /**

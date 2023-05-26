@@ -6,12 +6,15 @@ import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
+import com.isel.leic.ps.ionClassCode.domain.requests.Composite
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ionClassCode.repository.AssignmentRepository
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.CourseRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
+import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
@@ -45,9 +48,9 @@ class ClassroomServiceTests {
             override fun <R> run(block: (Transaction) -> R): R {
                 val mockedTransaction = mock<Transaction> {
                     val mockedClassroomRepository = mock<ClassroomRepository> {
-                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteLink = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
-                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
-                        on { getClassroomById(classroomId = 3) } doReturn Classroom(id = 3, name = "Classroom 3", inviteLink = "inviteLink2", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteCode = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 3) } doReturn Classroom(id = 3, name = "Classroom 3", inviteCode = "inviteLink2", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on { getStudentsByClassroom(classroomId = 1) } doReturn listOf(student)
                         on { getStudentsByClassroom(classroomId = 3) } doReturn listOf(student2)
                         on { getAllInviteLinks() } doReturn listOf("inviteLink", "inviteLink1")
@@ -55,14 +58,14 @@ class ClassroomServiceTests {
                         on { archiveClassroom(classroomId = 1) } doAnswer {}
                         on { updateClassroomName(classroomId = 1, classroomUpdate = ClassroomUpdateInputModel(name = "newName")) } doAnswer {}
                         on {
-                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteLink = "")
-                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteCode = "")
+                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on {
-                            getClassroomByInviteLink(inviteLink = "inviteLink2")
-                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                            getClassroomByCode(inviteLink = "inviteLink2")
+                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on {
-                            getClassroomByInviteLink(inviteLink = "inviteLink")
-                        } doReturn Classroom(id = 3, name = "Classroom 3", inviteLink = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                            getClassroomByCode(inviteLink = "inviteLink")
+                        } doReturn Classroom(id = 3, name = "Classroom 3", inviteCode = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
 
                         on { addStudentToClassroom(classroomId = 1, studentId = 4) } doAnswer {}
                     }
@@ -89,10 +92,14 @@ class ClassroomServiceTests {
                             getCourse(courseId = 1)
                         } doReturn Course(id = 1, orgUrl = "orgUrl", name = "name", orgId = 1111, teachers = listOf())
                     }
+                    val mockedCompositeRepository = mock<CompositeRepository> {
+                        on { createCompositeRequest(creator = 1, request = CompositeInput()) } doReturn Composite(id = 1, creator = 1, state = "Pending")
+                    }
                     on { classroomRepository } doReturn mockedClassroomRepository
                     on { assignmentRepository } doReturn mockedAssignmentRepository
                     on { courseRepository } doReturn mockedCoursesRepository
                     on { usersRepository } doReturn mockedUsersRepository
+                    on { compositeRepository } doReturn mockedCompositeRepository
                 }
                 return block(mockedTransaction)
             }

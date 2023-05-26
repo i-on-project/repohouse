@@ -7,6 +7,7 @@ import java.sql.Timestamp
  */
 data class AssignmentInputModel(
     val classroomId: Int,
+    val minNumberElems: Int,
     val maxNumberElems: Int,
     val maxNumberGroups: Int,
     val description: String,
@@ -15,6 +16,7 @@ data class AssignmentInputModel(
 ) {
     fun isNotValid(): Boolean {
         return maxNumberElems <= 0 ||
+                minNumberElems <= 0 ||
             maxNumberGroups <= 0 ||
             description.isBlank() ||
             title.isBlank()

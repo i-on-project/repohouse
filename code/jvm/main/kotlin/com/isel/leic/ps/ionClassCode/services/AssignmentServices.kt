@@ -63,6 +63,7 @@ class AssignmentServices(
             val assignment = it.assignmentRepository.createAssignment(
                 AssignmentInput(
                     classroomId = assignmentInfo.classroomId,
+                    minElemsPerGroup = assignmentInfo.minNumberElems,
                     maxElemsPerGroup = assignmentInfo.maxNumberElems,
                     maxNumberGroups = assignmentInfo.maxNumberGroups,
                     description = assignmentInfo.description,

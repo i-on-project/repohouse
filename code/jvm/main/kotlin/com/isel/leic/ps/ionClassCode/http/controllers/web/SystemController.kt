@@ -116,6 +116,9 @@ class SystemController {
             hiddenField("teamId")
             numberField("composite", null)
         }
+        block.action("closeTeam", Uris.CLOSE_TEAM_PATH, method = HttpMethod.POST, type = "application/json") {
+            hiddenField("teamId")
+        }
         block.action(title = "deleteDelivery", href = Uris.DELIVERY_PATH, method = HttpMethod.DELETE, type = "application/json") {}
         block.action(title = "syncDelivery", href = Uris.SYNC_DELIVERY_PATH, method = HttpMethod.POST, type = "application/json") {}
         block.action(title = "postFeedback", href = Uris.POST_FEEDBACK_PATH, method = HttpMethod.POST, type = "application/json") {
@@ -136,6 +139,7 @@ class SystemController {
             textField(name = "title")
             textField(name = "description")
             numberField(name = "maxNumbOfGroups")
+            numberField(name = "minElemsPerGroup")
             numberField(name = "maxElemsPerGroup")
         }
         block.action(title = "createDelivery", href = Uris.CREATE_DELIVERY_PATH, method = HttpMethod.POST, type = "application/json") {

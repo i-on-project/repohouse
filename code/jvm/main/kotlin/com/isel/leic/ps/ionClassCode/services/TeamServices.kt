@@ -11,6 +11,7 @@ import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.UpdateRequestStateInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
@@ -35,6 +36,7 @@ typealias TeamsResponse = Result<TeamServicesError, List<TeamModel>>
 typealias TeamRequestsResponse = Result<TeamServicesError, TeamRequestsModel>
 typealias TeamRequestsMobileResponse = Result<TeamServicesError, TeamRequestsForMobileModel>
 typealias TeamCreateRequestResponse = Result<TeamServicesError, CreateTeam>
+typealias TeamClosedResponse = Result<TeamServicesError, Boolean>
 typealias TeamLeaveRequestResponse = Result<TeamServicesError, LeaveTeam>
 typealias TeamJoinRequestResponse = Result<TeamServicesError, JoinTeam>
 typealias TeamUpdateRequestResponse = Result<TeamServicesError, Boolean>
@@ -54,6 +56,8 @@ sealed class TeamServicesError {
     object AssignmentNotFound : TeamServicesError()
     object InvalidData : TeamServicesError()
     object InternalError : TeamServicesError()
+    object TeamClosed : TeamServicesError()
+    object NotEnoughStudents : TeamServicesError()
 }
 
 /**
@@ -76,12 +80,14 @@ class TeamServices(
                 val students = it.teamRepository.getStudentsFromTeam(teamId)
                 val repo = it.repoRepository.getRepoByTeam(teamId)
                 val feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId)
+                val assignment = it.assignmentRepository.getAssignmentById(team.assignment) ?: return@run Result.Problem(TeamServicesError.AssignmentNotFound)
                 return@run Result.Success(
                     TeamModel(
                         team,
                         students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         repo,
                         feedbacks,
+                        assignment
                     ),
                 )
             }
@@ -94,6 +100,7 @@ class TeamServices(
     fun getTeamsInfoByAssignment(assignmentId: Int): TeamsResponse {
         if (assignmentId <= 0) return Result.Problem(value = TeamServicesError.InvalidData)
         return transactionManager.run {
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId) ?: return@run Result.Problem(TeamServicesError.AssignmentNotFound)
             val teams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
             Result.Success(
                 value = teams.map { team ->
@@ -102,6 +109,7 @@ class TeamServices(
                         students = it.teamRepository.getStudentsFromTeam(teamId = team.id).map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         repo = it.repoRepository.getRepoByTeam(teamId = team.id),
                         feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId = team.id),
+                        assignment = assignment
                     )
                 },
             )
@@ -153,6 +161,22 @@ class TeamServices(
     }
 
     /**
+     * Method to close a team
+     * All the students can do it
+     */
+    fun closeTeam(teamId: Int): TeamClosedResponse{
+        return transactionManager.run {
+            val team = it.teamRepository.getTeamById(teamId) ?: return@run Result.Problem(TeamServicesError.TeamNotFound)
+            val students = it.teamRepository.getStudentsFromTeam(teamId)
+            val assignment = it.assignmentRepository.getAssignmentById(team.assignment) ?: return@run Result.Problem(TeamServicesError.AssignmentNotFound)
+            if (assignment.minElemsPerGroup > students.size) return@run Result.Problem(TeamServicesError.NotEnoughStudents)
+            if (team.isClosed) return@run Result.Problem(TeamServicesError.TeamClosed)
+            it.teamRepository.updateTeamClosedStatus(teamId)
+            Result.Success(true)
+        }
+    }
+
+    /**
      * Method to create a request to join a team
      * Needs a teacher to approve the request
      */
@@ -165,9 +189,10 @@ class TeamServices(
             val classroom = it.classroomRepository.getClassroomById(assignment.classroomId)
                 ?: return@run Result.Problem(TeamServicesError.InternalError)
             if (classroom.isArchived) return@run Result.Problem(TeamServicesError.ClassroomArchived)
-            when (it.teamRepository.getTeamById(joinInfo.teamId)) {
+            when (val team = it.teamRepository.getTeamById(joinInfo.teamId)) {
                 null -> return@run Result.Problem(TeamServicesError.TeamNotFound)
                 else -> {
+                    if (team.isClosed) return@run Result.Problem(TeamServicesError.TeamClosed)
                     val request = it.joinTeamRepository.createJoinTeamRequest(joinInfo, creator)
                     return@run Result.Success(request)
                 }
@@ -219,9 +244,9 @@ class TeamServices(
             it.createRepoRepository.updateCreateRepoState(requestId = body.createRepo.requestId, state = body.createRepo.state)
             val compositeState = it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
             if (compositeState == "Accepted") {
-                it.teamRepository.updateTeamStatus(id = teamId)
-                it.teamRepository.addStudentToTeam(teamId = teamId, studentId = body.joinTeam.userId)
-                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?: "")
+                it.teamRepository.updateTeamCreatedStatus(id = teamId)
+                it.teamRepository.enterTeam(teamId = teamId, studentId = body.joinTeam.userId)
+                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?:"")
             }
             return@run Result.Success(value = true)
         }
@@ -295,11 +320,16 @@ class TeamServices(
         }
     }
 
-    fun updateRequestState(requestId: Int, state: String): TeamUpdateRequestResponse {
-        if (requestId < 0 || state.isEmpty()) return Result.Problem(TeamServicesError.InvalidData)
+    fun updateRequestState(body: UpdateRequestStateInput, teamId: Int): TeamUpdateRequestResponse {
+        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeValid()) return Result.Problem(value = TeamServicesError.InvalidData)
         return transactionManager.run {
-            it.requestRepository.changeStateRequest(id = requestId, state = state)
-            Result.Success(true)
+            it.requestRepository.changeStateRequest(id = body.requestId, state = body.state)
+            if (body.type.lowercase() == "leaveteam") {
+                it.teamRepository.leaveTeam(teamId = teamId, studentId = body.creator)
+            } else {
+                it.teamRepository.enterTeam(teamId = teamId, studentId = body.creator)
+            }
+            Result.Success(value = true)
         }
     }
 
@@ -317,6 +347,8 @@ class TeamServices(
             is TeamServicesError.InvalidData -> Problem.invalidInput
             is TeamServicesError.InternalError -> Problem.internalError
             is TeamServicesError.TeamNotAccepted -> Problem.invalidOperation
+            is TeamServicesError.TeamClosed -> Problem.invalidOperation
+            is TeamServicesError.NotEnoughStudents -> Problem.invalidOperation
         }
     }
 }

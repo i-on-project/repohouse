@@ -18,8 +18,8 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
     override fun createTeam(team: TeamInput): Team {
         val id = handle.createUpdate(
             """
-            INSERT INTO team (assignment, name, is_created)
-            VALUES (:assignmentId, :name, false)
+            INSERT INTO team (assignment, name, is_created,is_closed)
+            VALUES (:assignmentId, :name, false,false)
             RETURNING id
             """,
         )
@@ -38,13 +38,13 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
         )
             .bind("id", id)
             .bind("name", teamName)
-        return Team(id, teamName, false, team.assignmentId)
+        return Team(id, teamName, false,false,team.assignmentId)
     }
 
     /**
-     * Method to update a Team status
+     * Method to update a Team created status
      */
-    override fun updateTeamStatus(id: Int) {
+    override fun updateTeamCreatedStatus(id: Int) {
         handle.createUpdate(
             """
             UPDATE team SET is_created = :is_created
@@ -53,6 +53,21 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
         )
             .bind("id", id)
             .bind("is_created", true)
+            .execute()
+    }
+
+    /**
+     * Method to update a Team closed status
+     */
+    override fun updateTeamClosedStatus(id: Int) {
+        handle.createUpdate(
+            """
+            UPDATE team SET is_closed = :is_closed
+            WHERE id = :id
+            """,
+        )
+            .bind("id", id)
+            .bind("is_closed", true)
             .execute()
     }
 
@@ -86,21 +101,6 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .bind("teamId", teamId)
             .mapTo<Student>()
             .list()
-    }
-
-    /**
-     * Method to add a Student to a Team
-     */
-    override fun addStudentToTeam(teamId: Int, studentId: Int) {
-        handle.createUpdate(
-            """
-            INSERT INTO student_team (student, team)
-            VALUES (:student_id, :team_id)
-            """,
-        )
-            .bind("student_id", studentId)
-            .bind("team_id", teamId)
-            .execute()
     }
 
     /**

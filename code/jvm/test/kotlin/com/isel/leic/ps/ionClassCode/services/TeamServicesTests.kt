@@ -75,8 +75,8 @@ class TeamServicesTests {
                     }
 
                     val mockedClassroomRepository = mock<ClassroomRepository> {
-                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom1", lastSync = Timestamp.from(Instant.now()), isArchived = true, inviteLink = "inviteLink", courseId = 1)
-                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 1, name = "Classroom2", lastSync = Timestamp.from(Instant.now()), isArchived = false, inviteLink = "inviteLink1", courseId = 1)
+                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom1", lastSync = Timestamp.from(Instant.now()), isArchived = true, inviteCode = "inviteLink", courseId = 1)
+                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 1, name = "Classroom2", lastSync = Timestamp.from(Instant.now()), isArchived = false, inviteCode = "inviteLink1", courseId = 1)
                     }
 
                     val mockedCompositeRepository = mock<CompositeRepository> {

@@ -54,6 +54,24 @@ export class RequestCreatedDtoProperties {
     }
 }
 
+export interface RequestCreateTeamDtoProperties{
+    id: number,
+    teamId: number,
+    teamName: string,
+}
+
+export class RequestCreateTeamDtoProperties {
+    constructor(
+        id: number,
+        teamId: number,
+        teamName: string,
+    ) {
+        this.id = id
+        this.teamId = teamId
+        this.teamName = teamName
+    }
+}
+
 export interface RequestChangeStatusDtoProperties{
     id: number,
     changed: Boolean,

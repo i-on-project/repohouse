@@ -205,7 +205,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         return if (student) {
             handle.createQuery(
                 """
-                SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_link,classroom.is_archived,course_id FROM classroom
+                SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_code,classroom.is_archived,course_id,classroom.teacher_id FROM classroom
                 JOIN student_classroom ON classroom.id = student_classroom.classroom
                 WHERE student_classroom.student = :user_id AND classroom.course_id = :course_id
             """,
@@ -217,7 +217,7 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
         } else {
             handle.createQuery(
                 """
-                    SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_link,classroom.is_archived,course_id FROM classroom
+                    SELECT classroom.id,classroom.name,classroom.last_sync,classroom.invite_code,classroom.is_archived,course_id,classroom.teacher_id FROM classroom
                     WHERE classroom.teacher_id = :user_id AND classroom.course_id = :course_id
                 """,
             )
