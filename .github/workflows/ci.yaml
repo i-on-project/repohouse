@@ -16,6 +16,6 @@ jobs:
           env:
               POSTGRES_USER: postgres
               POSTGRES_PASSWORD: postgres
-              POSTGRES_DB: repohouse
-              JDBC_DATABASE_URL: jdbc:postgresql://db-docker:5432/repohouse?user=postgres&password=postgres
+              POSTGRES_DB: classcode
+              JDBC_DATABASE_URL: jdbc:postgresql://db-docker:5432/classcode?user=postgres&password=postgres
           run: code/jvm/gradlew -p code/jvm/ check
