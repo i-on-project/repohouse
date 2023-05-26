@@ -15,6 +15,9 @@ services:
     ports:
       - "5432:5432"
 
+    networks:
+      - net-classcode
+
   # The service running the API
   spring-service:
     container_name: spring-service
@@ -28,6 +31,9 @@ services:
 
     ports:
       - "8080:8080"
+
+    networks:
+      - net-classcode
 
     depends_on:
       - db-docker
@@ -45,4 +51,9 @@ services:
     depends_on:
       - spring-service
 
+    networks:
+      - net-classcode
 
+networks:
+    net-classcode:
+        driver: bridge
