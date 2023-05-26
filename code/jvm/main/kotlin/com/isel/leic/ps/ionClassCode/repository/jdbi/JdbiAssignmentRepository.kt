@@ -18,20 +18,21 @@ class JdbiAssignmentRepository(private val handle: Handle) : AssignmentRepositor
     override fun createAssignment(assignment: AssignmentInput): Assignment {
         val id = handle.createUpdate(
             """
-               INSERT INTO assignment (title, description, max_elems_per_group, max_number_groups,classroom_id, release_date) 
-               VALUES (:title, :description, :max_elems_per_group, :numb_groups,:classroom_id, CURRENT_DATE)
+               INSERT INTO assignment (title, description, max_elems_per_group, min_elems_per_group, max_number_groups, classroom_id, release_date) 
+               VALUES (:title, :description, :max_elems_per_group, :min_elems_per_group ,:numb_groups,:classroom_id, CURRENT_DATE)
                RETURNING id
                """,
         )
             .bind("title", assignment.title)
             .bind("description", assignment.description)
             .bind("max_elems_per_group", assignment.maxElemsPerGroup)
+            .bind("min_elems_per_group", assignment.minElemsPerGroup)
             .bind("numb_groups", assignment.maxNumberGroups)
             .bind("classroom_id", assignment.classroomId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Assignment(id, assignment.classroomId, assignment.minElemsPerGroup,assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
+        return Assignment(id, assignment.classroomId, assignment.minElemsPerGroup, assignment.maxElemsPerGroup, assignment.maxNumberGroups, Timestamp(System.currentTimeMillis()), assignment.description, assignment.title)
     }
 
     /**

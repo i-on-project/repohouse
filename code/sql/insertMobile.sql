@@ -163,6 +163,7 @@ VALUES (46, 6, 5);
 
 COMMIT TRANSACTION;
 
+
 SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username FROM
     (SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id) as x JOIN
     leaveteam as l on x.id = l.id

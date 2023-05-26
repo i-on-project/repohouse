@@ -16,6 +16,7 @@ class AssignmentRepositoryTests {
             assignment = AssignmentInput(
                 classroomId = classroomId,
                 maxElemsPerGroup = 10,
+                minElemsPerGroup = 1,
                 maxNumberGroups = 10,
                 description = "aaa",
                 title = "aaa",
