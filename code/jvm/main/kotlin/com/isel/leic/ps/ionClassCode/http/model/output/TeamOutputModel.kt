@@ -17,7 +17,7 @@ data class TeamOutputModel(
     val students: List<StudentWithoutToken>,
     val repo: Repo?,
     val feedbacks: List<Feedback>,
-    val assignment:Assignment
+    val assignment: Assignment
 )
 
 /**
@@ -42,7 +42,7 @@ data class TeamModel(
     val students: List<StudentWithoutToken>,
     val repo: Repo?,
     val feedbacks: List<Feedback>,
-    val assignment:Assignment
+    val assignment: Assignment
 )
 
 /**

@@ -1,5 +1,5 @@
 package com.isel.leic.ps.ionClassCode.http.controllers.mobile
-
+/*
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.ChallengeInput
 import com.isel.leic.ps.ionClassCode.http.GITHUB_BASE_URL
@@ -19,9 +19,9 @@ import com.isel.leic.ps.ionClassCode.infra.LinkRelation
 import com.isel.leic.ps.ionClassCode.infra.siren
 import com.isel.leic.ps.ionClassCode.services.GithubServices
 import com.isel.leic.ps.ionClassCode.services.UserServices
-import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
-import java.util.*
+import com.isel.leic.ps.ionClassCode.utils.Result
+import java.util.UUID
 import okhttp3.internal.EMPTY_REQUEST
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -151,3 +151,5 @@ private fun generateSessionCookie(token: String): ResponseCookie {
         .path("/api/mobile")
         .build()
 }
+
+*/

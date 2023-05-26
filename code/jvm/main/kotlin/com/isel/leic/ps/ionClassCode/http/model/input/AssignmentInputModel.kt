@@ -16,7 +16,7 @@ data class AssignmentInputModel(
 ) {
     fun isNotValid(): Boolean {
         return maxNumberElems <= 0 ||
-                minNumberElems <= 0 ||
+            minNumberElems <= 0 ||
             maxNumberGroups <= 0 ||
             description.isBlank() ||
             title.isBlank()

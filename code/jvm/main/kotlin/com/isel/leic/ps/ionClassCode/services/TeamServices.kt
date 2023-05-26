@@ -164,7 +164,7 @@ class TeamServices(
      * Method to close a team
      * All the students can do it
      */
-    fun closeTeam(teamId: Int): TeamClosedResponse{
+    fun closeTeam(teamId: Int): TeamClosedResponse {
         return transactionManager.run {
             val team = it.teamRepository.getTeamById(teamId) ?: return@run Result.Problem(TeamServicesError.TeamNotFound)
             val students = it.teamRepository.getStudentsFromTeam(teamId)
@@ -246,7 +246,7 @@ class TeamServices(
             if (compositeState == "Accepted") {
                 it.teamRepository.updateTeamCreatedStatus(id = teamId)
                 it.teamRepository.enterTeam(teamId = teamId, studentId = body.joinTeam.userId)
-                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?:"")
+                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?: "")
             }
             return@run Result.Success(value = true)
         }

@@ -1,0 +1,21 @@
+name: Continuous Integration
+
+on: [push]
+
+jobs:
+    build:
+      name: Continuous Integration
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Set up Java 17
+          uses: actions/setup-java@v1
+          with:
+            java-version: 17
+        - name: Build Docker images
+          env:
+              POSTGRES_USER: postgres
+              POSTGRES_PASSWORD: postgres
+              POSTGRES_DB: repohouse
+              JDBC_DATABASE_URL: jdbc:postgresql://db-docker:5432/repohouse?user=postgres&password=postgres
+          run: .\repohouse\code\jvm\gradlew -p .\repohouse\code\jvm\ check

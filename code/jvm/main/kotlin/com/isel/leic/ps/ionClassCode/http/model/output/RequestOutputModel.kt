@@ -36,7 +36,6 @@ data class RequestChangeStatusOutputModel(
     val changed: Boolean,
 ) : OutputModel
 
-
 /**
  * Represents a Request Created Team Output Model.
  */
