@@ -1,8 +1,13 @@
 const webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
     entry: './src/react-components/index.tsx',
-    mode: "development",
+    output: {
+        filename: 'main.js',
+        path: path.resolve(__dirname, 'public'),
+    },
+    mode: "production",
     resolve: {
         extensions: [".js", ".ts", ".tsx",".css"]
     },
