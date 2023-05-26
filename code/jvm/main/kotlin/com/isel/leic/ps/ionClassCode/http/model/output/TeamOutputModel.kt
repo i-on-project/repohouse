@@ -58,7 +58,7 @@ data class RequestsHistory(
 
 data class TeamRequestsForMobileModel(
     val needApproval: RequestsThatNeedApproval,
-    val requestsHistory: RequestsHistory
+    val requestsHistory: RequestsHistory,
 )
 
 /**
@@ -67,4 +67,3 @@ data class TeamRequestsForMobileModel(
 data class UpdateCreateTeamStatusOutput(
     val result: Boolean,
 )
-

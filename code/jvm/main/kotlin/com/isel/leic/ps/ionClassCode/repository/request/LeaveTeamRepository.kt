@@ -11,5 +11,4 @@ interface LeaveTeamRepository {
     fun getLeaveTeamRequests(): List<LeaveTeam>
     fun getLeaveTeamRequestById(id: Int): LeaveTeam?
     fun updateLeaveTeamState(requestId: Int, state: String)
-
 }

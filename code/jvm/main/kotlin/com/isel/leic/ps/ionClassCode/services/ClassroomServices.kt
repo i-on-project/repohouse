@@ -12,12 +12,12 @@ import com.isel.leic.ps.ionClassCode.http.model.output.LocalCopy
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
-import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
+import java.io.File
 
 /**
  * Alias for the response of the services

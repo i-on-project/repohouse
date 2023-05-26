@@ -7,7 +7,7 @@ to transpile Typescript to Javascript and to serve the application.
 
 All the components are designed with [Material UI](https://material-ui.com/), to provide a better user experience.
 
-### Table of Contents
+## Table of Contents
 
 - [Technologies](#technologies)
 - [Architecture](#architecture)
@@ -24,7 +24,7 @@ All the components are designed with [Material UI](https://material-ui.com/), to
   - [Test](#test)
 
 
-### Technologies
+## Technologies
 
 - [React](https://reactjs.org/)
 - [Typescript](https://www.typescriptlang.org/)
@@ -34,7 +34,7 @@ All the components are designed with [Material UI](https://material-ui.com/), to
 - [React Router](https://reactrouter.com)
 - [Material UI](https://material-ui.com/)
 
-### Architecture
+## Architecture
 
 The application is organized in the following folders:
 
@@ -44,7 +44,7 @@ The application is organized in the following folders:
 - domain/ : Domain objects
 - utils/ : Utility constants and functions
 
-#### Components
+### Components
 
 The components are the building blocks of the application,
 they are used to create the views of it and to interact with the user
@@ -54,7 +54,7 @@ The components use the [Material UI](https://material-ui.com/) library,
 to provide a better user experience.
 
 
-#### Services
+### Services
 
 The services are used to make the bridge between the components and the http client.
 
@@ -66,7 +66,7 @@ The services are a layer to process information before sending the request to th
 Tho the use of [JSON Home](https://datatracker.ietf.org/doc/html/draft-nottingham-json-home-06), the services have the knowledge of the link templates,
 so it's chosen the correct link template to use, and the respective parameters to use.
 
-#### Http
+### Http
 
 The Http layer is used to send the requests to the backend, it's used to create the requests,
 and to send them to the backend.
@@ -77,7 +77,7 @@ this is done to avoid blocking the UI, and to allow the user to continue using t
 The Http layer is also used to handle the errors, and to parse the response,
 returning the data to the services.
 
-#### Hooks
+### Hooks
 
 The hooks are used to provide a better user experience,
 by providing a better way to handle the state of the application.
@@ -97,7 +97,7 @@ and some context hooks, `useLoggedIn`, `useGithubId` and ``useUser` to handle th
 in the `AuthContainer` component created in the `Auth.tsx` file.
 
 
-#### Router
+### Router
 
 The React Dom Router is used to provide routing to the application,
 providing dynamic routing.

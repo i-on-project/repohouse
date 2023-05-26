@@ -33,7 +33,8 @@ The i-on initiative aims in systems open source software for academic purposes.
 - [Functionalities](#functionalities)
 - [Repository Organization](#repository-organization)
 - [Installation](#installation)
-- [Usage](#usage)
+    - [Web Application](#web-application)
+    - [Mobile Application](#mobile-application)
 - [License](#license)
 - [Project Status](#project-status)
 
@@ -61,12 +62,56 @@ The repository is organized as follows:
 
 ## Installation
 
-TODO: Add installation instructions
+
+### Web Application
+
+To install and set up the i-on ClassCode system, follow the steps below:
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/i-on-project/repohouse.git
+```
+
+2. Set up the environment variables:
+   - check the [jvm](./code/jvm/README.md#environment-variables) README for more information.
+   - check the [js](./code/js/README.md#environment-variables) README for more information.
 
 
-## Usage
+3. Set up the database:
+   - ensure that the database is running, with the tables and triggers created.
+   - check the [sql](./code/sql) directory for the database scripts.
 
-TODO: Add usage instructions
+4. Run the backend server:
+
+```
+cd code\jvm
+./gradlew bootRun
+```
+
+5. Install the frontend dependencies:
+
+```
+cd code\js
+npm install
+```
+
+6. Run the frontend server:
+
+```
+npm start
+```
+
+
+7. You're all set! The i-on ClassCode system is now installed and ready to use.
+
+Note: Make sure you have Node.js and npm installed on your machine before proceeding with the installation.
+
+Enjoy using i-on ClassCode to enhance your academic repository management experience!
+
+### Mobile Application
+
+- [ ] TODO
 
 
 ## License

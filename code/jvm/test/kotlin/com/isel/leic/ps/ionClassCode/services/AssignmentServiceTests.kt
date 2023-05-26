@@ -26,8 +26,6 @@ import com.isel.leic.ps.ionClassCode.repository.request.JoinTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
-import java.sql.Timestamp
-import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -37,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import java.sql.Timestamp
+import java.time.Instant
 
 @SpringBootTest
 class AssignmentServiceTests {
