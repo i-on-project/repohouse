@@ -58,7 +58,7 @@ class CourseServiceTests {
                         on { getCourse(courseId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 1111)
                         on { getCourse(courseId = 2) } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(teacherWithoutToken), isArchived = true, orgId = 2222)
                         on { getCourse(courseId = 3) } doReturn Course(id = 3, orgUrl = "orgUrl2", name = "courseName2", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 3333)
-                        on { getCourseUserClassrooms(courseId = 1, userId = 2, student = true) } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteLink = "inviteLink"))
+                        on { getCourseUserClassrooms(courseId = 1, userId = 2, student = true) } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink"))
                         on { getStudentInCourse(courseId = 1) } doReturn listOf(student)
                         on { getCourseByOrg(orgUrl = "orgUrl") } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 1111)
                         on { getCourseByOrg(orgUrl = "orgUrl3") } doReturn Course(
@@ -125,7 +125,7 @@ class CourseServiceTests {
                         on { checkIfCourseNameExists(name = "courseName") } doReturn true
                         on {
                             getCourseAllClassrooms(courseId = 1)
-                        } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteLink = "inviteLink"), Classroom(id = 2, name = "name2", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteLink = "inviteLink2"))
+                        } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink"), Classroom(id = 2, name = "name2", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink2"))
                         on {
                             getCourseAllClassrooms(courseId = 3)
                         } doReturn listOf()

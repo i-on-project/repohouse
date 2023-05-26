@@ -60,6 +60,7 @@ export class AssignmentDeletedDtoProperties {
 export class AssignmentBody{
     constructor(
         classroomId: number,
+        minNumberElems: number,
         maxNumberElems: number,
         maxNumberGroups: number,
         title: string,
@@ -67,6 +68,7 @@ export class AssignmentBody{
         dueDate: Date,
     ) {
         this.classroomId = classroomId
+        this.minNumberElems = minNumberElems
         this.maxNumberElems = maxNumberElems
         this.maxNumberGroups = maxNumberGroups
         this.title = title
@@ -75,6 +77,7 @@ export class AssignmentBody{
     }
 
     classroomId: number
+    minNumberElems: number
     maxNumberElems: number
     maxNumberGroups: number
     description: string

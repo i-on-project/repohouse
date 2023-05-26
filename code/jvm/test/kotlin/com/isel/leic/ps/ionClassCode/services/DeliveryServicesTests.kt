@@ -134,7 +134,7 @@ class DeliveryServicesTests {
                         on { getClassroomById(classroomId = 1) } doReturn Classroom(
                             id = 1,
                             name = "Classroom 1",
-                            inviteLink = "inviteLink",
+                            inviteCode = "inviteLink",
                             isArchived = true,
                             lastSync = Timestamp.from(Instant.now()),
                             courseId = 1,
@@ -142,7 +142,7 @@ class DeliveryServicesTests {
                         on { getClassroomById(classroomId = 2) } doReturn Classroom(
                             id = 2,
                             name = "Classroom 2",
-                            inviteLink = "inviteLink2",
+                            inviteCode = "inviteLink2",
                             isArchived = false,
                             lastSync = Timestamp.from(Instant.now()),
                             courseId = 1,

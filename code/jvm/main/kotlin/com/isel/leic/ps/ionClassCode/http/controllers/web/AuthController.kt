@@ -58,7 +58,7 @@ const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
 
-const val TEST = true
+const val TEST = false
 val URI = if (TEST) "http://localhost:3000" else System.getenv("NGROK_URI") ?: "http://localhost:3000"
 
 /**

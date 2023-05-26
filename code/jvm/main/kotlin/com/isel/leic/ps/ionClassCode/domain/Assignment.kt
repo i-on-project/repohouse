@@ -8,6 +8,7 @@ import java.sql.Timestamp
 data class Assignment(
     val id: Int,
     val classroomId: Int,
+    val minElemsPerGroup: Int,
     val maxElemsPerGroup: Int,
     val maxNumberGroups: Int,
     val releaseDate: Timestamp,

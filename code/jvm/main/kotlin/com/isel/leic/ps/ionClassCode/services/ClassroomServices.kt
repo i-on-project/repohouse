@@ -168,7 +168,7 @@ class ClassroomServices(
         if (inviteLink.isBlank()) return Result.Problem(ClassroomServicesError.InvalidInput)
         return transactionManager.run {
             it.usersRepository.getStudent(studentId) ?: return@run Result.Problem(ClassroomServicesError.InternalError)
-            val classroom = it.classroomRepository.getClassroomByInviteLink(inviteLink) ?: return@run Result.Problem(ClassroomServicesError.InviteLinkNotFound)
+            val classroom = it.classroomRepository.getClassroomByCode(inviteLink) ?: return@run Result.Problem(ClassroomServicesError.InviteLinkNotFound)
             if (classroom.isArchived) return@run Result.Problem(ClassroomServicesError.ClassroomArchived)
             val prevStudents = it.classroomRepository.getStudentsByClassroom(classroom.id)
             if (prevStudents.any { prevStudent -> prevStudent.id == studentId }) {

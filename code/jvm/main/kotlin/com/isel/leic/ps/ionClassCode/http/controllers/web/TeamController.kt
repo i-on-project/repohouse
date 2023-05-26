@@ -10,6 +10,8 @@ import com.isel.leic.ps.ionClassCode.http.Uris
 import com.isel.leic.ps.ionClassCode.http.model.output.FeedbackOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.RequestChangeStatusOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.RequestCreatedOutputModel
+import com.isel.leic.ps.ionClassCode.http.model.output.RequestTeamCreatedOutputModel
+import com.isel.leic.ps.ionClassCode.http.model.output.TeamClosedOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.TeamOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.TeamRequestsOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.TeamsOutputModel
@@ -47,7 +49,7 @@ class TeamController(
     ): ResponseEntity<*> {
         return when (val team = teamService.getTeamInfo(teamId)) {
             is Result.Problem -> teamService.problem(team.value)
-            is Result.Success -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repo, team.value.feedbacks)) {
+            is Result.Success -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repo, team.value.feedbacks,team.value.assignment)) {
                 clazz("team")
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
             }
@@ -108,8 +110,29 @@ class TeamController(
         if (user !is Student) return Problem.notStudent
         return when (val create = teamService.createTeamRequest(user.id, user.githubUsername, assignmentId, classroomId)) {
             is Result.Problem -> teamService.problem(create.value)
-            is Result.Success -> siren(RequestCreatedOutputModel(create.value.id, true)) {
+            is Result.Success -> siren(RequestTeamCreatedOutputModel(create.value.id, create.value.teamId,create.value.teamName)) {
                 clazz("createTeam")
+            }
+        }
+    }
+
+    /**
+     * Close a team that have the minimum number of students
+     */
+    @PostMapping(Uris.CLOSE_TEAM_PATH)
+    fun teamClose(
+        user: User,
+        @PathVariable teamId: Int,
+        @PathVariable courseId: Int,
+        @PathVariable classroomId: Int,
+        @PathVariable assignmentId: Int,
+    ): ResponseEntity<*> {
+        if (user !is Student) return Problem.notStudent
+        return when (val close = teamService.closeTeam(teamId)) {
+            is Result.Problem -> teamService.problem(close.value)
+            is Result.Success -> siren(TeamClosedOutputModel(close.value)) {
+                clazz("closeTeam")
+                link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("team"), needAuthentication = true)
             }
         }
     }

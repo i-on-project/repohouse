@@ -3,7 +3,12 @@ import * as Hypermedia from "../http/Hypermedia"
 import { fetchDelete, fetchGet, fetchPost } from "../http/Fetch"
 import { AssignmentBody, AssignmentDeletedDtoProperties, AssignmentDtoProperties } from "../domain/dto/AssignmentDtoProperties"
 import { parse } from "uri-template"
-import { CreateTeamBody, JoinTeamBody, RequestCreatedDtoProperties } from "../domain/dto/RequestDtoProperties"
+import {
+    CreateTeamBody,
+    JoinTeamBody,
+    RequestCreatedDtoProperties,
+    RequestCreateTeamDtoProperties
+} from "../domain/dto/RequestDtoProperties"
 import { TeamsDtoProperties } from "../domain/dto/TeamDtoProperties"
 
 
@@ -36,7 +41,7 @@ export class AssignmentServices {
     createTeam = async (body: CreateTeamBody, courseId: number, classroomId: number, assignmentId: number) => {
         const link = await navigationRepository.ensureAction(Hypermedia.CREATE_TEAM_KEY, systemServices.home)
         const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId})
-        return await fetchPost<RequestCreatedDtoProperties>(href,body)
+        return await fetchPost<RequestCreateTeamDtoProperties>(href,body)
     }
 
     teams = async (courseId,classroomId,assignmentId) => {

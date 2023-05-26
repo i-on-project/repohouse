@@ -35,3 +35,13 @@ data class RequestChangeStatusOutputModel(
     val id: Int,
     val changed: Boolean,
 ) : OutputModel
+
+
+/**
+ * Represents a Request Created Team Output Model.
+ */
+data class RequestTeamCreatedOutputModel(
+    val id: Int,
+    val teamId: Int,
+    val teamName: String,
+) : OutputModel

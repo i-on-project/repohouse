@@ -56,6 +56,7 @@ object Uris {
     const val TEAM_PATH = "$TEAMS_PATH/{teamId}"
     const val CREATE_TEAM_PATH = "$TEAMS_PATH/create"
     const val JOIN_TEAM_PATH = "$TEAMS_PATH/join"
+    const val CLOSE_TEAM_PATH = "$TEAM_PATH/close"
     const val EXIT_TEAM_PATH = "$TEAM_PATH/exit"
     const val EDIT_DELIVERY_PATH = "$DELIVERY_PATH/edit"
     const val SYNC_DELIVERY_PATH = "$DELIVERY_PATH/sync"

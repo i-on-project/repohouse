@@ -1,5 +1,6 @@
 package com.isel.leic.ps.ionClassCode.http.model.output
 
+import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Feedback
 import com.isel.leic.ps.ionClassCode.domain.Repo
 import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
@@ -16,6 +17,7 @@ data class TeamOutputModel(
     val students: List<StudentWithoutToken>,
     val repo: Repo?,
     val feedbacks: List<Feedback>,
+    val assignment:Assignment
 )
 
 /**
@@ -26,6 +28,13 @@ data class TeamsOutputModel(
 )
 
 /**
+ * Represents a Team Closed Output Model.
+ */
+data class TeamClosedOutputModel(
+    val closed: Boolean,
+)
+
+/**
  * Represents a Team Model for inner functions.
  */
 data class TeamModel(
@@ -33,6 +42,7 @@ data class TeamModel(
     val students: List<StudentWithoutToken>,
     val repo: Repo?,
     val feedbacks: List<Feedback>,
+    val assignment:Assignment
 )
 
 /**

@@ -72,7 +72,7 @@ CREATE TABLE Classroom(
     id serial primary key,
     name text not null,
     last_sync timestamp not null,
-    invite_link text unique not null,
+    invite_code text unique not null,
     is_archived boolean not null,
     course_id int not null,
     teacher_id int not null,
@@ -92,6 +92,7 @@ CREATE TABLE Student_Classroom(
 CREATE TABLE Assignment(
    id serial primary key,
    classroom_id int not null,
+   min_elems_per_group int not null,
    max_elems_per_group int not null,
    max_number_groups int not null,
    release_date timestamp not null,
@@ -104,6 +105,7 @@ CREATE TABLE Team(
     id serial primary key,
     name text not null,
     is_Created boolean not null,
+    is_Closed boolean not null,
     assignment int not null,
     foreign key (assignment) references Assignment(id)
 );
@@ -243,3 +245,5 @@ CREATE TABLE CreateRepo(
 );
 
 COMMIT;
+
+update team set is_closed = false where id=3;

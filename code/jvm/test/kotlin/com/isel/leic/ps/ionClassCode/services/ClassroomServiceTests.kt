@@ -45,9 +45,9 @@ class ClassroomServiceTests {
             override fun <R> run(block: (Transaction) -> R): R {
                 val mockedTransaction = mock<Transaction> {
                     val mockedClassroomRepository = mock<ClassroomRepository> {
-                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteLink = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
-                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
-                        on { getClassroomById(classroomId = 3) } doReturn Classroom(id = 3, name = "Classroom 3", inviteLink = "inviteLink2", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteCode = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 3) } doReturn Classroom(id = 3, name = "Classroom 3", inviteCode = "inviteLink2", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on { getStudentsByClassroom(classroomId = 1) } doReturn listOf(student)
                         on { getStudentsByClassroom(classroomId = 3) } doReturn listOf(student2)
                         on { getAllInviteLinks() } doReturn listOf("inviteLink", "inviteLink1")
@@ -55,14 +55,14 @@ class ClassroomServiceTests {
                         on { archiveClassroom(classroomId = 1) } doAnswer {}
                         on { updateClassroomName(classroomId = 1, classroomUpdate = ClassroomUpdateInputModel(name = "newName")) } doAnswer {}
                         on {
-                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteLink = "")
-                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                            createClassroom(classroom = ClassroomInput(name = "name", courseId = 1, teacherId = 1), inviteCode = "")
+                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on {
-                            getClassroomByInviteLink(inviteLink = "inviteLink2")
-                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                            getClassroomByCode(inviteLink = "inviteLink2")
+                        } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink2", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
                         on {
-                            getClassroomByInviteLink(inviteLink = "inviteLink")
-                        } doReturn Classroom(id = 3, name = "Classroom 3", inviteLink = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                            getClassroomByCode(inviteLink = "inviteLink")
+                        } doReturn Classroom(id = 3, name = "Classroom 3", inviteCode = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
 
                         on { addStudentToClassroom(classroomId = 1, studentId = 4) } doAnswer {}
                     }

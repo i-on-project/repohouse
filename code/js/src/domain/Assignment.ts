@@ -1,6 +1,7 @@
 export interface AssignmentDomain {
     id: number,
     classroomId: number,
+    minElemsPerGroup: number,
     maxElemsPerGroup: number,
     maxNumberGroups: number,
     releaseDate: Date,
@@ -12,6 +13,7 @@ export class AssignmentDomain {
     constructor(
         id: number,
         classroomId: number,
+        minElemsPerGroup: number,
         maxElemsPerGroup: number,
         maxNumberGroups: number,
         releaseDate: Date,
@@ -20,6 +22,7 @@ export class AssignmentDomain {
     ) {
         this.id = id
         this.classroomId = classroomId
+        this.minElemsPerGroup = minElemsPerGroup
         this.maxElemsPerGroup = maxElemsPerGroup
         this.maxNumberGroups = maxNumberGroups
         this.releaseDate = releaseDate
