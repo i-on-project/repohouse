@@ -58,7 +58,7 @@ class CourseServiceTests {
                         on { getCourse(courseId = 1) } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 1111)
                         on { getCourse(courseId = 2) } doReturn Course(id = 2, orgUrl = "orgUrl1", name = "courseName1", teachers = listOf(teacherWithoutToken), isArchived = true, orgId = 2222)
                         on { getCourse(courseId = 3) } doReturn Course(id = 3, orgUrl = "orgUrl2", name = "courseName2", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 3333)
-                        on { getCourseUserClassrooms(courseId = 1, userId = 2, student = true) } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink"))
+                        on { getCourseUserClassrooms(courseId = 1, userId = 2, student = true) } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink", teacherId = 1))
                         on { getStudentInCourse(courseId = 1) } doReturn listOf(student)
                         on { getCourseByOrg(orgUrl = "orgUrl") } doReturn Course(id = 1, orgUrl = "orgUrl", name = "courseName", teachers = listOf(teacherWithoutToken), isArchived = false, orgId = 1111)
                         on { getCourseByOrg(orgUrl = "orgUrl3") } doReturn Course(
@@ -73,11 +73,11 @@ class CourseServiceTests {
                                     id = 3,
                                     githubUsername = "githubUsername2",
                                     githubId = 202,
-                                    isCreated = false
-                                )
+                                    isCreated = false,
+                                ),
                             ),
                             isArchived = false,
-                            orgId = 2222
+                            orgId = 2222,
                         )
                         on {
                             addTeacherToCourse(teacherId = 1, courseId = 2)
@@ -93,16 +93,16 @@ class CourseServiceTests {
                                     id = 3,
                                     githubUsername = "githubUsername2",
                                     githubId = 202,
-                                    isCreated = false
-                                )
+                                    isCreated = false,
+                                ),
                             ),
                             isArchived = false,
-                            orgId = 2222
+                            orgId = 2222,
                         )
                         on {
                             addTeacherToCourse(
                                 teacherId = 1,
-                                courseId = 1
+                                courseId = 1,
                             )
                         } doReturn Course(
                             id = 1,
@@ -116,16 +116,16 @@ class CourseServiceTests {
                                     id = 3,
                                     githubUsername = "githubUsername2",
                                     githubId = 202,
-                                    isCreated = false
-                                )
+                                    isCreated = false,
+                                ),
                             ),
                             isArchived = false,
-                            orgId = 2222
+                            orgId = 2222,
                         )
                         on { checkIfCourseNameExists(name = "courseName") } doReturn true
                         on {
                             getCourseAllClassrooms(courseId = 1)
-                        } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink"), Classroom(id = 2, name = "name2", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink2"))
+                        } doReturn listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink", teacherId = 1), Classroom(id = 2, name = "name2", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink2", teacherId = 1))
                         on {
                             getCourseAllClassrooms(courseId = 3)
                         } doReturn listOf()
@@ -137,10 +137,10 @@ class CourseServiceTests {
                             orgUrl = "orgUrl",
                             name = "courseName",
                             teachers = listOf(
-                                teacherWithoutToken
+                                teacherWithoutToken,
                             ),
                             isArchived = false,
-                            orgId = 1111
+                            orgId = 1111,
                         )
                     }
                     on { usersRepository } doReturn mockedUsersRepository
@@ -243,9 +243,9 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = orgUrl,
                 name = "courseName3",
-                orgId = 5
+                orgId = 5,
             ),
-            teacherId = 1
+            teacherId = 1,
         )
 
         // the result should be an error
@@ -266,9 +266,9 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl2",
                 name = name,
-                orgId = 5
+                orgId = 5,
             ),
-            teacherId = 1
+            teacherId = 1,
         )
 
         // the result should be an error
@@ -286,9 +286,9 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl2",
                 name = "name2",
-                orgId = 5
+                orgId = 5,
             ),
-            teacherId = -1
+            teacherId = -1,
         )
 
         // the result should be an error
@@ -309,9 +309,9 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl2",
                 name = name,
-                orgId = 5
+                orgId = 5,
             ),
-            teacherId = 1
+            teacherId = 1,
         )
 
         // the result should be an error
@@ -329,9 +329,9 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl3",
                 name = "name",
-                orgId = 5
+                orgId = 5,
             ),
-            teacherId = 4
+            teacherId = 4,
         )
 
         // the result should be an error
@@ -349,9 +349,9 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl",
                 name = "courseName3",
-                orgId = 2222
+                orgId = 2222,
             ),
-            teacherId = 1
+            teacherId = 1,
         )
 
         // the result should be an error
@@ -369,9 +369,9 @@ class CourseServiceTests {
             courseInfo = CourseInputModel(
                 orgUrl = "orgUrl3",
                 name = "courseName3",
-                orgId = 2222
+                orgId = 2222,
             ),
-            teacherId = 1
+            teacherId = 1,
         )
 
         // the result should be an error
