@@ -77,9 +77,11 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
                 appendQueryParameter("challenge", challenge)
                 appendQueryParameter("challengeMethod", "s256")
             }.build()
-            val customTabsIntent = CustomTabsIntent.Builder().build()
-            customTabsIntent.intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
-            customTabsIntent.launchUrl(activity, uri)
+            val customIntent = CustomTabsIntent.Builder().build().intent.apply {
+                addFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                data = uri
+            }
+            activity.startActivity(customIntent)
             Either.Right(value = Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open URL", e)

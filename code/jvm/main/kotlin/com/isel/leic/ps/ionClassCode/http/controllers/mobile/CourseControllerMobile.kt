@@ -7,7 +7,6 @@ import com.isel.leic.ps.ionClassCode.infra.LinkRelation
 import com.isel.leic.ps.ionClassCode.infra.siren
 import com.isel.leic.ps.ionClassCode.services.CourseServices
 import com.isel.leic.ps.ionClassCode.utils.Result
-import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,7 +27,6 @@ class CourseControllerMobile(
         return when (val course = courseServices.getCourseById(courseId = courseId, userId = user.id, student = false)) {
             is Result.Problem -> courseServices.problem(error = course.value)
             is Result.Success -> {
-                log.info("course classrooms = ${course.value.classrooms}")
                 siren(
                     CourseWithClassroomOutputModel(
                         id = course.value.id,
@@ -44,8 +42,5 @@ class CourseControllerMobile(
                 }
             }
         }
-    }
-    companion object {
-        private val log = LoggerFactory.getLogger(CourseControllerMobile::class.java)
     }
 }

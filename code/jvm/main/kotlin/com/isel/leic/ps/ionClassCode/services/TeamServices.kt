@@ -297,7 +297,7 @@ class TeamServices(
     }
 
     fun updateRequestState(body: UpdateRequestStateInput, teamId: Int): TeamUpdateRequestResponse {
-        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeValid()) return Result.Problem(value = TeamServicesError.InvalidData)
+        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeNotValid()) return Result.Problem(value = TeamServicesError.InvalidData)
         return transactionManager.run {
             it.requestRepository.changeStateRequest(id = body.requestId, state = body.state)
             if (body.type.lowercase() == "leaveteam") {

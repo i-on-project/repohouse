@@ -41,27 +41,21 @@ class CourseActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val course = getCourseExtra()
-        if (course != null) {
-            vm.getClassrooms(courseId = course.id)
-        }
+        val course = getCourseExtra() ?: return finish()
+        vm.course = course
+        vm.getClassrooms()
         setContent {
             ClasscodeTheme {
-                if (course != null) {
-                    CourseScreen(
-                        course = course,
-                        onBackRequest = { finish() },
-                        onClassroomSelected = { classroom ->
-                            ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto(courseName = course.name))
-                        },
-                        classrooms = vm.classrooms,
-                        error = vm.error,
-                        onDismissRequest = { finish() },
-                    )
-                } else {
-                    // TODO(): Show a error alert dialog saying that some went wrong
-                    finish()
-                }
+                CourseScreen(
+                    course = course,
+                    onBackRequest = { finish() },
+                    onClassroomSelected = { classroom ->
+                        ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto(courseName = vm.course.name))
+                    },
+                    classrooms = vm.classrooms,
+                    error = vm.error,
+                    onDismissRequest = { finish() },
+                )
             }
         }
     }

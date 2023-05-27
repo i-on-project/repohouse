@@ -149,20 +149,17 @@ VALUES (45, 4, null, 'Pending');
 INSERT INTO archiverepo(id, repo_id)
 VALUES (45, 4);
 
+/*leaveTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (47, 4, null, 'Pending');
+VALUES (48, 4, null, 'Pending');
 INSERT INTO leaveteam(id, team_id)
-VALUES (47, 6);
+VALUES (48, 6);
 
 INSERT INTO request(id, creator, composite, state)
-VALUES (46, 4, null, 'Pending');
+VALUES (49, 4, null, 'Pending');
 INSERT INTO jointeam(id, team_id, assigment_id)
-VALUES (46, 6, 5);
-
-
+VALUES (49, 6, 5);
 
 COMMIT TRANSACTION;
 
-SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username FROM
-    (SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id) as x JOIN
-    leaveteam as l on x.id = l.id
+UPDATE request set state = 'Accepted' where id = 47;

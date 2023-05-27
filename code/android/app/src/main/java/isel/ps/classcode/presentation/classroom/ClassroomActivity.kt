@@ -10,7 +10,6 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.dto.LocalClassroomDto
 import isel.ps.classcode.presentation.classroom.services.ClassroomServices
 import isel.ps.classcode.presentation.team.TeamActivity
@@ -41,29 +40,27 @@ class ClassroomActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val pair = getClassroomExtra()
-        val classroom = pair.first ?: return finish()
-        val courseName = pair.second ?: return finish()
-        vm.getAssignments(classroomId = classroom.id, courseId = classroom.courseId)
+        val extra = getClassroomExtra() ?: return finish()
+        vm.classroomInfo = extra
+        vm.getAssignments()
         setContent {
-            val assignments = vm.assignments
             ClasscodeTheme {
                 ClassroomScreen(
-                    classroom = classroom,
+                    classroom = vm.classroomInfo.classroom,
                     teamsCreated = vm.teamsCreated,
-                    assignments = assignments,
+                    assignments = vm.assignments,
                     assignment = vm.assignment,
-                    onTeamSelected = { TeamActivity.navigate(origin = this, team = it.toLocalTeamDto(courseId = classroom.courseId, courseName = courseName, classroomId = classroom.id)) },
+                    onTeamSelected = { TeamActivity.navigate(origin = this, team = it.toLocalTeamDto(courseId = vm.classroomInfo.classroom.courseId, courseName = vm.classroomInfo.courseName, classroomId = vm.classroomInfo.classroom.id)) },
                     createTeamComposite = vm.createTeamComposite,
-                    onAssignmentChange = { assignment -> vm.getTeams(courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id) },
+                    onAssignmentChange = { assignment -> vm.getTeams(assignmentId = assignment.id) },
                     onBackRequest = { finish() },
                     error = vm.errorClassCode,
                     onDismissRequest = { finish() },
                     onCreateTeamComposite = { createTeamComposite, wasAccepted, assignment ->
                         if (wasAccepted) {
-                            vm.createTeamCompositeAccepted(team = createTeamComposite, courseName = courseName, courseId = classroom.courseId, classroomId = classroom.id, assignmentId = assignment.id)
+                            vm.createTeamCompositeAccepted(team = createTeamComposite, assignmentId = assignment.id)
                         } else {
-                            vm.createTeamCompositeRejected(team = createTeamComposite, classroomId = classroom.id, assignmentId = assignment.id, courseId = classroom.courseId)
+                            vm.createTeamCompositeRejected(team = createTeamComposite, assignmentId = assignment.id)
                         }
                     },
                 )
@@ -72,13 +69,17 @@ class ClassroomActivity : ComponentActivity() {
     }
 
     @Suppress("deprecation")
-    private fun getClassroomExtra(): Pair<Classroom?, String?> {
+    private fun getClassroomExtra(): ClassroomAndMoreInfo? {
         val classroomExtra: LocalClassroomDto? =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 intent.getParcelableExtra(CLASSROOM_EXTRA, LocalClassroomDto::class.java)
             } else {
                 intent.getParcelableExtra(CLASSROOM_EXTRA)
             }
-        return Pair(classroomExtra?.toClassroom(), classroomExtra?.courseName)
+        return if (classroomExtra == null) {
+            null
+        } else {
+            ClassroomAndMoreInfo(classroom = classroomExtra.toClassroom(), courseName = classroomExtra.courseName)
+        }
     }
 }
