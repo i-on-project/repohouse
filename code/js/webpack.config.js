@@ -1,8 +1,13 @@
 const webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
     entry: './src/react-components/index.tsx',
-    mode: "development",
+    output: {
+        filename: 'main.js',
+        path: path.resolve(__dirname, 'public'),
+    },
+    mode: "production",
     resolve: {
         extensions: [".js", ".ts", ".tsx",".css"]
     },
@@ -20,8 +25,8 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin({
             /** For testing production, comment the line to not use **/
-            "process.env.NGROK_URI": JSON.stringify("http://localhost:3000"),
-            // "process.env.NGROK_URI": JSON.stringify(process.env.NGROK_URI)
+            //"process.env.NGROK_URI": JSON.stringify("http://localhost:3000"),
+             "process.env.NGROK_URI": JSON.stringify(process.env.NGROK_URI)
         }),
     ],
     module: {

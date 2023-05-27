@@ -40,3 +40,5 @@ out/
 ### React ###
 code/js/node_modules/
 
+/code/js/public/main.js
+/code/js/public/main.js.LICENSE.txt

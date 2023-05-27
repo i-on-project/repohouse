@@ -12,7 +12,7 @@ class ClassroomRepositoryTests {
     @Test
     fun `can create classroom`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
-        val created = classroomRepo.createClassroom(classroom = ClassroomInput(name = "Classroom 1", courseId = 1, teacherId = 1), inviteLink = "linking link")
+        val created = classroomRepo.createClassroom(classroom = ClassroomInput(name = "Classroom 1", courseId = 1, teacherId = 1), inviteCode = "linking link")
         val classroom = classroomRepo.getClassroomById(classroomId = created.id)
         assert(classroom != null)
     }
@@ -96,16 +96,16 @@ class ClassroomRepositoryTests {
     fun `can get the classroom invite link`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
         val classroomId = 1
-        val link = "https://classroom.github.com/a/123"
-        val inviteLink = classroomRepo.getClassroomInviteLink(classroomId = classroomId) ?: fail("Classroom not found")
+        val link = "A123"
+        val inviteLink = classroomRepo.getClassroomInviteCode(classroomId = classroomId) ?: fail("Classroom not found")
         assert(inviteLink == link)
     }
 
     @Test
     fun `can get a classroom by classroom invite link`() = testWithHandleAndRollback { handle ->
         val classroomRepo = JdbiClassroomRepository(handle = handle)
-        val link = "https://classroom.github.com/a/123"
-        val classroom = classroomRepo.getClassroomByInviteLink(inviteLink = link) ?: fail("Classroom not found")
+        val link = "A123"
+        val classroom = classroomRepo.getClassroomByCode(inviteCode = link) ?: fail("Classroom not found")
         assert(classroom.id == 1)
     }
 

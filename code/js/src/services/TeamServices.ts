@@ -1,7 +1,7 @@
 import { navigationRepository, systemServices } from "../react-components"
 import * as Hypermedia from "../http/Hypermedia"
 import { fetchGet, fetchPost } from "../http/Fetch"
-import { FeedbackBody, TeamDtoProperties } from "../domain/dto/TeamDtoProperties"
+import { FeedbackBody, TeamClosedDtoProperties, TeamDtoProperties } from "../domain/dto/TeamDtoProperties"
 import { LeaveTeamBody, RequestChangeStatusDtoProperties, RequestCreatedDtoProperties, TeamRequestsDtoProperties } from "../domain/dto/RequestDtoProperties"
 import {FeedbackDtoProperties} from "../domain/dto/FeedbackDtoProperties"
 import { parse } from "uri-template"
@@ -37,5 +37,11 @@ export class TeamServices {
         const link = await navigationRepository.ensureAction(Hypermedia.POST_FEEDBACK_KEY, systemServices.home)
         const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,teamId:teamId})
         return await fetchPost<FeedbackDtoProperties>(href,body)
+    }
+
+    closeTeam = async (courseId,classroomId,assignmentId,teamId) => {
+        const link = await navigationRepository.ensureAction(Hypermedia.CLOSE_TEAM_KEY, systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId,assignmentId:assignmentId,teamId:teamId})
+        return await fetchPost<TeamClosedDtoProperties>(href)
     }
 }

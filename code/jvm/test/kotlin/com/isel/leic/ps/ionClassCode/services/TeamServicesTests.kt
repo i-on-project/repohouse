@@ -60,9 +60,9 @@ class TeamServicesTests {
             override fun <R> run(block: (Transaction) -> R): R {
                 val mockedTransaction = mock<Transaction> {
                     val mockedTeamRepository = mock<TeamRepository> {
-                        on { getTeamById(id = 1) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
+                        on { getTeamById(id = 1) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1, isClosed = false)
                         on { getStudentsFromTeam(teamId = 1) } doReturn listOf(Student(name = "test1245", email = "test@alunos.isel.pt", githubUsername = "test1a23", token = "token5", githubId = 124345, isCreated = false, id = 3, schoolId = null))
-                        on { createTeam(team = TeamInput(name = "Classroom2 - 1", 1, false)) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1)
+                        on { createTeam(team = TeamInput(name = "Classroom2 - 1", 1, false)) } doReturn Team(id = 1, name = "Team1", isCreated = false, assignment = 1, isClosed = false)
                     }
                     val mockedRepoRepository = mock<RepoRepository> {
                         on { getRepoByTeam(teamId = 1) } doReturn Repo(id = 1, name = "Repo1", url = "url", isCreated = false)
@@ -75,8 +75,8 @@ class TeamServicesTests {
                     }
 
                     val mockedClassroomRepository = mock<ClassroomRepository> {
-                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom1", lastSync = Timestamp.from(Instant.now()), isArchived = true, inviteLink = "inviteLink", courseId = 1)
-                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 1, name = "Classroom2", lastSync = Timestamp.from(Instant.now()), isArchived = false, inviteLink = "inviteLink1", courseId = 1)
+                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom1", lastSync = Timestamp.from(Instant.now()), isArchived = true, inviteCode = "inviteLink", courseId = 1, teacherId = 1)
+                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 1, name = "Classroom2", lastSync = Timestamp.from(Instant.now()), isArchived = false, inviteCode = "inviteLink1", courseId = 1, teacherId = 1)
                     }
 
                     val mockedCompositeRepository = mock<CompositeRepository> {
@@ -99,9 +99,9 @@ class TeamServicesTests {
                     }
 
                     val mockedAssignmentRepository = mock<AssignmentRepository> {
-                        on { getAssignmentById(assignmentId = 1) } doReturn Assignment(id = 1, classroomId = 1, maxNumberGroups = 2, maxElemsPerGroup = 2, description = "description", title = "title", releaseDate = Timestamp.from(Instant.now()))
-                        on { getAssignmentById(assignmentId = 2) } doReturn Assignment(id = 2, classroomId = 2, maxNumberGroups = 2, maxElemsPerGroup = 2, description = "description2", title = "title2", releaseDate = Timestamp.from(Instant.now()))
-                        on { getAssignmentById(assignmentId = 3) } doReturn Assignment(id = 3, classroomId = 3, maxNumberGroups = 2, maxElemsPerGroup = 2, description = "description3", title = "title3", releaseDate = Timestamp.from(Instant.now()))
+                        on { getAssignmentById(assignmentId = 1) } doReturn Assignment(id = 1, classroomId = 1, maxNumberGroups = 2, maxElemsPerGroup = 2, description = "description", title = "title", releaseDate = Timestamp.from(Instant.now()), minElemsPerGroup = 0)
+                        on { getAssignmentById(assignmentId = 2) } doReturn Assignment(id = 2, classroomId = 2, maxNumberGroups = 2, maxElemsPerGroup = 2, description = "description2", title = "title2", releaseDate = Timestamp.from(Instant.now()), minElemsPerGroup = 0)
+                        on { getAssignmentById(assignmentId = 3) } doReturn Assignment(id = 3, classroomId = 3, maxNumberGroups = 2, maxElemsPerGroup = 2, description = "description3", title = "title3", releaseDate = Timestamp.from(Instant.now()), minElemsPerGroup = 0)
                     }
 
                     val mockedRequestRepository = mock<RequestRepository> {

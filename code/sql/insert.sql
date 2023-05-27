@@ -75,33 +75,33 @@ INSERT INTO teacher_course (teacher, course)
 VALUES (2, 2);
 
 
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
-VALUES (1, 'DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/a/123', false, 1, 1);
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
-VALUES (2, 'PDM-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/b/123', false, 2, 1);
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
-VALUES (3, 'TVS-2223v-LI51D', CURRENT_TIMESTAMP, 'https://classroom.github.com/c/123', false, 1, 2);
+INSERT INTO classroom (id, name, last_sync, invite_code, is_archived, course_id, teacher_id)
+VALUES (1, 'DAW-2223v-LI51D', CURRENT_TIMESTAMP, 'A123', false, 1, 1);
+INSERT INTO classroom (id, name, last_sync, invite_code, is_archived, course_id, teacher_id)
+VALUES (2, 'PDM-2223v-LI51D', CURRENT_TIMESTAMP, 'B123', false, 2, 1);
+INSERT INTO classroom (id, name, last_sync, invite_code, is_archived, course_id, teacher_id)
+VALUES (3, 'TVS-2223v-LI51D', CURRENT_TIMESTAMP, 'C123', false, 1, 2);
 SELECT setval('classroom_id_seq', (SELECT MAX(id) from "classroom"));
 
 
-INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (1, 1, 2, 3, CURRENT_TIMESTAMP, 'description', 'title');
-INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (2, 1, 2, 3, CURRENT_TIMESTAMP, 'description1', 'title1');
-INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (3, 1, 2, 3, CURRENT_TIMESTAMP, 'description2', 'title2');
-INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (4, 2, 2, 3, CURRENT_TIMESTAMP, 'description3', 'title3');
+INSERT INTO assignment (id, classroom_id, min_elems_per_group,max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (1, 1, 1, 2, 3, CURRENT_TIMESTAMP, 'description', 'title');
+INSERT INTO assignment (id, classroom_id, min_elems_per_group,max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (2, 1, 1, 2, 3, CURRENT_TIMESTAMP, 'description1', 'title1');
+INSERT INTO assignment (id, classroom_id,min_elems_per_group, max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (3, 1, 1, 2, 3, CURRENT_TIMESTAMP, 'description2', 'title2');
+INSERT INTO assignment (id, classroom_id, min_elems_per_group,max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (4, 2, 1, 2, 3, CURRENT_TIMESTAMP, 'description3', 'title3');
 SELECT setval('assignment_id_seq', (SELECT MAX(id) from "assignment"));
 
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (1, 'team1', false, 1);
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (2, 'team2', false, 2);
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (3, 'team3', false, 1);
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (4, 'team4', false, 4);
+INSERT INTO team (id, name, is_created,is_closed, assignment)
+VALUES (1, 'team1', false, false, 1);
+INSERT INTO team (id, name, is_created,is_closed, assignment)
+VALUES (2, 'team2', false, false, 2);
+INSERT INTO team (id, name, is_created,is_closed, assignment)
+VALUES (3, 'team3', false,true, 1);
+INSERT INTO team (id, name, is_created,is_closed, assignment)
+VALUES (4, 'team4', false, true,4);
 SELECT setval('team_id_seq', (SELECT MAX(id) from "team"));
 
 INSERT INTO student_classroom (student, classroom)

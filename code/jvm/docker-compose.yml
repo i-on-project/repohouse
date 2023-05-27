@@ -13,8 +13,9 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
 
     ports:
-      - "5555:5432"
+      - "5432:5432"
 
+  # The service running the API
   spring-service:
     container_name: spring-service
     hostname: spring-service
@@ -26,11 +27,13 @@ services:
       JDBC_DATABASE_URL: ${JDBC_URL}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_CLIENT_ID_TESTS: ${GITHUB_CLIENT_ID_TESTS}
+      GITHUB_CLIENT_SECRET_TESTS: ${GITHUB_CLIENT_SECRET_TESTS}
       CLASSCODE_ENCRYPTION_KEY: ${CLASSCODE_ENCRYPTION_KEY}
       SENDGRID_CLASSCODE_API_KEY: ${SENDGRID_CLASSCODE_API_KEY}
 
     ports:
-      - "8081:8080"
+      - "8080:8080"
 
     depends_on:
       - db-docker
@@ -38,11 +41,13 @@ services:
   # The service running the load-balancer
   nginx:
     container_name: nginx
-    image: nginx
+    hostname: nginx
+    build:
+      context: ../..
+      dockerfile: code/jvm/docker/files/Dockerfile-nginx
     ports:
-      - "8080:8080"
-    volumes:
-      - ./docker/nginx:/etc/nginx
+      - "3000:3000"
+
     depends_on:
       - spring-service
 

@@ -18,22 +18,22 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
     /**
      * Method to create a Classroom
      */
-    override fun createClassroom(classroom: ClassroomInput, inviteLink: String): Classroom {
+    override fun createClassroom(classroom: ClassroomInput, inviteCode: String): Classroom {
         val id = handle.createUpdate(
             """
-            INSERT INTO Classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
-            VALUES (:name, CURRENT_DATE, :invite_link, false, :course_id, :teacher_id)
+            INSERT INTO Classroom (name, last_sync, invite_code, is_archived, course_id, teacher_id)
+            VALUES (:name, CURRENT_DATE, :invite_code, false, :course_id, :teacher_id)
             RETURNING id
             """,
         )
             .bind("name", classroom.name)
-            .bind("invite_link", inviteLink)
+            .bind("invite_code", inviteCode)
             .bind("course_id", classroom.courseId)
             .bind("teacher_id", classroom.teacherId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Classroom(id, classroom.name, Timestamp(System.currentTimeMillis()), inviteLink, false, classroom.courseId)
+        return Classroom(id, classroom.name, Timestamp(System.currentTimeMillis()), inviteCode, false, classroom.courseId,classroom.teacherId)
     }
 
     /**
@@ -132,10 +132,10 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
     /**
      * Method to get a Classroom invite link
      */
-    override fun getClassroomInviteLink(classroomId: Int): String? {
+    override fun getClassroomInviteCode(classroomId: Int): String? {
         return handle.createQuery(
             """
-            SELECT invite_link FROM Classroom
+            SELECT invite_code FROM Classroom
             WHERE id = :id
             """,
         )
@@ -147,14 +147,14 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
     /**
      * Method to get a Classroom by is invite link
      */
-    override fun getClassroomByInviteLink(inviteLink: String): Classroom? {
+    override fun getClassroomByCode(inviteCode: String): Classroom? {
         return handle.createQuery(
             """
             SELECT * FROM Classroom
-            WHERE invite_link = :invite_link
+            WHERE invite_code = :invite_code
             """,
         )
-            .bind("invite_link", inviteLink)
+            .bind("invite_code", inviteCode)
             .mapTo<Classroom>()
             .firstOrNull()
     }
@@ -198,7 +198,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
     override fun getAllInviteLinks(): List<String> {
         return handle.createQuery(
             """
-            SELECT invite_link FROM Classroom
+            SELECT invite_code FROM Classroom
             """,
         )
             .mapTo<String>()

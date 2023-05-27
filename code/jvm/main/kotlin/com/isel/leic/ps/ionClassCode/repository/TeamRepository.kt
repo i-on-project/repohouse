@@ -9,7 +9,8 @@ import com.isel.leic.ps.ionClassCode.domain.input.TeamInput
  */
 interface TeamRepository {
     fun createTeam(team: TeamInput): Team
-    fun updateTeamStatus(id: Int)
+    fun updateTeamCreatedStatus(id: Int)
+    fun updateTeamClosedStatus(id: Int)
     fun getTeamById(id: Int): Team?
     fun getStudentsFromTeam(teamId: Int): List<Student>
     fun enterTeam(teamId: Int, studentId: Int)

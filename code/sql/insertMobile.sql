@@ -161,5 +161,3 @@ INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (49, 6, 5);
 
 COMMIT TRANSACTION;
-
-UPDATE request set state = 'Accepted' where id = 47;

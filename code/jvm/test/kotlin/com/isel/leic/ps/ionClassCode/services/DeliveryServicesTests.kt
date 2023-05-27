@@ -97,6 +97,7 @@ class DeliveryServicesTests {
                                 name = "Team1",
                                 isCreated = false,
                                 assignment = 1,
+                                isClosed = false,
                             ),
                         )
                         on { getTeamsByDelivery(deliveryId = 5) } doReturn listOf()
@@ -110,6 +111,7 @@ class DeliveryServicesTests {
                             releaseDate = Timestamp.from(Instant.now()),
                             description = "description",
                             title = "title",
+                            minElemsPerGroup = 0,
                         )
                         on { getAssignmentById(assignmentId = 2) } doReturn Assignment(
                             id = 2,
@@ -119,6 +121,7 @@ class DeliveryServicesTests {
                             releaseDate = Timestamp.from(Instant.now()),
                             description = "description2",
                             title = "title2",
+                            minElemsPerGroup = 0,
                         )
                         on { getAssignmentById(assignmentId = 3) } doReturn Assignment(
                             id = 3,
@@ -128,24 +131,27 @@ class DeliveryServicesTests {
                             releaseDate = Timestamp.from(Instant.now()),
                             description = "description3",
                             title = "title3",
+                            minElemsPerGroup = 0,
                         )
                     }
                     val mockedClassroomRepository = mock<ClassroomRepository> {
                         on { getClassroomById(classroomId = 1) } doReturn Classroom(
                             id = 1,
                             name = "Classroom 1",
-                            inviteLink = "inviteLink",
+                            inviteCode = "inviteLink",
                             isArchived = true,
                             lastSync = Timestamp.from(Instant.now()),
                             courseId = 1,
+                            teacherId = 1,
                         )
                         on { getClassroomById(classroomId = 2) } doReturn Classroom(
                             id = 2,
                             name = "Classroom 2",
-                            inviteLink = "inviteLink2",
+                            inviteCode = "inviteLink2",
                             isArchived = false,
                             lastSync = Timestamp.from(Instant.now()),
                             courseId = 1,
+                            teacherId = 1,
                         )
                     }
                     val mockedUsersRepository = mock<UsersRepository> {

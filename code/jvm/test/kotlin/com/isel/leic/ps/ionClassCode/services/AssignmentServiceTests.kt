@@ -52,18 +52,18 @@ class AssignmentServiceTests {
                     val mockedAssignmentRepository = mock<AssignmentRepository> {
                         on { getClassroomAssignments(classroomId = 2) } doReturn listOf(ClassroomServiceTests.assignment)
                         on {
-                            createAssignment(assignment = AssignmentInput(classroomId = 1, description = "description", title = "title", maxNumberGroups = 2, maxElemsPerGroup = 2))
-                        } doReturn Assignment(id = 1, classroomId = 1, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description", title = "title")
-                        on { getAssignmentById(assignmentId = 1) } doReturn Assignment(id = 1, classroomId = 1, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description", title = "title")
-                        on { getAssignmentById(assignmentId = 2) } doReturn Assignment(id = 2, classroomId = 2, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description2", title = "title2")
-                        on { getAssignmentById(assignmentId = 3) } doReturn Assignment(id = 3, classroomId = 4, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description3", title = "title3")
-                        on { getAssignmentById(assignmentId = 4) } doReturn Assignment(id = 4, classroomId = 1, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description4", title = "title4")
+                            createAssignment(assignment = AssignmentInput(classroomId = 1, description = "description", title = "title", maxNumberGroups = 2, maxElemsPerGroup = 2, minElemsPerGroup = 1))
+                        } doReturn Assignment(id = 1, classroomId = 1, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description", title = "title", minElemsPerGroup = 1)
+                        on { getAssignmentById(assignmentId = 1) } doReturn Assignment(id = 1, classroomId = 1, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description", title = "title", minElemsPerGroup = 1)
+                        on { getAssignmentById(assignmentId = 2) } doReturn Assignment(id = 2, classroomId = 2, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description2", title = "title2", minElemsPerGroup = 1)
+                        on { getAssignmentById(assignmentId = 3) } doReturn Assignment(id = 3, classroomId = 4, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description3", title = "title3", minElemsPerGroup = 1)
+                        on { getAssignmentById(assignmentId = 4) } doReturn Assignment(id = 4, classroomId = 1, maxElemsPerGroup = 2, maxNumberGroups = 2, releaseDate = Timestamp.from(Instant.now()), description = "description4", title = "title4", minElemsPerGroup = 1)
                         on { deleteAssignment(assignmentId = 1) } doAnswer { }
                     }
 
                     val mockedClassroomRepository = mock<ClassroomRepository> {
-                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteLink = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1)
-                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteLink = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1)
+                        on { getClassroomById(classroomId = 1) } doReturn Classroom(id = 1, name = "Classroom 1", inviteCode = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1, teacherId = 1)
+                        on { getClassroomById(classroomId = 2) } doReturn Classroom(id = 2, name = "Classroom 2", inviteCode = "inviteLink1", isArchived = true, lastSync = Timestamp.from(Instant.now()), courseId = 1, teacherId = 1)
                     }
 
                     val mockedUsersRepository = mock<UsersRepository> {
@@ -100,19 +100,19 @@ class AssignmentServiceTests {
 
                     val mockedTeamsRepository = mock<TeamRepository> {
                         on { getTeamsFromAssignment(assignmentId = 1) } doReturn listOf(
-                            Team(id = 1, name = "team1", isCreated = false, assignment = 1),
+                            Team(id = 1, name = "team1", isCreated = false, assignment = 1, isClosed = false),
                         )
                         on { getTeamsFromAssignment(assignmentId = 2) } doReturn listOf(
-                            Team(id = 2, name = "team2", isCreated = false, assignment = 2),
+                            Team(id = 2, name = "team2", isCreated = false, assignment = 2, isClosed = false),
                         )
                         on { getTeamsFromAssignment(assignmentId = 3) } doReturn listOf(
-                            Team(id = 3, name = "team3", isCreated = false, assignment = 3),
+                            Team(id = 3, name = "team3", isCreated = false, assignment = 3, isClosed = false),
                         )
                         on { getTeamsFromAssignment(assignmentId = 4) } doReturn listOf(
-                            Team(id = 4, name = "team4", isCreated = false, assignment = 4),
+                            Team(id = 4, name = "team4", isCreated = false, assignment = 4, isClosed = false),
                         )
                         on { getTeamsFromAssignment(assignmentId = 5) } doReturn listOf(
-                            Team(id = 5, name = "team5", isCreated = false, assignment = 5),
+                            Team(id = 5, name = "team5", isCreated = false, assignment = 5, isClosed = false),
                         )
                         on { getTeamsFromStudent(studentId = 1) } doReturn listOf()
                     }
@@ -147,6 +147,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 1,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -172,6 +173,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 1,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -197,6 +199,7 @@ class AssignmentServiceTests {
                 description = description,
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 0,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -222,6 +225,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = title,
                 maxNumberGroups = 2,
+                minNumberElems = 0,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -247,6 +251,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = maxNumberGroups,
+                minNumberElems = 0,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -272,6 +277,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 0,
                 maxNumberElems = maxNumberElems,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -297,6 +303,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 1,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -322,6 +329,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 1,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -347,6 +355,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 1,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -369,6 +378,7 @@ class AssignmentServiceTests {
                 description = "description",
                 title = "title",
                 maxNumberGroups = 2,
+                minNumberElems = 1,
                 maxNumberElems = 2,
                 dueDate = Timestamp.from(Instant.now()),
             ),
@@ -667,7 +677,7 @@ class AssignmentServiceTests {
         val assignment = assignmentServices.getTeacherAssignmentInfoTeams(assignmentId = assignmentId)
 
         if (assignment is Result.Success) {
-            assert(assignment.value.createTeamComposites != null)
+            assert(assignment.value.createTeamComposites.isNotEmpty())
         } else {
             fail("Should not be Either.Right")
         }

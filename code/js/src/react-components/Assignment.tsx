@@ -337,9 +337,36 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
     const [title, setTitle] = useState<string>(null)
     const [description, setDescription] = useState<string>(null)
     const [numbGroups, setNumbGroups] = useState(10)
-    const [numbElemPerGroup, setNumbElemPerGroup] = useState(2)
+    const [minNumbElemPerGroup, setMinNumbElemPerGroup] = useState(1)
+    const [maxNumbElemPerGroup, setMaxNumbElemPerGroup] = useState(1)
     const [create, setCreate] = useState(false)
     const [serror, setError] = useState<ErrorMessageModel>(error)
+
+    const minNumbGroups = 5
+    const minElemsPerGroup = 1
+
+    const handleMinNumbElemsDecrease = useCallback(() => {
+        decreaseValue(1,minNumbElemPerGroup,setMinNumbElemPerGroup)
+    }, [minNumbElemPerGroup,setMinNumbElemPerGroup])
+
+    const handleMaxNumbElemsIncrese = useCallback(() => {
+        increaseValue(maxNumbElemPerGroup,setMaxNumbElemPerGroup)
+    }, [maxNumbElemPerGroup,setMaxNumbElemPerGroup])
+
+    const handleMinNumbElemsIncrese = useCallback(() => {
+        if (minNumbElemPerGroup + 1 == maxNumbElemPerGroup) {
+            handleMaxNumbElemsDecrease()
+        }
+        increaseValue(minNumbElemPerGroup,setMinNumbElemPerGroup)
+    }, [minNumbElemPerGroup,maxNumbElemPerGroup,setMinNumbElemPerGroup,setMaxNumbElemPerGroup])
+
+    const handleMaxNumbElemsDecrease = useCallback(() => {
+        if (maxNumbElemPerGroup - 1 == minNumbElemPerGroup) {
+            handleMinNumbElemsDecrease()
+        }
+        decreaseValue(minNumbElemPerGroup,maxNumbElemPerGroup,setMaxNumbElemPerGroup)
+    }, [minNumbElemPerGroup,maxNumbElemPerGroup,setMinNumbElemPerGroup,setMaxNumbElemPerGroup])
+
 
     const increaseValue = useCallback((actualValue, fun) => {
         fun(actualValue + 1)
@@ -370,12 +397,9 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
 
     if(create) {
         console.log("create")
-        const assignment = new AssignmentBody(classroomId,numbElemPerGroup,numbGroups,title,description,new Date())
+        const assignment = new AssignmentBody(classroomId,minNumbElemPerGroup,maxNumbElemPerGroup,numbGroups,title,description,new Date())
         return <ShowCreateAssignmentPost assignmentServices={assignmentServices} assignment={assignment} courseId={courseId} classroomId={classroomId} error={serror}/>
     }
-
-    const minNumbGroups = 5
-    const minElemsPerGroup = 1
 
     return(
         <Box sx={homeBoxStyle}>
@@ -397,12 +421,22 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
             </Box>
             <Box sx={alignHorizontalyBoxStyle}>
                 <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                    <Button onClick={() => decreaseValue(minElemsPerGroup,numbElemPerGroup, setNumbElemPerGroup)}>-</Button>
-                    <Button>{numbElemPerGroup}</Button>
-                    <Button onClick={() => increaseValue(numbElemPerGroup, setNumbElemPerGroup)}>+</Button>
+                    <Button onClick={() => decreaseValue(minElemsPerGroup,minNumbElemPerGroup, setMinNumbElemPerGroup)}>-</Button>
+                    <Button>{minNumbElemPerGroup}</Button>
+                    <Button onClick={() => increaseValue(minNumbElemPerGroup, setMinNumbElemPerGroup)}>+</Button>
                 </ButtonGroup>
                 <Typography variant="h6" component="h1" gutterBottom sx={typographyStyle}>
-                    Number of Elements per Group
+                    Minimum Number of Elements per Group
+                </Typography>
+            </Box>
+            <Box sx={alignHorizontalyBoxStyle}>
+                <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                    <Button onClick={() => decreaseValue(maxNumbElemPerGroup,maxNumbElemPerGroup, setMaxNumbElemPerGroup)}>-</Button>
+                    <Button>{maxNumbElemPerGroup}</Button>
+                    <Button onClick={() => increaseValue(maxNumbElemPerGroup, setMaxNumbElemPerGroup)}>+</Button>
+                </ButtonGroup>
+                <Typography variant="h6" component="h1" gutterBottom sx={typographyStyle}>
+                    Maximum Number of Elements per Group
                 </Typography>
             </Box>
             <Button variant="contained" onClick={handleSubmit}>Create</Button>
@@ -489,11 +523,13 @@ export function ShowAssigmentTeamsFetch({
         event.preventDefault()
         const body = new CreateTeamBody(null)
         const response = await assignmentServices.createTeam(body, courseId, classroomId, assignment.id)
+
         if (response instanceof ErrorMessageModel) {
             setError(response)
         }
         if (response instanceof SirenEntity) {
-            navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assignments/" + assignment.id + "/teams/" + response.properties.id, {replace: true})
+            console.log(response.properties)
+            navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assignments/" + assignment.id + "/teams/" + response.properties.teamId, {replace: true})
         }
     },[setError])
 
@@ -530,6 +566,7 @@ export function ShowAssigmentTeamsFetch({
                             <Typography
                                 variant="h6"
                                 sx={typographyStyle}
+                                onClick={() => navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assignments/" + assignment.id + "/teams/" + team.team.id)}
                             >
                                 {team.team.name}
                             </Typography>
@@ -568,7 +605,17 @@ export function ShowAssigmentTeamsFetch({
                                     </List>
                                 </AccordionDetails>
                             </Accordion>
-                            <Button variant="contained" onClick={handleJoinTeam} value={team.team.id} disabled={team.students.length >= assignment.maxElemsPerGroup}>Join</Button>
+                            {team.team.isCreated ? (
+                                    <>
+                                        {team.team.isClosed?
+                                            <Button variant="contained" onClick={handleJoinTeam} value={team.team.id} disabled={true}>Join</Button>
+                                            :
+                                            <Button variant="contained" onClick={handleJoinTeam} value={team.team.id} disabled={team.students.length >= assignment.maxElemsPerGroup}>Join</Button>
+                                        }
+                                    </>
+                                ) :
+                                <Button variant="contained" onClick={handleJoinTeam} value={team.team.id} disabled={true}>Being Created..</Button>
+                            }
                         </Box>
                     ))}
                     </Grid>
