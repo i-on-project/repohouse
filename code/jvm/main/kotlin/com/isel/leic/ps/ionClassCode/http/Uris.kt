@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.http
 
-import org.springframework.web.util.UriTemplate
 import java.net.URI
+import org.springframework.web.util.UriTemplate
 
 /**
  * Uris used in the application.
@@ -128,6 +128,7 @@ object Uris {
     const val MOBILE_COURSE_PATH = "$MOBILE_COURSES_PATH/{courseId}"
     const val MOBILE_CLASSROOMS_PATH = "$MOBILE_COURSE_PATH/classrooms"
     const val MOBILE_CLASSROOM_PATH = "$MOBILE_CLASSROOMS_PATH/{classroomId}"
+    const val MOBILE_CLASSROOM_ARCHIVED_PATH = "$MOBILE_CLASSROOM_PATH/archived"
     const val MOBILE_ASSIGMENTS_PATH = "$MOBILE_CLASSROOM_PATH/assignments"
     const val MOBILE_ASSIGMENT_PATH = "$MOBILE_ASSIGMENTS_PATH/{assignmentId}"
     const val MOBILE_TEAMS_PATH = "$MOBILE_ASSIGMENT_PATH/teams"

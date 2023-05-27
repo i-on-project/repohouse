@@ -12,4 +12,5 @@ interface RepoRepository {
     fun updateRepoStatus(repoId: Int, url: String)
     fun getRepoById(repoId: Int): Repo?
     fun getRepoByTeam(teamId: Int): Repo?
+    fun archiveRepo(repoId: Int)
 }

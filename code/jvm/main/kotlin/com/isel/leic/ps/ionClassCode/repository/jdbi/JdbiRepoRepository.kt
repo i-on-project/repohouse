@@ -90,4 +90,16 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .mapTo<Repo>()
             .firstOrNull()
     }
+
+    override fun archiveRepo(repoId: Int) {
+        handle.createUpdate(
+            """
+                UPDATE REPO
+                SET  = true
+                WHERE id = :repoId
+                """,
+        )
+            .bind("repoId", repoId)
+            .execute()
+    }
 }

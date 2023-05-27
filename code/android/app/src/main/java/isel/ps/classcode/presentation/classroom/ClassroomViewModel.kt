@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.CreateTeamComposite
 import isel.ps.classcode.domain.Team
+import isel.ps.classcode.domain.UpdateArchiveRepoInput
+import isel.ps.classcode.domain.UpdateArchiveRepoState
 import isel.ps.classcode.domain.UpdateCompositeState
 import isel.ps.classcode.domain.UpdateCreateRepoState
 import isel.ps.classcode.domain.UpdateCreateTeamRequestState
@@ -47,15 +49,35 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices) : Vie
     fun getAssignments() = viewModelScope.launch {
         when (val assignments = classroomServices.getAssignments(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId)) {
             is Either.Right -> {
-                if (assignments.value.isNotEmpty()) {
-                    _assignments = assignments.value
-                    _assignment = assignments.value.first()
-                    getTeams(assignmentId = assignments.value.first().id)
+                val archiveRepos = assignments.value.archiveRepos
+                val list = mutableListOf<UpdateArchiveRepoState>()
+                _assignments = assignments.value.assignments
+                if (archiveRepos?.isNotEmpty() == true) {
+                    archiveRepos.forEach { request ->
+                        when (classroomServices.archiveRepoInGithub(orgName = classroomInfo.courseName, repoName = request.repoName)) {
+                            is Either.Right -> {
+                                list.add(UpdateArchiveRepoState(requestId = request.requestId, state = "Accepted"))
+                            }
+                            is Either.Left -> {
+                                list.add(UpdateArchiveRepoState(requestId = request.requestId, state = "Pending"))
+                            }
+                        }
+                    }
+                    val updateArchiveRepo = UpdateArchiveRepoInput(archiveRepos = list, composite = UpdateCompositeState(requestId = archiveRepos.first().composite))
+                    when (val result = classroomServices.changeStatusArchiveRepoInClassCode(courseId = classroomInfo.classroom.courseId, classroomId = classroomInfo.classroom.id, updateArchiveRepo = updateArchiveRepo)) {
+                        is Either.Right -> Unit // Do nothing
+
+                        is Either.Left -> _errorClassCode = result.value
+                    }
+                }
+
+                if (assignments.value.assignments.isNotEmpty()) {
+                    _assignment = assignments.value.assignments.first()
+                    getTeams(assignmentId = assignments.value.assignments.first().id)
                 } else {
-                    _assignments = emptyList()
+                    _assignment = null
                     _teamsCreated = emptyList()
                     _createTeamComposite = emptyList()
-                    _assignment = null
                 }
             }
             is Either.Left -> {
@@ -76,29 +98,41 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices) : Vie
 
     fun createTeamCompositeAccepted(team: CreateTeamComposite, assignmentId: Int) = viewModelScope.launch {
         val teamSlug = team.createTeam.teamName.replace(" ", "-")
-        val createTeamResult = if (team.createTeam.state == "Accepted") null else classroomServices.createTeamInGitHub(createTeamComposite = team, orgName = classroomInfo.courseName)
-        val githubTeamId = if (createTeamResult == null) team.createTeam.gitHubTeamId else createTeamResult.value
-        val createRepoResult = if (team.createRepo.state == "Accepted") {
-            null
-        } else {
-            if (createTeamResult == null) {
-                classroomServices.createRepoInGitHub(orgName = classroomInfo.courseName, repo = team.createRepo, teamId = githubTeamId)
-            } else {
-                classroomServices.createRepoInGitHub(orgName = classroomInfo.courseName, repo = team.createRepo, teamId = createTeamResult.value)
+        val createTeamResult = if (team.createTeam.gitHubTeamId != null) null else classroomServices.createTeamInGitHub(createTeamComposite = team, orgName = classroomInfo.courseName)
+        val githubTeamId = when (createTeamResult) {
+            is Either.Right -> createTeamResult.value
+            is Either.Left -> {
+                _errorGitHub = createTeamResult.value
+                return@launch
             }
+            else -> team.createTeam.gitHubTeamId
+        }
+        val createRepoResult = if (team.createRepo.state == "Accepted") null else classroomServices.createRepoInGitHub(orgName = classroomInfo.courseName, repo = team.createRepo, teamId = githubTeamId)
+        val createRepo = when (createRepoResult) {
+            is Either.Right -> createRepoResult.value
+            is Either.Left -> {
+                _errorGitHub = createRepoResult.value
+                return@launch
+            }
+            else -> null
         }
         val joinTeamResult = if (team.joinTeam.state == "Accepted") null else classroomServices.addMemberToTeamInGitHub(orgName = classroomInfo.courseName, teamSlug = teamSlug, username = team.joinTeam.githubUsername)
+        when (joinTeamResult) {
+            is Either.Left -> {
+                _errorGitHub = joinTeamResult.value
+                return@launch
+            }
+            else -> {} // DO NOTHING
+        }
         val updateRequest = UpdateCreateTeamStatusInput(
             composite = UpdateCompositeState(requestId = team.createTeam.composite),
-            createTeam = UpdateCreateTeamRequestState(requestId = team.createTeam.requestId, state = getState(res = createTeamResult?.isCompleted), gitHubTeamId = githubTeamId),
-            createRepo = UpdateCreateRepoState(requestId = team.createRepo.requestId, state = getState(res = createRepoResult?.isCompleted), url = createRepoResult?.value, repoId = team.createRepo.repoId),
-            joinTeam = UpdateJoinTeamState(requestId = team.joinTeam.requestId, state = getState(res = joinTeamResult?.isCompleted), userId = team.joinTeam.creator),
+            createTeam = UpdateCreateTeamRequestState(requestId = team.createTeam.requestId, state = getState(res = createTeamResult), gitHubTeamId = githubTeamId),
+            createRepo = UpdateCreateRepoState(requestId = team.createRepo.requestId, state = getState(res = createRepoResult), url = createRepo, repoId = team.createRepo.repoId),
+            joinTeam = UpdateJoinTeamState(requestId = team.joinTeam.requestId, state = getState(res = joinTeamResult), userId = team.joinTeam.creator),
         )
         when (val res = classroomServices.changeCreateTeamStatus(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId, assignmentId = assignmentId, teamId = team.createTeam.teamId, updateCreateTeamStatus = updateRequest)) {
-            is Either.Right -> {
-                getTeams(assignmentId = assignmentId)
-            }
-            is Either.Left -> { _errorClassCode = res.value }
+            is Either.Right -> getTeams(assignmentId = assignmentId)
+            is Either.Left -> _errorClassCode = res.value
         }
     }
 
@@ -110,16 +144,14 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices) : Vie
             joinTeam = UpdateJoinTeamState(requestId = team.createTeam.requestId, state = "Rejected", userId = team.joinTeam.creator),
         )
         when (val res = classroomServices.changeCreateTeamStatus(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId, assignmentId = assignmentId, teamId = team.createTeam.teamId, updateCreateTeamStatus = updateRequest)) {
-            is Either.Right -> {
-                getTeams(assignmentId = assignmentId)
-            }
-            is Either.Left -> { _errorClassCode = res.value }
+            is Either.Right -> getTeams(assignmentId = assignmentId)
+            is Either.Left -> _errorClassCode = res.value
         }
     }
 }
 
-private fun getState(res: Boolean?): String =
+private fun <T>getState(res: Either<HandleGitHubResponseError, T>?): String =
     when (res) {
-        null, true -> "Accepted"
-        false -> "Pending"
+        is Either.Right, null -> "Accepted"
+        is Either.Left -> "Pending"
     }

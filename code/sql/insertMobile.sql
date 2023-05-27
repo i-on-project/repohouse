@@ -26,36 +26,36 @@ VALUES (9, 2);
 INSERT INTO teacher_course (teacher, course)
 VALUES (9, 3);
 
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
+INSERT INTO classroom (id, name, last_sync, invite_code, is_archived, course_id, teacher_id)
 VALUES (4, 'DAW-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/a/123', false, 1, 9);
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
+INSERT INTO classroom (id, name, last_sync, invite_code, is_archived, course_id, teacher_id)
 VALUES (5, 'PDM-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/b/123', false, 2, 9);
-INSERT INTO classroom (id, name, last_sync, invite_link, is_archived, course_id, teacher_id)
+INSERT INTO classroom (id, name, last_sync, invite_code, is_archived, course_id, teacher_id)
 VALUES (6, 'TVS-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/c/123', false, 1, 9);
 
 INSERT INTO student_classroom (student, classroom)
 VALUES (4, 4);
 
-INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (5, 4, 2, 3, CURRENT_TIMESTAMP, 'description4', 'title4');
-INSERT INTO assignment (id, classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-VALUES (6, 5, 2, 3, CURRENT_TIMESTAMP, 'description5', 'title5');
+INSERT INTO assignment (id, classroom_id, min_elems_per_group, max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (5, 4, 2, 2, 3, CURRENT_TIMESTAMP, 'description4', 'title4');
+INSERT INTO assignment (id, classroom_id, min_elems_per_group, max_elems_per_group, max_number_groups, release_date, description, title)
+VALUES (6, 5, 2, 2, 3, CURRENT_TIMESTAMP, 'description5', 'title5');
 
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (5, 'team5', true, 6);
+INSERT INTO team (id, name, is_created, is_closed, assignment)
+VALUES (5, 'team5', true, false, 6);
 
 INSERT INTO repo (id, name, url, is_created, team_id)
 VALUES (7, 'repo7', null, false, 5);
 
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (1, 'team1', true, 5);
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (2, 'team2', true, 5);
+INSERT INTO team (id, name, is_created, is_closed, assignment)
+VALUES (1, 'team1', true, false, 5);
+INSERT INTO team (id, name, is_created, is_closed, assignment)
+VALUES (2, 'team2', true, false, 5);
 
 
 /*TEAM 6*/
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (6, 'team6', false, 5);
+INSERT INTO team (id, name, is_created, is_closed, assignment)
+VALUES (6, 'team6', false, false, 5);
 INSERT INTO repo (id, name, url, is_created, team_id)
 VALUES (4, 'repo4', null, false, 6);
 
@@ -84,8 +84,8 @@ INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (36, 6, 5);
 
 /*TEAM 7*/
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (7, 'team7', false, 5);
+INSERT INTO team (id, name, is_created, is_closed, assignment)
+VALUES (7, 'team7', false, false, 5);
 INSERT INTO repo (id, name, url, is_created, team_id)
 VALUES (5, 'repo5', null, false, 7);
 
@@ -114,8 +114,8 @@ INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (40, 7, 5);
 
 /*TEAM 8*/
-INSERT INTO team (id, name, is_created, assignment)
-VALUES (8, 'team8', false, 5);
+INSERT INTO team (id, name, is_created, is_closed, assignment)
+VALUES (8, 'team8', false, false, 5);
 INSERT INTO repo (id, name, url, is_created, team_id)
 VALUES (6, 'repo6', null, false, 8);
 
@@ -143,21 +143,42 @@ VALUES (44, 4, 41, 'Pending');
 INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (44, 8, 5);
 
+/*leaveTeam*/
+INSERT INTO request(id, creator, composite, state)
+VALUES (46, 4, null, 'Pending');
+INSERT INTO leaveteam(id, team_id)
+VALUES (46, 6);
+
+INSERT INTO request(id, creator, composite, state)
+VALUES (47, 4, null, 'Pending');
+INSERT INTO jointeam(id, team_id, assigment_id)
+VALUES (47, 6, 5);
+
+COMMIT TRANSACTION;
+
+UPDATE classroom SET is_archived = true WHERE id = 4;
+
+INSERT INTO request(id, creator, composite, state)
+VALUES (70, 4, null, 'Pending');
+INSERT INTO composite(id)
+VALUES (70);
+
 /*archiveRepo*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (45, 4, null, 'Pending');
+VALUES (45, 4, 70, 'Pending');
 INSERT INTO archiverepo(id, repo_id)
 VALUES (45, 4);
 
-/*leaveTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (48, 4, null, 'Pending');
-INSERT INTO leaveteam(id, team_id)
-VALUES (48, 6);
+VALUES (61, 4, 70, 'Pending');
+INSERT INTO archiverepo(id, repo_id)
+VALUES (61, 5);
 
-INSERT INTO request(id, creator, composite, state)
-VALUES (49, 4, null, 'Pending');
-INSERT INTO jointeam(id, team_id, assigment_id)
-VALUES (49, 6, 5);
+UPDATE request SET state = 'Pending' WHERE id = 61;
 
-COMMIT TRANSACTION;
+
+SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name AS repo_name FROM
+(SELECT a.id FROM assignment a JOIN classroom c on a.classroom_id = c.id WHERE c.id = 4) as y
+JOIN team t on t.assignment = y.id
+JOIN (SELECT a.id, a.repo_id, r.name, r.team_id FROM archiverepo a JOIN repo r on a.repo_id = r.id) as x on x.team_id = t.id
+JOIN request r on r.id = x.id

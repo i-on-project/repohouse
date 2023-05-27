@@ -10,7 +10,8 @@ data class ClassCodeClassroomDeserialization(
     @JsonProperty("id") val id: Int,
     @JsonProperty("name") val name: String,
     @JsonProperty("lastSync") val lastSync: Timestamp,
-    @JsonProperty("inviteLink") val inviteLink: String,
+    @JsonProperty("inviteCode") val inviteCode: String,
     @JsonProperty("isArchived") val isArchived: Boolean,
     @JsonProperty("courseId") val courseId: Int,
+    @JsonProperty("teacherId") val teacherId: Int,
 )

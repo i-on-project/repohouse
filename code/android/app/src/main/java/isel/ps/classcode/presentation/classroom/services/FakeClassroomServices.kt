@@ -1,36 +1,25 @@
 package isel.ps.classcode.presentation.classroom.services
 
-import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.CreateRepo
 import isel.ps.classcode.domain.CreateTeamComposite
+import isel.ps.classcode.domain.GetAssignmentsResponse
 import isel.ps.classcode.domain.Teams
+import isel.ps.classcode.domain.UpdateArchiveRepoInput
 import isel.ps.classcode.domain.UpdateCreateTeamStatusInput
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.delay
-import java.sql.Timestamp
-import java.time.Instant
 
 /**
  * Implementation of the [ClassroomServices] interface that will be used for tests
  */
 class FakeClassroomServices : ClassroomServices {
-    override suspend fun getAssignments(classroomId: Int, courseId: Int): Either<HandleClassCodeResponseError, List<Assignment>> {
-        delay(2000)
-        return Either.Right(
-            value = List(10) { index ->
-                val i = index + 1
-                Assignment(
-                    id = i,
-                    classroomId = classroomId,
-                    maxElemsPerGroup = 2,
-                    maxNumberGroups = 2,
-                    releaseDate = Timestamp(Instant.now().toEpochMilli()),
-                    description = "Description $i",
-                    title = "Title $i",
-                )
-            },
-        )
+    override suspend fun getAssignments(
+        classroomId: Int,
+        courseId: Int,
+    ): Either<HandleClassCodeResponseError, GetAssignmentsResponse> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun getTeams(
@@ -45,7 +34,7 @@ class FakeClassroomServices : ClassroomServices {
     override suspend fun createTeamInGitHub(
         createTeamComposite: CreateTeamComposite,
         orgName: String,
-    ): ResultFromRequest<Int> {
+    ): Either<HandleGitHubResponseError, Int> {
         TODO("Not yet implemented")
     }
 
@@ -53,7 +42,7 @@ class FakeClassroomServices : ClassroomServices {
         orgName: String,
         teamSlug: String,
         username: String,
-    ): ResultFromRequest<Unit> {
+    ): Either<HandleGitHubResponseError, Unit> {
         TODO("Not yet implemented")
     }
 
@@ -61,7 +50,7 @@ class FakeClassroomServices : ClassroomServices {
         orgName: String,
         teamId: Int?,
         repo: CreateRepo,
-    ): ResultFromRequest<String> {
+    ): Either<HandleGitHubResponseError, String?> {
         TODO("Not yet implemented")
     }
 
@@ -71,6 +60,21 @@ class FakeClassroomServices : ClassroomServices {
         assignmentId: Int,
         teamId: Int,
         updateCreateTeamStatus: UpdateCreateTeamStatusInput,
+    ): Either<HandleClassCodeResponseError, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun archiveRepoInGithub(
+        orgName: String,
+        repoName: String,
+    ): Either<HandleGitHubResponseError, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun changeStatusArchiveRepoInClassCode(
+        courseId: Int,
+        classroomId: Int,
+        updateArchiveRepo: UpdateArchiveRepoInput
     ): Either<HandleClassCodeResponseError, Unit> {
         TODO("Not yet implemented")
     }

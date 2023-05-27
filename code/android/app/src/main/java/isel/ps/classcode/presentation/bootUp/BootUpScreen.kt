@@ -15,6 +15,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,23 +39,45 @@ import kotlinx.coroutines.delay
 const val BOOT_UP_DELAY = 2000L
 
 @Composable
-fun BootUpScreen(actionHandler: () -> Unit = { }) {
+fun BootUpScreen(strongBiometric: () -> Unit = { }) {
     var visible by remember { mutableStateOf(true) }
     Box(modifier = Modifier.fillMaxSize()) {
         LaunchedEffect(Unit) {
             delay(timeMillis = BOOT_UP_DELAY)
             visible = false
-            actionHandler()
+            strongBiometric()
         }
         AnimatedVisibility(
-            visible = visible,
+            visible = true,
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.background),
             enter = slideInHorizontally() + fadeIn(animationSpec = tween(durationMillis = 1000, easing = LinearEasing)),
             exit = fadeOut(animationSpec = tween(durationMillis = 1000, easing = LinearEasing)),
         ) {
-            IselLogoView()
+            if (visible) {
+                IselLogoView()
+            } else {
+                Screen(actionHandler = strongBiometric)
+            }
+        }
+    }
+}
+
+@Composable
+fun Screen(actionHandler: () -> Unit = { }) {
+    Column(
+        modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        IconButton(onClick = { actionHandler() }, modifier = Modifier.size(200.dp)) {
+            Icon(
+                modifier = Modifier.size(100.dp),
+                imageVector = Icons.Default.Fingerprint,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }

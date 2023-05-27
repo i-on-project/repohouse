@@ -20,7 +20,7 @@ class FakeCourseServices : CourseServices {
                     id = i,
                     name = "Classroom $i",
                     lastSync = Timestamp(Instant.now().toEpochMilli()),
-                    inviteLink = "invite link $i",
+                    inviteCode = "invite link $i",
                     isArchived = i in (6..7),
                     courseId = courseId,
                 )

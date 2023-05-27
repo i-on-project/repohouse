@@ -22,7 +22,7 @@ data class UpdateCompositeState(
 data class UpdateCreateTeamRequestState(
     override val requestId: Int,
     val state: String,
-    val gitHubTeamId: Int?
+    val gitHubTeamId: Int?,
 ) : UpdateRequest
 
 /**
@@ -52,4 +52,13 @@ data class UpdateCreateTeamStatusInput(
     val createTeam: UpdateCreateTeamRequestState,
     val joinTeam: UpdateJoinTeamState,
     val createRepo: UpdateCreateRepoState,
+)
+data class UpdateArchiveRepoState(
+    override val requestId: Int,
+    val state: String,
+) : UpdateRequest
+
+data class UpdateArchiveRepoInput(
+    val composite: UpdateCompositeState,
+    val archiveRepos: List<UpdateArchiveRepoState>,
 )

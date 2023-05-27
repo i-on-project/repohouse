@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.ps.classcode.R
+import isel.ps.classcode.domain.ArchiveRepo
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.CreateRepo
@@ -298,6 +299,7 @@ fun Aaaa() {
     val assignment = Assignment(
         id = 1,
         classroomId = 1,
+        minElemsPerGroup = 1,
         maxElemsPerGroup = 2,
         maxNumberGroups = 2,
         releaseDate = Timestamp.valueOf("2021-06-01 00:00:00"),
