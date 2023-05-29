@@ -11,4 +11,5 @@ interface LeaveCourseRepository {
     fun getLeaveCourseRequests(): List<LeaveCourse>
     fun getLeaveCourseRequestById(id: Int): LeaveCourse?
     fun getLeaveCourseRequestsByUser(userId: Int): List<LeaveCourse>
+    fun getLeaveCourseRequestsByCourse(courseId: Int): List<LeaveCourse>
 }

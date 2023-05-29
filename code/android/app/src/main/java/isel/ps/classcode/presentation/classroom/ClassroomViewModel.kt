@@ -87,7 +87,10 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices) : Vie
     }
 
     fun getTeams(assignmentId: Int) = viewModelScope.launch {
-        when (val teams = classroomServices.getTeams(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId, assignmentId = assignmentId)) {
+        val x = classroomInfo.classroom.id
+        val y = classroomInfo.classroom.courseId
+        val z = assignmentId
+        when (val teams = classroomServices.getTeams(classroomId = x, courseId = y, assignmentId = z)) {
             is Either.Right -> {
                 _teamsCreated = teams.value.teamsCreated
                 _createTeamComposite = teams.value.createTeamComposite
@@ -131,7 +134,15 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices) : Vie
             joinTeam = UpdateJoinTeamState(requestId = team.joinTeam.requestId, state = getState(res = joinTeamResult), userId = team.joinTeam.creator),
         )
         when (val res = classroomServices.changeCreateTeamStatus(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId, assignmentId = assignmentId, teamId = team.createTeam.teamId, updateCreateTeamStatus = updateRequest)) {
-            is Either.Right -> getTeams(assignmentId = assignmentId)
+            is Either.Right -> {
+                val teamsCreated = _teamsCreated
+                val createTeamComposite = _createTeamComposite
+                if (teamsCreated != null && createTeamComposite != null) {
+                    val newTeam = Team(id = team.createTeam.teamId, name = team.createTeam.teamName, isCreated = true, isClosed = true, assignment = assignmentId)
+                    _teamsCreated = teamsCreated + newTeam
+                    _createTeamComposite = createTeamComposite.filter { it.createTeam.teamId != team.createTeam.teamId }
+                }
+            }
             is Either.Left -> _errorClassCode = res.value
         }
     }
@@ -144,7 +155,13 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices) : Vie
             joinTeam = UpdateJoinTeamState(requestId = team.createTeam.requestId, state = "Rejected", userId = team.joinTeam.creator),
         )
         when (val res = classroomServices.changeCreateTeamStatus(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId, assignmentId = assignmentId, teamId = team.createTeam.teamId, updateCreateTeamStatus = updateRequest)) {
-            is Either.Right -> getTeams(assignmentId = assignmentId)
+            is Either.Right -> {
+                val teamsCreated = _teamsCreated
+                val createTeamComposite = _createTeamComposite
+                if (teamsCreated != null && createTeamComposite != null) {
+                    _createTeamComposite = createTeamComposite.filter { it.createTeam.teamId != team.createTeam.teamId } + team.copy(compositeState = "Rejected ", createTeam = team.createTeam.copy(state = "Rejected"), joinTeam = team.joinTeam.copy(state = "Rejected"), createRepo = team.createRepo.copy(state = "Rejected"))
+                }
+            }
             is Either.Left -> _errorClassCode = res.value
         }
     }

@@ -43,7 +43,7 @@ class CourseActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val course = getCourseExtra() ?: return finish()
         vm.course = course
-        vm.getClassrooms()
+        vm.getClassrooms(activity = this)
         setContent {
             ClasscodeTheme {
                 CourseScreen(
@@ -53,11 +53,15 @@ class CourseActivity : ComponentActivity() {
                         ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto(courseName = vm.course.name))
                     },
                     classrooms = vm.classrooms,
-                    error = vm.error,
+                    error = vm.errorClassCode,
                     onDismissRequest = { finish() },
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     @Suppress("deprecation")

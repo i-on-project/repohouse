@@ -112,7 +112,7 @@ class CourseController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Student) return Problem.unauthorized
-        return when (val request = courseServices.leaveCourse(courseId, user.id)) {
+        return when (val request = courseServices.leaveCourse(courseId, user.id, user.githubUsername)) {
             is Result.Problem -> courseServices.problem(request.value)
             is Result.Success -> siren(
                 RequestOutputModel(

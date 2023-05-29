@@ -9,3 +9,8 @@ data class UpdateRequestStateInput(val type: String, val creator: Int, val reque
         return !(lowercase == "jointeam" || lowercase == "leaveteam")
     }
 }
+
+/**
+ * Change Request State Input
+ */
+data class LeaveRequestStateInput(val requestId: Int, val creator: Int)

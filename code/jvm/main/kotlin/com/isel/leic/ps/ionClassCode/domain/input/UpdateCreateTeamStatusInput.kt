@@ -62,3 +62,16 @@ data class UpdateArchiveRepoInput(
     val composite: UpdateCompositeState,
     val archiveRepos: List<UpdateArchiveRepoState>,
 )
+
+data class LeaveTeamWithDelete(override val requestId: Int, val state: String = "Pending", val teamId: Int, val wasDeleted: Boolean = false) : UpdateRequest
+
+data class UpdateLeaveCourse(
+    override val requestId: Int,
+    val courseId: Int,
+) : UpdateRequest
+
+data class UpdateLeaveCourseCompositeInput(
+    val composite: UpdateCompositeState,
+    val leaveCourse: UpdateLeaveCourse,
+    val leaveTeam: List<LeaveTeamWithDelete>
+)

@@ -68,6 +68,14 @@ class ClassroomActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val assignment = vm.assignment
+        if (assignment != null) {
+            vm.getTeams(assignmentId = assignment.id)
+        }
+    }
+
     @Suppress("deprecation")
     private fun getClassroomExtra(): ClassroomAndMoreInfo? {
         val classroomExtra: LocalClassroomDto? =

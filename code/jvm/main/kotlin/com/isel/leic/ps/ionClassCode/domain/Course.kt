@@ -1,5 +1,8 @@
 package com.isel.leic.ps.ionClassCode.domain
 
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveCourse
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
+
 /**
  * Course Domain Interface
  */
@@ -24,4 +27,14 @@ data class CourseWithClassrooms(
     val isArchived: Boolean = false,
     val students: List<Student> = emptyList(),
     val classrooms: List<Classroom> = emptyList()
+)
+
+data class LeaveCourseRequest(
+    val leaveCourse: LeaveCourse,
+    val leaveTeamRequests: List<LeaveTeam>
+)
+
+data class CourseWithLeaveCourseRequests(
+    val course: CourseWithClassrooms,
+    val leaveCourseRequests: List<LeaveCourseRequest> = emptyList()
 )

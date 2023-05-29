@@ -7,10 +7,9 @@ insert into teacher(id, github_token)
 values (9, 'token1234');
 
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
-VALUES (4, 'andre.david.santos.02@gmail.com', true, 'AndreSantos0', 80883346, 'token3', 'student2');
+VALUES (19, 'andre.david.santos.02@gmail.com', true, 'AndreSantos0', 80883346, 'token420', 'student2');
 INSERT INTO student (id, school_id)
-VALUES (4, 1237);
-
+VALUES (19, 1535);
 
 INSERT INTO course (id, org_url, name, org_id)
 VALUES (1, 'https://daw.isel.pt', 'test-project-isel', 127772322);
@@ -34,7 +33,7 @@ INSERT INTO classroom (id, name, last_sync, invite_code, is_archived, course_id,
 VALUES (6, 'TVS-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/c/123', false, 1, 9);
 
 INSERT INTO student_classroom (student, classroom)
-VALUES (4, 4);
+VALUES (19, 4);
 
 INSERT INTO assignment (id, classroom_id, min_elems_per_group, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (5, 4, 2, 2, 3, CURRENT_TIMESTAMP, 'description4', 'title4');
@@ -58,28 +57,30 @@ INSERT INTO team (id, name, is_created, is_closed, assignment)
 VALUES (6, 'team6', false, false, 5);
 INSERT INTO repo (id, name, url, is_created, team_id)
 VALUES (4, 'repo4', null, false, 6);
+INSERT INTO team (id, name, is_created, is_closed, assignment)
+VALUES (10, 'team10', false, false, 5);
 
 /*composite*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (33, 4, null, 'Pending');
+VALUES (33, 19, null, 'Pending');
 INSERT INTO composite(id)
 VALUES (33);
 
 /*createTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (34, 4, 33, 'Pending');
+VALUES (34, 19, 33, 'Pending');
 INSERT INTO createteam(id, team_id)
 VALUES (34, 6);
 
 /*createRepo*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (35, 4, 33, 'Pending');
+VALUES (35, 19, 33, 'Pending');
 INSERT INTO createrepo(id, repo_id)
 VALUES (35, 4);
 
 /*joinTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (36, 4, 33, 'Pending');
+VALUES (36, 19, 33, 'Pending');
 INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (36, 6, 5);
 
@@ -91,25 +92,25 @@ VALUES (5, 'repo5', null, false, 7);
 
 /*composite*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (37, 4, null, 'Pending');
+VALUES (37, 19, null, 'Pending');
 INSERT INTO composite(id)
 VALUES (37);
 
 /*createTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (38, 4, 37, 'Pending');
+VALUES (38, 19, 37, 'Pending');
 INSERT INTO createteam(id, team_id)
 VALUES (38, 7);
 
 /*createRepo*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (39, 4, 37, 'Pending');
+VALUES (39, 19, 37, 'Pending');
 INSERT INTO createrepo(id, repo_id)
 VALUES (39, 5);
 
 /*joinTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (40, 4, 37, 'Pending');
+VALUES (40, 19, 37, 'Pending');
 INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (40, 7, 5);
 
@@ -121,64 +122,63 @@ VALUES (6, 'repo6', null, false, 8);
 
 /*composite*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (41, 4, null, 'Pending');
+VALUES (41, 19, null, 'Pending');
 INSERT INTO composite(id)
 VALUES (41);
 
 /*createTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (42, 4, 41, 'Pending');
+VALUES (42, 19, 41, 'Pending');
 INSERT INTO createteam(id, team_id)
 VALUES (42, 8);
 
 /*createRepo*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (43, 4, 41, 'Pending');
+VALUES (43, 19, 41, 'Pending');
 INSERT INTO createrepo(id, repo_id)
 VALUES (43, 6);
 
 /*joinTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (44, 4, 41, 'Pending');
+VALUES (44, 19, 41, 'Pending');
 INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (44, 8, 5);
 
 /*leaveTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (46, 4, null, 'Pending');
+VALUES (80, 19, null, 'Pending');
 INSERT INTO leaveteam(id, team_id)
-VALUES (46, 6);
-
-INSERT INTO request(id, creator, composite, state)
-VALUES (47, 4, null, 'Pending');
-INSERT INTO jointeam(id, team_id, assigment_id)
-VALUES (47, 6, 5);
+VALUES (80, 6);
 
 COMMIT TRANSACTION;
 
-UPDATE classroom SET is_archived = true WHERE id = 4;
+INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
+VALUES (5, 'test4@alunos.isel.pt', true, 'test12345a', 12341527, 'token4', 'student3');
+INSERT INTO student (id, school_id)
+VALUES (5, 153);
+INSERT INTO student_classroom (student, classroom)
+VALUES (5, 4);
+INSERT INTO student_team (student, team)
+VALUES (5, 6);
 
 INSERT INTO request(id, creator, composite, state)
-VALUES (70, 4, null, 'Pending');
+VALUES (81, 19, null, 'Pending');
 INSERT INTO composite(id)
-VALUES (70);
-
-/*archiveRepo*/
+VALUES (81);
 INSERT INTO request(id, creator, composite, state)
-VALUES (45, 4, 70, 'Pending');
-INSERT INTO archiverepo(id, repo_id)
-VALUES (45, 4);
-
+VALUES (84, 19, 81, 'Pending');
+INSERT INTO leavecourse(id, course_id)
+VALUES (84, 1);
 INSERT INTO request(id, creator, composite, state)
-VALUES (61, 4, 70, 'Pending');
-INSERT INTO archiverepo(id, repo_id)
-VALUES (61, 5);
+VALUES (82, 19, 81, 'Pending');
+INSERT INTO leaveteam(id, team_id)
+VALUES (82, 6);
+INSERT INTO request(id, creator, composite, state)
+VALUES (83, 19, 81, 'Pending');
+INSERT INTO leaveteam(id, team_id)
+VALUES (83, 7);
 
-UPDATE request SET state = 'Pending' WHERE id = 61;
-
-
-SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name AS repo_name FROM
-(SELECT a.id FROM assignment a JOIN classroom c on a.classroom_id = c.id WHERE c.id = 4) as y
-JOIN team t on t.assignment = y.id
-JOIN (SELECT a.id, a.repo_id, r.name, r.team_id FROM archiverepo a JOIN repo r on a.repo_id = r.id) as x on x.team_id = t.id
-JOIN request r on r.id = x.id
+SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username, (SELECT COUNT(*) FROM student_team
+                                                                             WHERE team = l.team_id) as members_count FROM
+(SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id WHERE r.id = 83) as x JOIN
+leaveteam l on x.id = l.id

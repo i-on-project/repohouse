@@ -4,6 +4,7 @@ import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.TeacherWithoutToken
+import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.dto.CourseDTO
 import com.isel.leic.ps.ionClassCode.domain.input.CourseInput
 import com.isel.leic.ps.ionClassCode.repository.CourseRepository
@@ -403,6 +404,23 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("courseId", courseId)
             .mapTo<Int>()
             .firstOrNull() != null
+
+    override fun getAllTeamsFromAUserInACourse(courseId: Int, userId: Int, classrooms: List<Int>): List<Team> {
+        return classrooms.map { classroomId ->
+            handle.createQuery(
+                """
+                SELECT t.id, name, is_created, is_closed, assignment FROM team t
+                JOIN student_team st on t.id = st.team
+                JOIN (SELECT a.id FROM assignment a WHERE classroom_id = :classroomId) as x on t.assignment = x.id
+                WHERE st.student = :userId
+            """
+            )
+                .bind("userId", userId)
+                .bind("classroomId", classroomId)
+                .mapTo<Team>()
+                .first()
+        }
+    }
 
     /**
      * Method to get a Course by is id

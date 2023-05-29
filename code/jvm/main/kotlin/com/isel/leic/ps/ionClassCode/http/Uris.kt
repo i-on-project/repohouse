@@ -126,6 +126,7 @@ object Uris {
     const val MOBILE_MENU_PATH = "$MOBILE_API/menu"
     const val MOBILE_COURSES_PATH = "$MOBILE_API/courses"
     const val MOBILE_COURSE_PATH = "$MOBILE_COURSES_PATH/{courseId}"
+    const val MOBILE_LEAVE_COURSE_PATH = "$MOBILE_COURSE_PATH/users/{userId}"
     const val MOBILE_CLASSROOMS_PATH = "$MOBILE_COURSE_PATH/classrooms"
     const val MOBILE_CLASSROOM_PATH = "$MOBILE_CLASSROOMS_PATH/{classroomId}"
     const val MOBILE_CLASSROOM_ARCHIVED_PATH = "$MOBILE_CLASSROOM_PATH/archived"

@@ -128,12 +128,6 @@ ALTER TABLE Request
         FOREIGN KEY (composite)
             REFERENCES Composite(id);
 
-CREATE TABLE ArchiveRepo(
-   id int primary key,
-   repo_id int unique not null,
-   foreign key (id) references Request(id)
-);
-
 CREATE TABLE LeaveCourse(
     id int primary key,
     course_id int not null,
@@ -172,7 +166,7 @@ CREATE TABLE Apply(
 
 CREATE TABLE Student_Team(
     student int,
-    team int,
+    team int not null,
     primary key (student, team),
     foreign key (student) references Student(id),
     foreign key (team) references Team(id)
@@ -194,6 +188,13 @@ CREATE TABLE Repo(
     is_created boolean not null,
     team_id int unique not null,
     foreign key (team_id) references Team(id)
+);
+
+CREATE TABLE ArchiveRepo(
+    id int primary key,
+    repo_id int unique not null,
+    foreign key (id) references Request(id),
+    foreign key (repo_id) references Repo(id)
 );
 
 CREATE TABLE Tags(

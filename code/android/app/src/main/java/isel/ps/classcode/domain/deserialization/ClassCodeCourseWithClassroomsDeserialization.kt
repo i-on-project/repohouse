@@ -1,10 +1,6 @@
 package isel.ps.classcode.domain.deserialization
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import isel.ps.classcode.http.hypermedia.SirenEntity
-
-typealias ClassCodeCourseDto = SirenEntity<ClassCodeCourseWithClassroomsDeserialization>
-val ClassCodeCourseDtoType = SirenEntity.getType<ClassCodeCourseWithClassroomsDeserialization>()
 
 /**
  * Class used to deserialize the ClassCodeCourse response from the database
