@@ -45,9 +45,11 @@ import isel.ps.classcode.R
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.login.LoginScreen
 import isel.ps.classcode.presentation.views.AvatarImage
 import isel.ps.classcode.presentation.views.ClassCodeErrorView
+import isel.ps.classcode.presentation.views.GithubErrorView
 import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
 import isel.ps.classcode.ui.theme.ClasscodeTheme
@@ -63,7 +65,8 @@ fun CourseScreen(
     classrooms: List<Classroom>? = null,
     onClassroomSelected: (Classroom) -> Unit,
     onBackRequest: () -> Unit,
-    error: HandleClassCodeResponseError? = null,
+    errorClassCode: HandleClassCodeResponseError? = null,
+    errorGitHub: HandleGitHubResponseError? = null,
     onDismissRequest: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -87,8 +90,11 @@ fun CourseScreen(
                 .padding(top = it.calculateTopPadding(), start = 16.dp, end = 16.dp)
                 .background(color = MaterialTheme.colorScheme.background),
         ) {
-            if (error != null) {
-                ClassCodeErrorView(handleClassCodeResponseError = error, onDismissRequest = onDismissRequest)
+            if (errorClassCode != null) {
+                ClassCodeErrorView(handleClassCodeResponseError = errorClassCode, onDismissRequest = onDismissRequest)
+            }
+            if (errorGitHub != null) {
+                GithubErrorView(handleGitHubResponseError = errorGitHub, onDismissRequest = onDismissRequest)
             }
             ShowCourseInfo(course = course)
             Spacer(modifier = Modifier.size(8.dp))

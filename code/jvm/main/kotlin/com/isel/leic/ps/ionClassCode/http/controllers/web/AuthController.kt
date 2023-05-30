@@ -30,6 +30,7 @@ import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
 import jakarta.servlet.http.HttpServletResponse
+import java.util.*
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -41,7 +42,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org user:email repo"
@@ -58,7 +58,7 @@ const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
 
-const val TEST = true
+const val TEST = false
 val URI = if (TEST) "http://localhost:3000" else System.getenv("NGROK_URI") ?: "http://localhost:3000"
 
 /**

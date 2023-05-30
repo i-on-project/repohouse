@@ -44,8 +44,8 @@ fun BootUpScreen(strongBiometric: () -> Unit = { }) {
     Box(modifier = Modifier.fillMaxSize()) {
         LaunchedEffect(Unit) {
             delay(timeMillis = BOOT_UP_DELAY)
-            visible = false
             strongBiometric()
+            visible = false
         }
         AnimatedVisibility(
             visible = true,

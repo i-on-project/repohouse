@@ -3,10 +3,8 @@ package isel.ps.classcode.presentation.course.services
 import com.damnhandy.uri.template.UriTemplate
 import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
-import isel.ps.classcode.COURSE_KEY
-import isel.ps.classcode.DELETE_TEAM
-import isel.ps.classcode.GITHUB_DELETE_TEAM
-import isel.ps.classcode.LEAVE_COURSE_KEY
+import isel.ps.classcode.presentation.COURSE_KEY
+import isel.ps.classcode.presentation.LEAVE_COURSE_KEY
 import isel.ps.classcode.MEDIA_TYPE
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.Classroom
@@ -15,11 +13,9 @@ import isel.ps.classcode.domain.UpdateLeaveCourseCompositeInput
 import isel.ps.classcode.domain.deserialization.ClassCodeCourseWithLeaveCourseRequestsDto
 import isel.ps.classcode.domain.deserialization.ClassCodeCourseWithLeaveCourseRequestsDtoType
 import isel.ps.classcode.http.NavigationRepository
-import isel.ps.classcode.http.handleResponseGitHub
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
-import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
@@ -56,46 +52,6 @@ class RealCourseServices(private val sessionStore: SessionStore, private val obj
                 Either.Right(value = ClassroomsAndLeaveCourseRequests(classrooms = classrooms, leaveCourseRequests = leaveCourseRequests))
             }
             is Either.Left -> Either.Left(value = result.value)
-        }
-    }
-
-    override suspend fun leaveCourseInGitHub(orgName: String, username: String): Either<HandleGitHubResponseError, Unit> {
-        val accessToken = sessionStore.getGithubToken().first()
-        val requestCreateTeam = Request.Builder()
-            .url(GITHUB_DELETE_TEAM(orgName, username))
-            .delete(
-                objectMapper.writeValueAsString(
-                    emptyMap<String, String>(),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        val result = requestCreateTeam.send(httpClient) { response ->
-            handleResponseGitHub<Unit>(
-                response = response,
-                jsonMapper = objectMapper,
-                ignoreBody = true,
-            )
-        }
-        return when (result) {
-            is Either.Left -> Either.Left(value = result.value)
-            is Either.Right -> Either.Right(value = Unit)
-        }
-    }
-
-    override suspend fun deleteTeamFromTeamInGitHub(courseName: String, teamSlug: String): Either<HandleGitHubResponseError, Unit> {
-        val accessToken = sessionStore.getGithubToken().first()
-        val requestCreateTeam = Request.Builder()
-            .url(DELETE_TEAM(courseName, teamSlug))
-            .delete(
-                objectMapper.writeValueAsString(
-                    emptyMap<String, String>(),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        return requestCreateTeam.send(httpClient) { response ->
-            handleResponseGitHub(response = response, jsonMapper = objectMapper, ignoreBody = true)
         }
     }
 

@@ -2,20 +2,15 @@ package isel.ps.classcode.presentation.classroom.services
 
 import com.damnhandy.uri.template.UriTemplate
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.ASSIGNMENT_KEY
+import isel.ps.classcode.presentation.ASSIGNMENT_KEY
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
-import isel.ps.classcode.CLASSROOM_ARCHIVED_KEY
-import isel.ps.classcode.CLASSROOM_KEY
-import isel.ps.classcode.CREATE_TEAM_KEY
-import isel.ps.classcode.GITHUB_ADD_MEMBER_TO_TEAM
-import isel.ps.classcode.GITHUB_ADD_TEAM
-import isel.ps.classcode.GITHUB_CREATE_REPO
-import isel.ps.classcode.GITHUB_UPDATE_REPO
+import isel.ps.classcode.presentation.CLASSROOM_ARCHIVED_KEY
+import isel.ps.classcode.presentation.CLASSROOM_KEY
+import isel.ps.classcode.presentation.CREATE_TEAM_KEY
 import isel.ps.classcode.MEDIA_TYPE
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.ArchiveRepo
 import isel.ps.classcode.domain.Assignment
-import isel.ps.classcode.domain.CreateRepo
 import isel.ps.classcode.domain.CreateTeamComposite
 import isel.ps.classcode.domain.GetAssignmentsResponse
 import isel.ps.classcode.domain.Team
@@ -26,14 +21,10 @@ import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithArchiveReq
 import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithArchiveRequestsDtoType
 import isel.ps.classcode.domain.deserialization.ClassCodeTeacherAssignmentDto
 import isel.ps.classcode.domain.deserialization.ClassCodeTeacherAssignmentDtoType
-import isel.ps.classcode.domain.deserialization.GitHubCreateRepoDeserialization
-import isel.ps.classcode.domain.deserialization.GitHubCreateTeamDeserialization
 import isel.ps.classcode.http.NavigationRepository
-import isel.ps.classcode.http.handleResponseGitHub
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
-import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
@@ -132,80 +123,6 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
         }
     }
 
-    override suspend fun createTeamInGitHub(
-        createTeamComposite: CreateTeamComposite,
-        orgName: String,
-    ): Either<HandleGitHubResponseError, Int> {
-        val accessToken = sessionStore.getGithubToken().first()
-        val requestCreateTeam = Request.Builder()
-            .url(GITHUB_ADD_TEAM(orgName))
-            .post(
-                objectMapper.writeValueAsString(
-                    mapOf(
-                        "name" to createTeamComposite.createTeam.teamName,
-                    ),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        val result = requestCreateTeam.send(httpClient) { response ->
-            handleResponseGitHub<GitHubCreateTeamDeserialization>(
-                response = response,
-                jsonMapper = objectMapper,
-            )
-        }
-        return when (result) {
-            is Either.Left -> Either.Left(value = result.value)
-            is Either.Right -> Either.Right(value = result.value.id)
-        }
-    }
-    override suspend fun addMemberToTeamInGitHub(
-        orgName: String,
-        teamSlug: String,
-        username: String,
-    ): Either<HandleGitHubResponseError, Unit> {
-        val accessToken = sessionStore.getGithubToken().first()
-        val requestCreateTeam = Request.Builder()
-            .url(GITHUB_ADD_MEMBER_TO_TEAM(orgName, teamSlug, username))
-            .put(
-                objectMapper.writeValueAsString(
-                    emptyMap<String, String>(),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        return requestCreateTeam.send(httpClient) { response ->
-            handleResponseGitHub(response = response, jsonMapper = objectMapper, ignoreBody = true)
-        }
-    }
-
-    override suspend fun createRepoInGitHub(orgName: String, teamId: Int?, repo: CreateRepo): Either<HandleGitHubResponseError, String?> {
-        if (teamId == null) return Either.Right(value = null)
-        val accessToken = sessionStore.getGithubToken().first()
-        val request = Request.Builder()
-            .url(GITHUB_CREATE_REPO(orgName))
-            .post(
-                objectMapper.writeValueAsString(
-                    mapOf(
-                        "name" to repo.repoName,
-                        "team_id" to teamId,
-                    ),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        val result = request.send(httpClient) { response ->
-            handleResponseGitHub<GitHubCreateRepoDeserialization>(
-                response = response,
-                jsonMapper = objectMapper,
-            )
-        }
-        return when (result) {
-            is Either.Right -> Either.Right(value = result.value.htmlUrl)
-            is Either.Left -> Either.Left(value = result.value)
-        }
-    }
-
     override suspend fun changeCreateTeamStatus(
         classroomId: Int,
         courseId: Int,
@@ -245,31 +162,6 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
             is Either.Right -> Either.Right(value = Unit)
 
             is Either.Left -> Either.Left(value = result.value)
-        }
-    }
-
-    override suspend fun archiveRepoInGithub(
-        orgName: String,
-        repoName: String,
-    ): Either<HandleGitHubResponseError, Unit> {
-        val accessToken = sessionStore.getGithubToken().first()
-        val request = Request.Builder()
-            .url(GITHUB_UPDATE_REPO(orgName, repoName))
-            .post(
-                objectMapper.writeValueAsString(
-                    mapOf(
-                        "archived" to true,
-                    ),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        return request.send(httpClient) { response ->
-            handleResponseGitHub(
-                response = response,
-                jsonMapper = objectMapper,
-                ignoreBody = true,
-            )
         }
     }
 

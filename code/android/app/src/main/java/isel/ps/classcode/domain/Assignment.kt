@@ -9,20 +9,12 @@ import java.sql.Timestamp
 data class Assignment(
     val id: Int,
     val classroomId: Int,
-    val minElemsPerGroup: Int,
-    val maxElemsPerGroup: Int,
-    val maxNumberGroups: Int,
-    val releaseDate: Timestamp,
     val description: String,
     val title: String,
 ) {
     constructor(classCodeAssignmentDeserialization: ClassCodeAssignmentDeserialization) : this(
         id = classCodeAssignmentDeserialization.id,
         classroomId = classCodeAssignmentDeserialization.classroomId,
-        minElemsPerGroup = classCodeAssignmentDeserialization.minElemsPerGroup,
-        maxElemsPerGroup = classCodeAssignmentDeserialization.maxElemsPerGroup,
-        maxNumberGroups = classCodeAssignmentDeserialization.maxNumberGroups,
-        releaseDate = classCodeAssignmentDeserialization.releaseDate,
         description = classCodeAssignmentDeserialization.description,
         title = classCodeAssignmentDeserialization.title,
     )

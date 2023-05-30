@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
+import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
 import isel.ps.classcode.presentation.course.CourseActivity
 import isel.ps.classcode.presentation.credits.CreditsActivity
 import isel.ps.classcode.presentation.login.LoginActivity
@@ -17,6 +18,7 @@ import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class MenuActivity : ComponentActivity() {
     private val menuServices: MenuServices by lazy { (application as DependenciesContainer).menuServices }
+    private val gitHubFunctions: GitHubFunctions by lazy { (application as DependenciesContainer).gitHubFunctions }
 
     companion object {
         fun navigate(origin: Activity) {
@@ -31,7 +33,7 @@ class MenuActivity : ComponentActivity() {
     private val vm by viewModels<MenuViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MenuViewModel(menuServices = menuServices) as T
+                return MenuViewModel(menuServices = menuServices, gitHubFunctions = gitHubFunctions) as T
             }
         }
     }
@@ -53,6 +55,9 @@ class MenuActivity : ComponentActivity() {
                     onCourseSelected = { course ->
                         CourseActivity.navigate(origin = this, course = course.toLocalCourseDto())
                     },
+                    errorGitHub = vm.errorGitHub,
+                    errorClassCode = vm.errorClassCode,
+                    onDismissRequest = { finish() }
                 )
             }
         }

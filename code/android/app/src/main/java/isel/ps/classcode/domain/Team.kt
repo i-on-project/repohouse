@@ -11,7 +11,7 @@ data class Team(
     val name: String,
     val isCreated: Boolean,
     val isClosed: Boolean,
-    val assignment: Int
+    val assignment: Int,
 ) {
     constructor(classCodeTeamDeserialization: ClassCodeTeamDeserialization) : this(
         id = classCodeTeamDeserialization.id,

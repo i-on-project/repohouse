@@ -11,13 +11,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
 import isel.ps.classcode.domain.dto.LocalClassroomDto
+import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
 import isel.ps.classcode.presentation.classroom.services.ClassroomServices
 import isel.ps.classcode.presentation.team.TeamActivity
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class ClassroomActivity : ComponentActivity() {
     private val classroomServices: ClassroomServices by lazy { (application as DependenciesContainer).classroomServices }
-
+    private val gitHubFunctions: GitHubFunctions by lazy { (application as DependenciesContainer).gitHubFunctions }
     companion object {
         const val CLASSROOM_EXTRA = "CLASSROOM_EXTRA"
         fun navigate(origin: Activity, classroom: LocalClassroomDto) {
@@ -33,7 +34,7 @@ class ClassroomActivity : ComponentActivity() {
     private val vm by viewModels<ClassroomViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ClassroomViewModel(classroomServices = classroomServices) as T
+                return ClassroomViewModel(classroomServices = classroomServices, gitHubFunctions = gitHubFunctions) as T
             }
         }
     }
@@ -54,7 +55,8 @@ class ClassroomActivity : ComponentActivity() {
                     createTeamComposite = vm.createTeamComposite,
                     onAssignmentChange = { assignment -> vm.getTeams(assignmentId = assignment.id) },
                     onBackRequest = { finish() },
-                    error = vm.errorClassCode,
+                    errorClassCode = vm.errorClassCode,
+                    errorGitHub = vm.errorGitHub,
                     onDismissRequest = { finish() },
                     onCreateTeamComposite = { createTeamComposite, wasAccepted, assignment ->
                         if (wasAccepted) {

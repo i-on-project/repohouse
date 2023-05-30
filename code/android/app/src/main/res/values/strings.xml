@@ -15,6 +15,7 @@
     <string name="history_icon">History icon</string>
     <string name="pending_icon">Pending icon</string>
     <string name="filter_icon">Filter icon</string>
+    <string name="email_icon">Filter icon</string>
     <string name="checked_icon">Checked icon</string>
     <string name="refreshed_icon">Refreshed icon</string>
     <string name="closed_icon">Closed icon</string>
@@ -29,5 +30,6 @@
     <string name="dropdown_menu_item_unarchived">Unarchived</string>
     <string name="dropdown_menu_item_created">Created</string>
     <string name="dropdown_menu_item_not_created">Unarchived</string>
+    <string name="activity_info_no_suitable_app">Not suitable app found</string>
 
 </resources>

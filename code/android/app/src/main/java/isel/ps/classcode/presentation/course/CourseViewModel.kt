@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import isel.ps.classcode.R
+import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.LeaveCourse
@@ -22,7 +22,7 @@ import isel.ps.classcode.presentation.course.services.CourseServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.launch
 
-class CourseViewModel(private val courseServices: CourseServices) : ViewModel() {
+class CourseViewModel(private val courseServices: CourseServices, private val gitHubFunctions: GitHubFunctions) : ViewModel() {
     lateinit var course: Course
     val classrooms: List<Classroom>?
         get() = _classrooms
@@ -33,6 +33,8 @@ class CourseViewModel(private val courseServices: CourseServices) : ViewModel() 
         get() = _errorClassCode
 
     private var _errorGithub: HandleGitHubResponseError? by mutableStateOf(null)
+
+    // TODO("SHOULD BE USED IN THE FUTURE")
     val errorGithub: HandleGitHubResponseError?
         get() = _errorGithub
 
@@ -61,12 +63,12 @@ class CourseViewModel(private val courseServices: CourseServices) : ViewModel() 
 
     private fun leaveCourseInGitHub(leaveCourse: LeaveCourse, leaveTeamRequests: List<LeaveTeam>, activity: Activity) {
         viewModelScope.launch {
-            when (val result = courseServices.leaveCourseInGitHub(orgName = course.name, username = leaveCourse.githubUsername)) {
+            when (val result = gitHubFunctions.leaveCourseInGitHub(orgName = course.name, username = leaveCourse.githubUsername)) {
                 is Either.Right -> {
                     val list = mutableListOf<LeaveTeamWithDelete>()
                     leaveTeamRequests.forEach { leaveTeam ->
                         if (leaveTeam.membersCount == 1) {
-                            when (courseServices.deleteTeamFromTeamInGitHub(courseName = course.name, teamSlug = leaveTeam.teamName.replace(" ", "-"))) {
+                            when (gitHubFunctions.deleteTeamFromTeamInGitHub(courseName = course.name, teamSlug = leaveTeam.teamName.replace(" ", "-"))) {
                                 is Either.Right -> {
                                     list.add(LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted", wasDeleted = true))
                                 }
@@ -84,7 +86,7 @@ class CourseViewModel(private val courseServices: CourseServices) : ViewModel() 
                                 .makeText(
                                     activity,
                                     "The user with id ${leaveCourse.creator} has left the course successfully",
-                                    Toast.LENGTH_LONG
+                                    Toast.LENGTH_LONG,
                                 )
                                 .show()
                         }

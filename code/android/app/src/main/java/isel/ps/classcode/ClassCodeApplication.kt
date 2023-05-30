@@ -8,6 +8,9 @@ import isel.ps.classcode.dataAccess.sessionStore.FakeSessionStore
 import isel.ps.classcode.dataAccess.sessionStore.RealSessionStore
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.http.NavigationRepository
+import isel.ps.classcode.dataAccess.gitHubFunctions.FakeGitHubFunctions
+import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
+import isel.ps.classcode.dataAccess.gitHubFunctions.RealGitHubFunctions
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.bootUp.services.FakeBootUpServices
 import isel.ps.classcode.presentation.bootUp.services.RealBootUpServices
@@ -28,7 +31,6 @@ import isel.ps.classcode.presentation.team.services.RealTeamServices
 import isel.ps.classcode.presentation.team.services.TeamServices
 import okhttp3.OkHttpClient
 
-const val TAG = "Classcode"
 const val iS_REAL_IMPLEMENTATION = true
 
 /**
@@ -42,6 +44,7 @@ data class Dependencies(
     override val classroomServices: ClassroomServices,
     override val bootUpServices: BootUpServices,
     override val teamServices: TeamServices,
+    override val gitHubFunctions: GitHubFunctions,
 ) : DependenciesContainer
 
 class ClassCodeApplication : DependenciesContainer, Application() {
@@ -50,6 +53,7 @@ class ClassCodeApplication : DependenciesContainer, Application() {
     private val cryptoManager: CryptoManager by lazy { CryptoManager() }
     private val navigationRepository: NavigationRepository by lazy { NavigationRepository() }
     private val dependencies: DependenciesContainer by lazy { dependencies(isRealImplementation = iS_REAL_IMPLEMENTATION, context = this, cryptoManager = cryptoManager, objectMapper = objectMapper, httpClient = httpClient, navigationRepo = navigationRepository) }
+    override val gitHubFunctions: GitHubFunctions by lazy { dependencies.gitHubFunctions }
     override val sessionStore: SessionStore by lazy { dependencies.sessionStore }
     override val bootUpServices: BootUpServices by lazy { dependencies.bootUpServices }
     override val loginServices: LoginServices by lazy { dependencies.loginServices }
@@ -64,6 +68,7 @@ class ClassCodeApplication : DependenciesContainer, Application() {
  */
 interface DependenciesContainer {
     val sessionStore: SessionStore
+    val gitHubFunctions: GitHubFunctions
     val bootUpServices: BootUpServices
     val loginServices: LoginServices
     val menuServices: MenuServices
@@ -118,6 +123,11 @@ private fun dependencies(isRealImplementation: Boolean, context: Context, crypto
                 navigationRepo = navigationRepo,
                 bootUpServices = bootUpServices,
             ),
+            gitHubFunctions = RealGitHubFunctions(
+                httpClient = httpClient,
+                objectMapper = objectMapper,
+                sessionStore = sessionStore,
+            ),
         )
     } else {
         Dependencies(
@@ -128,6 +138,7 @@ private fun dependencies(isRealImplementation: Boolean, context: Context, crypto
             courseServices = FakeCourseServices(),
             classroomServices = FakeClassroomServices(),
             teamServices = FakeTeamServices(),
+            gitHubFunctions = FakeGitHubFunctions(),
         )
     }
 }
