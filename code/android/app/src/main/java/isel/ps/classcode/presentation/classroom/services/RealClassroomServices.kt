@@ -2,29 +2,26 @@ package isel.ps.classcode.presentation.classroom.services
 
 import com.damnhandy.uri.template.UriTemplate
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.ASSIGNMENT_KEY
+import isel.ps.classcode.presentation.ASSIGNMENT_KEY
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
-import isel.ps.classcode.CLASSROOM_KEY
-import isel.ps.classcode.CREATE_TEAM_KEY
-import isel.ps.classcode.GITHUB_ADD_MEMBER_TO_TEAM
-import isel.ps.classcode.GITHUB_ADD_TEAM
-import isel.ps.classcode.GITHUB_CREATE_REPO
+import isel.ps.classcode.presentation.CLASSROOM_ARCHIVED_KEY
+import isel.ps.classcode.presentation.CLASSROOM_KEY
+import isel.ps.classcode.presentation.CREATE_TEAM_KEY
 import isel.ps.classcode.MEDIA_TYPE
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
+import isel.ps.classcode.domain.ArchiveRepo
 import isel.ps.classcode.domain.Assignment
-import isel.ps.classcode.domain.CreateRepo
 import isel.ps.classcode.domain.CreateTeamComposite
+import isel.ps.classcode.domain.GetAssignmentsResponse
 import isel.ps.classcode.domain.Team
 import isel.ps.classcode.domain.Teams
+import isel.ps.classcode.domain.UpdateArchiveRepoInput
 import isel.ps.classcode.domain.UpdateCreateTeamStatusInput
-import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithAssignmentsDto
-import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithAssignmentsDtoType
+import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithArchiveRequestsDto
+import isel.ps.classcode.domain.deserialization.ClassCodeClassroomWithArchiveRequestsDtoType
 import isel.ps.classcode.domain.deserialization.ClassCodeTeacherAssignmentDto
 import isel.ps.classcode.domain.deserialization.ClassCodeTeacherAssignmentDtoType
-import isel.ps.classcode.domain.deserialization.GitHubCreateRepoDeserialization
-import isel.ps.classcode.domain.deserialization.GitHubCreateTeamDeserialization
 import isel.ps.classcode.http.NavigationRepository
-import isel.ps.classcode.http.handleResponseGitHub
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
@@ -42,7 +39,7 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
     override suspend fun getAssignments(
         classroomId: Int,
         courseId: Int,
-    ): Either<HandleClassCodeResponseError, List<Assignment>> {
+    ): Either<HandleClassCodeResponseError, GetAssignmentsResponse> {
         val ensureLink =
             navigationRepo.ensureLink(key = CLASSROOM_KEY, fetchLink = { bootUpServices.getHome() })
                 ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
@@ -56,20 +53,23 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
             .addHeader("Cookie", cookie.first())
             .build()
         val result = request.send(httpClient) { response ->
-            handleSirenResponseClassCode<ClassCodeClassroomWithAssignmentsDto>(
+            handleSirenResponseClassCode<ClassCodeClassroomWithArchiveRequestsDto>(
                 response = response,
-                type = ClassCodeClassroomWithAssignmentsDtoType,
+                type = ClassCodeClassroomWithArchiveRequestsDtoType,
                 jsonMapper = objectMapper,
             )
         }
         return when (result) {
             is Either.Right -> {
                 Either.Right(
-                    value = result.value.properties.assignments.map {
-                        Assignment(
-                            classCodeAssignmentDeserialization = it,
-                        )
-                    },
+                    value = GetAssignmentsResponse(
+                        assignments = result.value.properties.classroomModel.assignments.map {
+                            Assignment(classCodeAssignmentDeserialization = it)
+                        },
+                        archiveRepos = result.value.properties.archiveRequest?.map {
+                            ArchiveRepo(deserialization = it)
+                        },
+                    ),
                 )
             }
 
@@ -123,80 +123,6 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
         }
     }
 
-    override suspend fun createTeamInGitHub(
-        createTeamComposite: CreateTeamComposite,
-        orgName: String,
-    ): ResultFromRequest<Int> {
-        val accessToken = sessionStore.getGithubToken().first()
-        val requestCreateTeam = Request.Builder()
-            .url(GITHUB_ADD_TEAM(orgName))
-            .post(
-                objectMapper.writeValueAsString(
-                    mapOf(
-                        "name" to createTeamComposite.createTeam.teamName,
-                    ),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        val result = requestCreateTeam.send(httpClient) { response ->
-            handleResponseGitHub<GitHubCreateTeamDeserialization>(
-                response = response,
-                jsonMapper = objectMapper,
-            )
-        }
-        return when (result) {
-            is Either.Left -> ResultFromRequest(isCompleted = false)
-            is Either.Right -> ResultFromRequest(isCompleted = true, value = result.value.id)
-        }
-    }
-    override suspend fun addMemberToTeamInGitHub(
-        orgName: String,
-        teamSlug: String,
-        username: String,
-    ): ResultFromRequest<Unit> {
-        val accessToken = sessionStore.getGithubToken().first()
-        val requestCreateTeam = Request.Builder()
-            .url(GITHUB_ADD_MEMBER_TO_TEAM(orgName, teamSlug, username))
-            .put(
-                objectMapper.writeValueAsString(
-                    emptyMap<String, String>(),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        return requestCreateTeam.send(httpClient) { response ->
-            ResultFromRequest(isCompleted = response.isSuccessful)
-        }
-    }
-
-    override suspend fun createRepoInGitHub(orgName: String, teamId: Int?, repo: CreateRepo): ResultFromRequest<String> {
-        if (teamId == null) return ResultFromRequest(isCompleted = false)
-        val accessToken = sessionStore.getGithubToken().first()
-        val requestCreateTeam = Request.Builder()
-            .url(GITHUB_CREATE_REPO(orgName))
-            .post(
-                objectMapper.writeValueAsString(
-                    mapOf(
-                        "name" to repo.repoName,
-                        "team_id" to teamId,
-                    ),
-                ).toRequestBody(MEDIA_TYPE),
-            )
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-        val result = requestCreateTeam.send(httpClient) { response ->
-            handleResponseGitHub<GitHubCreateRepoDeserialization>(
-                response = response,
-                jsonMapper = objectMapper,
-            )
-        }
-        return when (result) {
-            is Either.Right -> ResultFromRequest<String>(isCompleted = true, value = result.value.htmlUrl)
-            is Either.Left -> ResultFromRequest<String>(isCompleted = false)
-        }
-    }
-
     override suspend fun changeCreateTeamStatus(
         classroomId: Int,
         courseId: Int,
@@ -225,7 +151,7 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
             if (response.isSuccessful) {
                 Either.Right(value = Unit)
             } else {
-                handleSirenResponseClassCode<Unit>(
+                handleSirenResponseClassCode(
                     response = response,
                     type = null,
                     jsonMapper = objectMapper,
@@ -233,13 +159,35 @@ class RealClassroomServices(private val sessionStore: SessionStore, private val 
             }
         }
         return when (result) {
-            is Either.Right -> {
-                Either.Right(value = Unit)
-            }
+            is Either.Right -> Either.Right(value = Unit)
 
             is Either.Left -> Either.Left(value = result.value)
         }
     }
-}
 
-data class ResultFromRequest<T> (val isCompleted: Boolean, val value: T? = null)
+    override suspend fun changeStatusArchiveRepoInClassCode(courseId: Int, classroomId: Int, updateArchiveRepo: UpdateArchiveRepoInput): Either<HandleClassCodeResponseError, Unit> {
+        val ensureLink = navigationRepo.ensureLink(key = CLASSROOM_ARCHIVED_KEY, fetchLink = { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
+        val cookie = sessionStore.getSessionCookie()
+        val uri = UriTemplate.fromTemplate(ensureLink.href)
+            .set("courseId", courseId)
+            .set("classroomId", classroomId)
+            .expand()
+        val request = Request.Builder()
+            .url(CLASSCODE_LINK_BUILDER(uri))
+            .post(
+                objectMapper.writeValueAsString(
+                    updateArchiveRepo,
+                ).toRequestBody(MEDIA_TYPE),
+            )
+            .addHeader("Cookie", cookie.first())
+            .build()
+        return request.send(httpClient) { response ->
+            handleSirenResponseClassCode<Unit>(
+                response = response,
+                type = null,
+                jsonMapper = objectMapper,
+                ignoreBody = true,
+            )
+        }
+    }
+}

@@ -284,29 +284,35 @@ cleaned all just with the data from the [insert.sql](../sql/insert.sql) file.
 
 The JVM application can use Docker to run the application.
 
-All the commands to run the application with Docker are in the [Compose](../jvm/docker-compose.yml) file.
+All the services defined and used to run the application with Docker are in the [Compose](../jvm/docker-compose.yml) file.
+
+The 'Compose' file creates:
+
+- n instances of the JVM application with spring
+- 1 instance of the PostgreSQL database
+- 1 instance of NGINX to serve the I-on Classcode Web Application and make use of the multiple instances of the JVM application for load balancing
 
 To run the application with Docker, run the following command:
 
 ```
-docker-compose up
+./gradlew composeUp
 ```
 
 To stop the application with Docker, run the following command:
 
 ```
-docker-compose down
+./gradlew composeDown
 ```
 
-The 'Compose' file creates:
+To run the application with Docker and define the number of JVM application instances for load balancing, run the following command:
 
-- 2 instances of the JVM application with spring 
-- 1 instance of the PostgreSQL database
-- 1 instance of NGINX to redirect the requests to the JVM application
+```
+docker-compose up --build --scale spring-service=[number]
+```
 
 ### NGINX
 
-The JVM application uses NGINX to redirect the requests to the JVM application.
+The JVM application uses NGINX to redirect the requests to the JVM application, use the multiple instances of the JVM application for load balancing and serve the web application.
 
 NGINX is a high-performance web server and reverse proxy server.
 It can serve static content, balance the load across multiple servers, and handle SSL/TLS encryption.

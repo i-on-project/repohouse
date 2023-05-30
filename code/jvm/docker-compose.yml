@@ -17,7 +17,6 @@ services:
 
   # The service running the API
   spring-service:
-    container_name: spring-service
     hostname: spring-service
     build:
       context: ../..
@@ -33,7 +32,7 @@ services:
       SENDGRID_CLASSCODE_API_KEY: ${SENDGRID_CLASSCODE_API_KEY}
 
     ports:
-      - "8080:8080"
+      - "8080"
 
     depends_on:
       - db-docker

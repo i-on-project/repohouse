@@ -1,11 +1,7 @@
 package isel.ps.classcode.domain.deserialization
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import isel.ps.classcode.http.hypermedia.SirenEntity
 import java.sql.Timestamp
-
-typealias ClassCodeClassroomWithAssignmentsDto = SirenEntity<ClassCodeClassroomWithAssignmentsDeserialization>
-val ClassCodeClassroomWithAssignmentsDtoType = SirenEntity.getType<ClassCodeClassroomWithAssignmentsDeserialization>()
 
 /**
  * Class used to deserialize the ClassCodeClassroomWithAssignments response from the database

@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
+import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.dto.LocalCourseDto
 import isel.ps.classcode.presentation.classroom.ClassroomActivity
@@ -18,6 +19,7 @@ import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class CourseActivity : ComponentActivity() {
     private val courseServices: CourseServices by lazy { (application as DependenciesContainer).courseServices }
+    private val gitHubFunctions: GitHubFunctions by lazy { (application as DependenciesContainer).gitHubFunctions }
 
     companion object {
         const val COURSE_EXTRA = "COURSE_EXTRA"
@@ -34,36 +36,35 @@ class CourseActivity : ComponentActivity() {
     private val vm by viewModels<CourseViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return CourseViewModel(courseServices = courseServices) as T
+                return CourseViewModel(courseServices = courseServices, gitHubFunctions = gitHubFunctions) as T
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val course = getCourseExtra()
-        if (course != null) {
-            vm.getClassrooms(courseId = course.id)
-        }
+        val course = getCourseExtra() ?: return finish()
+        vm.course = course
+        vm.getClassrooms(activity = this)
         setContent {
             ClasscodeTheme {
-                if (course != null) {
-                    CourseScreen(
-                        course = course,
-                        onBackRequest = { finish() },
-                        onClassroomSelected = { classroom ->
-                            ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto(courseName = course.name))
-                        },
-                        classrooms = vm.classrooms,
-                        error = vm.error,
-                        onDismissRequest = { finish() },
-                    )
-                } else {
-                    // TODO(): Show a error alert dialog saying that some went wrong
-                    finish()
-                }
+                CourseScreen(
+                    course = course,
+                    onBackRequest = { finish() },
+                    onClassroomSelected = { classroom ->
+                        ClassroomActivity.navigate(origin = this, classroom = classroom.toLocalClassroomDto(courseName = vm.course.name))
+                    },
+                    classrooms = vm.classrooms,
+                    errorClassCode = vm.errorClassCode,
+                    errorGitHub = vm.errorGithub,
+                    onDismissRequest = { finish() },
+                )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     @Suppress("deprecation")

@@ -2,6 +2,7 @@ package com.isel.leic.ps.ionClassCode.http.model.output
 
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Course
+import com.isel.leic.ps.ionClassCode.domain.LeaveCourseRequest
 import com.isel.leic.ps.ionClassCode.domain.TeacherWithoutToken
 
 /**
@@ -27,7 +28,12 @@ data class CourseWithClassroomOutputModel(
     val classrooms: List<Classroom>,
 ) : OutputModel
 
-/**
+data class CourseWithLeaveCourseRequestsOutputModel(
+    val course: CourseWithClassroomOutputModel,
+    val leaveCourseRequests: List<LeaveCourseRequest> = emptyList()
+) : OutputModel
+
+    /**
  * Represents a Course Created Output Model.
  */
 data class CourseCreatedOutputModel(

@@ -109,14 +109,14 @@ fun ClassCodeErrorView(
 fun GithubErrorView(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = { },
-    handleClassCodeResponseError: HandleGitHubResponseError,
+    handleGitHubResponseError: HandleGitHubResponseError,
 ) {
     Box(
         modifier = modifier,
     ) {
-        when (handleClassCodeResponseError) {
+        when (handleGitHubResponseError) {
             is HandleGitHubResponseError.FailDeserialize -> {
-                val error = handleClassCodeResponseError.error
+                val error = handleGitHubResponseError.error
                 AlertDialog(
                     onDismissRequest = onDismissRequest,
                     confirmButton = {
@@ -131,7 +131,7 @@ fun GithubErrorView(
             }
 
             is HandleGitHubResponseError.FailRequest -> {
-                val error = handleClassCodeResponseError.error
+                val error = handleGitHubResponseError.error
                 AlertDialog(
                     onDismissRequest = onDismissRequest,
                     confirmButton = {

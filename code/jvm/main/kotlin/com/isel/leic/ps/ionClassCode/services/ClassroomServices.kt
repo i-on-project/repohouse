@@ -2,45 +2,49 @@ package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
+import com.isel.leic.ps.ionClassCode.domain.input.UpdateArchiveRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.ArchiveRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomInviteModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomModel
+import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomModelWithArchiveRequest
 import com.isel.leic.ps.ionClassCode.http.model.output.LocalCopy
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import java.io.File
 
 /**
  * Alias for the response of the services
  */
 typealias ClassroomResponse = Result<ClassroomServicesError, ClassroomModel>
+typealias ClassroomWithArchiveRequestsResponse = Result<ClassroomServicesError, ClassroomModelWithArchiveRequest>
 typealias ClassroomArchivedResponse = Result<ClassroomServicesError, ClassroomArchivedResult>
 typealias ClassroomCreateResponse = Result<ClassroomServicesError, ClassroomModel>
 typealias ClassroomEnterResponse = Result<ClassroomServicesError, ClassroomInviteModel>
 typealias ClassroomSyncResponse = Result<ClassroomServicesError, Boolean>
 typealias ClassroomLocalCopyResponse = Result<ClassroomServicesError, LocalCopy>
+typealias ClassroomUpdateArchiveResponse = Result<ClassroomServicesError, Boolean>
 
 /**
  * Error codes for the services
  */
 sealed class ClassroomServicesError {
     object ClassroomNotFound : ClassroomServicesError()
-    object CourseNotFound : ClassroomServicesError()
     object ClassroomArchived : ClassroomServicesError()
     object AlreadyInClassroom : ClassroomServicesError()
-    object NameAlreadyExists : ClassroomServicesError()
-    object InviteLinkNotFound : ClassroomServicesError()
     object InvalidInput : ClassroomServicesError()
+    object InviteLinkNotFound : ClassroomServicesError()
     object InternalError : ClassroomServicesError()
+    object CourseNotFound : ClassroomServicesError()
+    object NameAlreadyExists : ClassroomServicesError()
 }
 
 /**
@@ -74,6 +78,38 @@ class ClassroomServices(
                     )
                 }
             }
+        }
+    }
+
+    fun getClassroomWithArchiveRequest(classroomId: Int): ClassroomWithArchiveRequestsResponse {
+        return transactionManager.run {
+            when (val classroom = it.classroomRepository.getClassroomById(classroomId)) {
+                null -> return@run Result.Problem(ClassroomServicesError.ClassroomNotFound)
+                else -> {
+                    val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
+                    val students = it.classroomRepository.getStudentsByClassroom(classroomId)
+                    val classroomModel = ClassroomModel(id = classroom.id, name = classroom.name, isArchived = classroom.isArchived, lastSync = classroom.lastSync, assignments = assignments, students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) })
+                    val archiveRequest = if (classroom.isArchived) {
+                        val requests = it.archiveRepoRepository.getArchiveRepoRequestForClassroom(classroomId = classroomId)
+                        requests.ifEmpty { null }
+                    } else {
+                        null
+                    }
+                    return@run Result.Success(
+                        ClassroomModelWithArchiveRequest(classroomModel = classroomModel, archiveRequest = archiveRequest),
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateRequestState(body: UpdateArchiveRepoInput, classroomId: Int): ClassroomUpdateArchiveResponse {
+        return transactionManager.run {
+            body.archiveRepos.forEach { request ->
+                it.requestRepository.changeStateRequest(id = request.requestId, state = request.state)
+            }
+            it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
+            Result.Success(value = true)
         }
     }
 

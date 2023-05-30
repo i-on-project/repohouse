@@ -56,11 +56,12 @@ import isel.ps.classcode.domain.CreateTeamComposite
 import isel.ps.classcode.domain.JoinTeam
 import isel.ps.classcode.domain.Team
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.course.ChosenIcon
 import isel.ps.classcode.presentation.views.ClassCodeErrorView
+import isel.ps.classcode.presentation.views.GithubErrorView
 import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
-import java.sql.Timestamp
 
 private enum class TypeOfTeam {
     TEAMS_CREATED,
@@ -79,7 +80,8 @@ fun ClassroomScreen(
     assignment: Assignment?,
     onAssignmentChange: (Assignment) -> Unit,
     onBackRequest: () -> Unit,
-    error: HandleClassCodeResponseError? = null,
+    errorClassCode: HandleClassCodeResponseError? = null,
+    errorGitHub: HandleGitHubResponseError? = null,
     onDismissRequest: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -104,37 +106,42 @@ fun ClassroomScreen(
                 .padding(top = it.calculateTopPadding(), start = 24.dp, end = 24.dp)
                 .background(color = MaterialTheme.colorScheme.background),
         ) {
+            if (errorClassCode != null) {
+                ClassCodeErrorView(
+                    handleClassCodeResponseError = errorClassCode,
+                    onDismissRequest = onDismissRequest,
+                )
+            }
+            if (errorGitHub != null) {
+                GithubErrorView(
+                    handleGitHubResponseError = errorGitHub,
+                    onDismissRequest = onDismissRequest,
+                )
+            }
             if (assignments != null) {
-                if (error != null) {
-                    ClassCodeErrorView(
-                        handleClassCodeResponseError = error,
-                        onDismissRequest = onDismissRequest,
+                ShowClassroom(classroom = classroom)
+                if (assignment != null) {
+                    FilterButtons(
+                        typeOfTeam = typeOfTeam,
+                        onTypeOfTeamChange = { type -> typeOfTeam = type },
+                        assignment = assignment,
+                        assignments = assignments,
+                        onAssignmentChange = onAssignmentChange,
                     )
-                } else {
-                    ShowClassroom(classroom = classroom)
-                    if (assignment != null) {
-                        FilterButtons(
-                            typeOfTeam = typeOfTeam,
-                            onTypeOfTeamChange = { type -> typeOfTeam = type },
-                            assignment = assignment,
-                            assignments = assignments,
-                            onAssignmentChange = onAssignmentChange,
-                        )
-                        if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
-                            if (teamsCreated != null) {
-                                ShowTeams(
-                                    teamsCreated = teamsCreated,
-                                    onTeamSelected = onTeamSelected,
-                                )
-                            }
-                        } else {
-                            if (createTeamComposite != null) {
-                                ShowCreateTeamComposite(
-                                    createTeamComposite = createTeamComposite,
-                                    assignment = assignment,
-                                    onCreateTeamComposite = onCreateTeamComposite,
-                                )
-                            }
+                    if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
+                        if (teamsCreated != null) {
+                            ShowTeams(
+                                teamsCreated = teamsCreated,
+                                onTeamSelected = onTeamSelected,
+                            )
+                        }
+                    } else {
+                        if (createTeamComposite != null) {
+                            ShowCreateTeamComposite(
+                                createTeamComposite = createTeamComposite,
+                                assignment = assignment,
+                                onCreateTeamComposite = onCreateTeamComposite,
+                            )
                         }
                     }
                 }
@@ -161,13 +168,19 @@ private fun ShowCreateTeamComposite(
                 Text(text = stringResource(id = R.string.create_team_composite_empty_text), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
-            items(createTeamComposite.size) { index -> CreateTeamCompositeCard(createTeamComposite = createTeamComposite[index], assignment = assignment, onCreateTeamComposite = onCreateTeamComposite) }
+            createTeamComposite.forEach { createTeamComposite ->
+                item {
+                    CreateTeamCompositeCard(createTeamComposite = createTeamComposite, assignment = assignment, onCreateTeamComposite = onCreateTeamComposite)
+                }
+            }
         }
     }
 }
+enum class PendingState { NORMAL, LOADING }
 
 @Composable
 fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, assignment: Assignment, onCreateTeamComposite: (CreateTeamComposite, Boolean, Assignment) -> Unit) {
+    var pending by remember { mutableStateOf(PendingState.NORMAL) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,24 +197,32 @@ fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, assignment
 
         Column(modifier = Modifier.weight(0.15f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
             if (createTeamComposite.compositeState == "Not_Concluded") {
-                IconButton(onClick = { onCreateTeamComposite(createTeamComposite, true, assignment) }) {
+                IconButton(onClick = {
+                    pending = PendingState.LOADING
+                    onCreateTeamComposite(createTeamComposite, true, assignment)
+                }) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = stringResource(id = R.string.refreshed_icon),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-
                     )
                 }
             } else {
                 Column {
-                    IconButton(onClick = { onCreateTeamComposite(createTeamComposite, false, assignment) }) {
+                    IconButton(onClick = {
+                        pending = PendingState.LOADING
+                        onCreateTeamComposite(createTeamComposite, false, assignment)
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(id = R.string.closed_icon),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    IconButton(onClick = { onCreateTeamComposite(createTeamComposite, true, assignment) }) {
+                    IconButton(onClick = {
+                        pending = PendingState.LOADING
+                        onCreateTeamComposite(createTeamComposite, true, assignment)
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Done,
                             contentDescription = stringResource(id = R.string.checked_icon),
@@ -298,12 +319,8 @@ fun Aaaa() {
     val assignment = Assignment(
         id = 1,
         classroomId = 1,
-        maxElemsPerGroup = 2,
-        maxNumberGroups = 2,
-        releaseDate = Timestamp.valueOf("2021-06-01 00:00:00"),
         description = "description",
         title = "title",
-
     )
     CreateTeamCompositeCard(createTeamComposite = createTeamComposite, assignment = assignment, onCreateTeamComposite = { _, _, _ -> })
 }
@@ -394,7 +411,7 @@ fun AssignmentChooser(modifier: Modifier = Modifier, currentAssignment: Assignme
         ) {
             assignments.forEach { assignment ->
                 DropdownMenuItem(
-                    text = { Text(stringResource(id = R.string.dropdown_menu_item_normal)) },
+                    text = { Text(assignment.title) },
                     onClick = { onAssignmentChange(assignment) },
                     leadingIcon = { if (currentAssignment == assignment) ChosenIcon() },
                 )

@@ -26,7 +26,7 @@ data class LocalClassroomDto(
         id = id,
         name = name,
         lastSync = lastSync,
-        inviteLink = inviteLink,
+        inviteCode = inviteLink,
         isArchived = isArchived,
         courseId = courseId,
     )

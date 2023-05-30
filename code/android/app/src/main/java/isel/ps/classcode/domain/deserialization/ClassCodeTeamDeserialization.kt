@@ -9,5 +9,6 @@ data class ClassCodeTeamDeserialization(
     @JsonProperty("id")val id: Int,
     @JsonProperty("name")val name: String,
     @JsonProperty("isCreated")val isCreated: Boolean,
+    @JsonProperty("isClosed")val isClosed: Boolean,
     @JsonProperty("assignment")val assignment: Int,
 )

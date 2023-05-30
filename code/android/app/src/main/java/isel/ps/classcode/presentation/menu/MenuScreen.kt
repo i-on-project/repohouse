@@ -35,7 +35,11 @@ import coil.compose.rememberAsyncImagePainter
 import isel.ps.classcode.R
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.UserInfo
+import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.views.AvatarImage
+import isel.ps.classcode.presentation.views.ClassCodeErrorView
+import isel.ps.classcode.presentation.views.GithubErrorView
 import isel.ps.classcode.presentation.views.LoadingAnimationCircle
 import isel.ps.classcode.presentation.views.TopBar
 import isel.ps.classcode.ui.theme.ClasscodeTheme
@@ -49,6 +53,9 @@ fun MenuScreen(
     onCourseSelected: (Course) -> Unit = { },
     onBackRequest: suspend () -> Unit = { },
     onCreditsRequested: () -> Unit = { },
+    errorClassCode: HandleClassCodeResponseError? = null,
+    errorGitHub: HandleGitHubResponseError? = null,
+    onDismissRequest: () -> Unit = { },
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
@@ -78,6 +85,12 @@ fun MenuScreen(
                 )
                 .background(color = MaterialTheme.colorScheme.background),
         ) {
+            if (errorClassCode != null) {
+                ClassCodeErrorView(handleClassCodeResponseError = errorClassCode, onDismissRequest = onDismissRequest)
+            }
+            if (errorGitHub != null) {
+                GithubErrorView(handleGitHubResponseError = errorGitHub, onDismissRequest = onDismissRequest)
+            }
             if (userInfo != null) {
                 ShowUserInfo(userInfo = userInfo)
             } else {
@@ -149,15 +162,16 @@ fun CourseCard(
                 .fillMaxWidth()
                 .padding(8.dp),
         ) {
-            Text(text = "${index + 1}-", style = MaterialTheme.typography.titleMedium)
+            Text(modifier = Modifier.weight(.15f), text = "${index + 1}-", style = MaterialTheme.typography.titleMedium)
             Image(
                 painter = rememberAsyncImagePainter(model = "https://avatars.githubusercontent.com/u/${course.orgId}?s=200&v=4"),
                 contentDescription = stringResource(id = R.string.course_image),
                 modifier = Modifier
+                    .weight(.35f)
                     .size(50.dp)
                     .clip(RoundedCornerShape(percent = 10)),
             )
-            Text(text = course.name, style = MaterialTheme.typography.titleMedium)
+            Text(modifier = Modifier.weight(.5f), text = course.name, style = MaterialTheme.typography.titleMedium)
         }
     }
 }

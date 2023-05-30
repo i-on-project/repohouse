@@ -23,7 +23,6 @@ import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
 import java.util.*
 import okhttp3.internal.EMPTY_REQUEST
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
@@ -52,16 +51,13 @@ class AuthControllerMobile(
     ): ResponseEntity<*> {
         val state = generateUserState()
         userServices.storeChallengeInfo(challengeMethod = challengeMethod, challenge = challenge, state = state.value)
-        logger.info("uri: $GITHUB_BASE_URL${MOBILE_GITHUB_OAUTH_URI(MOBILE_GITHUB_TEACHER_SCOPE, state.value)}")
         return ResponseEntity
             .status(Status.REDIRECT)
             .header(HttpHeaders.SET_COOKIE, state.cookie.toString())
             .header(HttpHeaders.LOCATION, "$GITHUB_BASE_URL${MOBILE_GITHUB_OAUTH_URI(MOBILE_GITHUB_TEACHER_SCOPE, state.value)}")
             .body(EMPTY_REQUEST)
     }
-    companion object {
-        private val logger = LoggerFactory.getLogger(AuthControllerMobile::class.java)
-    }
+
     /**
      * Callback from the OAuth2 provider.
      * It fetches the access token and the user info.

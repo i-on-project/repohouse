@@ -10,6 +10,7 @@ import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveRequestStateInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.UpdateRequestStateInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
@@ -87,7 +88,7 @@ class TeamServices(
                         students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         repo,
                         feedbacks,
-                        assignment
+                        assignment,
                     ),
                 )
             }
@@ -109,7 +110,7 @@ class TeamServices(
                         students = it.teamRepository.getStudentsFromTeam(teamId = team.id).map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         repo = it.repoRepository.getRepoByTeam(teamId = team.id),
                         feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId = team.id),
-                        assignment = assignment
+                        assignment = assignment,
                     )
                 },
             )
@@ -164,7 +165,7 @@ class TeamServices(
      * Method to close a team
      * All the students can do it
      */
-    fun closeTeam(teamId: Int): TeamClosedResponse{
+    fun closeTeam(teamId: Int): TeamClosedResponse {
         return transactionManager.run {
             val team = it.teamRepository.getTeamById(teamId) ?: return@run Result.Problem(TeamServicesError.TeamNotFound)
             val students = it.teamRepository.getStudentsFromTeam(teamId)
@@ -246,7 +247,7 @@ class TeamServices(
             if (compositeState == "Accepted") {
                 it.teamRepository.updateTeamCreatedStatus(id = teamId)
                 it.teamRepository.enterTeam(teamId = teamId, studentId = body.joinTeam.userId)
-                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?:"")
+                it.repoRepository.updateRepoStatus(repoId = body.createRepo.repoId, url = body.createRepo.url ?: "")
             }
             return@run Result.Success(value = true)
         }
@@ -321,7 +322,7 @@ class TeamServices(
     }
 
     fun updateRequestState(body: UpdateRequestStateInput, teamId: Int): TeamUpdateRequestResponse {
-        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeValid()) return Result.Problem(value = TeamServicesError.InvalidData)
+        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeNotValid()) return Result.Problem(value = TeamServicesError.InvalidData)
         return transactionManager.run {
             it.requestRepository.changeStateRequest(id = body.requestId, state = body.state)
             if (body.type.lowercase() == "leaveteam") {
@@ -329,6 +330,16 @@ class TeamServices(
             } else {
                 it.teamRepository.enterTeam(teamId = teamId, studentId = body.creator)
             }
+            Result.Success(value = true)
+        }
+    }
+
+    fun deleteTeam(body: LeaveRequestStateInput, teamId: Int): TeamUpdateRequestResponse {
+        if (body.requestId < 0 && teamId < 0) return Result.Problem(value = TeamServicesError.InvalidData)
+        return transactionManager.run {
+            it.requestRepository.changeStateRequest(id = body.requestId, state = "Accepted")
+            it.teamRepository.leaveTeam(teamId = teamId, studentId = body.creator)
+            it.teamRepository.deleteTeam(teamId = teamId)
             Result.Success(value = true)
         }
     }

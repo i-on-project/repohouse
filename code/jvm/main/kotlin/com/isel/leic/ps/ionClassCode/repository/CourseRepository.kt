@@ -4,6 +4,7 @@ import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.TeacherWithoutToken
+import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.CourseInput
 
 /**
@@ -27,4 +28,5 @@ interface CourseRepository {
     fun getCourseByOrg(orgUrl: String): Course?
     fun getCourseByName(name: String): Course?
     fun isStudentInCourse(studentId: Int, courseId: Int): Boolean
+    fun getAllTeamsFromAUserInACourse(courseId: Int, userId: Int, classrooms: List<Int>): List<Team>
 }

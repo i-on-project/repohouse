@@ -37,9 +37,12 @@ class SystemControllerMobile {
         block.link(rel = LinkRelation("token"), href = Uris.MOBILE_GET_ACCESS_TOKEN_PATH)
         block.link(rel = LinkRelation("menu"), href = Uris.MOBILE_MENU_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("course"), href = Uris.MOBILE_COURSE_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("leaveCourse"), href = Uris.MOBILE_LEAVE_COURSE_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("classroom"), href = Uris.MOBILE_CLASSROOM_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("assignment"), href = Uris.MOBILE_ASSIGMENT_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("team"), href = Uris.MOBILE_TEAM_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("createTeam"), href = Uris.MOBILE_TEAM_CREATE_TEAM_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("teamRequestsNotAccepted"), href = Uris.MOBILE_TEAM_REQUESTS_NOT_ACCEPTED_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("classroomArchiveRequest"), href = Uris.MOBILE_CLASSROOM_ARCHIVED_PATH, needAuthentication = true)
     }
 }
