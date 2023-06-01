@@ -33,7 +33,7 @@ The i-on initiative aims in systems open source software for academic purposes.
 - [Functionalities](#functionalities)
 - [Repository Organization](#repository-organization)
 - [Installation](#installation)
-    - [Web Application](#web-application)
+    - [Web and JVM Application](#web-and-jvm-application)
     - [Mobile Application](#mobile-application)
 - [License](#license)
 - [Project Status](#project-status)
@@ -63,7 +63,7 @@ The repository is organized as follows:
 ## Installation
 
 
-### Web Application
+### Web and JVM Application
 
 To install and set up the i-on ClassCode system, follow the steps below:
 
