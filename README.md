@@ -33,7 +33,7 @@ The i-on initiative aims in systems open source software for academic purposes.
 - [Functionalities](#functionalities)
 - [Repository Organization](#repository-organization)
 - [Installation](#installation)
-    - [Web Application](#web-application)
+    - [Web and JVM Application](#web-and-jvm-application)
     - [Mobile Application](#mobile-application)
 - [License](#license)
 - [Project Status](#project-status)
@@ -63,7 +63,7 @@ The repository is organized as follows:
 ## Installation
 
 
-### Web Application
+### Web and JVM Application
 
 To install and set up the i-on ClassCode system, follow the steps below:
 
@@ -111,7 +111,26 @@ Enjoy using i-on ClassCode to enhance your academic repository management experi
 
 ### Mobile Application
 
-- [ ] TODO
+To install and set up the i-on ClassCode mobile application, follow the steps below:
+
+1. Clone the repository:
+
+```
+git clone
+```
+
+2. Set up the environment variables:
+   - check the [android](./code/android/README.md#environment-variables) README for more information.
+
+3. Install the application on your device:
+
+```
+./gradlew installDebug
+```
+
+You're all set! The i-on ClassCode mobile application is now installed and ready to use.
+
+Note: Make sure you have the Android SDK installed on your machine before proceeding with the installation and the Web and JVM Application running.
 
 
 ## License
