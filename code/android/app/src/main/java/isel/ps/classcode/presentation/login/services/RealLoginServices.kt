@@ -1,10 +1,8 @@
 package isel.ps.classcode.presentation.login.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.presentation.AUTH_KEY
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
 import isel.ps.classcode.MEDIA_TYPE
-import isel.ps.classcode.presentation.TOKEN_KEY
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.deserialization.ClassCodeAuthDto
 import isel.ps.classcode.domain.deserialization.ClassCodeAuthDtoType
@@ -12,6 +10,8 @@ import isel.ps.classcode.http.NavigationRepository
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.presentation.AUTH_KEY
+import isel.ps.classcode.presentation.TOKEN_KEY
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
@@ -59,12 +59,12 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
         }
     }
 
-    override suspend fun startOauth(startActivity: (String, String) -> Boolean ): Either<HandleClassCodeResponseError, Unit> {
+    override suspend fun startOauth(startActivity: (String, String) -> Boolean): Either<HandleClassCodeResponseError, Unit> {
         val secret = generateSecret()
         sessionStore.storeSecret(secret = secret)
         val challenge = generateCodeChallenge(secret = secret)
         val ensureLink = navigationRepo.ensureLink(key = AUTH_KEY, fetchLink = { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
-        return if(startActivity(CLASSCODE_LINK_BUILDER(ensureLink.href), challenge)) {
+        return if (startActivity(CLASSCODE_LINK_BUILDER(ensureLink.href), challenge)) {
             Either.Right(value = Unit)
         } else {
             Either.Left(value = HandleClassCodeResponseError.Fail(error = "Failed to open URL"))

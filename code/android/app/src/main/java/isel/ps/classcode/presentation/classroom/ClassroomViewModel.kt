@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
+import isel.ps.classcode.dataAccess.gitHubService.GitHubService
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.CreateTeamComposite
 import isel.ps.classcode.domain.Team
@@ -22,7 +22,7 @@ import isel.ps.classcode.presentation.classroom.services.ClassroomServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.launch
 
-class ClassroomViewModel(private val classroomServices: ClassroomServices, private val gitHubFunctions: GitHubFunctions) : ViewModel() {
+class ClassroomViewModel(private val classroomServices: ClassroomServices, private val gitHubService: GitHubService) : ViewModel() {
     lateinit var classroomInfo: ClassroomAndMoreInfo
     val assignments: List<Assignment>?
         get() = _assignments
@@ -55,7 +55,7 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
                 _assignments = assignments.value.assignments
                 if (archiveRepos?.isNotEmpty() == true) {
                     archiveRepos.forEach { request ->
-                        when (gitHubFunctions.archiveRepoInGithub(orgName = classroomInfo.courseName, repoName = request.repoName)) {
+                        when (gitHubService.archiveRepoInGithub(orgName = classroomInfo.courseName, repoName = request.repoName)) {
                             is Either.Right -> {
                                 list.add(UpdateArchiveRepoState(requestId = request.requestId, state = "Accepted"))
                             }
@@ -102,7 +102,7 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
 
     fun createTeamCompositeAccepted(team: CreateTeamComposite, assignmentId: Int) = viewModelScope.launch {
         val teamSlug = team.createTeam.teamName.replace(" ", "-")
-        val createTeamResult = if (team.createTeam.gitHubTeamId != null) null else gitHubFunctions.createTeamInGitHub(createTeamComposite = team, orgName = classroomInfo.courseName)
+        val createTeamResult = if (team.createTeam.gitHubTeamId != null) null else gitHubService.createTeamInGitHub(createTeamComposite = team, orgName = classroomInfo.courseName)
         val githubTeamId = when (createTeamResult) {
             is Either.Right -> createTeamResult.value
             is Either.Left -> {
@@ -111,7 +111,7 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
             }
             else -> team.createTeam.gitHubTeamId
         }
-        val createRepoResult = if (team.createRepo.state == "Accepted") null else gitHubFunctions.createRepoInGitHub(orgName = classroomInfo.courseName, repo = team.createRepo, teamId = githubTeamId)
+        val createRepoResult = if (team.createRepo.state == "Accepted") null else gitHubService.createRepoInGitHub(orgName = classroomInfo.courseName, repo = team.createRepo, teamId = githubTeamId)
         val createRepo = when (createRepoResult) {
             is Either.Right -> createRepoResult.value
             is Either.Left -> {
@@ -120,7 +120,7 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
             }
             else -> null
         }
-        val joinTeamResult = if (team.joinTeam.state == "Accepted") null else gitHubFunctions.addMemberToTeamInGitHub(orgName = classroomInfo.courseName, teamSlug = teamSlug, username = team.joinTeam.githubUsername)
+        val joinTeamResult = if (team.joinTeam.state == "Accepted") null else gitHubService.addMemberToTeamInGitHub(orgName = classroomInfo.courseName, teamSlug = teamSlug, username = team.joinTeam.githubUsername)
         when (joinTeamResult) {
             is Either.Left -> {
                 _errorGitHub = joinTeamResult.value

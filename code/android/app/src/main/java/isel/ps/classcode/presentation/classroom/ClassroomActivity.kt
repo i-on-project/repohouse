@@ -10,15 +10,15 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
+import isel.ps.classcode.dataAccess.gitHubService.GitHubService
 import isel.ps.classcode.domain.dto.LocalClassroomDto
-import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
 import isel.ps.classcode.presentation.classroom.services.ClassroomServices
 import isel.ps.classcode.presentation.team.TeamActivity
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class ClassroomActivity : ComponentActivity() {
     private val classroomServices: ClassroomServices by lazy { (application as DependenciesContainer).classroomServices }
-    private val gitHubFunctions: GitHubFunctions by lazy { (application as DependenciesContainer).gitHubFunctions }
+    private val gitHubService: GitHubService by lazy { (application as DependenciesContainer).gitHubService }
     companion object {
         const val CLASSROOM_EXTRA = "CLASSROOM_EXTRA"
         fun navigate(origin: Activity, classroom: LocalClassroomDto) {
@@ -34,7 +34,7 @@ class ClassroomActivity : ComponentActivity() {
     private val vm by viewModels<ClassroomViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ClassroomViewModel(classroomServices = classroomServices, gitHubFunctions = gitHubFunctions) as T
+                return ClassroomViewModel(classroomServices = classroomServices, gitHubService = gitHubService) as T
             }
         }
     }

@@ -9,7 +9,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
+import isel.ps.classcode.dataAccess.gitHubService.GitHubService
 import isel.ps.classcode.presentation.course.CourseActivity
 import isel.ps.classcode.presentation.credits.CreditsActivity
 import isel.ps.classcode.presentation.login.LoginActivity
@@ -18,7 +18,7 @@ import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class MenuActivity : ComponentActivity() {
     private val menuServices: MenuServices by lazy { (application as DependenciesContainer).menuServices }
-    private val gitHubFunctions: GitHubFunctions by lazy { (application as DependenciesContainer).gitHubFunctions }
+    private val gitHubService: GitHubService by lazy { (application as DependenciesContainer).gitHubService }
 
     companion object {
         fun navigate(origin: Activity) {
@@ -33,7 +33,7 @@ class MenuActivity : ComponentActivity() {
     private val vm by viewModels<MenuViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MenuViewModel(menuServices = menuServices, gitHubFunctions = gitHubFunctions) as T
+                return MenuViewModel(menuServices = menuServices, gitHubService = gitHubService) as T
             }
         }
     }
