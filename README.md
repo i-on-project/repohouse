@@ -111,7 +111,26 @@ Enjoy using i-on ClassCode to enhance your academic repository management experi
 
 ### Mobile Application
 
-- [ ] TODO
+To install and set up the i-on ClassCode mobile application, follow the steps below:
+
+1. Clone the repository:
+
+```
+git clone
+```
+
+2. Set up the environment variables:
+   - check the [android](./code/android/README.md#environment-variables) README for more information.
+
+3. Install the application on your device:
+
+```
+./gradlew installDebug
+```
+
+You're all set! The i-on ClassCode mobile application is now installed and ready to use.
+
+Note: Make sure you have the Android SDK installed on your machine before proceeding with the installation and the Web and JVM Application running.
 
 
 ## License
