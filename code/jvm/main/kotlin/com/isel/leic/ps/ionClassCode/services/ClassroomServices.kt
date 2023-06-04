@@ -72,6 +72,7 @@ class ClassroomServices(
                             name = classroom.name,
                             isArchived = classroom.isArchived,
                             lastSync = classroom.lastSync,
+                            inviteCode = classroom.inviteCode,
                             assignments = assignments,
                             students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         ),
@@ -88,7 +89,7 @@ class ClassroomServices(
                 else -> {
                     val assignments = it.assignmentRepository.getClassroomAssignments(classroomId)
                     val students = it.classroomRepository.getStudentsByClassroom(classroomId)
-                    val classroomModel = ClassroomModel(id = classroom.id, name = classroom.name, isArchived = classroom.isArchived, lastSync = classroom.lastSync, assignments = assignments, students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) })
+                    val classroomModel = ClassroomModel(id = classroom.id, name = classroom.name, isArchived = classroom.isArchived, lastSync = classroom.lastSync, inviteCode = classroom.inviteCode, assignments = assignments, students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) })
                     val archiveRequest = if (classroom.isArchived) {
                         val requests = it.archiveRepoRepository.getArchiveRepoRequestForClassroom(classroomId = classroomId)
                         requests.ifEmpty { null }
@@ -134,6 +135,7 @@ class ClassroomServices(
                     name = classroom.name,
                     isArchived = classroom.isArchived,
                     lastSync = classroom.lastSync,
+                    inviteCode = classroom.inviteCode,
                     assignments = listOf(),
                     students = listOf(),
                 ),
@@ -188,6 +190,7 @@ class ClassroomServices(
                             name = classroomUpdateInput.name,
                             isArchived = false,
                             lastSync = classroom.lastSync,
+                            inviteCode = classroom.inviteCode,
                             assignments = assignments,
                             students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         ),
@@ -223,6 +226,7 @@ class ClassroomServices(
                         name = classroom.name,
                         isArchived = false,
                         lastSync = classroom.lastSync,
+                        inviteCode = classroom.inviteCode,
                         assignments = assignments,
                         students = students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                     ),

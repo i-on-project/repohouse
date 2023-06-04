@@ -211,7 +211,7 @@ CREATE TABLE Tags(
 CREATE TABLE Feedback(
     id serial primary key,
     description text not null,
-    label text not null,
+    label text not null check ( label in ('General', 'Task', 'Alert') ),
     team_id int not null,
     foreign key (team_id) references Team(id)
 );

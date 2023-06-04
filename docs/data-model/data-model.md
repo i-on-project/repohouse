@@ -191,7 +191,7 @@ Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária.
 - description - não pode ser vazio ou null.
-- Label - não pode ser vazio ou null.
+- Label - não pode ser vazio ou null. Toma os valores: 'General', 'Task' and 'Alert'
 - team_id - valor numérico inteiro não negativo. Chave estrangeira para ``Team``.
 
 ``Repo`` - entidade fraca de ``Team``

@@ -14,6 +14,7 @@ data class ClassroomOutputModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
+    val inviteCode: String,
     val assignments: List<Assignment>,
     val students: List<StudentWithoutToken>,
 ) : OutputModel
@@ -35,6 +36,7 @@ data class ClassroomModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
+    val inviteCode: String,
     val assignments: List<Assignment>,
     val students: List<StudentWithoutToken>,
 ) : OutputModel
