@@ -10,7 +10,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.dataAccess.gitHubFunctions.GitHubFunctions
+import isel.ps.classcode.dataAccess.gitHubService.GitHubService
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.dto.LocalCourseDto
 import isel.ps.classcode.presentation.classroom.ClassroomActivity
@@ -19,7 +19,7 @@ import isel.ps.classcode.ui.theme.ClasscodeTheme
 
 class CourseActivity : ComponentActivity() {
     private val courseServices: CourseServices by lazy { (application as DependenciesContainer).courseServices }
-    private val gitHubFunctions: GitHubFunctions by lazy { (application as DependenciesContainer).gitHubFunctions }
+    private val gitHubService: GitHubService by lazy { (application as DependenciesContainer).gitHubService }
 
     companion object {
         const val COURSE_EXTRA = "COURSE_EXTRA"
@@ -36,7 +36,7 @@ class CourseActivity : ComponentActivity() {
     private val vm by viewModels<CourseViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return CourseViewModel(courseServices = courseServices, gitHubFunctions = gitHubFunctions) as T
+                return CourseViewModel(courseServices = courseServices, gitHubService = gitHubService) as T
             }
         }
     }
@@ -61,10 +61,6 @@ class CourseActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     @Suppress("deprecation")
