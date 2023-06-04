@@ -30,29 +30,14 @@ The i-on initiative aims in systems open source software for academic purposes.
 ## Table of Contents
 
 - [Overview](#overview)
-- [Functionalities](#functionalities)
 - [Repository Organization](#repository-organization)
 - [Installation](#installation)
     - [Web and JVM Application](#web-and-jvm-application)
     - [Mobile Application](#mobile-application)
+- [Functionalities](#functionalities)
 - [License](#license)
 - [Project Status](#project-status)
 
-
-## Functionalities
-
-- [ ] Associate a GitHub repository to a Course
-- [ ] Create Classrooms, included in a Course
-- [ ] Invite Codes to Students to join a Classroom
-- [ ] Create Assignments, included in a Classroom
-- [ ] Create Teams associated with an Assignment
-- [ ] Create a GitHub repository and a GitHub Team for each Assignment Team
-- [ ] Define a set o rules for the teams
-- [ ] Define various Deliveries for an Assignment, with tag control and deadline
-- [ ] Check for each Delivery, the Teams that have delivered and the ones that have not
-- [ ] Post feedback to the Teams, based on labels 
-- [ ] Accept other GitHub users to join as Teachers
- 
 ## Repository Organization
 
 The repository is organized as follows:
@@ -85,14 +70,14 @@ git clone https://github.com/i-on-project/repohouse.git
 4. Run the backend server:
 
 ```
-cd code\jvm
+cd code/jvm
 ./gradlew bootRun
 ```
 
 5. Install the frontend dependencies:
 
 ```
-cd code\js
+cd code/js
 npm install
 ```
 
@@ -106,6 +91,9 @@ npm start
 7. You're all set! The i-on ClassCode system is now installed and ready to use.
 
 Note: Make sure you have Node.js and npm installed on your machine before proceeding with the installation.
+
+:warning: Warning: While in development, the frontend server will run on port 3000 using Ngrok. This is done to allow the mobile application to access the backend server. 
+
 
 Enjoy using i-on ClassCode to enhance your academic repository management experience!
 
@@ -132,6 +120,19 @@ You're all set! The i-on ClassCode mobile application is now installed and ready
 
 Note: Make sure you have the Android SDK installed on your machine before proceeding with the installation and the Web and JVM Application running.
 
+## Functionalities
+
+- [ ] Associate a GitHub repository to a Course
+- [ ] Create Classrooms, included in a Course
+- [ ] Invite Codes to Students to join a Classroom
+- [ ] Create Assignments, included in a Classroom
+- [ ] Create Teams associated with an Assignment
+- [ ] Create a GitHub repository and a GitHub Team for each Assignment Team
+- [ ] Define a set o rules for the teams
+- [ ] Define various Deliveries for an Assignment, with tag control and deadline
+- [ ] Check for each Delivery, the Teams that have delivered and the ones that have not
+- [ ] Post feedback to the Teams, based on labels
+- [ ] Accept other GitHub users to join as Teachers
 
 ## License
 

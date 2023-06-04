@@ -1,6 +1,6 @@
 ## Android
 
-The application is created using [Kotlin](https://kotlinlang.org/).
+The application was created using [Kotlin](https://kotlinlang.org/).
 
 It uses [Gradle](https://gradle.org/) to build the application.
 
@@ -25,6 +25,8 @@ All the components are designed with [Jetpack Compose](https://developer.android
 - [Kotlin](https://kotlinlang.org/)
 - [Gradle](https://gradle.org/)
 - [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- [GitHub API](https://docs.github.com/en/rest)
+- [Custom Tabs](https://developer.chrome.com/docs/android/custom-tabs/overview/)
 - [OKHttp](https://square.github.io/okhttp/)
 
 
@@ -46,7 +48,7 @@ The presentation layer is ensured by 3 main tasks:
 - To provide the services to the user, to interact with the application and send the requests to the Http layer
 - To provide the logic to the application, to handle the data and the user actions
 
-The layer is the mediator between the user and the application, it is the layer that the user interacts with, ensuring the application functionality
+This layer is the mediator between the user and the application, it is the layer that the user interacts with, ensuring the application functionality
 is presented to the user in a way that is intuitive and visually appealing.
 
 
@@ -57,6 +59,7 @@ The data access layer is used to store and retrieve the user session and informa
 It has the capability to encrypt and decrypt the secret from authentication process, and stores in the device the access token needed to make the requests to the GitHub API.
 This layer is used for the authentication process, to store the user session data, and to store the user information data.
 
+It stores to the cookie needed to make the requests to the i-on ClassCode application.
 
 ### Http
 
@@ -71,7 +74,8 @@ The layer has 2 methods to make the requests, because the application makes use 
 
 The only environment variable used by the application is the url needed to make the http requests.
 
-The environment variable is named `NGROK_URI` and it is defined in tthe local properties file `local.properties`.
+The environment variable is named `NGROK_URI` and it is defined in the local properties file `local.properties`, that is located in the root of the project.
+The file must include the `sdk.dir` property, that is the path to the Android SDK.
 
 
 ## How to..
