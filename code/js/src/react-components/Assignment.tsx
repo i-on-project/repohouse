@@ -388,7 +388,6 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
 
     const handleSubmit = useCallback((event:any) => {
         event.preventDefault()
-        console.log("submit")
         if (title == null || description == null) {
             return
         }
@@ -396,7 +395,6 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
     },[setCreate,title, description])
 
     if(create) {
-        console.log("create")
         const assignment = new AssignmentBody(classroomId,minNumbElemPerGroup,maxNumbElemPerGroup,numbGroups,title,description,new Date())
         return <ShowCreateAssignmentPost assignmentServices={assignmentServices} assignment={assignment} courseId={courseId} classroomId={classroomId} error={serror}/>
     }
@@ -528,7 +526,6 @@ export function ShowAssigmentTeamsFetch({
             setError(response)
         }
         if (response instanceof SirenEntity) {
-            console.log(response.properties)
             navigate("/courses/" + courseId + "/classrooms/" + classroomId + "/assignments/" + assignment.id + "/teams/" + response.properties.teamId, {replace: true})
         }
     },[setError])

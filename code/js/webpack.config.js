@@ -7,7 +7,7 @@ module.exports = {
         filename: 'main.js',
         path: path.resolve(__dirname, 'public'),
     },
-    mode: "production",
+    mode: "development",
     resolve: {
         extensions: [".js", ".ts", ".tsx",".css"]
     },
