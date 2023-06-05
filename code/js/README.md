@@ -188,7 +188,7 @@ running in [Jest](https://jestjs.io/) framework.
 
 All the tests are located in the `tests/` folder.
 
-Make sure the database is running before running the tests. Before running the tests, verify if the database is empty and run the script [createTables.sql](tests/script.sql).
+Make sure the database is running before running the tests. Before running the tests, verify if the database is empty and run the script [script.sql](tests/script.sql).
 
 To run the tests, you can run:
 
