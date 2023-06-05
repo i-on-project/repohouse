@@ -105,7 +105,7 @@ begin
     delete from createrepo where repo_id = repo_id_h;
     delete from createteam where team_id = old.id;
     delete from tags where repo_id = repo_id_h;
-    delete from repo where repo.id = repo_id_h;
+    update repo set team_id = null where id = repo_id_h;
     delete from leaveteam where team_id = old.id;
     delete from jointeam where team_id = old.id;
     RAISE NOTICE 'old.id: %', old.id;

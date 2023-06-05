@@ -186,7 +186,7 @@ CREATE TABLE Repo(
     name text not null,
     url text unique default null,
     is_created boolean not null,
-    team_id int unique not null,
+    team_id int unique null,
     foreign key (team_id) references Team(id)
 );
 
@@ -247,4 +247,3 @@ CREATE TABLE CreateRepo(
 
 COMMIT;
 
-update team set is_closed = false where id=3;

@@ -91,15 +91,18 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .firstOrNull()
     }
 
-    override fun archiveRepo(repoId: Int) {
-        handle.createUpdate(
+    /**
+     * Method to get all dead Repos
+     */
+    override fun getDeadRepos(): List<Repo> {
+        return handle.createQuery(
             """
-                UPDATE REPO
-                SET  = true
-                WHERE id = :repoId
+                SELECT * FROM REPO
+                WHERE team_id IS NULL
                 """,
         )
-            .bind("repoId", repoId)
-            .execute()
+            .mapTo<Repo>()
+            .list()
     }
+
 }

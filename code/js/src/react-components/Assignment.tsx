@@ -393,7 +393,7 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
             return
         }
         setCreate(true)
-    },[setCreate, title, description])
+    },[setCreate,title, description])
 
     if(create) {
         console.log("create")

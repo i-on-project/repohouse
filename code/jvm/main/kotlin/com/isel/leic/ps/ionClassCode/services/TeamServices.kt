@@ -125,16 +125,23 @@ class TeamServices(
         return transactionManager.run {
             it.usersRepository.getStudent(creator) ?: return@run Result.Problem(value = TeamServicesError.InternalError)
             val classroom = it.classroomRepository.getClassroomById(classroomId) ?: return@run Result.Problem(value = TeamServicesError.ClassroomNotFound)
-            it.assignmentRepository.getAssignmentById(assignmentId) ?: return@run Result.Problem(value = TeamServicesError.AssignmentNotFound)
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId) ?: return@run Result.Problem(value = TeamServicesError.AssignmentNotFound)
             if (classroom.isArchived) return@run Result.Problem(value = TeamServicesError.ClassroomArchived)
+            val teams = it.teamRepository.getTeamsFromAssignment(assignmentId)
+            val deadRepos = it.repoRepository.getDeadRepos()
+            var teamName = "${classroom.name}-${assignment.title}-${teams.size + 1}"
+            var i = 0
+            while (teams.any { team -> team.name == teamName } || deadRepos.any { repo -> repo.name == teamName }) {
+                teamName = "${classroom.name}-${assignment.title}-${teams.size + 1 + i++}"
+            }
             val team = it.teamRepository.createTeam(
                 team = TeamInput(
-                    "${classroom.name} - $assignmentId",
+                    teamName,
                     assignmentId,
                     false,
                 ),
             )
-            val repo = it.repoRepository.createRepo(repo = RepoInput(name = "${classroom.name} - $assignmentId - ${team.id}", url = null, teamId = team.id))
+            val repo = it.repoRepository.createRepo(repo = RepoInput(name = teamName, url = null, teamId = team.id))
             val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(), creator = creator)
             val createTeam = it.createTeamRepository.createCreateTeamRequest(request = CreateTeamInput(teamId = team.id, composite = composite.id, teamName = team.name), creator = creator)
             it.createRepoRepository.createCreateRepoRequest(request = CreateRepoInput(repoId = repo.id, composite = composite.id, repoName = repo.name), creator = creator)

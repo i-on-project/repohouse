@@ -122,13 +122,13 @@ class ClassroomServices(
         return transactionManager.run {
             it.usersRepository.getTeacher(classroomInput.teacherId) ?: return@run Result.Problem(ClassroomServicesError.InternalError)
             it.courseRepository.getCourse(classroomInput.courseId) ?: return@run Result.Problem(ClassroomServicesError.CourseNotFound)
-            val otherInviteLinks = it.classroomRepository.getAllInviteLinks()
-            val inviteLink = generateRandomInviteLink(otherInviteLinks)
+            val otherInviteCode = it.classroomRepository.getAllInviteLinks()
+            val inviteCode = generateRandomInviteCode(otherInviteCode)
             val otherClassroomNames = it.classroomRepository.getAllCourseClassrooms(classroomInput.courseId).map { classroom -> classroom.name }
             if (otherClassroomNames.map { name -> name.lowercase() }.contains(classroomInput.name.lowercase())) {
                 return@run Result.Problem(ClassroomServicesError.NameAlreadyExists)
             }
-            val classroom = it.classroomRepository.createClassroom(classroomInput, inviteLink)
+            val classroom = it.classroomRepository.createClassroom(classroomInput, inviteCode)
             return@run Result.Success(
                 ClassroomModel(
                     id = classroom.id,
@@ -314,15 +314,15 @@ class ClassroomServices(
     /**
      * Method to generate a random invite link
      */
-    private fun generateRandomInviteLink(otherInviteLinks: List<String>): String {
+    private fun generateRandomInviteCode(otherInviteCodes: List<String>): String {
         val chars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-        val inviteLink = (10..30)
+        val inviteCode = (10..15)
             .map { chars.random() }
             .joinToString("")
-        return if (otherInviteLinks.contains(inviteLink)) {
-            generateRandomInviteLink(otherInviteLinks)
+        return if (otherInviteCodes.contains(inviteCode)) {
+            generateRandomInviteCode(otherInviteCodes)
         } else {
-            inviteLink
+            inviteCode
         }
     }
 

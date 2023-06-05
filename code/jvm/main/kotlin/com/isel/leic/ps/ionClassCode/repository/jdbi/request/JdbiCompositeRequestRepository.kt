@@ -131,4 +131,19 @@ class JdbiCompositeRequestRepository(
             .mapTo<Composite>()
             .list()
     }
+
+    /**
+     * Method to get a Composite Request by is id
+     */
+    override fun getCompositeByCompositeId(compositeId: Int): Composite? {
+        return handle.createQuery(
+            """
+           SELECT r.id, r.creator, r.state, r.composite FROM composite c JOIN request r on c.id = r.id
+           WHERE :compositeId = c.id
+           """,
+        )
+            .bind("compositeId", compositeId)
+            .mapTo<Composite>()
+            .firstOrNull()
+    }
 }

@@ -135,7 +135,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
     override fun getTeamsDeliveredByDelivery(deliveryId: Int): List<Team> {
         return handle.createQuery(
             """
-                SELECT distinct (team.id), team.name, team.is_created, team.assignment FROM team
+                SELECT distinct team.id, team.name, team.is_created, team.is_closed,team.assignment FROM team
                 JOIN tags t on :deliveryId = t.delivery_id
                 WHERE t.is_delivered = true
                 """,

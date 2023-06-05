@@ -13,4 +13,6 @@ interface CompositeRepository {
     fun getCompositeRequestsThatAreNotAccepted(): List<Composite>
     fun getCompositeRequestsById(compositeId: Int): List<Int>?
     fun getCompositeRequestsByUser(userId: Int): List<Composite>
+    fun getCompositeByCompositeId(compositeId: Int): Composite?
+
 }
