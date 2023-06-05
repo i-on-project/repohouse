@@ -25,7 +25,7 @@ begin
     insert into teacher_course (teacher, course)
     values (teacher_id, course_id);
 
-    insert into classroom (name, last_sync, invite_link, is_archived, course_id, teacher_id)
+    insert into classroom (name, last_sync, invite_code, is_archived, course_id, teacher_id)
     values ('ClassCode', now(), 'https://classroom.google.com/c/MTU5NjQ5NjYxNjIw', false, course_id, teacher_id);
 
     select id from classroom where name = 'ClassCode' into classroom_id;
@@ -33,13 +33,13 @@ begin
     insert into student_classroom (student, classroom)
     values (student_id, classroom_id);
 
-    insert into assignment (classroom_id, max_elems_per_group, max_number_groups, release_date, description, title)
-    values (classroom_id, 4, 4, now(), 'Assignment description', 'Assignment title');
+    insert into assignment (classroom_id, max_elems_per_group, min_elems_per_group, max_number_groups, release_date, description, title)
+    values (classroom_id, 4, 1, 4, now(), 'Assignment description', 'Assignment title');
 
     select id from assignment where title = 'Assignment title' into assign_id;
 
-    insert into team (name, is_created, assignment)
-    values ('Team 1', true, assign_id);
+    insert into team (name, is_created, is_closed, assignment)
+    values ('Team 1', true, false, assign_id);
 
     select id from team where name = 'Team 1' into team_id;
 
