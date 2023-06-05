@@ -30,7 +30,6 @@ import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
 import jakarta.servlet.http.HttpServletResponse
-import java.util.*
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -42,8 +41,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
-const val ORG_NAME = "test-project-isel"
 const val GITHUB_TEACHER_SCOPE = "read:org user:email repo"
 const val MOBILE_GITHUB_TEACHER_SCOPE = "admin:org%20user:email%20repo"
 const val GITHUB_STUDENT_SCOPE = "repo user:email"

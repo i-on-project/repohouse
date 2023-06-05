@@ -129,7 +129,7 @@ VALUES (3, CURRENT_TIMESTAMP, 'tag2', 2, CURRENT_TIMESTAMP);
 SELECT setval('delivery_id_seq', (SELECT MAX(id) from "delivery"));
 
 INSERT INTO feedback (description, label, team_id)
-VALUES ('description1', 'Notice', 1);
+VALUES ('description1', 'Task', 1);
 INSERT INTO feedback (description, label, team_id)
 VALUES ('description2', 'General', 1);
 

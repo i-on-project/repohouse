@@ -43,7 +43,6 @@ export async function fetchDelete<T>(url: string) {
 }
 
 async function myFetch<T>(url: string, options: object) {
-    console.log("fetching", url)
     const res = await fetch(url, options)
     const resp = await res.json()
     return handleResponse<T>(resp, res.ok)
