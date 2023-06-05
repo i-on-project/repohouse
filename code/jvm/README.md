@@ -274,8 +274,8 @@ To run the JVM application, run the following command:
 
 To test the JVM application, run the following command:
 
-Make sure the database is running before running the tests,
-cleaned all just with the data from the [insert.sql](../sql/insert.sql) file.
+Make sure the database is running before running the tests.
+Before running the tests, verify if the database is empty and run the script files [createTables.sql](../sql/createTables.sql) and [insert.sql](../sql/insert.sql).
 
 ```
 ./gradlew test
