@@ -17,3 +17,11 @@ data class LeaveTeam(
         require(checkState()) { "Invalid state" }
     }
 }
+
+/**
+ * Leave Team Request with Repo Name
+ */
+data class LeaveTeamWithRepoName(
+    val leaveTeam: LeaveTeam,
+    val repoName: String,
+)

@@ -88,10 +88,7 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
     }
 
     fun getTeams(assignmentId: Int) = viewModelScope.launch {
-        val x = classroomInfo.classroom.id
-        val y = classroomInfo.classroom.courseId
-        val z = assignmentId
-        when (val teams = classroomServices.getTeams(classroomId = x, courseId = y, assignmentId = z)) {
+        when (val teams = classroomServices.getTeams(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId, assignmentId = assignmentId)) {
             is Either.Right -> {
                 _teamsCreated = teams.value.teamsCreated
                 _createTeamComposite = teams.value.createTeamComposite
@@ -101,7 +98,6 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
     }
 
     fun createTeamCompositeAccepted(team: CreateTeamComposite, assignmentId: Int) = viewModelScope.launch {
-        val teamSlug = team.createTeam.teamName.replace(" ", "-")
         val createTeamResult = if (team.createTeam.gitHubTeamId != null) null else gitHubService.createTeamInGitHub(createTeamComposite = team, orgName = classroomInfo.courseName)
         val githubTeamId = when (createTeamResult) {
             is Either.Right -> createTeamResult.value
@@ -120,11 +116,10 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
             }
             else -> null
         }
-        val joinTeamResult = if (team.joinTeam.state == "Accepted") null else gitHubService.addMemberToTeamInGitHub(orgName = classroomInfo.courseName, teamSlug = teamSlug, username = team.joinTeam.githubUsername)
+        val joinTeamResult = if (team.joinTeam.state == "Accepted") null else gitHubService.addMemberToTeamInGitHub(orgName = classroomInfo.courseName, teamSlug = team.createTeam.teamName, username = team.joinTeam.githubUsername)
         when (joinTeamResult) {
             is Either.Left -> {
                 _errorGitHub = joinTeamResult.value
-                return@launch
             }
             else -> {} // DO NOTHING
         }

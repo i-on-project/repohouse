@@ -78,7 +78,7 @@ interface DependenciesContainer {
 }
 
 private fun dependencies(isRealImplementation: Boolean, context: Context, cryptoManager: CryptoManager, objectMapper: ObjectMapper, httpClient: OkHttpClient, navigationRepo: NavigationRepository): Dependencies {
-    val sessionStore = if (isRealImplementation) RealSessionStore(context = context, cryptoManager = cryptoManager) else FakeSessionStore(alreadyLoggedIn = true)
+    val sessionStore = if (isRealImplementation) RealSessionStore(context = context, cryptoManager = cryptoManager) else FakeSessionStore(alreadyLoggedIn = false)
     return if (isRealImplementation) {
         val bootUpServices = RealBootUpServices(
             httpClient = httpClient,
@@ -130,11 +130,12 @@ private fun dependencies(isRealImplementation: Boolean, context: Context, crypto
             ),
         )
     } else {
+        val fakeData: FakeDataStorage by lazy { FakeDataStorage() }
         Dependencies(
             sessionStore = sessionStore,
-            loginServices = FakeLoginServices(),
+            loginServices = FakeLoginServices(activity = context),
             bootUpServices = FakeBootUpServices(),
-            menuServices = FakeMenuServices(),
+            menuServices = FakeMenuServices(data = fakeData),
             courseServices = FakeCourseServices(),
             classroomServices = FakeClassroomServices(),
             teamServices = FakeTeamServices(),

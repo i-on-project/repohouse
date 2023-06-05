@@ -1,5 +1,6 @@
 package isel.ps.classcode.domain.deserialization
 
+
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.sql.Timestamp
 
@@ -11,6 +12,7 @@ data class ClassCodeClassroomWithAssignmentsDeserialization(
     @JsonProperty("name")val name: String,
     @JsonProperty("isArchived")val isArchived: Boolean,
     @JsonProperty("lastSync")val lastSync: Timestamp,
+    @JsonProperty("inviteCode")val inviteCode: String,
     @JsonProperty("assignments")val assignments: List<ClassCodeAssignmentDeserialization>,
     @JsonProperty("students")val students: List<ClassCodeStudentDeserialization>,
 )

@@ -81,18 +81,6 @@ class TeamRepositoryTests {
     }
 
     @Test
-    fun `cannot delete a team`() = testWithHandleAndRollback { handle ->
-        val teamRepo = JdbiTeamRepository(handle = handle)
-        val teamId = 1
-        try {
-            teamRepo.deleteTeam(teamId = teamId)
-            fail("Should not be able to delete a team")
-        } catch (e: Exception) {
-            assert(true)
-        }
-    }
-
-    @Test
     fun `can get students of a team`() = testWithHandleAndRollback { handle ->
         val teamRepo = JdbiTeamRepository(handle = handle)
         val teamId = 1

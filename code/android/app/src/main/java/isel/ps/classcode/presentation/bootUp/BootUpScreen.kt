@@ -14,12 +14,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,18 +32,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.ps.classcode.R
+import isel.ps.classcode.presentation.views.TopBar
 import isel.ps.classcode.ui.theme.ClasscodeTheme
 import kotlinx.coroutines.delay
 
 const val BOOT_UP_DELAY = 2000L
 
 @Composable
-fun BootUpScreen(strongBiometric: () -> Unit = { }) {
+fun BootUpScreen(strongBiometric: () -> Unit = { }, onBackRequest: () -> Unit = {}) {
     var visible by remember { mutableStateOf(true) }
     Box(modifier = Modifier.fillMaxSize()) {
         LaunchedEffect(Unit) {
@@ -58,26 +64,42 @@ fun BootUpScreen(strongBiometric: () -> Unit = { }) {
             if (visible) {
                 IselLogoView()
             } else {
-                Screen(actionHandler = strongBiometric)
+                Screen(actionHandler = strongBiometric, onBackRequest = onBackRequest)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Screen(actionHandler: () -> Unit = { }) {
-    Column(
-        modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        IconButton(onClick = { actionHandler() }, modifier = Modifier.size(200.dp)) {
-            Icon(
-                modifier = Modifier.size(100.dp),
-                imageVector = Icons.Default.Fingerprint,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+fun Screen(actionHandler: () -> Unit = { }, onBackRequest: () -> Unit) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    Scaffold(
+        topBar = {
+            TopBar(
+                name = stringResource(id = R.string.classroom_top_page),
+                onBackRequested = onBackRequest,
+                scrollBehavior = scrollBehavior,
             )
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(it)
+                .background(color = MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            IconButton(onClick = { actionHandler() }, modifier = Modifier.size(200.dp)) {
+                Icon(
+                    modifier = Modifier.size(100.dp),
+                    imageVector = Icons.Default.Fingerprint,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }
