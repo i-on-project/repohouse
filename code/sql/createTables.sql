@@ -247,3 +247,4 @@ CREATE TABLE CreateRepo(
 
 COMMIT;
 
+update Apply set state='Accepted' where id = 1;

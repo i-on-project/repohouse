@@ -36,3 +36,4 @@ val GITHUB_ACCESS_TOKEN_URI: (code: String) -> String = { code ->
 }
 
 const val GITHUB_USER_ORGS = "/user/orgs"
+val GITHUB_USER_ORGS_MEMBERSHIP : (org:String,username:String) -> String = { org,username ->"/orgs/$org/memberships/$username"}

@@ -98,7 +98,7 @@ class JdbiApplyRepository(
         return handle.createUpdate(
             """
             UPDATE apply SET state = :state
-            WHERE id = :id
+            WHERE pending_teacher_id = :id
             """,
         )
             .bind("id", id)
