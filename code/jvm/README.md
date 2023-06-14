@@ -242,13 +242,14 @@ that tries to register in the application.
 
 The JVM application uses the following environment variables:
 
-| Name                         | Description                               | Example Value                                                             |
-|------------------------------|-------------------------------------------|---------------------------------------------------------------------------|
-| `CLASSCODE_ENCRYPTION_KEY`   | The key used to encrypt the cookies data  | n2r5u8x/A%D*G-KaPdSgVkYp3dd9OpdB                                          |                                      
-| `JDBC_DATABASE_URL`          | The URL of the database                   | jdbc:postgresql://localhost:5432/postgres?user=postgres&password=password |
-| `GITHUB_CLIENT_ID`           | The client ID of the GitHub OAuth App     | adff5774ce19eabcc0d6                                                      |                                
-| `GITHUB_CLIENT_SECRET`       | The client secret of the GitHub OAuth App | 5ab7eba0d3ed134715f8e6ab52d6056ef4e0e108                                  |                             
-| `SENDGRID_CLASSCODE_API_KEY` | The key to access the SendGrid API        | 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     |   
+| Name                         | Description                                                                           |
+|------------------------------|---------------------------------------------------------------------------------------|
+| `CLASSCODE_ENCRYPTION_KEY`   | The key used to encrypt the cookies data                                              |                                     
+| `JDBC_DATABASE_URL`          | The URL of the database                                                               |
+| `GITHUB_CLIENT_ID`           | The client ID of the GitHub OAuth App                                                 |                               
+| `GITHUB_CLIENT_SECRET`       | The client secret of the GitHub OAuth App                                             |                           
+| `SENDGRID_CLASSCODE_API_KEY` | The key to access the SendGrid API                                                    |
+| `NGROK_URI`                  | Used to allow the mobile application to access the backend server during development. | 
 
 
 ### How to..
@@ -273,8 +274,8 @@ To run the JVM application, run the following command:
 
 To test the JVM application, run the following command:
 
-Make sure the database is running before running the tests,
-cleaned all just with the data from the [insert.sql](../sql/insert.sql) file.
+Make sure the database is running before running the tests.
+Before running the tests, verify if the database is empty and run the script files [createTables.sql](../sql/createTables.sql) and [insert.sql](../sql/insert.sql).
 
 ```
 ./gradlew test

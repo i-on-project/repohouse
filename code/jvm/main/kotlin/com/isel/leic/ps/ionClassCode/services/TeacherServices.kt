@@ -1,7 +1,6 @@
 package com.isel.leic.ps.ionClassCode.services
 
 import com.isel.leic.ps.ionClassCode.domain.PendingTeacher
-import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.input.ApplyInput
 import com.isel.leic.ps.ionClassCode.domain.input.TeacherInput
 import com.isel.leic.ps.ionClassCode.http.model.input.TeachersPendingInputModel
@@ -15,9 +14,6 @@ import com.isel.leic.ps.ionClassCode.tokenHash.TokenHash
 import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESDecrypt
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 
@@ -58,9 +54,7 @@ class TeacherServices(
      */
     fun confirmPendingTeacher(githubId: Long): PendingTeacherCreationResult {
         return transactionManager.run {
-            val pendingTeacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: return@run Result.Problem(
-                TeacherServicesError.TeacherNotFound
-            )
+            val pendingTeacher = it.usersRepository.getPendingTeacherByGithubId(githubId) ?: return@run Result.Problem(TeacherServicesError.TeacherNotFound)
             val updatedPendingTeacher = it.usersRepository.acceptPendingTeacher(pendingTeacher)
             it.applyRequestRepository.createApplyRequest(ApplyInput(updatedPendingTeacher.id))
             return@run Result.Success(updatedPendingTeacher)
@@ -75,13 +69,9 @@ class TeacherServices(
         val hash = tokenHash.getTokenHash(teacher.token)
         val githubToken = AESEncrypt.encrypt(teacher.githubToken)
         return transactionManager.run {
-            if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) return@run Result.Problem(
-                TeacherServicesError.GithubUserNameInUse
-            )
+            if (it.usersRepository.checkIfGithubUsernameExists(teacher.githubUsername)) return@run Result.Problem(TeacherServicesError.GithubUserNameInUse)
             if (it.usersRepository.checkIfEmailExists(teacher.email)) return@run Result.Problem(TeacherServicesError.EmailInUse)
-            if (it.usersRepository.checkIfGithubIdExists(teacher.githubId)) return@run Result.Problem(
-                TeacherServicesError.GithubIdInUse
-            )
+            if (it.usersRepository.checkIfGithubIdExists(teacher.githubId)) return@run Result.Problem(TeacherServicesError.GithubIdInUse)
             if (it.usersRepository.checkIfTokenExists(hash)) return@run Result.Problem(TeacherServicesError.TokenInUse)
             if (it.usersRepository.checkIfGithubTokenExists(githubToken)) return@run Result.Problem(TeacherServicesError.TokenInUse)
             val teacherRes = it.usersRepository.createPendingTeacher(
@@ -151,6 +141,23 @@ class TeacherServices(
     }
 
     /**
+     * Function to handle errors from teacher
+     */
+    fun problem(error: TeacherServicesError): ResponseEntity<ErrorMessageModel> {
+        return when (error) {
+            is TeacherServicesError.CourseNotFound -> Problem.courseNotFound
+            is TeacherServicesError.TeacherNotFound -> Problem.userNotFound
+            is TeacherServicesError.RequestNotFound -> Problem.notFound
+            is TeacherServicesError.InvalidData -> Problem.invalidInput
+            is TeacherServicesError.TokenInUse -> Problem.internalError
+            is TeacherServicesError.EmailInUse -> Problem.internalError
+            is TeacherServicesError.GithubIdInUse -> Problem.internalError
+            is TeacherServicesError.GithubUserNameInUse -> Problem.internalError
+            is TeacherServicesError.InternalError -> Problem.internalError
+        }
+    }
+
+    /**
      * Method to get all the organizations of a teacher
      */
     suspend fun getTeacherOrgs(teacherId: Int, githubUsername:String, githubToken: String): TeacherOrgsResponse {
@@ -163,19 +170,19 @@ class TeacherServices(
             )
         }
 
-       val adminOrgs = orgs.mapNotNull { org ->
-           if ( githubServices.fetchRoleTeacherOrg(
-                       org.login,
-                   githubUsername,
-                       githubToken
-                   ).role  == "admin") {
-               org
-           } else {
-               null
-           }
-       }
+        val adminOrgs = orgs.mapNotNull { org ->
+            if ( githubServices.fetchRoleTeacherOrg(
+                    org.login,
+                    githubUsername,
+                    githubToken
+                ).role  == "admin") {
+                org
+            } else {
+                null
+            }
+        }
 
-       return transactionManager.run {
+        return transactionManager.run {
             it.usersRepository.getTeacher(teacherId)
                 ?: return@run Result.Problem(TeacherServicesError.InternalError)
             val teacherCourses = it.courseRepository.getAllTeacherCourses(teacherId)
@@ -184,10 +191,9 @@ class TeacherServices(
                     teacherOrg.orgUrl == org.url
                 }
             }
-                return@run Result.Success(orgsToAdd)
-       }
+            return@run Result.Success(orgsToAdd)
+        }
     }
-
 
     /**
      * Method to get all teachers that need approval
@@ -204,23 +210,6 @@ class TeacherServices(
                 email = teacher.email,
                 applyRequestId = apply.id,
             )
-        }
-    }
-
-    /**
-     * Function to handle errors from teacher
-     */
-    fun problem(error: TeacherServicesError): ResponseEntity<ErrorMessageModel> {
-        return when (error) {
-            is TeacherServicesError.CourseNotFound -> Problem.courseNotFound
-            is TeacherServicesError.TeacherNotFound -> Problem.userNotFound
-            is TeacherServicesError.RequestNotFound -> Problem.notFound
-            is TeacherServicesError.InvalidData -> Problem.invalidInput
-            is TeacherServicesError.TokenInUse -> Problem.internalError
-            is TeacherServicesError.EmailInUse -> Problem.internalError
-            is TeacherServicesError.GithubIdInUse -> Problem.internalError
-            is TeacherServicesError.GithubUserNameInUse -> Problem.internalError
-            is TeacherServicesError.InternalError -> Problem.internalError
         }
     }
 }

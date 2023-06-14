@@ -52,7 +52,7 @@ fun ClassCodeErrorView(
                         }
                     },
                     icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = stringResource(id = R.string.warning_icon)) },
-                    title = { Text(text = "Error in the the process of the response from the server") },
+                    title = { Text(text = "Error in the process of the response from the server") },
                     text = { Text(text = error) },
                 )
             }

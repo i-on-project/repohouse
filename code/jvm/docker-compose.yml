@@ -10,7 +10,7 @@ services:
     environment:
       PORT: 8081
       NGROK_URI: ${NGROK_URI}
-      JDBC_DATABASE_URL: jdbc:postgresql://34.175.41.95:5432/classcode?user=postgres&password=postgres
+      JDBC_DATABASE_URL: ${JDBC_DATABASE_URL}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       GITHUB_CLIENT_ID_TESTS: ${GITHUB_CLIENT_ID_TESTS}
@@ -24,13 +24,11 @@ services:
 
   # The service running the load-balancer
   nginx:
-    container_name: nginxnm
+    container_name: nginx
     hostname: nginx
     build:
       context: ../..
       dockerfile: code/jvm/docker/files/Dockerfile-nginx
-    environment:
-      NGROK_URI: ${NGROK_URI}
     ports:
       - "3000:3000"
 

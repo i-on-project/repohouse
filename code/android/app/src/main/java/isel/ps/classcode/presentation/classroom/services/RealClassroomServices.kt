@@ -2,11 +2,7 @@ package isel.ps.classcode.presentation.classroom.services
 
 import com.damnhandy.uri.template.UriTemplate
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.presentation.ASSIGNMENT_KEY
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
-import isel.ps.classcode.presentation.CLASSROOM_ARCHIVED_KEY
-import isel.ps.classcode.presentation.CLASSROOM_KEY
-import isel.ps.classcode.presentation.CREATE_TEAM_KEY
 import isel.ps.classcode.MEDIA_TYPE
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.ArchiveRepo
@@ -25,6 +21,10 @@ import isel.ps.classcode.http.NavigationRepository
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.presentation.ASSIGNMENT_KEY
+import isel.ps.classcode.presentation.CLASSROOM_ARCHIVED_KEY
+import isel.ps.classcode.presentation.CLASSROOM_KEY
+import isel.ps.classcode.presentation.CREATE_TEAM_KEY
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first

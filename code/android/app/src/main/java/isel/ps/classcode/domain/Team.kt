@@ -20,6 +20,5 @@ data class Team(
         isClosed = classCodeTeamDeserialization.isClosed,
         assignment = classCodeTeamDeserialization.assignment,
     )
-    val teamSlug = name.replace(" ", "-").lowercase()
     fun toLocalTeamDto(courseId: Int, courseName: String, classroomId: Int): LocalTeamDto = LocalTeamDto(id = id, name = name, isCreated = isCreated, assignment = assignment, courseId = courseId, courseName = courseName, classroomId = classroomId, isClosed = isClosed)
 }

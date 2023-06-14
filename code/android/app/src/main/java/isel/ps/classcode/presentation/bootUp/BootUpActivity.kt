@@ -52,6 +52,10 @@ class BootUpActivity : ComponentActivity() {
                             LoginActivity.navigate(origin = this)
                         }
                     },
+                    onBackRequest = {
+                        vm.logOut()
+                        LoginActivity.navigate(origin = this)
+                    },
                 )
             }
         }

@@ -200,7 +200,7 @@ fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, assignment
                 IconButton(onClick = {
                     pending = PendingState.LOADING
                     onCreateTeamComposite(createTeamComposite, true, assignment)
-                }) {
+                }, enabled = pending == PendingState.NORMAL) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = stringResource(id = R.string.refreshed_icon),
@@ -212,7 +212,7 @@ fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, assignment
                     IconButton(onClick = {
                         pending = PendingState.LOADING
                         onCreateTeamComposite(createTeamComposite, false, assignment)
-                    }) {
+                    }, enabled = pending == PendingState.NORMAL) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(id = R.string.closed_icon),
@@ -222,7 +222,7 @@ fun CreateTeamCompositeCard(createTeamComposite: CreateTeamComposite, assignment
                     IconButton(onClick = {
                         pending = PendingState.LOADING
                         onCreateTeamComposite(createTeamComposite, true, assignment)
-                    }) {
+                    }, enabled = pending == PendingState.NORMAL) {
                         Icon(
                             imageVector = Icons.Default.Done,
                             contentDescription = stringResource(id = R.string.checked_icon),

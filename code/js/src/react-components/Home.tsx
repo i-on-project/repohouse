@@ -38,7 +38,6 @@ export function ShowHomeFetch({
         <Box sx={homeBoxStyle}>
             {home instanceof SirenEntity ? (
                 <>
-                    {console.log(process.env.NGROK_URI)}
                     <Typography
                         variant="h1"
                         sx={typographyStyle}

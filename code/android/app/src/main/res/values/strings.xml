@@ -24,7 +24,7 @@
     <string name="logout">Logout</string>
     <string name="create_team_composite_empty_text">No teams need approval</string>
     <string name="teams_empty_text">No teams were created so far</string>
-    <string name="no_teams_text">No teams need approval</string>
+    <string name="no_teams_text">No teams were created</string>
     <string name="dropdown_menu_item_normal">Normal</string>
     <string name="dropdown_menu_item_archived">Archived</string>
     <string name="dropdown_menu_item_unarchived">Unarchived</string>

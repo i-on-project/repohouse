@@ -1,22 +1,7 @@
 package com.isel.leic.ps.ionClassCode.services
 
-import com.isel.leic.ps.ionClassCode.http.GITHUB_ACCESS_TOKEN_URI
-import com.isel.leic.ps.ionClassCode.http.GITHUB_API_BASE_URL
-import com.isel.leic.ps.ionClassCode.http.GITHUB_BASE_URL
-import com.isel.leic.ps.ionClassCode.http.GITHUB_USERINFO_URI
-import com.isel.leic.ps.ionClassCode.http.GITHUB_USERMAILS_URI
-import com.isel.leic.ps.ionClassCode.http.GITHUB_USER_ORGS
-import com.isel.leic.ps.ionClassCode.http.GITHUB_USER_ORGS_MEMBERSHIP
-import com.isel.leic.ps.ionClassCode.http.OkHttp
-import com.isel.leic.ps.ionClassCode.http.makeCallToList
-import com.isel.leic.ps.ionClassCode.http.makeCallToObject
-import com.isel.leic.ps.ionClassCode.http.model.github.Collaborator
-import com.isel.leic.ps.ionClassCode.http.model.github.Commit
-import com.isel.leic.ps.ionClassCode.http.model.github.GithubOrgRole
-import com.isel.leic.ps.ionClassCode.http.model.github.RepoOrg
-import com.isel.leic.ps.ionClassCode.http.model.github.RepoReponse
-import com.isel.leic.ps.ionClassCode.http.model.github.Tag
-import com.isel.leic.ps.ionClassCode.http.model.github.Tags
+import com.isel.leic.ps.ionClassCode.http.*
+import com.isel.leic.ps.ionClassCode.http.model.github.*
 import com.isel.leic.ps.ionClassCode.http.model.output.ClientToken
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubOrgsModel
 import com.isel.leic.ps.ionClassCode.http.model.output.GitHubUserEmail
@@ -84,18 +69,6 @@ class GithubServices(
     }
 
     /**
-     * Method to fetch the teacher orgs from GitHub.
-     */
-    suspend fun fetchRoleTeacherOrg(orgName: String,username:String,githubToken: String): GithubOrgRole {
-        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_USER_ORGS_MEMBERSHIP(orgName,username)}")
-            .addHeader("Authorization", "Bearer $githubToken")
-            .addHeader("Accept", "application/vnd.github+json")
-            .build()
-
-        return okHttp.makeCallToObject(request)
-    }
-
-    /**
      * Method to get the repositories from GitHub based on the organization and respective repository name
      */
     suspend fun getRepository(repoName: String, token: String, orgName: String): RepoReponse {
@@ -134,6 +107,18 @@ class GithubServices(
         }
 
         return RepoReponse(orgRepo.name, collaborators, tagsList)
+    }
+
+    /**
+     * Method to fetch the teacher orgs from GitHub.
+     */
+    suspend fun fetchRoleTeacherOrg(orgName: String,username:String,githubToken: String): GithubOrgRole {
+        val request = Request.Builder().url("$GITHUB_API_BASE_URL${GITHUB_USER_ORGS_MEMBERSHIP(orgName,username)}")
+            .addHeader("Authorization", "Bearer $githubToken")
+            .addHeader("Accept", "application/vnd.github+json")
+            .build()
+
+        return okHttp.makeCallToObject(request)
     }
 
     /**

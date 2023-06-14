@@ -10,6 +10,10 @@ INSERT INTO users (id, email, is_created, github_username, github_id, token, nam
 VALUES (19, 'andre.david.santos.02@gmail.com', true, 'AndreSantos0', 80883346, 'token420', 'student2');
 INSERT INTO student (id, school_id)
 VALUES (19, 1535);
+INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
+VALUES (20, 'ricardo.freitas.henriques@gmail.com', true, 'Henriquess19', 80883225, 'token421', 'student3');
+INSERT INTO student (id, school_id)
+VALUES (20, 1534);
 
 INSERT INTO course (id, org_url, name, org_id)
 VALUES (1, 'https://daw.isel.pt', 'test-project-isel', 127772322);
@@ -34,6 +38,8 @@ VALUES (6, 'TVS-2223v-LI52D', CURRENT_TIMESTAMP, 'https://classroom1.github.com/
 
 INSERT INTO student_classroom (student, classroom)
 VALUES (19, 4);
+INSERT INTO student_classroom (student, classroom)
+VALUES (20, 4);
 
 INSERT INTO assignment (id, classroom_id, min_elems_per_group, max_elems_per_group, max_number_groups, release_date, description, title)
 VALUES (5, 4, 2, 2, 3, CURRENT_TIMESTAMP, 'description4', 'title4');
@@ -57,32 +63,63 @@ INSERT INTO team (id, name, is_created, is_closed, assignment)
 VALUES (6, 'team6', false, false, 5);
 INSERT INTO repo (id, name, url, is_created, team_id)
 VALUES (4, 'repo4', null, false, 6);
+
 INSERT INTO team (id, name, is_created, is_closed, assignment)
-VALUES (10, 'team10', false, false, 5);
+VALUES (10, 'team8', false, false, 5);
+INSERT INTO repo (id, name, url, is_created, team_id)
+VALUES (8, 'repo8', null, false, 10);
 
 /*composite*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (33, 19, null, 'Pending');
+VALUES (33, 20, null, 'Pending');
 INSERT INTO composite(id)
 VALUES (33);
 
 /*createTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (34, 19, 33, 'Pending');
+VALUES (34, 20, 33, 'Pending');
 INSERT INTO createteam(id, team_id)
 VALUES (34, 6);
 
 /*createRepo*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (35, 19, 33, 'Pending');
+VALUES (35, 20, 33, 'Pending');
 INSERT INTO createrepo(id, repo_id)
 VALUES (35, 4);
 
 /*joinTeam*/
 INSERT INTO request(id, creator, composite, state)
-VALUES (36, 19, 33, 'Pending');
+VALUES (36, 20, 33, 'Pending');
 INSERT INTO jointeam(id, team_id, assigment_id)
 VALUES (36, 6, 5);
+
+INSERT INTO request(id, creator, composite, state)
+VALUES (63, 19, null, 'Pending');
+INSERT INTO composite(id)
+VALUES (63);
+
+/*createTeam*/
+INSERT INTO request(id, creator, composite, state)
+VALUES (66, 19, 63, 'Pending');
+INSERT INTO createteam(id, team_id)
+VALUES (66, 10);
+
+/*createRepo*/
+INSERT INTO request(id, creator, composite, state)
+VALUES (67, 19, 63, 'Pending');
+INSERT INTO createrepo(id, repo_id)
+VALUES (67, 8);
+
+/*joinTeam*/
+INSERT INTO request(id, creator, composite, state)
+VALUES (68, 19, 63, 'Pending');
+INSERT INTO jointeam(id, team_id, assigment_id)
+VALUES (68, 10, 5);
+
+INSERT INTO request(id, creator, composite, state)
+VALUES (97, 19, null, 'Pending');
+INSERT INTO jointeam(id, team_id, assigment_id)
+VALUES (97, 6, 5);
 
 /*TEAM 7*/
 INSERT INTO team (id, name, is_created, is_closed, assignment)
@@ -150,6 +187,14 @@ VALUES (80, 19, null, 'Pending');
 INSERT INTO leaveteam(id, team_id)
 VALUES (80, 6);
 
+INSERT INTO request(id, creator, composite, state)
+VALUES (81, 19, null, 'Pending');
+INSERT INTO leaveteam(id, team_id)
+VALUES (81, 6);
+INSERT INTO request(id, creator, composite, state)
+VALUES (82, 20, null, 'Pending');
+INSERT INTO leaveteam(id, team_id)
+VALUES (82, 6);
 COMMIT TRANSACTION;
 
 INSERT INTO users (id, email, is_created, github_username, github_id, token, name)
@@ -170,11 +215,11 @@ VALUES (84, 19, 81, 'Pending');
 INSERT INTO leavecourse(id, course_id)
 VALUES (84, 1);
 INSERT INTO request(id, creator, composite, state)
-VALUES (82, 19, 81, 'Pending');
+VALUES (82, 19, null, 'Pending');
 INSERT INTO leaveteam(id, team_id)
 VALUES (82, 6);
 INSERT INTO request(id, creator, composite, state)
-VALUES (83, 19, 81, 'Pending');
+VALUES (83, 19, null, 'Pending');
 INSERT INTO leaveteam(id, team_id)
 VALUES (83, 7);
 

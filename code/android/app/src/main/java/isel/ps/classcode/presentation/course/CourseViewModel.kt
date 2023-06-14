@@ -66,7 +66,7 @@ class CourseViewModel(private val courseServices: CourseServices, private val gi
                     val list = mutableListOf<LeaveTeamWithDelete>()
                     leaveTeamRequests.forEach { leaveTeam ->
                         if (leaveTeam.membersCount == 1) {
-                            when (gitHubService.deleteTeamFromTeamInGitHub(courseName = course.name, teamSlug = leaveTeam.teamName.replace(" ", "-"))) {
+                            when (gitHubService.deleteTeamFromTeamInGitHub(courseName = course.name, teamSlug = leaveTeam.teamName)) {
                                 is Either.Right -> {
                                     list.add(LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted", wasDeleted = true))
                                 }

@@ -157,10 +157,7 @@ when the requested resource is not found in the frontend.
 The application only environment variable is the `PORT` variable, which is used to set the port
 where the application is served, per default it's set to `3000`.
 
-The `NGROK_URI` variable is only used for development purposes,
-to set the backend URL, to avoid CORS issues.
-
-Both variables are set in the `webpack.config.js` file.
+This variable is set in the `webpack.config.js` file.
 
 ### How to..
 
@@ -187,6 +184,8 @@ which is a Node library to automate Chromium, Firefox and WebKit with a single A
 running in [Jest](https://jestjs.io/) framework.
 
 All the tests are located in the `tests/` folder.
+
+Make sure the database is running before running the tests. Before running the tests, verify if the database is empty and run the script [script.sql](tests/script.sql).
 
 To run the tests, you can run:
 

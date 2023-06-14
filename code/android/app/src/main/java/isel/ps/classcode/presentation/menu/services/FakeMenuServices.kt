@@ -1,5 +1,6 @@
 package isel.ps.classcode.presentation.menu.services
 
+import isel.ps.classcode.FakeDataStorage
 import isel.ps.classcode.domain.Course
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
@@ -7,9 +8,9 @@ import isel.ps.classcode.presentation.utils.Either
 /**
  * Implementation of the [MenuServices] interface that will be used for tests
  */
-class FakeMenuServices : MenuServices {
+class FakeMenuServices(private val data: FakeDataStorage) : MenuServices {
     override suspend fun getCourses(): Either<HandleClassCodeResponseError, List<Course>> {
-        return Either.Right(value = listOf(Course(id = 1, name = "PDM", orgId = 6817318, orgUrl = "https://avatars.githubusercontent.com/u/6817318?s=200&v=4"), Course(id = 2, name = "LAE", orgId = 5501606, orgUrl = "https://avatars.githubusercontent.com/u/5501606?s=200&v=4"), Course(id = 3, name = "DAW", orgId = 10852760, orgUrl = "https://avatars.githubusercontent.com/u/10852760?s=200&v=4")))
+        return Either.Right(value = data.getCourses())
     }
 
     override suspend fun logout() {

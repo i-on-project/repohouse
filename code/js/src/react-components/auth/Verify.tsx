@@ -17,7 +17,7 @@ export function ShowVerifyFetch({
 }) {
 
     if (window.opener) {
-        window.opener.postMessage({type:"Auth", data:'/auth/verify'},process.env.NGROK_URI)
+        window.opener.postMessage({type:"Auth", data:'/auth/verify'}, location.origin)
         window.close()
     }
 

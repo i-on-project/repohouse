@@ -8,6 +8,7 @@ import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.requests.ArchiveRepo
 import com.isel.leic.ps.ionClassCode.domain.requests.JoinTeam
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeamWithRepoName
 
 /**
  * Represents a Team Output Model.
@@ -56,13 +57,13 @@ data class TeamRequestsModel(
 
 data class RequestsThatNeedApproval(
     val joinTeam: List<JoinTeam>,
-    val leaveTeam: List<LeaveTeam>,
+    val leaveTeam: List<LeaveTeamWithRepoName>,
 )
 
 data class RequestsHistory(
     val createTeamComposite: CreateTeamComposite,
     val joinTeam: List<JoinTeam>,
-    val leaveTeam: List<LeaveTeam>,
+    val leaveTeam: List<LeaveTeamWithRepoName>,
     val archiveRepo: ArchiveRepo?,
 )
 

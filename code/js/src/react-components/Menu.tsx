@@ -145,7 +145,7 @@ export function ShowMenuCallbackFetch() {
     const githubId = searchParams.get('githubId')
     const userId = searchParams.get('userId')
     if (state !== undefined && githubId !== undefined && userId !== undefined) {
-        window.opener.postMessage({type:"Menu", data:'/menu', state: {auth:state,githubId:githubId,userId:userId}}, process.env.NGROK_URI)
+        window.opener.postMessage({type:"Menu", data:'/menu', state: {auth:state,githubId:githubId,userId:userId}}, location.origin)
         window.close()
         return (<></>)
     }

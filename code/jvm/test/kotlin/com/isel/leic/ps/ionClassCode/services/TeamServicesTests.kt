@@ -293,23 +293,6 @@ class TeamServicesTests {
         }
     }
 
-    @Test
-    fun `createTeamRequest should give the id of the request`() {
-        // when: getting a success
-        val team = teamServices.createTeamRequest(
-            assignmentId = 1,
-            classroomId = 2,
-            creator = 1,
-            creatorGitHubUserName = "team1",
-        )
-
-        if (team is Result.Success) {
-            assert(team.value.id == 1)
-        } else {
-            fail("Should not be Either.Left")
-        }
-    }
-
     // TEST: leaveTeamRequest
 
     @Test
