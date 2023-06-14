@@ -22,9 +22,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
-const val LOCAL_DATABASE_URL = "JDBC_DATABASE_URL"
-const val DATABASE_URL = "GCP_DATABASE_URL"
-const val DEFAULT_URL = "jdbc:postgresql://localhost:5432/classcode"
+const val DATABASE_URL = "JDBC_DATABASE_URL"
 
 @SpringBootApplication
 @EnableScheduling
@@ -32,8 +30,7 @@ class IonClassCodeApplication : WebMvcConfigurer {
     @Bean
     fun jdbi() = Jdbi.create(
         PGSimpleDataSource().apply {
-            //setURL(System.getenv(DATABASE_URL) ?: System.getenv(LOCAL_DATABASE_URL) ?: DEFAULT_URL)
-            setURL("jdbc:postgresql://34.175.41.95:5432/classcode?user=postgres&password=postgres")
+            setURL(System.getenv(DATABASE_URL))
         },
     ).configure()
 

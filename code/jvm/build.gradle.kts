@@ -77,14 +77,6 @@ task<Copy>("extractUberJar") {
     into("build/dependency")
 }
 
-task<Exec>("dbDockerUp") {
-    commandLine("docker-compose", "up", "-d", "db-docker")
-}
-
-task<Exec>("dbDockerDown") {
-    commandLine("docker-compose", "down")
-}
-
 task<Exec>("composeUp") {
     commandLine("docker-compose", "up", "--build", "--force-recreate")
     dependsOn("extractUberJar")
@@ -95,6 +87,4 @@ task<Exec>("composeDown") {
 
 tasks.named("check") {
     dependsOn("ktlintCheck")
-    dependsOn("dbDockerUp")
-    finalizedBy("dbDockerDown")
 }
