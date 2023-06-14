@@ -21,7 +21,6 @@ import com.isel.leic.ps.ionClassCode.services.GithubServices
 import com.isel.leic.ps.ionClassCode.services.UserServices
 import com.isel.leic.ps.ionClassCode.utils.Result
 import com.isel.leic.ps.ionClassCode.utils.cypher.AESEncrypt
-import java.util.*
 import okhttp3.internal.EMPTY_REQUEST
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
@@ -32,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 /**
  * Teacher authentication with the respective scope.

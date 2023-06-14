@@ -49,7 +49,7 @@ class TeamController(
     ): ResponseEntity<*> {
         return when (val team = teamService.getTeamInfo(teamId)) {
             is Result.Problem -> teamService.problem(team.value)
-            is Result.Success -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repo, team.value.feedbacks,team.value.assignment)) {
+            is Result.Success -> siren(TeamOutputModel(team.value.team, team.value.students, team.value.repo, team.value.feedbacks, team.value.assignment)) {
                 clazz("team")
                 link(href = Uris.teamUri(courseId, classroomId, assignmentId, teamId), rel = LinkRelation("self"), needAuthentication = true)
             }
@@ -110,7 +110,7 @@ class TeamController(
         if (user !is Student) return Problem.notStudent
         return when (val create = teamService.createTeamRequest(user.id, user.githubUsername, assignmentId, classroomId)) {
             is Result.Problem -> teamService.problem(create.value)
-            is Result.Success -> siren(RequestTeamCreatedOutputModel(create.value.id, create.value.teamId,create.value.teamName)) {
+            is Result.Success -> siren(RequestTeamCreatedOutputModel(create.value.id, create.value.teamId, create.value.teamName)) {
                 clazz("createTeam")
             }
         }

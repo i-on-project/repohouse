@@ -160,7 +160,7 @@ class TeacherServices(
     /**
      * Method to get all the organizations of a teacher
      */
-    suspend fun getTeacherOrgs(teacherId: Int, githubUsername:String, githubToken: String): TeacherOrgsResponse {
+    suspend fun getTeacherOrgs(teacherId: Int, githubUsername: String, githubToken: String): TeacherOrgsResponse {
         val orgs = githubServices.fetchTeacherOrgs(githubToken).map {
             GitHubOrgsModel(
                 it.login,
@@ -171,11 +171,13 @@ class TeacherServices(
         }
 
         val adminOrgs = orgs.mapNotNull { org ->
-            if ( githubServices.fetchRoleTeacherOrg(
+            if (
+                githubServices.fetchRoleTeacherOrg(
                     org.login,
                     githubUsername,
                     githubToken
-                ).role  == "admin") {
+                ).role == "admin"
+            ) {
                 org
             } else {
                 null

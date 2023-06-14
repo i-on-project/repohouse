@@ -38,7 +38,7 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
         )
             .bind("id", id)
             .bind("name", teamName)
-        return Team(id, teamName, false,false,team.assignmentId)
+        return Team(id, teamName, false, false, team.assignmentId)
     }
 
     /**

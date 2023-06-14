@@ -6,9 +6,9 @@ import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
-import java.sql.Timestamp
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
+import java.sql.Timestamp
 
 /**
  * Implementation of the Classroom methods
@@ -33,7 +33,7 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return Classroom(id, classroom.name, Timestamp(System.currentTimeMillis()), inviteCode, false, classroom.courseId,classroom.teacherId)
+        return Classroom(id, classroom.name, Timestamp(System.currentTimeMillis()), inviteCode, false, classroom.courseId, classroom.teacherId)
     }
 
     /**

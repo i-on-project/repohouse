@@ -104,5 +104,4 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .mapTo<Repo>()
             .list()
     }
-
 }

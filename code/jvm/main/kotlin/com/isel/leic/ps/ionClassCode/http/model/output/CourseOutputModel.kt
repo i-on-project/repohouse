@@ -33,7 +33,7 @@ data class CourseWithLeaveCourseRequestsOutputModel(
     val leaveCourseRequests: List<LeaveCourseRequest> = emptyList()
 ) : OutputModel
 
-    /**
+/**
  * Represents a Course Created Output Model.
  */
 data class CourseCreatedOutputModel(

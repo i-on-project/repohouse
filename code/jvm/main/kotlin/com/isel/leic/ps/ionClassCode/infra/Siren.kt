@@ -25,7 +25,6 @@ data class SirenModel<T>(
     val actions: List<ActionModel>,
 )
 
-
 /**
  * Represents a Link Model related to a Siren Model.
  */
