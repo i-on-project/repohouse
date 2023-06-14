@@ -157,10 +157,7 @@ when the requested resource is not found in the frontend.
 The application only environment variable is the `PORT` variable, which is used to set the port
 where the application is served, per default it's set to `3000`.
 
-The `NGROK_URI` variable is only used for development purposes,
-to set the backend URL, to avoid CORS issues.
-
-Both variables are set in the `webpack.config.js` file.
+This variable is set in the `webpack.config.js` file.
 
 ### How to..
 

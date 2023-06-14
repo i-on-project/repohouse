@@ -106,7 +106,7 @@ export function ShowCreateTeacherFetchPost({
 }
 
 export function ShowCreateCallbackTeacher() {
-    window.opener.postMessage({type:"Auth", data:'/auth/create/teacher'},process.env.NGROK_URI)
+    window.opener.postMessage({type:"Auth", data:'/auth/create/teacher'}, location.origin)
     window.close()
     return (<> </>)
 }

@@ -7,7 +7,7 @@ import { authServices } from ".."
 import {homeBoxStyle, typographyStyle} from "../../utils/Style";
 
 export function HandleAuthFailCallback() {
-    window.opener.postMessage({type:"Auth", data:'/auth/fail'}, process.env.NGROK_URI)
+    window.opener.postMessage({type:"Auth", data:'/auth/fail'}, location.origin)
     window.close()
     return (<> </>)
 }
@@ -34,7 +34,7 @@ export function HandleAuthFail() {
 }
 
 export function HandleAuthErrorCallback() {
-    window.opener.postMessage({type:"Auth", data:'/auth/error'}, process.env.NGROK_URI)
+    window.opener.postMessage({type:"Auth", data:'/auth/error'}, location.origin)
     window.close()
     return (<> </>)
 }
