@@ -8,7 +8,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {ErrorAlert} from "./error/ErrorAlert";
 import {AuthState, useLoggedIn} from "./auth/Auth";
 import {DeliveryServices} from "../services/DeliveryServices";
-import {DeliveryBody} from "../domain/dto/DeliveryDtoProperties";
+import {DeliveryBody, DeliveryDtoProperties} from "../domain/dto/DeliveryDtoProperties";
 import {DeliveryDomain} from "../domain/Delivery";
 import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../utils/Style";
 
@@ -21,9 +21,15 @@ export function ShowDeliveryFetch({
     assignmentId: number;
     deliveryId: number;
 }) {
-    const content = useAsync(async () => {
-        return await deliveryServices.delivery(courseId,classroomId,assignmentId,deliveryId);
-    });
+    const [content, setContent] = useState<SirenEntity<DeliveryDtoProperties> | ErrorMessageModel>(null);
+
+    React.useEffect(() => {
+            const res = useAsync(async () => {
+                return await deliveryServices.delivery(courseId, classroomId, assignmentId, deliveryId);
+            });
+            setContent(res)
+    }, [setContent]);
+    
     const [error, setError] = useState<ErrorMessageModel>(null);
     const navigate = useNavigate();
     const user = useLoggedIn()
@@ -34,9 +40,9 @@ export function ShowDeliveryFetch({
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            navigate(`/courses/${courseId}/classrooms/${classroomId}/assignments/${assignmentId}/deliveries/${deliveryId}`, {replace: true})
+            setContent(result);
         }
-    }, [setError]);
+    }, [setError,setContent]);
 
     const handleDeleteDelivery = useCallback(async () => {
         const result = await deliveryServices.deleteDelivery(courseId,classroomId,assignmentId,deliveryId);

@@ -23,8 +23,6 @@ import com.isel.leic.ps.ionClassCode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
-import java.sql.Timestamp
-import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.mockito.kotlin.doAnswer
@@ -34,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import java.sql.Timestamp
+import java.time.Instant
 
 @SpringBootTest
 class CourseServiceTests {
@@ -156,7 +156,7 @@ class CourseServiceTests {
                         on { getAllTeamsFromAUserInACourse(1, 1, listOf(1)) } doReturn listOf(Team(id = 1, name = "name", isCreated = true, isClosed = true, assignment = 1))
                     }
                     val mockedCompositeRepository = mock<CompositeRepository> {
-                        on { createCompositeRequest(CompositeInput(), 1) } doReturn Composite(id = 1, creator = 1, state = "Pending", composite = null )
+                        on { createCompositeRequest(CompositeInput(), 1) } doReturn Composite(id = 1, creator = 1, state = "Pending", composite = null)
                     }
                     val mockedLeaveCourseRepository = mock<LeaveCourseRepository> {
                         on { createLeaveCourseRequest(LeaveCourseInput(1, 1, "githubUsername"), 1) } doReturn LeaveCourse(

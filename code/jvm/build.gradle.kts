@@ -18,8 +18,8 @@ sourceSets {
         java.srcDirs("test/kotlin")
     }
 }
-group = "com.isel.leic.ps.ion_repohouse"
-version = "0.0.1-SNAPSHOT"
+group = "ion_classcode"
+version = "0.0.1"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -37,6 +37,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    // for Deploying to GCP
+    implementation("com.google.cloud.sql:postgres-socket-factory:1.1.0")
+    implementation("com.google.cloud.tools:appengine-gradle-plugin:2.4.5")
 
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -61,10 +65,6 @@ tasks.withType<KotlinCompile> {
 tasks.withType<BootJar> {
     enabled = true
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    manifest {
-        attributes["Main-Class"] = "com.isel.leic.ps.ion_repohouse.IonRepohouseApplicationKt"
-    }
 }
 
 tasks.withType<Test> {

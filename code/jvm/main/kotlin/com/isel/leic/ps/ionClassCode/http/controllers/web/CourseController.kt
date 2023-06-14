@@ -50,7 +50,7 @@ class CourseController(
         return when (val token = teacherServices.getTeacherGithubToken(user.id)) {
             is Result.Problem -> teacherServices.problem(token.value)
             is Result.Success -> {
-                when (val orgs = teacherServices.getTeacherOrgs(user.id, token.value)) {
+                when (val orgs = teacherServices.getTeacherOrgs(user.id, user.githubUsername, token.value)) {
                     is Result.Problem -> teacherServices.problem(orgs.value)
                     is Result.Success -> siren(GitHubOrgsOutputModel(orgs.value)) {
                         clazz("orgs")

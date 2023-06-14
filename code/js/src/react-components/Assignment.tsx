@@ -334,19 +334,19 @@ function ShowTeacherAssignmentFetch({
 }
 
 export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, error }: { assignmentServices: AssignmentServices,courseId:number,classroomId:number, error: ErrorMessageModel | null }) {
-    const [title, setTitle] = useState<string>(null)
-    const [description, setDescription] = useState<string>(null)
-    const [numbGroups, setNumbGroups] = useState(10)
-    const [minNumbElemPerGroup, setMinNumbElemPerGroup] = useState(1)
-    const [maxNumbElemPerGroup, setMaxNumbElemPerGroup] = useState(1)
-    const [create, setCreate] = useState(false)
-    const [serror, setError] = useState<ErrorMessageModel>(error)
-
     const minNumbGroups = 5
     const minElemsPerGroup = 1
-
+    
+    const [title, setTitle] = useState<string>(null)
+    const [description, setDescription] = useState<string>(null)
+    const [numbGroups, setNumbGroups] = useState(minNumbGroups)
+    const [minNumbElemPerGroup, setMinNumbElemPerGroup] = useState(minElemsPerGroup)
+    const [maxNumbElemPerGroup, setMaxNumbElemPerGroup] = useState(minElemsPerGroup)
+    const [create, setCreate] = useState(false)
+    const [serror, setError] = useState<ErrorMessageModel>(error)
+    
     const handleMinNumbElemsDecrease = useCallback(() => {
-        decreaseValue(1,minNumbElemPerGroup,setMinNumbElemPerGroup)
+        decreaseValue(minElemsPerGroup,minNumbElemPerGroup,setMinNumbElemPerGroup)
     }, [minNumbElemPerGroup,setMinNumbElemPerGroup])
 
     const handleMaxNumbElemsIncrese = useCallback(() => {
@@ -354,14 +354,14 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
     }, [maxNumbElemPerGroup,setMaxNumbElemPerGroup])
 
     const handleMinNumbElemsIncrese = useCallback(() => {
-        if (minNumbElemPerGroup + 1 == maxNumbElemPerGroup) {
-            handleMaxNumbElemsDecrease()
+        if (minNumbElemPerGroup + 1 > maxNumbElemPerGroup) {
+            handleMaxNumbElemsIncrese()
         }
         increaseValue(minNumbElemPerGroup,setMinNumbElemPerGroup)
     }, [minNumbElemPerGroup,maxNumbElemPerGroup,setMinNumbElemPerGroup,setMaxNumbElemPerGroup])
 
     const handleMaxNumbElemsDecrease = useCallback(() => {
-        if (maxNumbElemPerGroup - 1 == minNumbElemPerGroup) {
+        if (maxNumbElemPerGroup - 1 < minNumbElemPerGroup) {
             handleMinNumbElemsDecrease()
         }
         decreaseValue(minNumbElemPerGroup,maxNumbElemPerGroup,setMaxNumbElemPerGroup)
