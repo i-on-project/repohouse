@@ -73,7 +73,7 @@ All web API routes are prefixed with `/api/web`.
 | Route                                                           | Description                                                                 |
 |-----------------------------------------------------------------|-----------------------------------------------------------------------------|
 | GET ```/courses/:id/classrooms/:id/assignments/:id```           | Get the assignment page for the assignment with the given id.               |
-| POST ```/courses/:id/classrooms/:id/assignments/create```       | Create a new assignment. *                                                  |
+| POST ```/courses/:id/classrooms/:id/assignments/create```      | Create a new assignment. *                                                  |
 | DELETE ```/courses/:id/classrooms/:id/assignments/:id/delete``` | Delete an assignment. *                                                     |
 
 <br/><br/>
@@ -94,7 +94,7 @@ All web API routes are prefixed with `/api/web`.
 
 | Route                                                                    | Description                                           |
 |--------------------------------------------------------------------------|-------------------------------------------------------|
- | GET ```/courses/:id/classrooms/:id/assignments/:id/team```               | Get the team page for the delivery with the given id. |
+| GET ```/courses/:id/classrooms/:id/assignments/:id/team```               | Get the team page for the delivery with the given id. |
 | GET ```/courses/:id/classrooms/:id/assignments/:id/teams```              | Get all teams from an assignment.                     |
 | POST ```/courses/:id/classrooms/:id/assignments/:id/team/create```       | Creates a request to create a new team. **            |
 | POST ```/courses/:id/classrooms/:id/assignments/:id/team/join```         | Creates a request to Join a team. **                  |

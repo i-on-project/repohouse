@@ -106,27 +106,26 @@ that can be used to navigate through the API.
 
 The Siren format is composed by the following fields:
 
-- `class`: The class of the entity. It can be a single class or a list of classes.
+- `class` {String}: The class of the entity. It can be a single class or a list of classes.
 - `properties`: The properties of the entity.
-- `entities`:An Entity is a URI-addressable resource that has properties and actions associated with it. It may contain sub-entities and navigational links.
-  - `class`: Describes the nature of an entity's content based on the current representation.
-  - `rel`: Defines the relationship of the sub-entity to its parent.
-  - `href`: The URI of the linked sub-entity.
+- `entities`: An Entity is a URI-addressable resource that has properties and actions associated with it. It may contain sub-entities and navigational links.
+  - `properties`: A set of key-value pairs that describe the state of an entity. In JSON Siren, this is an object such as { "name": "Kevin", "age": 30 }. Optional.
+  - `rel`: Defines the relationship of the sub-entity to its parent, per [Web Linking (RFC5988)](https://tools.ietf.org/html/rfc5988) and Link Relations. MUST be a non-empty array of strings. Required.
+  - `links`: A collection of items that describe navigational links, distinct from entity relationships. Link items should contain a rel attribute to describe the relationship and an href attribute to point to the target URI. Entities should include a link rel to self. In JSON Siren, this is represented as "links": [{ "rel": ["self"], "href": "http://api/classroom/1234" }]. Optional.
 - `actions`: The actions that can be performed on the entity.
-  - `name`: Identifies the action to be performed.
-  - `method`: The HTTP method of the action.
-  - `href`: The URI of the action.
-  - `title`: Descriptive text about the action.
-  - `type`: The encoding type for the request.
+  - `name` {String}: Identifies the action to be performed.
+  - `method` {String}: The HTTP method of the action.
+  - `href` {URI}: The URI of the action.
+  - `title` {String}: Descriptive text about the action.
+  - `type` {String}: The encoding type for the request.
   - `fields`: Fields represent controls inside actions.
-    - `type`: The input type of the field.
+    - `type` {String}: The input type of the field.
     - `value`: A value assigned to the field.
-    - `title`: Textual annotation of a field.
+    - `title` {String}: Textual annotation of a field.
 - `links`: Represent navigational transitions.
-  - `rel`: The relation of the link to its entity.
-  - `href`: The URI of the linked resource.
-  - `type`: Defines media type of the linked resource, per [Web Linking (RFC5988)](https://tools.ietf.org/html/rfc5988).
-  - `title`: Text describing the nature of a link.
+  - `rel` : List of relations of the link to its entity.
+  - `href` {String}: The URI of the linked resource.
+  - `needAuthentication` {Boolean}: Defines if access to the link requires API authentication.
 
 
 The media type of the responses is `application/vnd.siren+json`.

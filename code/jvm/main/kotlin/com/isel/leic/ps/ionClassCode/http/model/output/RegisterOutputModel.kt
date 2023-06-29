@@ -6,5 +6,5 @@ package com.isel.leic.ps.ionClassCode.http.model.output
 data class RegisterOutputModel(
     val name: String,
     val email: String,
-    val GitHubUsername: String,
+    val gitHubUsername: String,
 ) : OutputModel
