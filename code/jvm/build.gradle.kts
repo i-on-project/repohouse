@@ -78,11 +78,11 @@ task<Copy>("extractUberJar") {
 }
 
 task<Exec>("composeUp") {
-    commandLine("docker-compose", "up", "--build", "--force-recreate")
+    commandLine("docker", "compose", "up", "--build", "--force-recreate")
     dependsOn("extractUberJar")
 }
 task<Exec>("composeDown") {
-    commandLine("docker-compose", "down")
+    commandLine("docker", "compose", "down")
 }
 
 tasks.named("check") {
