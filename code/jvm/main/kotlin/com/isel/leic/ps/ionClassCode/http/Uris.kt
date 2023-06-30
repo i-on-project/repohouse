@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.http
 
-import java.net.URI
 import org.springframework.web.util.UriTemplate
+import java.net.URI
 
 /**
  * Uris used in the application.

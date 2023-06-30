@@ -31,7 +31,7 @@ class CourseControllerMobile(
         return when (val course = courseServices.getCourseWithLeaveRequestById(courseId = courseId, userId = user.id, student = false)) {
             is Result.Problem -> courseServices.problem(error = course.value)
             is Result.Success -> {
-                val courseRes = CourseWithClassroomOutputModel(id = course.value.course.id, orgUrl = course.value.course.orgUrl, name = course.value.course.name, teacher = course.value.course.teachers, isArchived = course.value.course.isArchived, classrooms = course.value.course.classrooms,)
+                val courseRes = CourseWithClassroomOutputModel(id = course.value.course.id, orgUrl = course.value.course.orgUrl, name = course.value.course.name, teacher = course.value.course.teachers, isArchived = course.value.course.isArchived, classrooms = course.value.course.classrooms)
                 siren(
                     CourseWithLeaveCourseRequestsOutputModel(
                         course = courseRes,
