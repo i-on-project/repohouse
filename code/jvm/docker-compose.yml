@@ -29,7 +29,7 @@ services:
       context: ../..
       dockerfile: code/jvm/docker/files/Dockerfile-nginx
     ports:
-      - "3000:3000"
+      - "443:3000"
 
     depends_on:
       - spring-service
