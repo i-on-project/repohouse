@@ -21,14 +21,9 @@ export function ShowDeliveryFetch({
     assignmentId: number;
     deliveryId: number;
 }) {
-    const [content, setContent] = useState<SirenEntity<DeliveryDtoProperties> | ErrorMessageModel>(null);
-
-    React.useEffect(() => {
-            const res = useAsync(async () => {
-                return await deliveryServices.delivery(courseId, classroomId, assignmentId, deliveryId);
-            });
-            setContent(res)
-    }, [setContent]);
+    const content = useAsync(async () => {
+        return await deliveryServices.delivery(courseId, classroomId, assignmentId, deliveryId);
+    });
     
     const [error, setError] = useState<ErrorMessageModel>(null);
     const navigate = useNavigate();
@@ -40,9 +35,9 @@ export function ShowDeliveryFetch({
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            setContent(result);
+            // TODO
         }
-    }, [setError,setContent]);
+    }, [setError]);
 
     const handleDeleteDelivery = useCallback(async () => {
         const result = await deliveryServices.deleteDelivery(courseId,classroomId,assignmentId,deliveryId);
