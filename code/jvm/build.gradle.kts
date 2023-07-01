@@ -91,12 +91,18 @@ task<Exec>("composeUp") {
 }
 
 task<Exec>("actions") {
-    commandLine("docker", "compose","-f","docker-compose.actions.yml", "up", "--build", "--force-recreate")
+    commandLine("docker", "compose","-f","docker-compose.actions.yml", "up", "-d", "db-docker")
     dependsOn("extractUberJar")
 }
 
 task<Exec>("composeDown") {
     commandLine("docker-compose", "down")
+}
+
+tasks {
+    named<Test>("test") {
+        dependsOn("actions")
+    }
 }
 
 tasks.named("check") {
