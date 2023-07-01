@@ -63,7 +63,7 @@ The API adopted Problem Json representation is composed by:
 
 #### Web
 
-All web API routes are prefixed with `/api/web`.
+All web API routes are prefixed with `/api`.
 The specific properties representation for each endpoint response are:
 
 - GET ```/home```
@@ -112,7 +112,7 @@ The specific properties representation for each endpoint response are:
     - message {String}: Explains the next authentications step. 
 - POST ```/auth/logout```
     - No properties (null).
-- GET ```/menu```
+- GET ```/menu``` (if Student)
     - name {String}: Username.
     - schoolNumber {Number}: If user is a student, student school number.
     - email {String}: User institutional email.
@@ -128,55 +128,685 @@ The specific properties representation for each endpoint response are:
             - githubUsername {String}: Course´s teacher Github username.
             - githubId {Number}: Course´s teacher Github id..
             - isCreated {Boolean}: Indicates if the teacher is registered in the system.
+- GET ```/menu``` (if Teacher)
+    - name {String}: Username.
+    - email {String}: User institutional email.
+    - courses:
+        - id {Number}: Course System´s Id.
+        - orgUrl {String}: Course´s associated Github organization URL.
+        - name {String}: Course´s associated Github organization name.
+        - orgId {Number}: Course´s associated Github organization id.
+        - teacher:
+            - name {String}: Course´s teacher name.
+            - email {String}: Course´s teacher institutional email.
+            - id {Number}: Course´s teacher system´s id.
+            - githubUsername {String}: Course´s teacher Github username.
+            - githubId {Number}: Course´s teacher Github id..
+            - isCreated {Boolean}: Indicates if the teacher is registered in the system.
 - GET ```/teachers```
+    - teachers: list of teachers
+        - name {String}: Teacher´s name.
+        - email {String}: Teacher´s email.
+        - id {Number}: Teacher´s system Id.
+        - applyRequestId {Number}: Teacher´s registration request Id.
 - POST ```/teachers```
+    - teachers: list of teachers
+        - name {String}: Teacher´s name.
+        - email {String}: Teacher´s email.
+        - id {Number}: Teacher´s system Id.
+        - applyRequestId {Number}: Teacher´s registration request Id.
 - GET ```/courses/:id```
-- GET ```/courses/create```
-- POST ```/courses/create```
+    - id {Number}: Course System´s Id.
+    - orgUrl {String}: Course´s associated Github organization URL.
+    - name {String}: Course´s associated Github organization name.
+    - teacher: list of teacher
+        - name {String}: Course´s teacher name.
+        - email {String}: Course´s teacher institutional email.
+        - id {Number}: Course´s teacher system´s id.
+        - githubUsername {String}: Course´s teacher Github username.
+        - githubId {Number}: Course´s teacher Github id..
+        - isCreated {Boolean}: Indicates if the teacher is registered in the system.
+    - isArchived {Boolean}: Indicates if the course has been archived.
+    - classrooms: list of classroom
+        - id {Number}: Classroom´s system Id.
+        - name {String}: Classroom´s name.
+        - lastSync {Date}: Classroom´s last time of synchronization with Github.
+        - inviteCode {String}: Classroom´s invite code for students.
+        - isArchived {Boolean}: Indicates if the classroom has been archived.
+        - courseId {Number}: Classroom's associated course system´s Id.
+        - teacherId {Number}: Classroom's associated course's teacher system´s Id.
+- GET ```/orgs```
+    - orgs: list of organizations
+        - login {String}: Github´s organization name.
+        - url {String}: Github´s organization URL.
+        - avatar_url {String}: Github´s organization avatar URL.
+        - id {Number}: Github´s organization Id.
+- POST ```/courses```
+    - course:
+        - id {Number}: Course System´s Id.
+        - orgUrl {String}: Course´s associated Github organization URL.
+        - name {String}: Course´s associated Github organization name.
+        - orgId {Number}: Course´s associated Github organization id.
+        - teachers: list of teachers
+            - name {String}: Course´s teacher name.
+            - email {String}: Course´s teacher institutional email.
+            - id {Number}: Course´s teacher system´s id.
+            - githubUsername {String}: Course´s teacher Github username.
+            - githubId {Number}: Course´s teacher Github id..
+            - isCreated {Boolean}: Indicates if the teacher is registered in the system.
+        - isArchived {Boolean}: Indicates if the course has been archived.
 - PUT ```/courses/:id/leave```
-- PUT ```/courses/:id```
-- GET ```/orgs/```
+    - status {Number}: Leave course request status.
+    - id {Number}: Leave course request Id.
+    - title {String}: Leave course request message.
+- PUT ```/courses/:id``` (When course is archived)
+    - id {Number}: Course System´s Id.
+    - orgUrl {String}: Course´s associated Github organization URL.
+    - name {String}: Course´s associated Github organization name.
+    - teacher: list of teacher
+        - name {String}: Course´s teacher name.
+        - email {String}: Course´s teacher institutional email.
+        - id {Number}: Course´s teacher system´s id.
+        - githubUsername {String}: Course´s teacher Github username.
+        - githubId {Number}: Course´s teacher Github id..
+        - isCreated {Boolean}: Indicates if the teacher is registered in the system.
+    - isArchived {Boolean}: Indicates if the course has been archived.
+    - classrooms: list of classroom
+        - id {Number}: Classroom´s system Id.
+        - name {String}: Classroom´s name.
+        - lastSync {Date}: Classroom´s last time of synchronization with Github.
+        - inviteCode {String}: Classroom´s invite code for students.
+        - isArchived {Boolean}: Indicates if the classroom has been archived.
+        - courseId {Number}: Classroom's associated course system´s Id.
+        - teacherId {Number}: Classroom's associated course's teacher system´s Id.  
+- PUT ```/courses/:id``` (When course is deleted)
+    - id {Number}: Course´s system Id.
+    - deleted {Boolean}: Indicates if the course has been deleted.
 - GET ```/courses/:id/classrooms/:id```
+    - id {Number}: Classroom´s system Id.
+    - name {String}: Classroom´s name.
+    - lastSync {Date}: Classroom´s last time of synchronization with Github.
+    - isArchived {Boolean}: Indicates if the classroom has been archived.
+    - inviteCode {String}: Classroom´s invite code for students.
+    - assignments: list of assignments
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}:  Assignment´s description.
+        - title {String}:  Assignment´s title.
+    - students: list of students
+        - name {String}: Student´s name.
+        - email {String}: Student´s email.
+        - id {Number}: Student´s system Id.
+        - githubUsername {String}: Student´s Github username.
+        - githubId {Number}: Student´s Github Id.
+        - isCreated {Boolean}: Indicates if the student is registered in the system.
+        - schoolId {Number}: Student´s school Id.
 - POST ```/courses/:id/classrooms/create```
+    - id {Number}: Classroom´s system Id.
+    - name {String}: Classroom´s name.
+    - lastSync {Date}: Classroom´s last time of synchronization with Github.
+    - isArchived {Boolean}: Indicates if the classroom has been archived.
+    - inviteCode {String}: Classroom´s invite code for students.
+    - assignments: list of assignments
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}:  Assignment´s description.
+        - title {String}:  Assignment´s title.
+    - students: list of students
+        - name {String}: Student´s name.
+        - email {String}: Student´s email.
+        - id {Number}: Student´s system Id.
+        - githubUsername {String}: Student´s Github username.
+        - githubId {Number}: Student´s Github Id.
+        - isCreated {Boolean}: Indicates if the student is registered in the system.
+        - schoolId {Number}: Student´s school Id.
 - PUT ```/courses/:id/classrooms/:id/archive```
+    - id {Number}: Classroom´s system Id.
+    - archived {Boolean}: Indicates if the classroom has been archived.
+    - deleted {Boolean}: Indicates if the classroom has been deleted.
 - POST ```/courses/:id/classrooms/:id/edit``` 
+    - id {Number}: Classroom´s system Id.
+    - name {String}: Classroom´s name.
+    - lastSync {Date}: Classroom´s last time of synchronization with Github.
+    - isArchived {Boolean}: Indicates if the classroom has been archived.
+    - inviteCode {String}: Classroom´s invite code for students.
+    - assignments: list of assignments
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}:  Assignment´s description.
+        - title {String}:  Assignment´s title.
+    - students: list of students
+        - name {String}: Student´s name.
+        - email {String}: Student´s email.
+        - id {Number}: Student´s system Id.
+        - githubUsername {String}: Student´s Github username.
+        - githubId {Number}: Student´s Github Id.
+        - isCreated {Boolean}: Indicates if the student is registered in the system.
+        - schoolId {Number}: Student´s school Id.
 - POST ```/courses/:id/enter-classroom/:inviteLink```
-- POST ```/courses/:id/classrooms/:id/sync``` 
-- POST ```/courses/:id/classrooms/:id/copy```
-- GET ```/courses/:id/classrooms/:id/assignments/:id```
+    - courseId {Number}: Classroom associated course's system Id.
+    - classroom:
+        - id {Number}: Classroom´s system Id.
+        - name {String}: Classroom´s name.
+        - lastSync {Date}: Classroom´s last time of synchronization with Github.
+        - isArchived {Boolean}: Indicates if the classroom has been archived.
+        - inviteCode {String}: Classroom´s invite code for students.
+        - assignments: list of assignments
+            - id {Number}: Assignment´s system Id.
+            - classroomId {Number}: Assignment associated classroom´s system Id.
+            - minElemsPerGroup {Number}: minimum number of elements for work groups.
+            - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+            - maxNumberGroups {Number}: maximum number of work groups.
+            - releaseDate {Date}: Assignment´s release date.
+            - description {String}:  Assignment´s description.
+            - title {String}:  Assignment´s title.
+        - students: list of students
+            - name {String}: Student´s name.
+            - email {String}: Student´s email.
+            - id {Number}: Student´s system Id.
+            - githubUsername {String}: Student´s Github username.
+            - githubId {Number}: Student´s Github Id.
+            - isCreated {Boolean}: Indicates if the student is registered in the system.
+            - schoolId {Number}: Student´s school Id.
+- POST ```/courses/:id/classrooms/:id/sync```
+    - id {Number}: Classroom´s system Id.
+    - name {String}: Classroom´s name.
+    - lastSync {Date}: Classroom´s last time of synchronization with Github.
+    - isArchived {Boolean}: Indicates if the classroom has been archived.
+    - inviteCode {String}: Classroom´s invite code for students.
+    - assignments: list of assignments
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}:  Assignment´s description.
+        - title {String}:  Assignment´s title.
+    - students: list of students
+        - name {String}: Student´s name.
+        - email {String}: Student´s email.
+        - id {Number}: Student´s system Id.
+        - githubUsername {String}: Student´s Github username.
+        - githubId {Number}: Student´s Github Id.
+        - isCreated {Boolean}: Indicates if the student is registered in the system.
+        - schoolId {Number}: Student´s school Id.
+- GET ```/courses/:id/classrooms/:id/assignments/:id``` (if Student)
+    - assignment:
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}: Assignment´s description.
+        - title {String}:  ´s title.
+    - deliveries: list of deliveries
+        - id {Number}: Delivery´s system Id.
+        - dueDate {Date}: Delivery´s due date.
+        - tagControl {String}: Delivery´s tag format.
+        - assignmentId {Number}: Delivery associated assignment´s system Id.
+        - lastSync {Date}: Delivery last sync update with Github.
+    - team (can be null):
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+- GET ```/courses/:id/classrooms/:id/assignments/:id``` (if Teacher)
+    - assignment:
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}: Assignment´s description.
+        - title {String}: Assignment´s title.
+    - deliveries: list of deliveries
+        - id {Number}: Delivery´s system Id.
+        - dueDate {Date}: Delivery´s due date.
+        - tagControl {String}: Delivery´s tag format.
+        - assignmentId {Number}: Delivery associated assignment´s system Id.
+        - lastSync {Date}: Delivery last sync update with Github.
+    - teams: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
 - POST ```/courses/:id/classrooms/:id/assignments/create```
+    - assignment:
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}: Assignment´s description.
+        - title {String}: Assignment´s title.
 - DELETE ```/courses/:id/classrooms/:id/assignments/:id/delete```
-- GET ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id```          
-- POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/create```                                         
-- DELETE ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/delete```                                    
-- POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/edit```     
+    - deleted {Boolean}: Indicates if the assignment was deleted.
+- GET ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id```
+    - delivery:
+        - id {Number}: Delivery´s system Id.
+        - dueDate {Date}: Delivery´s due date.
+        - tagControl {String}: Delivery´s tag format.
+        - assignmentId {Number}: Delivery associated assignment´s system Id.
+        - lastSync {Date}: Delivery last sync update with Github.
+    - teamsDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+    - teamsNotDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.   
+- POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/create```
+    - delivery:
+        - id {Number}: Delivery´s system Id.
+        - dueDate {Date}: Delivery´s due date.
+        - tagControl {String}: Delivery´s tag format.
+        - assignmentId {Number}: Delivery associated assignment´s system Id.
+        - lastSync {Date}: Delivery last sync update with Github.
+    - teamsDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+    - teamsNotDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.                                            
+- DELETE ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/delete```
+    - id {Number}: Delivery´s system Id.
+    - deleted {Boolean}: Indicates if the delivey was deleted.                                   
+- POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/edit```
+    - delivery:
+        - id {Number}: Delivery´s system Id.
+        - dueDate {Date}: Delivery´s due date.
+        - tagControl {String}: Delivery´s tag format.
+        - assignmentId {Number}: Delivery associated assignment´s system Id.
+        - lastSync {Date}: Delivery last sync update with Github.
+    - teamsDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+    - teamsNotDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.     
 - POST ```/courses/:id/classrooms/:id/assignments/:id/deliveries/:id/sync```
-- GET ```/courses/:id/classrooms/:id/assignments/:id/team```               
-- GET ```/courses/:id/classrooms/:id/assignments/:id/teams```              
-- POST ```/courses/:id/classrooms/:id/assignments/:id/team/create```       
-- POST ```/courses/:id/classrooms/:id/assignments/:id/team/join```         
-- POST ```/courses/:id/classrooms/:id/assignments/:id/team/exit```         
-- GET ```/courses/:id/classrooms/:id/assignments/:id/team/requests```      
-- POST ```/courses/:id/classrooms/:id/assignments/:id/team/requests/:id```
-- POST ```/courses/:id/classrooms/:id/assignments/:id/team/feedback```
+    - delivery:
+        - id {Number}: Delivery´s system Id.
+        - dueDate {Date}: Delivery´s due date.
+        - tagControl {String}: Delivery´s tag format.
+        - assignmentId {Number}: Delivery associated assignment´s system Id.
+        - lastSync {Date}: Delivery last sync update with Github.
+    - teamsDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+    - teamsNotDelivered: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+- GET ```/courses/:id/classrooms/:id/assignments/:id/team/:id```
+    - team:
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+    - students: list of students
+        - name {String}: Student´s name.
+        - email {String}: Student´s email.
+        - id {Number}: Student´s system Id.
+        - githubUsername {String}: Student´s Github username.
+        - githubId {Number}: Student´s Github Id.
+        - isCreated {Boolean}: Indicates if the student is registered in the system.
+        - schoolId {Number}: Student´s school Id.
+    - repo (can be null):
+        - id {Number}: Repository´s system Id.
+        - url {String}: Repository´s Github URL.
+        - name {String}: Repository´s Github name.
+        - isCreated {Boolean}: Indicates if the repository is created in Github.
+    - feedbacks: list of feedbacks
+        - id {Number}: Feedback´s system Id.
+        - description {String}: Feedback´s description.
+        - label {String}: Feedback´s label.
+        - teamId {Number}: Feedback associated team´s system Id.
+    - assignment:
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}: Assignment´s description.
+        - title {String}: Assignment´s title.               
+- GET ```/courses/:id/classrooms/:id/assignments/:id/teams```
+    - teams: list of teams
+        - team:
+            - id {Number}: Team´s system Id.
+            - name {String}: Team´s name.
+            - isCreated {Boolean}: Indicates if the team is created in Github.
+            - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+            - assignment {Number}: Team associated assignment´s system Id.
+        - students: list of students
+            - name {String}: Student´s name.
+            - email {String}: Student´s email.
+            - id {Number}: Student´s system Id.
+            - githubUsername {String}: Student´s Github username.
+            - githubId {Number}: Student´s Github Id.
+            - isCreated {Boolean}: Indicates if the student is registered in the system.
+            - schoolId {Number}: Student´s school Id.
+        - repo (can be null):
+            - id {Number}: Repository´s system Id.
+            - url {String}: Repository´s Github URL.
+            - name {String}: Repository´s Github name.
+            - isCreated {Boolean}: Indicates if the repository is created in Github.
+        - feedbacks: list of feedbacks
+            - id {Number}: Feedback´s system Id.
+            - description {String}: Feedback´s description.
+            - label {String}: Feedback´s label.
+            - teamId {Number}: Feedback associated team´s system Id.
+        - assignment:
+            - id {Number}: Assignment´s system Id.
+            - classroomId {Number}: Assignment associated classroom´s system Id.
+            - minElemsPerGroup {Number}: minimum number of elements for work groups.
+            - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+            - maxNumberGroups {Number}: maximum number of work groups.
+            - releaseDate {Date}: Assignment´s release date.
+            - description {String}: Assignment´s description.
+            - title {String}: Assignment´s title.                    
+- POST ```/courses/:id/classrooms/:id/assignments/:id/team/create```
+    - id {Number}: Request´s system Id.
+    - teamId {Number}: Request team´s system Id.
+    - teamName {String}: Request team´s system name.
+- POST ```/courses/:id/classrooms/:id/assignments/:id/team/join```
+    - id {Number}: Request´s system Id.
+    - created {Boolean}: Indicates if the request was created.
+- POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/close```
+    - closed {Boolean}: Indicates if the team was closed.         
+- POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/exit```
+    - id {Number}: Request´s system Id.
+    - created {Boolean}: Indicates if the request was created.         
+- GET ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests```
+    - joinTeam: list of join team requests
+        - id {Number}: Request´s system Id.
+        - creator {Number}: Creator User´s system Id.
+        - state {String}: Request state.
+        - composite (can be null) {Number}: Parent Request´s system Id.
+        - teamId {Number}: Request team´s system Id.
+        - githubUsername {String}: Creator´s Github username.
+    - leaveTeam: list of leave team requests
+        - id {Number}: Request´s system Id.
+        - creator {Number}: Creator User´s system Id.
+        - state {String}: Request state.
+        - composite (can be null) {Number}: Parent Request´s system Id.
+        - teamId {Number}: Request team´s system Id.
+        - githubUsername {String}: Creator´s Github username.
+        - membersCount {Number}: number of team numbers.
+        - teamName {String}: Request team´s name.     
+- POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests/:id```
+    - id {Number}: Request´s system Id.
+    - changed {Boolean}: Indicates if the request´s state was changed.
+- POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/feedback```
+    - id {Number}: Feedbacks´s system Id.
+    - created {Boolean}: Indicates if the feedback was posted.
 
 #### Mobile
 
 All mobile API routes are prefixed with `/api/mobile`.
 The specific properties representation for each endpoint response are:
 
-- GET ```/home```    
+- GET ```/home```
+    - title {String}: Project´s and system name.
+    - description {String}: System´s main purpose.
+    - subDescription {String}: Additional description.
+    - est {String}: Eastern Stantard Time Year.    
 - GET ```/credits```
-- GET ```/auth```          
-- GET ```/auth/callback``` 
-- GET ```/auth/token```    
+    - teacher
+        - name {String}: Project´s teacher name.
+        - email {String}: Project´s teacher email.
+        - githubLink {String}: Project´s teacher github account URL.
+    - students: list of students
+        - name {String}: Project´s teacher institutional name.
+        - email {String}: Project´s teacher institutional email.
+        - githubLink {String}: Project´s teacher github account URL.
+- POST ```/token```
+    - accessToken {String}: User´s access token.    
 - GET ```/menu```
-- GET ```/courses/:id```     
-- POST ```/courses/leave```             
+    - name {String}: Username.
+    - email {String}: User institutional email.
+    - courses:
+        - id {Number}: Course System´s Id.
+        - orgUrl {String}: Course´s associated Github organization URL.
+        - name {String}: Course´s associated Github organization name.
+        - orgId {Number}: Course´s associated Github organization id.
+        - teacher:
+            - name {String}: Course´s teacher name.
+            - email {String}: Course´s teacher institutional email.
+            - id {Number}: Course´s teacher system´s id.
+            - githubUsername {String}: Course´s teacher Github username.
+            - githubId {Number}: Course´s teacher Github id..
+            - isCreated {Boolean}: Indicates if the teacher is registered in the system.
+- GET ```/courses/:id```
+    - course:
+        - id {Number}: Course System´s Id.
+        - orgUrl {String}: Course´s associated Github organization URL.
+        - name {String}: Course´s associated Github organization name.
+        - teacher: list of teacher
+            - name {String}: Course´s teacher name.
+            - email {String}: Course´s teacher institutional email.
+            - id {Number}: Course´s teacher system´s id.
+            - githubUsername {String}: Course´s teacher Github username.
+            - githubId {Number}: Course´s teacher Github id..
+            - isCreated {Boolean}: Indicates if the teacher is registered in the system.
+        - isArchived {Boolean}: Indicates if the course has been archived.
+        - classrooms: list of classroom
+            - id {Number}: Classroom´s system Id.
+            - name {String}: Classroom´s name.
+            - lastSync {Date}: Classroom´s last time of synchronization with Github.
+            - inviteCode {String}: Classroom´s invite code for students.
+            - isArchived {Boolean}: Indicates if the classroom has been archived.
+            - courseId {Number}: Classroom's associated course system´s Id.
+            - teacherId {Number}: Classroom's associated course's teacher system´s Id.
+    - leaveCourseRequests: list of requests
+        - leaveCourse:
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - courseId {Number}: Request course´s system Id.
+            - githubUsername {String}: Creator´s Github username.
+        - leaveTeamRequests: list of requests
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - teamId {Number}: Request team´s system Id.
+            - githubUsername {String}: Creator´s Github username.
+            - membersCount {Number}: number of team numbers.
+            - teamName {String}: Request team´s name.        
+- POST ```/courses/leave```
+    - No properties (null).              
 - GET ```/courses/:id/classrooms/:id```
-- POST ```/courses/:id/classrooms/archived``` 
-- GET ```/courses/:id/classrooms/:id/assignments/:id```          
-- GET ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests``` 
-- POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/create```  
+    - classroomModel:
+        - id {Number}: Classroom´s system Id.
+        - name {String}: Classroom´s name.
+        - lastSync {Date}: Classroom´s last time of synchronization with Github.
+        - isArchived {Boolean}: Indicates if the classroom has been archived.
+        - inviteCode {String}: Classroom´s invite code for students.
+        - assignments: list of assignments
+            - id {Number}: Assignment´s system Id.
+            - classroomId {Number}: Assignment associated classroom´s system Id.
+            - minElemsPerGroup {Number}: minimum number of elements for work groups.
+            - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+            - maxNumberGroups {Number}: maximum number of work groups.
+            - releaseDate {Date}: Assignment´s release date.
+            - description {String}:  Assignment´s description.
+            - title {String}:  Assignment´s title.
+        - students: list of students
+            - name {String}: Student´s name.
+            - email {String}: Student´s email.
+            - id {Number}: Student´s system Id.
+            - githubUsername {String}: Student´s Github username.
+            - githubId {Number}: Student´s Github Id.
+            - isCreated {Boolean}: Indicates if the student is registered in the system.
+            - schoolId {Number}: Student´s school Id.
+    - archiveRequest: list of requests (can be null) 
+        - id {Number}: Request´s system Id.
+        - creator {Number}: Creator User´s system Id.
+        - state {String}: Request state.
+        - composite (can be null) {Number}: Parent Request´s system Id.
+        - repoId {Number}: Repository´s system Id.
+        - repoName {String}: Repository´s system name.
+- POST ```/courses/:id/classrooms/archived```
+    - No properties (null). 
+- GET ```/courses/:id/classrooms/:id/assignments/:id```
+    - assignment:
+        - id {Number}: Assignment´s system Id.
+        - classroomId {Number}: Assignment associated classroom´s system Id.
+        - minElemsPerGroup {Number}: minimum number of elements for work groups.
+        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+        - maxNumberGroups {Number}: maximum number of work groups.
+        - releaseDate {Date}: Assignment´s release date.
+        - description {String}:  Assignment´s description.
+        - title {String}:  Assignment´s title.
+    - teamsCreated: list of teams
+        - id {Number}: Team´s system Id.
+        - name {String}: Team´s name.
+        - isCreated {Boolean}: Indicates if the team is created in Github.
+        - isClosed {Boolean}: Indicates if the team is closed after the end of a semester.
+        - assignment {Number}: Team associated assignment´s system Id.
+    - createTeamComposites: list of requests 
+        - compositeState {String}: Request´s state.
+        - createTeam:
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - teamId {Number}: Request team´s system Id.
+            - githubTeamId {String}: Request team´s Github Id.
+            - teamName {String}: Request team´s name.     
+        - joinTeam:
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - teamId {Number}: Request team´s system Id.
+            - githubUsername {String}: Creator´s Github username.
+        - createRepo:
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - repoId {Number}: Repository´s system Id.
+            - repoName {String}: Repository´s system name.        
+- GET ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests```
+    - needApproval
+        - joinTeam: list of requests
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - teamId {Number}: Request team´s system Id.
+            - githubUsername {String}: Creator´s Github username.
+        - leaveTeam: list of requests
+            - leaveTeam:
+                - id {Number}: Request´s system Id.
+                - creator {Number}: Creator User´s system Id.
+                - state {String}: Request state.
+                - composite (can be null) {Number}: Parent Request´s system Id.
+                - teamId {Number}: Request team´s system Id.
+                - githubUsername {String}: Creator´s Github username.
+                - membersCount {Number}: number of team numbers.
+                - teamName {String}: Request team´s name. 
+            - repoName {String}: Repository´s system name.
+    - requestsHistory
+        - createTeamComposite
+            - compositeState {String}: Request´s state.
+            - createTeam:
+                - id {Number}: Request´s system Id.
+                - creator {Number}: Creator User´s system Id.
+                - state {String}: Request state.
+                - composite (can be null) {Number}: Parent Request´s system Id.
+                - teamId {Number}: Request team´s system Id.
+                - githubTeamId {String}: Request team´s Github Id.
+                - teamName {String}: Request team´s name.     
+            - joinTeam:
+                - id {Number}: Request´s system Id.
+                - creator {Number}: Creator User´s system Id.
+                - state {String}: Request state.
+                - composite (can be null) {Number}: Parent Request´s system Id.
+                - teamId {Number}: Request team´s system Id.
+                - githubUsername {String}: Creator´s Github username.
+            - createRepo:
+                - id {Number}: Request´s system Id.
+                - creator {Number}: Creator User´s system Id.
+                - state {String}: Request state.
+                - composite (can be null) {Number}: Parent Request´s system Id.
+                - repoId {Number}: Repository´s system Id.
+                - repoName {String}: Repository´s system name.  
+        - joinTeam: list of requests
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - teamId {Number}: Request team´s system Id.
+            - githubUsername {String}: Creator´s Github username.
+        - leaveTeam: list of requests
+             - leaveTeam:
+                - id {Number}: Request´s system Id.
+                - creator {Number}: Creator User´s system Id.
+                - state {String}: Request state.
+                - composite (can be null) {Number}: Parent Request´s system Id.
+                - teamId {Number}: Request team´s system Id.
+                - githubUsername {String}: Creator´s Github username.
+                - membersCount {Number}: number of team numbers.
+                - teamName {String}: Request team´s name. 
+            - repoName {String}: Repository´s system name.
+        - archiveRepo (can be null):
+            - id {Number}: Request´s system Id.
+            - creator {Number}: Creator User´s system Id.
+            - state {String}: Request state.
+            - composite (can be null) {Number}: Parent Request´s system Id.
+            - repoId {Number}: Repository´s system Id.
+            - repoName {String}: Repository´s system name.
+- POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/create```
+    - result {Boolean}: Indicates if the request was created.
 - PUT ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests```
+    - id {Number}: Request´s system Id.
+    - changed {Boolean}: Indicates if the state was changed.
 - DELETE ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests/:id```
+    - id {Number}: Request´s system Id.
+    - changed {Boolean}: Indicates if the state was changed.

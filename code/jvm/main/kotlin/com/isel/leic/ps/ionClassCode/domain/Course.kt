@@ -12,7 +12,7 @@ data class Course(
     val name: String,
     val orgId: Long,
     val teachers: List<TeacherWithoutToken>,
-    val isArchived: Boolean = false
+    val isArchived: Boolean = false,
 )
 
 /**
@@ -26,15 +26,15 @@ data class CourseWithClassrooms(
     val teachers: List<TeacherWithoutToken>,
     val isArchived: Boolean = false,
     val students: List<Student> = emptyList(),
-    val classrooms: List<Classroom> = emptyList()
+    val classrooms: List<Classroom> = emptyList(),
 )
 
 data class LeaveCourseRequest(
     val leaveCourse: LeaveCourse,
-    val leaveTeamRequests: List<LeaveTeam>
+    val leaveTeamRequests: List<LeaveTeam>,
 )
 
 data class CourseWithLeaveCourseRequests(
     val course: CourseWithClassrooms,
-    val leaveCourseRequests: List<LeaveCourseRequest> = emptyList()
+    val leaveCourseRequests: List<LeaveCourseRequest> = emptyList(),
 )

@@ -2,7 +2,7 @@
 
 ### WEB API Routes
 
-All web API routes are prefixed with `/api/web`.
+All web API routes are prefixed with `/api`.
 
 <br/>
 
@@ -46,11 +46,10 @@ All web API routes are prefixed with `/api/web`.
 | Route                       | Description                                            |
 |-----------------------------|--------------------------------------------------------|
 | GET ```/courses/:id```      | Get the course page for the course with the given id.  |
-| GET ```/courses/create```   | Get all teacher GitHub organizations. *                |
+| GET ```/orgs```   | Get all teacher GitHub organizations. *                |
 | POST ```/courses/create```  | Create a new course, based on a Github Organization. * |
 | PUT ```/courses/:id/leave``` | Leave a course. **                                     |
 | PUT ```/courses/:id```      | Archive a course. *                                    |
-| GET ```/orgs/```            | Get all teacher GitHub organizations. *                |
 
 <br/><br/>
 
@@ -92,16 +91,17 @@ All web API routes are prefixed with `/api/web`.
 
 #### Team Controller 
 
-| Route                                                                    | Description                                           |
-|--------------------------------------------------------------------------|-------------------------------------------------------|
-| GET ```/courses/:id/classrooms/:id/assignments/:id/team```               | Get the team page for the delivery with the given id. |
-| GET ```/courses/:id/classrooms/:id/assignments/:id/teams```              | Get all teams from an assignment.                     |
-| POST ```/courses/:id/classrooms/:id/assignments/:id/team/create```       | Creates a request to create a new team. **            |
-| POST ```/courses/:id/classrooms/:id/assignments/:id/team/join```         | Creates a request to Join a team. **                  |
-| POST ```/courses/:id/classrooms/:id/assignments/:id/team/exit```         | Creates a request to Leave a team. **                 |
-| GET ```/courses/:id/classrooms/:id/assignments/:id/team/requests```      | Get all requests history from a team.                 |
-| POST ```/courses/:id/classrooms/:id/assignments/:id/team/requests/:id``` | Change a request status to 'pending' state. *         |
-| POST ```/courses/:id/classrooms/:id/assignments/:id/team/feedback```     | Post a feedback in a team. *                          |
+| Route                                                                        | Description                                             |
+|------------------------------------------------------------------------------|---------------------------------------------------------|
+| GET ```/courses/:id/classrooms/:id/assignments/:id/team```                   | Get the team page for the assignment with the given id. |
+| GET ```/courses/:id/classrooms/:id/assignments/:id/teams```                  | Get all teams from an assignment.                       |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/create```           | Creates a request to create a new team. **              |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/join```             | Creates a request to Join a team. **                    |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/exit```         | Creates a request to Leave a team. **                   |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/close```        | Closes a team. **                                       |
+| GET ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests```      | Get all requests history from a team.                   |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/requests/:id``` | Change a request status to 'pending' state. *           |
+| POST ```/courses/:id/classrooms/:id/assignments/:id/team/:id/feedback```     | Post a feedback in a team. *                            |
 
 <br/><br/>
 
@@ -131,7 +131,7 @@ All mobile API routes are prefixed with `/api/mobile`.
 |--------------------------|----------------------------------------------------------------------------|
 | GET ```/auth```          | Start GitHub OAuth process.                                                |
 | GET ```/auth/callback``` | Callback for GitHub OAuth process.                                         |
-| GET ```/auth/token```    | Obtain a token for the current user.                                       |
+| POST ```/token```    | Obtain a token for the current user.                                       |
 
 
 <br/><br/>

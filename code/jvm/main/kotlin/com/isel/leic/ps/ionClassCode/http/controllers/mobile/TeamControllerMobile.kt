@@ -41,6 +41,7 @@ class TeamControllerMobile(
             is Result.Problem -> teamServices.problem(error = result.value)
         }
     }
+
     @GetMapping(Uris.MOBILE_TEAM_REQUESTS_NOT_ACCEPTED_PATH, produces = ["application/vnd.siren+json"])
     fun getTeamRequests(
         user: User,

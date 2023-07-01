@@ -30,7 +30,7 @@ data class CourseWithClassroomOutputModel(
 
 data class CourseWithLeaveCourseRequestsOutputModel(
     val course: CourseWithClassroomOutputModel,
-    val leaveCourseRequests: List<LeaveCourseRequest> = emptyList()
+    val leaveCourseRequests: List<LeaveCourseRequest> = emptyList(),
 ) : OutputModel
 
 /**
@@ -45,5 +45,5 @@ data class CourseCreatedOutputModel(
  */
 data class CourseDeletedOutputModel(
     val id: Int,
-    val deleted: Boolean
+    val deleted: Boolean,
 ) : OutputModel
