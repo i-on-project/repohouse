@@ -3,17 +3,23 @@ services:
 
   # The service running the API
   spring-service:
-    container_name: spring-service
     hostname: spring-service
     build:
       context: ../..
       dockerfile: code/jvm/docker/files/Dockerfile-Spring
     environment:
       PORT: 8081
+      NGROK_URI: ${NGROK_URI}
       JDBC_DATABASE_URL: ${JDBC_DATABASE_URL}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_CLIENT_ID_TESTS: ${GITHUB_CLIENT_ID_TESTS}
+      GITHUB_CLIENT_SECRET_TESTS: ${GITHUB_CLIENT_SECRET_TESTS}
+      CLASSCODE_ENCRYPTION_KEY: ${CLASSCODE_ENCRYPTION_KEY}
+      SENDGRID_CLASSCODE_API_KEY: ${SENDGRID_CLASSCODE_API_KEY}
 
     ports:
-      - "8080:8080"
+      - "8080"
 
   # The service running the load-balancer
   nginx:
@@ -23,7 +29,8 @@ services:
       context: ../..
       dockerfile: code/jvm/docker/files/Dockerfile-nginx
     ports:
-      - "3000:3000"
+      - "443:3000"
 
     depends_on:
-        - spring-service
+      - spring-service
+
