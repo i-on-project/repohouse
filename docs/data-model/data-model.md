@@ -97,6 +97,7 @@ Restrições
 - id - identificador da disciplina/cadeira.
 - name - nome da disciplina/cadeira.
 - org_url - url da organização no github.
+- org_id - identificador da organização no github.
 - teacher_id - identificador do professor criador da cadeira.
 
 Restrições
@@ -104,13 +105,14 @@ Restrições
 - id - valor numérico inteiro não negativo. Chave primária.
 - name - não pode ser vazio ou null. Valor único.
 - org_url - não pode ser vazio ou null. Valor único.
+- org_id - não pode ser vazio ou null. Valor único.
 - teacher_id - valor numérico inteiro não negativo. Chave estrangeira para ``Teacher``.
 
 ``Classroom``
 > Entidade que representa uma turma, pertencente a uma disciplina/cadeira do sistema.
 - id - identificador da turma.
 - name - nome da turma.
-- invite_link - link de convite para a turma
+- invite_code - código de convite para a turma
 - last_sync - data da última sincronização.
 - is_archived - flag que indica se a turma está arquivada.
 - course_id - identificador da disciplina/cadeira associada.
@@ -119,7 +121,7 @@ Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária.
 - name - não pode ser vazio ou null.
-- invite_link - não pode ser vazio ou null. Valor único.
+- invite_code - não pode ser vazio ou null. Valor único.
 - last_sync - não pode ser null. formato de data. 
 - is_archived - não pode ser null. Valor por omissão é falso.
 - course_id - valor numérico inteiro não negativo. Chave estrangeira para ``Course``.
@@ -131,6 +133,7 @@ Restrições
 - description - descrição da tarefa.
 - release_date - data de lançamento da tarefa.
 - max_number_groups - número máximo de grupos
+- min_elems_per_group - número mínimo de elementos por grupo.
 - max_elems_per_group - número máximo de elementos por grupo.
 - classroom_id - identificador da classroom associada.
 
@@ -140,6 +143,7 @@ Restrições
 - title - não pode ser vazio ou null. Valor único.
 - description - não pode ser vazio ou null. Valor único.
 - release_date - não pode ser null. formato de data.
+- min_elems_per_group - não pode ser null. valor numérico inteiro não negativo.
 - max_number_groups - não pode ser null. valor numérico inteiro não negativo.
 - max_elems_per_group - não pode ser null. valor numérico inteiro não negativo.
 - classroom_id - valor numérico inteiro não negativo. Chave estrangeira para ``Classroom``.
@@ -149,6 +153,7 @@ Restrições
 - id - identificador da entrega.
 - tag_control - tag de controlo da entrega.
 - due_date - data limite de entrega.
+- last_sync - data da última sincronização.
 - assignment_id - identificador da tarefa associada a esta entrega.
 
 Restrições
@@ -156,6 +161,7 @@ Restrições
 - id - valor numérico inteiro não negativo. Chave primária.
 - tag_control - não pode ser vazio ou null.
 - due_date - não pode ser null. formato de data.
+- last_sync - não pode ser null. formato de data.
 - assignment_id - valor numérico inteiro não negativo. Chave estrangeira para ``Assignment``.
 
 ``Team`` - entidade fraca de ``Assignment``
@@ -163,6 +169,7 @@ Restrições
 - id - identificador do grupo.
 - name - nome do grupo.
 - is_created - flag que indica se o grupo já foi criado.
+- is_closed - flag que indica se o grupo está fechado.
 - assignment_id - identificador da tarefa associada a esta entrega.
 
 Restrições
@@ -170,6 +177,7 @@ Restrições
 - id - valor numérico inteiro não negativo. Chave primária.
 - name - não pode ser vazio ou null.
 - is_created - não pode ser null.
+- is_closed - não pode ser null.
 - assignment_id - valor numérico inteiro não negativo. Chave estrangeira para ``Assignment``.
 
 ``Feedback`` - entidade fraca de ``Team``
@@ -183,7 +191,7 @@ Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária.
 - description - não pode ser vazio ou null.
-- Label - não pode ser vazio ou null.
+- Label - não pode ser vazio ou null. Toma os valores: 'General', 'Task' and 'Alert'
 - team_id - valor numérico inteiro não negativo. Chave estrangeira para ``Team``.
 
 ``Repo`` - entidade fraca de ``Team``
@@ -222,8 +230,8 @@ Restrições
 
 ``Student_Classroom``
 > Entidade que representa a associação entre um aluno e uma turma.
-> - student_id - identificador do aluno.
-> - classroom_id - identificador da turma.
+- student_id - identificador do aluno.
+- classroom_id - identificador da turma.
 
 Restrições
 
@@ -253,7 +261,7 @@ Restrições
 - id - valor numérico inteiro não negativo. Chave primária.
 - creator - valor numérico inteiro não negativo. Chave estrangeira para ``Users``.
 - composite - valor numérico inteiro não negativo. Chave estrangeira para ``Request``. Pode ser null.
-- state - não pode ser null. Toma os valores 'pending', 'accepted', 'rejected'.
+- state - não pode ser null. Toma os valores 'pending', 'accepted', 'rejected' ou 'Not_Concluded'.
 
 ``CreateRepo`` - especialização de ``Request``
 > Entidade que representa um pedido de criação de um repositório.
@@ -289,21 +297,25 @@ Restrições
 > Entidade que representa um pedido de criação de uma turma.
 - id - identificador do pedido.
 - team_id - identificador do grupo.
+- github_team_id - identificador do grupo no Github.
 
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
 - team_id - não pode ser null. valor numérico inteiro não negativo.
+- github_team_id - não pode ser null. valor numérico inteiro não negativo.
 
 ``JoinTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de adesão a uma turma.
 - id - identificador do pedido.
 - team_id - identificador do grupo.
+- assignment_id - identificador da tarefa associada ao pedido.
 
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
 - team_id - não pode ser null. valor numérico inteiro não negativo.
+- assignment_id - não pode ser null. valor numérico inteiro não negativo.
 
 ``LeaveTeam`` - especialização de ``Request``
 > Entidade que representa um pedido de saída de uma turma.
@@ -319,11 +331,13 @@ Restrições
 > Entidade que representa um pedido de aplicação como docente no sistema.
 - id - identificador do pedido.
 - teacher_id - identificador do professor associado ao pedido.
+- state - estado atual do pedido.
 
 Restrições
 
 - id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
 - team_id -  não pode ser null. valor numérico inteiro não negativo. Chave estrangeira para ``Users``.
+- state - não pode ser null. Toma os valores 'pending', 'accepted', 'rejected'.
 
 ``Composite`` - especialização de ``Request``
 > Entidade que representa um conjunto de Request's.
@@ -336,13 +350,13 @@ Restrições
 ``Outbox``
 > Entidade que representa a caixa de saída de um utilizador.
 - user_id - identificador do utilizador.
-- state - estado atual da caixa de saída.
+- status - estado da caixa de saída.
 - sent_at - data de envio da caixa de saída.
 
 Restrições
 
 - user_id - valor numérico inteiro não negativo. Chave estrangeira para ``Users``.
-- state - não pode ser null. Toma os valores 'Pending' ou 'Sent'.
+- status - não pode ser null. Toma os valores 'pending' ou 'sent'.
 
 ``Cooldown``
 > Entidade que representa o tempo de espera de um utilizador.
@@ -369,3 +383,16 @@ Restrições
 - otp - não pode ser null. valor numérico inteiro não negativo de 6 dígitos.
 - expires_at - não pode ser null. formato de data.
 - tries - valor numérico inteiro não negativo.
+
+``ChallengeInfo``
+> Entidade que representa a informação sobre um pedido de autenticação vindo do aplicativo móvel.
+- state - valor de controlo do pedido de autenticação.
+- challenge - código de autenticação de dois fatores.
+- challenge_method - método de encriptação do challenge.
+
+Restrições
+
+- state - não pode ser null. Chave primária. 
+- challenge - não pode ser null.
+- challenge_method - não pode ser null. Toma os valores 'plain' ou 's256'.
+

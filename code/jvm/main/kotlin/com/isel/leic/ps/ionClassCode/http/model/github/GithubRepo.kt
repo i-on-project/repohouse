@@ -192,3 +192,10 @@ data class Author(
     val email: String,
     val date: String
 )
+
+/**
+ * GitHub Orgaznization Role model.
+ */
+data class GithubOrgRole(
+    val role: String
+)

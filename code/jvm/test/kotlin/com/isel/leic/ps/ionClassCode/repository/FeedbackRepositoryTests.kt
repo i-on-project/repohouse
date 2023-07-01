@@ -12,7 +12,7 @@ class FeedbackRepositoryTests {
     fun `can create a feedback`() = testWithHandleAndRollback { handle ->
         val feedbackRepo = JdbiFeedbackRepository(handle = handle)
         val teamId = 1
-        val created = feedbackRepo.createFeedback(feedback = FeedbackInput(description = "description", label = "label", teamId = teamId))
+        val created = feedbackRepo.createFeedback(feedback = FeedbackInput(description = "description", label = "Task", teamId = teamId))
         val feedback = feedbackRepo.getFeedbackById(feedbackId = created.id)
         assert(feedback != null)
     }
@@ -21,7 +21,7 @@ class FeedbackRepositoryTests {
     fun `can get a feedback by id`() = testWithHandleAndRollback { handle ->
         val feedbackRepo = JdbiFeedbackRepository(handle = handle)
         val feedbackId = 1
-        val label = "label1"
+        val label = "Task"
         val feedback = feedbackRepo.getFeedbackById(feedbackId = feedbackId) ?: fail("Feedback not found")
         assert(feedback.label == label)
     }
@@ -40,7 +40,7 @@ class FeedbackRepositoryTests {
     fun `can update feedback label`() = testWithHandleAndRollback { handle ->
         val feedbackRepo = JdbiFeedbackRepository(handle = handle)
         val feedbackId = 1
-        val newLabel = "new label"
+        val newLabel = "General"
         feedbackRepo.updateFeedbackLabel(feedbackId = feedbackId, label = newLabel)
         val feedback = feedbackRepo.getFeedbackById(feedbackId = feedbackId) ?: fail("Feedback not found")
         assert(feedback.label == newLabel)

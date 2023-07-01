@@ -52,7 +52,7 @@ fun ClassCodeErrorView(
                         }
                     },
                     icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = stringResource(id = R.string.warning_icon)) },
-                    title = { Text(text = "Error in the the process of the response from the server") },
+                    title = { Text(text = "Error in the process of the response from the server") },
                     text = { Text(text = error) },
                 )
             }
@@ -109,14 +109,14 @@ fun ClassCodeErrorView(
 fun GithubErrorView(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = { },
-    handleClassCodeResponseError: HandleGitHubResponseError,
+    handleGitHubResponseError: HandleGitHubResponseError,
 ) {
     Box(
         modifier = modifier,
     ) {
-        when (handleClassCodeResponseError) {
+        when (handleGitHubResponseError) {
             is HandleGitHubResponseError.FailDeserialize -> {
-                val error = handleClassCodeResponseError.error
+                val error = handleGitHubResponseError.error
                 AlertDialog(
                     onDismissRequest = onDismissRequest,
                     confirmButton = {
@@ -131,7 +131,7 @@ fun GithubErrorView(
             }
 
             is HandleGitHubResponseError.FailRequest -> {
-                val error = handleClassCodeResponseError.error
+                val error = handleGitHubResponseError.error
                 AlertDialog(
                     onDismissRequest = onDismissRequest,
                     confirmButton = {

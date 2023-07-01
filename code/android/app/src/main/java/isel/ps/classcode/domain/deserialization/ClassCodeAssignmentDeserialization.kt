@@ -10,6 +10,7 @@ import java.sql.Timestamp
 data class ClassCodeAssignmentDeserialization(
     @JsonProperty("id")val id: Int,
     @JsonProperty("classroomId")val classroomId: Int,
+    @JsonProperty("minElemsPerGroup")val minElemsPerGroup: Int,
     @JsonProperty("maxElemsPerGroup")val maxElemsPerGroup: Int,
     @JsonProperty("maxNumberGroups")val maxNumberGroups: Int,
     @JsonProperty("releaseDate")val releaseDate: Timestamp,

@@ -36,7 +36,7 @@ export function ShowAuthStudentFetch({
 
     useEffect(() => {
         window.addEventListener('message', function(e) {
-            if(e.origin !== process.env.NGROK_URI)
+            if(e.origin !== location.origin)
                 return;
             if (e.data.type === "Menu") {
                 setGithubId(e.data.state.githubId)

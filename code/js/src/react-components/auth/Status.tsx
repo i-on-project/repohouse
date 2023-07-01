@@ -2,7 +2,7 @@ import * as React from "react"
 import { useAsync } from "../../http/Fetch"
 import { ErrorMessageModel } from "../../domain/response-models/Error"
 import { SirenEntity } from "../../http/Siren"
-import {Backdrop, Box, CircularProgress, List, Typography} from "@mui/material"
+import {Backdrop, Box, CircularProgress, Typography} from "@mui/material"
 import { AuthServices } from "../../services/AuthServices"
 import { Error } from "../error/Error"
 import {homeBoxStyle, typographyStyle} from "../../utils/Style";
@@ -18,7 +18,7 @@ export function ShowStatusFetch({
     })
 
     if (window.opener) {
-        window.opener.postMessage({type:"Auth", data:'/auth/status'},process.env.NGROK_URI)
+        window.opener.postMessage({type:"Auth", data:'/auth/status'}, location.origin)
         window.close()
     }
 

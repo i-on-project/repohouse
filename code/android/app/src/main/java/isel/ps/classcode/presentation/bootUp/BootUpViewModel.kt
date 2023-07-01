@@ -22,4 +22,10 @@ class BootUpViewModel(private val sessionStore: SessionStore, private val bootUp
         viewModelScope.launch {
             bootUpServices.getHome()
         }
+    fun logOut() =
+        viewModelScope.launch {
+            sessionStore.cleanTokens()
+            val res = sessionStore.checkIfTokensExists()
+            _tokensExists = res
+        }
 }

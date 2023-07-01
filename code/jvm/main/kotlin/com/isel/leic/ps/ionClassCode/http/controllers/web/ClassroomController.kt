@@ -54,6 +54,7 @@ class ClassroomController(
                     name = classroom.value.name,
                     isArchived = classroom.value.isArchived,
                     lastSync = classroom.value.lastSync,
+                    inviteCode = classroom.value.inviteCode,
                     assignments = classroom.value.assignments,
                     students = classroom.value.students,
                 ),
@@ -82,6 +83,7 @@ class ClassroomController(
                     name = classroom.value.name,
                     isArchived = classroom.value.isArchived,
                     lastSync = classroom.value.lastSync,
+                    inviteCode = classroom.value.inviteCode,
                     assignments = classroom.value.assignments,
                     students = classroom.value.students,
                 ),
@@ -141,6 +143,7 @@ class ClassroomController(
                     name = classroom.value.name,
                     isArchived = classroom.value.isArchived,
                     lastSync = classroom.value.lastSync,
+                    inviteCode = classroom.value.inviteCode,
                     assignments = classroom.value.assignments,
                     students = classroom.value.students,
                 ),
@@ -195,6 +198,7 @@ class ClassroomController(
                         name = classroom.value.name,
                         isArchived = classroom.value.isArchived,
                         lastSync = classroom.value.lastSync,
+                        inviteCode = classroom.value.inviteCode,
                         assignments = classroom.value.assignments,
                         students = classroom.value.students,
                     ),
@@ -217,7 +221,6 @@ class ClassroomController(
         @PathVariable courseId: Int,
     ): ResponseEntity<*> {
         if (user !is Teacher) return Problem.notTeacher
-        // TODO : check for other users
         return when (val localCopy = classroomServices.localCopy(classroomId)) {
             is Result.Problem -> classroomServices.problem(localCopy.value)
             is Result.Success ->

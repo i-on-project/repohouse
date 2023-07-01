@@ -11,7 +11,7 @@ data class Classroom(
     val id: Int,
     val name: String,
     val lastSync: Timestamp,
-    val inviteLink: String,
+    val inviteCode: String,
     val isArchived: Boolean,
     val courseId: Int,
 ) {
@@ -19,7 +19,7 @@ data class Classroom(
         id = classCodeClassroomDeserialization.id,
         name = classCodeClassroomDeserialization.name,
         lastSync = classCodeClassroomDeserialization.lastSync,
-        inviteLink = classCodeClassroomDeserialization.inviteLink,
+        inviteCode = classCodeClassroomDeserialization.inviteCode,
         isArchived = classCodeClassroomDeserialization.isArchived,
         courseId = classCodeClassroomDeserialization.courseId,
     )
@@ -31,7 +31,7 @@ data class Classroom(
         id = id,
         name = name,
         lastSync = lastSync,
-        inviteLink = inviteLink,
+        inviteLink = inviteCode,
         isArchived = isArchived,
         courseId = courseId,
         courseName = courseName,

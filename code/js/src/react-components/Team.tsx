@@ -260,9 +260,9 @@ export function ShowTeamFetch({
                                     label="Label"
                                     onChange={(event) => setLabel(event.target.value as string)}
                                 >
-                                    <MenuItem  value="info">Info</MenuItem >
-                                    <MenuItem  value="test1">Test1</MenuItem >
-                                    <MenuItem  value="amor">Amor</MenuItem >
+                                    <MenuItem  value="General">Info</MenuItem >
+                                    <MenuItem  value="Notice">Test1</MenuItem >
+                                    <MenuItem  value="Task">Amor</MenuItem >
                                 </Select>
                                 <TextField
                                     id="description"

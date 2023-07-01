@@ -117,7 +117,7 @@ export function ShowCreateStudentFetchPost({
 }
 
 export function ShowCreateCallbackStudent() {
-    window.opener.postMessage({type:"Auth", data:'/auth/create/student'},process.env.NGROK_URI)
+    window.opener.postMessage({type:"Auth", data:'/auth/create/student'}, location.origin)
     window.close()
     return (<> </>)
 }

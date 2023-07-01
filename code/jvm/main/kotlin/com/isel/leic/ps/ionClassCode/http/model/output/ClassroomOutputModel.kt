@@ -2,6 +2,7 @@ package com.isel.leic.ps.ionClassCode.http.model.output
 
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
+import com.isel.leic.ps.ionClassCode.domain.requests.ArchiveRepo
 import java.io.File
 import java.sql.Timestamp
 
@@ -13,6 +14,7 @@ data class ClassroomOutputModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
+    val inviteCode: String,
     val assignments: List<Assignment>,
     val students: List<StudentWithoutToken>,
 ) : OutputModel
@@ -34,8 +36,14 @@ data class ClassroomModel(
     val name: String,
     val isArchived: Boolean,
     val lastSync: Timestamp,
+    val inviteCode: String,
     val assignments: List<Assignment>,
     val students: List<StudentWithoutToken>,
+) : OutputModel
+
+data class ClassroomModelWithArchiveRequest(
+    val classroomModel: ClassroomModel,
+    val archiveRequest: List<ArchiveRepo>?,
 ) : OutputModel
 
 /**

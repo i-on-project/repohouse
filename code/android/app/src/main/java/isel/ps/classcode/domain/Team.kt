@@ -10,14 +10,15 @@ data class Team(
     val id: Int,
     val name: String,
     val isCreated: Boolean,
-    val assignment: Int
+    val isClosed: Boolean,
+    val assignment: Int,
 ) {
     constructor(classCodeTeamDeserialization: ClassCodeTeamDeserialization) : this(
-        classCodeTeamDeserialization.id,
-        classCodeTeamDeserialization.name,
-        classCodeTeamDeserialization.isCreated,
-        classCodeTeamDeserialization.assignment,
+        id = classCodeTeamDeserialization.id,
+        name = classCodeTeamDeserialization.name,
+        isCreated = classCodeTeamDeserialization.isCreated,
+        isClosed = classCodeTeamDeserialization.isClosed,
+        assignment = classCodeTeamDeserialization.assignment,
     )
-    val teamSlug = name.replace(" ", "-").lowercase()
-    fun toLocalTeamDto(courseId: Int, courseName: String, classroomId: Int): LocalTeamDto = LocalTeamDto(id = id, name = name, isCreated = isCreated, assignment = assignment, courseId = courseId, courseName = courseName, classroomId = classroomId)
+    fun toLocalTeamDto(courseId: Int, courseName: String, classroomId: Int): LocalTeamDto = LocalTeamDto(id = id, name = name, isCreated = isCreated, assignment = assignment, courseId = courseId, courseName = courseName, classroomId = classroomId, isClosed = isClosed)
 }

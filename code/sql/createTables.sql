@@ -128,12 +128,6 @@ ALTER TABLE Request
         FOREIGN KEY (composite)
             REFERENCES Composite(id);
 
-CREATE TABLE ArchiveRepo(
-   id int primary key,
-   repo_id int unique not null,
-   foreign key (id) references Request(id)
-);
-
 CREATE TABLE LeaveCourse(
     id int primary key,
     course_id int not null,
@@ -172,7 +166,7 @@ CREATE TABLE Apply(
 
 CREATE TABLE Student_Team(
     student int,
-    team int,
+    team int not null,
     primary key (student, team),
     foreign key (student) references Student(id),
     foreign key (team) references Team(id)
@@ -192,8 +186,15 @@ CREATE TABLE Repo(
     name text not null,
     url text unique default null,
     is_created boolean not null,
-    team_id int unique not null,
+    team_id int unique null,
     foreign key (team_id) references Team(id)
+);
+
+CREATE TABLE ArchiveRepo(
+    id int primary key,
+    repo_id int unique not null,
+    foreign key (id) references Request(id),
+    foreign key (repo_id) references Repo(id)
 );
 
 CREATE TABLE Tags(
@@ -210,7 +211,7 @@ CREATE TABLE Tags(
 CREATE TABLE Feedback(
     id serial primary key,
     description text not null,
-    label text not null,
+    label text not null check ( label in ('General', 'Task', 'Alert') ),
     team_id int not null,
     foreign key (team_id) references Team(id)
 );
@@ -245,5 +246,3 @@ CREATE TABLE CreateRepo(
 );
 
 COMMIT;
-
-update team set is_closed = false where id=3;

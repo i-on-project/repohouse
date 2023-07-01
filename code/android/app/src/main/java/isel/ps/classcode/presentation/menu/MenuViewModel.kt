@@ -9,11 +9,12 @@ import isel.ps.classcode.domain.Course
 import isel.ps.classcode.domain.UserInfo
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
+import isel.ps.classcode.dataAccess.gitHubService.GitHubService
 import isel.ps.classcode.presentation.menu.services.MenuServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.launch
 
-class MenuViewModel(private val menuServices: MenuServices) : ViewModel() {
+class MenuViewModel(private val menuServices: MenuServices, private val gitHubService: GitHubService) : ViewModel() {
     val userInfo: UserInfo?
         get() = _userInfo
     private var _userInfo by mutableStateOf<UserInfo?>(null)
@@ -31,7 +32,7 @@ class MenuViewModel(private val menuServices: MenuServices) : ViewModel() {
         get() = _errorGitHub
 
     fun getUserInfo() = viewModelScope.launch {
-        when (val userInfo = menuServices.getUserInfo()) {
+        when (val userInfo = gitHubService.getUserInfo()) {
             is Either.Right -> { _userInfo = userInfo.value }
             is Either.Left -> { _errorGitHub = userInfo.value }
         }

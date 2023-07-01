@@ -45,12 +45,16 @@ class BootUpActivity : ComponentActivity() {
         setContent {
             ClasscodeTheme {
                 BootUpScreen(
-                    actionHandler = {
+                    strongBiometric = {
                         if (vm.tokensExists) {
                             launchBiometricPrompt()
                         } else {
                             LoginActivity.navigate(origin = this)
                         }
+                    },
+                    onBackRequest = {
+                        vm.logOut()
+                        LoginActivity.navigate(origin = this)
                     },
                 )
             }
@@ -71,8 +75,6 @@ class BootUpActivity : ComponentActivity() {
 
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
-                Log.d(BIOMETRIC_TAG, "Authentication was successful")
-                Log.d(BIOMETRIC_TAG, "result crypto object: ${result.cryptoObject}")
                 MenuActivity.navigate(origin = this@BootUpActivity)
             }
         }

@@ -160,12 +160,35 @@ class TeacherServices(
     /**
      * Method to get all the organizations of a teacher
      */
-    suspend fun getTeacherOrgs(teacherId: Int, githubToken: String): TeacherOrgsResponse {
-        val orgs = githubServices.fetchTeacherOrgs(githubToken).map { GitHubOrgsModel(it.login, it.url.replace("api.github.com/orgs", "github.com"), it.avatar_url, it.id) }
+    suspend fun getTeacherOrgs(teacherId: Int, githubUsername: String, githubToken: String): TeacherOrgsResponse {
+        val orgs = githubServices.fetchTeacherOrgs(githubToken).map {
+            GitHubOrgsModel(
+                it.login,
+                it.url.replace("api.github.com/orgs", "github.com"),
+                it.avatar_url,
+                it.id
+            )
+        }
+
+        val adminOrgs = orgs.mapNotNull { org ->
+            if (
+                githubServices.fetchRoleTeacherOrg(
+                    org.login,
+                    githubUsername,
+                    githubToken
+                ).role == "admin"
+            ) {
+                org
+            } else {
+                null
+            }
+        }
+
         return transactionManager.run {
-            it.usersRepository.getTeacher(teacherId) ?: return@run Result.Problem(TeacherServicesError.InternalError)
+            it.usersRepository.getTeacher(teacherId)
+                ?: return@run Result.Problem(TeacherServicesError.InternalError)
             val teacherCourses = it.courseRepository.getAllTeacherCourses(teacherId)
-            val orgsToAdd = orgs.filter { org ->
+            val orgsToAdd = adminOrgs.filter { org ->
                 teacherCourses.none { teacherOrg ->
                     teacherOrg.orgUrl == org.url
                 }

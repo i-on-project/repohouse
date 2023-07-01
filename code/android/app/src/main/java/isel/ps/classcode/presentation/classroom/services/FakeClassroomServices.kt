@@ -1,35 +1,34 @@
 package isel.ps.classcode.presentation.classroom.services
 
+import isel.ps.classcode.domain.ArchiveRepo
 import isel.ps.classcode.domain.Assignment
-import isel.ps.classcode.domain.CreateRepo
-import isel.ps.classcode.domain.CreateTeamComposite
+import isel.ps.classcode.domain.GetAssignmentsResponse
 import isel.ps.classcode.domain.Teams
+import isel.ps.classcode.domain.UpdateArchiveRepoInput
 import isel.ps.classcode.domain.UpdateCreateTeamStatusInput
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.delay
-import java.sql.Timestamp
-import java.time.Instant
 
 /**
  * Implementation of the [ClassroomServices] interface that will be used for tests
  */
 class FakeClassroomServices : ClassroomServices {
-    override suspend fun getAssignments(classroomId: Int, courseId: Int): Either<HandleClassCodeResponseError, List<Assignment>> {
+    override suspend fun getAssignments(
+        classroomId: Int,
+        courseId: Int,
+    ): Either<HandleClassCodeResponseError, GetAssignmentsResponse> {
         delay(2000)
         return Either.Right(
-            value = List(10) { index ->
-                val i = index + 1
-                Assignment(
-                    id = i,
-                    classroomId = classroomId,
-                    maxElemsPerGroup = 2,
-                    maxNumberGroups = 2,
-                    releaseDate = Timestamp(Instant.now().toEpochMilli()),
-                    description = "Description $i",
-                    title = "Title $i",
-                )
-            },
+            value = GetAssignmentsResponse(
+                assignments = listOf(
+                    Assignment(id = 1, classroomId = 1, description = "Description1", title = "Assignment1"),
+                    Assignment(id = 2, classroomId = 1, description = "Description2", title = "Assignment2"),
+                ),
+                archiveRepos = listOf(
+                    ArchiveRepo(requestId = 1, creator = 1, state = "Pending", composite = 1, repoId = 1, repoName = "Repo1"),
+                ),
+            ),
         )
     }
 
@@ -39,29 +38,6 @@ class FakeClassroomServices : ClassroomServices {
         assignmentId: Int,
     ): Either<HandleClassCodeResponseError, Teams> {
         delay(2000)
-        TODO()
-    }
-
-    override suspend fun createTeamInGitHub(
-        createTeamComposite: CreateTeamComposite,
-        orgName: String,
-    ): ResultFromRequest<Int> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addMemberToTeamInGitHub(
-        orgName: String,
-        teamSlug: String,
-        username: String,
-    ): ResultFromRequest<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun createRepoInGitHub(
-        orgName: String,
-        teamId: Int?,
-        repo: CreateRepo,
-    ): ResultFromRequest<String> {
         TODO("Not yet implemented")
     }
 
@@ -71,6 +47,14 @@ class FakeClassroomServices : ClassroomServices {
         assignmentId: Int,
         teamId: Int,
         updateCreateTeamStatus: UpdateCreateTeamStatusInput,
+    ): Either<HandleClassCodeResponseError, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun changeStatusArchiveRepoInClassCode(
+        courseId: Int,
+        classroomId: Int,
+        updateArchiveRepo: UpdateArchiveRepoInput,
     ): Either<HandleClassCodeResponseError, Unit> {
         TODO("Not yet implemented")
     }

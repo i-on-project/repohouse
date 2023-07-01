@@ -12,6 +12,7 @@ import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
+import com.isel.leic.ps.ionClassCode.utils.cypher.AESDecrypt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -140,9 +141,10 @@ class DeliveryServices(
             val delivery = it.deliveryRepository.getDeliveryById(deliveryId) ?: return@run Result.Problem(
                 DeliveryServicesError.DeliveryNotFound,
             )
-            val teacherToken = it.usersRepository.getTeacherGithubToken(userId) ?: return@run Result.Problem(
+            val teacherTokenEncrypt = it.usersRepository.getTeacherGithubToken(userId) ?: return@run Result.Problem(
                 DeliveryServicesError.NotTeacher,
             )
+            val teacherToken = AESDecrypt.decrypt(teacherTokenEncrypt)
             val course = it.courseRepository.getCourse(courseId) ?: return@run Result.Problem(DeliveryServicesError.CourseNotFound)
             val courseName = course.name
             val teams = it.deliveryRepository.getTeamsByDelivery(deliveryId)
@@ -195,6 +197,7 @@ class DeliveryServices(
                 }
             }
         }
+
         couroutines.forEach { it.join() }
 
         transactionManager.run {

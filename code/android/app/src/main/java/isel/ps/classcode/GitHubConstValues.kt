@@ -18,6 +18,18 @@ val GITHUB_CREATE_REPO: (String) -> String = { orgName ->
     "$GITHUB_API_BASE_URL/orgs/$orgName/repos"
 }
 
+val GITHUB_DELETE_TEAM: (String, String) -> String = { orgName, username ->
+    "$GITHUB_API_BASE_URL/orgs/$orgName/members/$username"
+}
+
+val GITHUB_UPDATE_REPO: (String, String) -> String = { orgName, repoName ->
+    "$GITHUB_API_BASE_URL/repos/$orgName/$repoName"
+}
+
+val DELETE_TEAM: (String, String) -> String = { orgName, teamSlug ->
+    "$GITHUB_API_BASE_URL/orgs/$orgName/teams/$teamSlug"
+}
+
 val GITHUB_ADD_MEMBER_TO_TEAM: (String, String, String) -> String = { orgName, teamSlug, username ->
     "${GITHUB_ADD_TEAM(orgName)}/$teamSlug/memberships/$username"
 }

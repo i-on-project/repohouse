@@ -94,7 +94,7 @@ class TeamServicesTests {
                     }
 
                     val mockedLeaveTeamRepository = mock<LeaveTeamRepository> {
-                        on { createLeaveTeamRequest(request = LeaveTeamInput(teamId = 1), creator = 1) } doReturn LeaveTeam(id = 1, creator = 1, teamId = 1, githubUsername = "name")
+                        on { createLeaveTeamRequest(request = LeaveTeamInput(teamId = 1), creator = 1) } doReturn LeaveTeam(id = 1, creator = 1, teamId = 1, githubUsername = "name", membersCount = 1, teamName = "team1")
                         on { getLeaveTeamRequests() } doReturn listOf()
                     }
 
@@ -290,23 +290,6 @@ class TeamServicesTests {
             assert(team.value is TeamServicesError.ClassroomArchived)
         } else {
             fail("Should not be Either.Right")
-        }
-    }
-
-    @Test
-    fun `createTeamRequest should give the id of the request`() {
-        // when: getting a success
-        val team = teamServices.createTeamRequest(
-            assignmentId = 1,
-            classroomId = 2,
-            creator = 1,
-            creatorGitHubUserName = "team1",
-        )
-
-        if (team is Result.Success) {
-            assert(team.value.id == 1)
-        } else {
-            fail("Should not be Either.Left")
         }
     }
 

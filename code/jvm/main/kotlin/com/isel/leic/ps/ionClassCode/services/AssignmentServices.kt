@@ -66,8 +66,8 @@ class AssignmentServices(
                     minElemsPerGroup = assignmentInfo.minNumberElems,
                     maxElemsPerGroup = assignmentInfo.maxNumberElems,
                     maxNumberGroups = assignmentInfo.maxNumberGroups,
-                    description = assignmentInfo.description,
-                    title = assignmentInfo.title,
+                    description = assignmentInfo.description.replace(" ", "_"),
+                    title = assignmentInfo.title.replace(" ", "_"),
                 ),
             )
             Result.Success(assignment)
@@ -102,10 +102,12 @@ class AssignmentServices(
             } else {
                 val teams = it.teamRepository.getTeamsFromAssignment(assignmentId = assignmentId)
                 val filteredCreatedTeam = teams.filter { team -> team.isCreated }
-                val compositeRequestsFromCompositesNotAccepted = it.compositeRepository.getCompositeRequestsThatAreNotAccepted().map { composite ->
-                    val createTeam = it.createTeamRepository.getCreateTeamRequestByCompositeId(compositeId = composite.id) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
-                    val joinTeam = it.joinTeamRepository.getJoinTeamRequestByCompositeId(compositeId = composite.id) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
-                    val repoRequest = it.createRepoRepository.getCreateRepoRequestByCompositeId(compositeId = composite.id) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
+                val teamsNotCreatedTeams = teams.filter { team -> !team.isCreated }
+                val compositeRequestsFromCompositesNotAccepted = teamsNotCreatedTeams.map { team ->
+                    val createTeam = it.createTeamRepository.getCreateTeamRequestByTeamId(teamId = team.id) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
+                    val joinTeam = it.joinTeamRepository.getJoinTeamRequestByCompositeId(compositeId = createTeam.composite) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
+                    val repoRequest = it.createRepoRepository.getCreateRepoRequestByCompositeId(compositeId = createTeam.composite) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
+                    val composite = it.compositeRepository.getCompositeByCompositeId(compositeId = createTeam.composite) ?: return@run Result.Problem(value = AssignmentServicesError.InternalError)
                     CreateTeamComposite(createTeam = createTeam, joinTeam = joinTeam, createRepo = repoRequest, compositeState = composite.state)
                 }
                 Result.Success(TeacherAssignmentTeams(assignment = assignment, teamsCreated = filteredCreatedTeam, createTeamComposites = compositeRequestsFromCompositesNotAccepted))

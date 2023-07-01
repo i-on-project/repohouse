@@ -89,6 +89,13 @@ export function ShowClassroomFetch({
                             }
                         )}
                     </Typography>
+                    <Typography
+                        variant="h5"
+                        gutterBottom
+                        sx={typographyStyle}
+                    >
+                        {"Classroom Code: " + content.properties.inviteCode}
+                    </Typography>
                     { user == AuthState.Teacher ? (
                         <Box sx={alignHorizontalyBoxStyle}>
                             { !content.properties.isArchived ? (

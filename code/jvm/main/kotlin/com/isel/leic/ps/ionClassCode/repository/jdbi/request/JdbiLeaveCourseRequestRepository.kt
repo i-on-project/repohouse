@@ -41,7 +41,15 @@ class JdbiLeaveCourseRequestRepository(
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .first()
-        return LeaveCourse(id, creator, courseId = request.courseId)
+        val githubUsername = handle.createQuery(
+            """
+            SELECT u.github_username FROM users u WHERE u.id=:id
+            """,
+        )
+            .bind("id", creator)
+            .mapTo<String>()
+            .first()
+        return LeaveCourse(id, creator, courseId = request.courseId, composite = request.composite, githubUsername = githubUsername)
     }
 
     /**
@@ -50,7 +58,7 @@ class JdbiLeaveCourseRequestRepository(
     override fun getLeaveCourseRequests(): List<LeaveCourse> {
         return handle.createQuery(
             """
-            SELECT l.id, r.creator, r.state, l.course_id, r.composite FROM leavecourse as l JOIN request as r ON l.id = r.id
+            SELECT l.id, r.creator, r.state, l.course_id, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leavecourse as l JOIN request as r ON l.id = r.id
             """,
         )
             .mapTo<LeaveCourse>()
@@ -63,7 +71,7 @@ class JdbiLeaveCourseRequestRepository(
     override fun getLeaveCourseRequestById(id: Int): LeaveCourse? {
         return handle.createQuery(
             """
-            SELECT l.id, r.creator, r.state, l.course_id, r.composite FROM leavecourse as l JOIN request as r ON l.id = r.id
+            SELECT l.id, r.creator, r.state, l.course_id, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leavecourse as l JOIN request as r ON l.id = r.id
             WHERE l.id = :id
             """,
         )
@@ -78,11 +86,23 @@ class JdbiLeaveCourseRequestRepository(
     override fun getLeaveCourseRequestsByUser(userId: Int): List<LeaveCourse> {
         return handle.createQuery(
             """
-            SELECT l.id, r.creator, r.state, l.course_id, r.composite FROM leavecourse as l JOIN request as r ON l.id = r.id
+            SELECT l.id, r.creator, r.state, l.course_id, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leavecourse as l JOIN request as r ON l.id = r.id
             WHERE r.creator = :creator 
             """,
         )
             .bind("creator", userId)
+            .mapTo<LeaveCourse>()
+            .list()
+    }
+
+    override fun getLeaveCourseRequestsByCourse(courseId: Int): List<LeaveCourse> {
+        return handle.createQuery(
+            """
+            SELECT l.id, r.creator, r.state, l.course_id, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leavecourse as l JOIN request as r ON l.id = r.id
+            WHERE l.course_id = :courseId AND r.state != 'Accepted'
+            """,
+        )
+            .bind("courseId", courseId)
             .mapTo<LeaveCourse>()
             .list()
     }

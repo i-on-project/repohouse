@@ -90,4 +90,18 @@ class JdbiRepoRepository(private val handle: Handle) : RepoRepository {
             .mapTo<Repo>()
             .firstOrNull()
     }
+
+    /**
+     * Method to get all dead Repos
+     */
+    override fun getDeadRepos(): List<Repo> {
+        return handle.createQuery(
+            """
+                SELECT * FROM REPO
+                WHERE team_id IS NULL
+                """,
+        )
+            .mapTo<Repo>()
+            .list()
+    }
 }

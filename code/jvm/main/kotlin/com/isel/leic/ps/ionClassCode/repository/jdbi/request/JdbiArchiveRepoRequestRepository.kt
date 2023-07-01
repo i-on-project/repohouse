@@ -64,7 +64,23 @@ class JdbiArchiveRepoRequestRepository(
             JOIN request r on r.id = x.id
             """,
         )
-            .mapTo(ArchiveRepo::class.java)
+            .mapTo<ArchiveRepo>()
+            .list()
+    }
+
+    override fun getArchiveRepoRequestForClassroom(classroomId: Int): List<ArchiveRepo> {
+        return handle.createQuery(
+            """
+                SELECT r.id, r.creator, r.state, r.composite, x.repo_id, x.name AS repo_name FROM 
+                (SELECT a.id FROM assignment a JOIN classroom c on a.classroom_id = c.id WHERE c.id = :classroomId) as y
+                JOIN team t on t.assignment = y.id
+                JOIN (SELECT a.id, a.repo_id, r.name, r.team_id FROM archiverepo a JOIN repo r on a.repo_id = r.id) as x on x.team_id = t.id
+                JOIN request r on r.id = x.id
+                WHERE r.state != 'Accepted'
+            """
+        )
+            .bind("classroomId", classroomId)
+            .mapTo<ArchiveRepo>()
             .list()
     }
 

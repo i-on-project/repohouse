@@ -8,7 +8,8 @@ data class LeaveCourse(
     override val creator: Int,
     override val state: String = "Pending",
     val courseId: Int,
-    override val composite: Int? = null
+    override val composite: Int,
+    val githubUsername: String,
 ) : RequestInterface {
     init {
         require(checkState()) { "Invalid state" }

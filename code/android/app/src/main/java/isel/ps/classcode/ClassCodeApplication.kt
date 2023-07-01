@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.dataAccess.CryptoManager
+import isel.ps.classcode.dataAccess.gitHubService.FakeGitHubService
+import isel.ps.classcode.dataAccess.gitHubService.GitHubService
+import isel.ps.classcode.dataAccess.gitHubService.RealGitHubService
 import isel.ps.classcode.dataAccess.sessionStore.FakeSessionStore
 import isel.ps.classcode.dataAccess.sessionStore.RealSessionStore
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
@@ -28,7 +31,6 @@ import isel.ps.classcode.presentation.team.services.RealTeamServices
 import isel.ps.classcode.presentation.team.services.TeamServices
 import okhttp3.OkHttpClient
 
-const val TAG = "Classcode"
 const val iS_REAL_IMPLEMENTATION = true
 
 /**
@@ -42,6 +44,7 @@ data class Dependencies(
     override val classroomServices: ClassroomServices,
     override val bootUpServices: BootUpServices,
     override val teamServices: TeamServices,
+    override val gitHubService: GitHubService,
 ) : DependenciesContainer
 
 class ClassCodeApplication : DependenciesContainer, Application() {
@@ -50,6 +53,7 @@ class ClassCodeApplication : DependenciesContainer, Application() {
     private val cryptoManager: CryptoManager by lazy { CryptoManager() }
     private val navigationRepository: NavigationRepository by lazy { NavigationRepository() }
     private val dependencies: DependenciesContainer by lazy { dependencies(isRealImplementation = iS_REAL_IMPLEMENTATION, context = this, cryptoManager = cryptoManager, objectMapper = objectMapper, httpClient = httpClient, navigationRepo = navigationRepository) }
+    override val gitHubService: GitHubService by lazy { dependencies.gitHubService }
     override val sessionStore: SessionStore by lazy { dependencies.sessionStore }
     override val bootUpServices: BootUpServices by lazy { dependencies.bootUpServices }
     override val loginServices: LoginServices by lazy { dependencies.loginServices }
@@ -64,6 +68,7 @@ class ClassCodeApplication : DependenciesContainer, Application() {
  */
 interface DependenciesContainer {
     val sessionStore: SessionStore
+    val gitHubService: GitHubService
     val bootUpServices: BootUpServices
     val loginServices: LoginServices
     val menuServices: MenuServices
@@ -73,7 +78,7 @@ interface DependenciesContainer {
 }
 
 private fun dependencies(isRealImplementation: Boolean, context: Context, cryptoManager: CryptoManager, objectMapper: ObjectMapper, httpClient: OkHttpClient, navigationRepo: NavigationRepository): Dependencies {
-    val sessionStore = if (isRealImplementation) RealSessionStore(context = context, cryptoManager = cryptoManager) else FakeSessionStore(alreadyLoggedIn = true)
+    val sessionStore = if (isRealImplementation) RealSessionStore(context = context, cryptoManager = cryptoManager) else FakeSessionStore(alreadyLoggedIn = false)
     return if (isRealImplementation) {
         val bootUpServices = RealBootUpServices(
             httpClient = httpClient,
@@ -118,16 +123,23 @@ private fun dependencies(isRealImplementation: Boolean, context: Context, crypto
                 navigationRepo = navigationRepo,
                 bootUpServices = bootUpServices,
             ),
+            gitHubService = RealGitHubService(
+                httpClient = httpClient,
+                objectMapper = objectMapper,
+                sessionStore = sessionStore,
+            ),
         )
     } else {
+        val fakeData: FakeDataStorage by lazy { FakeDataStorage() }
         Dependencies(
             sessionStore = sessionStore,
-            loginServices = FakeLoginServices(),
+            loginServices = FakeLoginServices(activity = context),
             bootUpServices = FakeBootUpServices(),
-            menuServices = FakeMenuServices(),
+            menuServices = FakeMenuServices(data = fakeData),
             courseServices = FakeCourseServices(),
             classroomServices = FakeClassroomServices(),
             teamServices = FakeTeamServices(),
+            gitHubService = FakeGitHubService(),
         )
     }
 }

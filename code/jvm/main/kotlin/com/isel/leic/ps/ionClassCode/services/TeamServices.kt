@@ -10,6 +10,7 @@ import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CreateTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.JoinTeamInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveRequestStateInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.UpdateRequestStateInput
 import com.isel.leic.ps.ionClassCode.domain.requests.CreateTeam
@@ -87,7 +88,7 @@ class TeamServices(
                         students.map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         repo,
                         feedbacks,
-                        assignment
+                        assignment,
                     ),
                 )
             }
@@ -109,7 +110,7 @@ class TeamServices(
                         students = it.teamRepository.getStudentsFromTeam(teamId = team.id).map { student -> StudentWithoutToken(student.name, student.email, student.id, student.githubUsername, student.githubId, student.isCreated, student.schoolId) },
                         repo = it.repoRepository.getRepoByTeam(teamId = team.id),
                         feedbacks = it.feedbackRepository.getFeedbacksByTeam(teamId = team.id),
-                        assignment = assignment
+                        assignment = assignment,
                     )
                 },
             )
@@ -124,16 +125,23 @@ class TeamServices(
         return transactionManager.run {
             it.usersRepository.getStudent(creator) ?: return@run Result.Problem(value = TeamServicesError.InternalError)
             val classroom = it.classroomRepository.getClassroomById(classroomId) ?: return@run Result.Problem(value = TeamServicesError.ClassroomNotFound)
-            it.assignmentRepository.getAssignmentById(assignmentId) ?: return@run Result.Problem(value = TeamServicesError.AssignmentNotFound)
+            val assignment = it.assignmentRepository.getAssignmentById(assignmentId) ?: return@run Result.Problem(value = TeamServicesError.AssignmentNotFound)
             if (classroom.isArchived) return@run Result.Problem(value = TeamServicesError.ClassroomArchived)
+            val teams = it.teamRepository.getTeamsFromAssignment(assignmentId)
+            val deadRepos = it.repoRepository.getDeadRepos()
+            var teamName = "${classroom.name}-${assignment.title}-${teams.size + 1}"
+            var i = 0
+            while (teams.any { team -> team.name == teamName } || deadRepos.any { repo -> repo.name == teamName }) {
+                teamName = "${classroom.name}-${assignment.title}-${teams.size + 1 + i++}"
+            }
             val team = it.teamRepository.createTeam(
                 team = TeamInput(
-                    "${classroom.name} - $assignmentId",
+                    teamName,
                     assignmentId,
                     false,
                 ),
             )
-            val repo = it.repoRepository.createRepo(repo = RepoInput(name = "${classroom.name} - $assignmentId - ${team.id}", url = null, teamId = team.id))
+            val repo = it.repoRepository.createRepo(repo = RepoInput(name = teamName, url = null, teamId = team.id))
             val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(), creator = creator)
             val createTeam = it.createTeamRepository.createCreateTeamRequest(request = CreateTeamInput(teamId = team.id, composite = composite.id, teamName = team.name), creator = creator)
             it.createRepoRepository.createCreateRepoRequest(request = CreateRepoInput(repoId = repo.id, composite = composite.id, repoName = repo.name), creator = creator)
@@ -297,7 +305,7 @@ class TeamServices(
                     val createTeam = it.createTeamRepository.getCreateTeamRequestByTeamId(teamId = teamId) ?: return@run Result.Problem(value = TeamServicesError.TeamNotFound)
                     if (createTeam.state != "Accepted") return@run Result.Problem(value = TeamServicesError.TeamNotAccepted)
                     val joinTeamRequests = it.joinTeamRepository.getJoinTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
-                    val leaveTeamRequests = it.leaveTeamRepository.getLeaveTeamRequests().filter { teamRequest -> teamRequest.teamId == teamId }
+                    val leaveTeamRequests = it.leaveTeamRepository.getLeaveTeamWithRepoNameRequests(teamId = teamId)
                     val createRepo = it.createRepoRepository.getCreateRepoRequestByCompositeId(compositeId = createTeam.composite) ?: return@run Result.Problem(value = TeamServicesError.InternalError)
                     val joinTeam = joinTeamRequests.find { request -> request.composite == createTeam.composite } ?: return@run Result.Problem(value = TeamServicesError.InternalError)
                     val archiveRepo = it.archiveRepoRepository.getArchiveRepoRequestsByTeam(teamId = teamId)
@@ -305,12 +313,12 @@ class TeamServices(
                         TeamRequestsForMobileModel(
                             needApproval = RequestsThatNeedApproval(
                                 joinTeam = joinTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
-                                leaveTeam = leaveTeamRequests.filter { request -> request.state != "Accepted" && request.composite == null },
+                                leaveTeam = leaveTeamRequests.filter { request -> request.leaveTeam.state != "Accepted" && request.leaveTeam.composite == null },
                             ),
                             requestsHistory = RequestsHistory(
                                 createTeamComposite = CreateTeamComposite(createTeam = createTeam, joinTeam = joinTeam, createRepo = createRepo, compositeState = "Accepted"),
                                 joinTeam = joinTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
-                                leaveTeam = leaveTeamRequests.filter { request -> request.state == "Accepted" && request.composite == null },
+                                leaveTeam = leaveTeamRequests.filter { request -> request.leaveTeam.state == "Accepted" && request.leaveTeam.composite == null },
                                 archiveRepo = if (archiveRepo != null && archiveRepo.state == "Accepted") archiveRepo else null,
                             ),
                         ),
@@ -321,7 +329,7 @@ class TeamServices(
     }
 
     fun updateRequestState(body: UpdateRequestStateInput, teamId: Int): TeamUpdateRequestResponse {
-        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeValid()) return Result.Problem(value = TeamServicesError.InvalidData)
+        if (body.requestId < 0 || body.state.isEmpty() || body.creator < 0 || body.type.isEmpty() || body.checkIfTypeNotValid()) return Result.Problem(value = TeamServicesError.InvalidData)
         return transactionManager.run {
             it.requestRepository.changeStateRequest(id = body.requestId, state = body.state)
             if (body.type.lowercase() == "leaveteam") {
@@ -329,6 +337,16 @@ class TeamServices(
             } else {
                 it.teamRepository.enterTeam(teamId = teamId, studentId = body.creator)
             }
+            Result.Success(value = true)
+        }
+    }
+
+    fun deleteTeam(body: LeaveRequestStateInput, teamId: Int): TeamUpdateRequestResponse {
+        if (body.requestId < 0 && teamId < 0) return Result.Problem(value = TeamServicesError.InvalidData)
+        return transactionManager.run {
+            it.requestRepository.changeStateRequest(id = body.requestId, state = "Accepted")
+            it.teamRepository.leaveTeam(teamId = teamId, studentId = body.creator)
+            it.teamRepository.deleteTeam(teamId = teamId)
             Result.Success(value = true)
         }
     }

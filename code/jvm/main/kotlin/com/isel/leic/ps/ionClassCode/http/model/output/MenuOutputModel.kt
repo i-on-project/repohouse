@@ -7,7 +7,7 @@ data class MenuStudentOutputModel(
     val name: String,
     val schoolNumber: Int,
     val email: String,
-    val courses: List<CourseOutputModel>
+    val courses: List<CourseOutputModel>,
 ) : OutputModel
 
 /**
@@ -16,5 +16,5 @@ data class MenuStudentOutputModel(
 data class MenuTeacherOutputModel(
     val name: String,
     val email: String,
-    val courses: List<CourseOutputModel>
+    val courses: List<CourseOutputModel>,
 ) : OutputModel

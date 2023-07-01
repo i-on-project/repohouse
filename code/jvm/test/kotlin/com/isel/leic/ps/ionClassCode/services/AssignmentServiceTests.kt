@@ -667,19 +667,4 @@ class AssignmentServiceTests {
             fail("Should not be Either.Right")
         }
     }
-
-    @Test
-    fun `can get the list of teams should be as success`() {
-        // given: a valid assignment id
-        val assignmentId = 4
-
-        // when: getting an error
-        val assignment = assignmentServices.getTeacherAssignmentInfoTeams(assignmentId = assignmentId)
-
-        if (assignment is Result.Success) {
-            assert(assignment.value.createTeamComposites.isNotEmpty())
-        } else {
-            fail("Should not be Either.Right")
-        }
-    }
 }

@@ -73,27 +73,29 @@ CREATE trigger DeleteTeachersTrigger
 after delete on teacher
 for each row execute procedure DeleteTeachers();
 
-
-CREATE OR REPLACE FUNCTION SyncClassroom()
+CREATE OR REPLACE FUNCTION DeleteTeam()
     RETURNS trigger
 AS $$
+declare repo_id_h integer;
 begin
-    if (new.last_sync != old.last_sync) then
-        update classroom set last_sync = new.last_sync where id = (
-            select classroom_id from assignment where id = new.assignment_id
-        );
-        return new;
-    end if;
-    return new;
+    select r.id from repo r where r.team_id = old.id into repo_id_h;
+    delete from student_team where team = old.id;
+    delete from feedback where team_id = old.id;
+    delete from archiverepo where repo_id = repo_id_h;
+    delete from createrepo where repo_id = repo_id_h;
+    delete from createteam where team_id = old.id;
+    delete from tags where repo_id = repo_id_h;
+    update repo set team_id = null where id = repo_id_h;
+    delete from leaveteam where team_id = old.id;
+    delete from jointeam where team_id = old.id;
+    RAISE NOTICE 'old.id: %', old.id;
+    return old;
 end;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS Sync ON delivery;
-CREATE trigger Sync
-    after update on delivery
-    for each row execute procedure SyncClassroom();
-
+DROP TRIGGER IF EXISTS DeleteTeamTrigger ON team;
+CREATE trigger DeleteTeamTrigger
+    before delete on team
+    for each row execute function DeleteTeam();
 
 COMMIT TRANSACTION;
-
-update apply set state = 'Accepted' where id = 1;

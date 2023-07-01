@@ -5,5 +5,5 @@ package com.isel.leic.ps.ionClassCode.http.model.output
  */
 data class FeedbackOutputModel(
     val id: Int,
-    val created: Boolean
+    val created: Boolean,
 ) : OutputModel

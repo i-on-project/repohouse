@@ -1,18 +1,8 @@
 package isel.ps.classcode.presentation.login.services
 
-import android.app.Activity
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.net.Uri
-import android.util.Log
-import android.widget.Toast
-import androidx.browser.customtabs.CustomTabsIntent
 import com.fasterxml.jackson.databind.ObjectMapper
-import isel.ps.classcode.AUTH_KEY
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
 import isel.ps.classcode.MEDIA_TYPE
-import isel.ps.classcode.R
-import isel.ps.classcode.TAG
-import isel.ps.classcode.TOKEN_KEY
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.deserialization.ClassCodeAuthDto
 import isel.ps.classcode.domain.deserialization.ClassCodeAuthDtoType
@@ -20,6 +10,8 @@ import isel.ps.classcode.http.NavigationRepository
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.presentation.AUTH_KEY
+import isel.ps.classcode.presentation.TOKEN_KEY
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
@@ -67,41 +59,26 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
         }
     }
 
-    override suspend fun startOauth(activity: Activity): Either<HandleClassCodeResponseError, Unit> {
+    override suspend fun startOauth(startActivity: (String, String) -> Boolean): Either<HandleClassCodeResponseError, Unit> {
         val secret = generateSecret()
         sessionStore.storeSecret(secret = secret)
         val challenge = generateCodeChallenge(secret = secret)
         val ensureLink = navigationRepo.ensureLink(key = AUTH_KEY, fetchLink = { bootUpServices.getHome() }) ?: return Either.Left(value = HandleClassCodeResponseError.LinkNotFound())
-        return try {
-            val uri = Uri.parse(CLASSCODE_LINK_BUILDER(ensureLink.href)).buildUpon().apply {
-                appendQueryParameter("challenge", challenge)
-                appendQueryParameter("challengeMethod", "s256")
-            }.build()
-            val customTabsIntent = CustomTabsIntent.Builder().build()
-            customTabsIntent.intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
-            customTabsIntent.launchUrl(activity, uri)
+        return if (startActivity(CLASSCODE_LINK_BUILDER(ensureLink.href), challenge)) {
             Either.Right(value = Unit)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to open URL", e)
-            Toast
-                .makeText(
-                    activity,
-                    R.string.failed_url_open,
-                    Toast.LENGTH_LONG,
-                )
-                .show()
-            Either.Left(value = HandleClassCodeResponseError.Fail(error = e.message ?: "Failed to open URL"))
+        } else {
+            Either.Left(value = HandleClassCodeResponseError.Fail(error = "Failed to open URL"))
         }
     }
 
-    private fun generateSecret(): String {
+    fun generateSecret(): String {
         val random = SecureRandom()
         val bytes = ByteArray(32)
         random.nextBytes(bytes)
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
     }
 
-    private fun generateCodeChallenge(secret: String): String {
+    fun generateCodeChallenge(secret: String): String {
         val bytes = secret.toByteArray()
         val messageDigest = MessageDigest.getInstance("SHA-256")
         val digest = messageDigest.digest(bytes)

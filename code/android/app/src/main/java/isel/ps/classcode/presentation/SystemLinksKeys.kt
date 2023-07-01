@@ -1,0 +1,15 @@
+package isel.ps.classcode.presentation
+
+const val HOME_KEY = "home"
+const val CREDITS_KEY = "credits"
+const val AUTH_KEY = "auth"
+const val TOKEN_KEY = "token"
+const val MENU_KEY = "menu"
+const val COURSE_KEY = "course"
+const val CLASSROOM_KEY = "classroom"
+const val CLASSROOM_ARCHIVED_KEY = "classroomArchiveRequest"
+const val ASSIGNMENT_KEY = "assignment"
+const val CREATE_TEAM_KEY = "createTeam"
+const val TEAM_KEY = "team"
+const val REQUESTS_NOT_ACCEPTED_KEY = "teamRequestsNotAccepted"
+const val LEAVE_COURSE_KEY = "leaveCourse"

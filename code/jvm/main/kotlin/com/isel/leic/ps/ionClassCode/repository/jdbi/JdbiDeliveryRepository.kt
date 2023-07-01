@@ -135,7 +135,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
     override fun getTeamsDeliveredByDelivery(deliveryId: Int): List<Team> {
         return handle.createQuery(
             """
-                SELECT distinct (team.id), team.name, team.is_created, team.assignment FROM team
+                SELECT distinct team.id, team.name, team.is_created, team.is_closed,team.assignment FROM team
                 JOIN tags t on :deliveryId = t.delivery_id
                 WHERE t.is_delivered = true
                 """,
@@ -146,7 +146,7 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
     }
 
     /**
-     * Method to update a Delivery sync time
+     * Method to update a Delivery sync time and the classroom sync time
      */
     override fun updateSyncTimeFromDelivery(deliveryId: Int) {
         handle.createUpdate(
@@ -154,6 +154,16 @@ class JdbiDeliveryRepository(private val handle: Handle) : DeliveryRepository {
                 UPDATE DELIVERY
                 SET last_sync = now()
                 WHERE id = :deliveryId
+                """,
+        )
+            .bind("deliveryId", deliveryId)
+            .execute()
+
+        handle.createUpdate(
+            """
+                UPDATE CLASSROOM
+                SET last_sync = now()
+                WHERE id = (SELECT classroom_id FROM ASSIGNMENT WHERE id = (SELECT assignment_id FROM DELIVERY WHERE id = :deliveryId))
                 """,
         )
             .bind("deliveryId", deliveryId)

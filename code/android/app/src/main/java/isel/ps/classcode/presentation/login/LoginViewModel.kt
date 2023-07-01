@@ -34,7 +34,7 @@ class LoginViewModel(private val loginServices: LoginServices, private val conne
         }
     }
 
-    fun startOAuth(activity: Activity) = viewModelScope.launch {
-        loginServices.startOauth(activity = activity)
+    fun startOAuth(startActivity: (String, String) -> Boolean) = viewModelScope.launch {
+        loginServices.startOauth(startActivity = startActivity)
     }
 }

@@ -5,11 +5,21 @@ import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.TeacherWithoutToken
+import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.CourseInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveCourseInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ionClassCode.domain.requests.Composite
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveCourse
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
 import com.isel.leic.ps.ionClassCode.http.model.input.CourseInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.CourseArchivedResult
 import com.isel.leic.ps.ionClassCode.repository.CourseRepository
 import com.isel.leic.ps.ionClassCode.repository.UsersRepository
+import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
+import com.isel.leic.ps.ionClassCode.repository.request.LeaveCourseRepository
+import com.isel.leic.ps.ionClassCode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.transaction.Transaction
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
@@ -142,9 +152,27 @@ class CourseServiceTests {
                             isArchived = false,
                             orgId = 1111,
                         )
+                        on { getCourseAllClassrooms(courseId = 1) } doReturn (listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink", teacherId = 1)))
+                        on { getAllTeamsFromAUserInACourse(1, 1, listOf(1)) } doReturn listOf(Team(id = 1, name = "name", isCreated = true, isClosed = true, assignment = 1))
+                    }
+                    val mockedCompositeRepository = mock<CompositeRepository> {
+                        on { createCompositeRequest(CompositeInput(), 1) } doReturn Composite(id = 1, creator = 1, state = "Pending", composite = null)
+                    }
+                    val mockedLeaveCourseRepository = mock<LeaveCourseRepository> {
+                        on { createLeaveCourseRequest(LeaveCourseInput(1, 1, "githubUsername"), 1) } doReturn LeaveCourse(
+                            2, 1, "Pending", 1, 1, "username"
+                        )
+                    }
+                    val mockedLeaveTeamRepository = mock<LeaveTeamRepository> {
+                        on { createLeaveTeamRequest(LeaveTeamInput(1, 1), 1) } doReturn LeaveTeam(
+                            2, 1, "Pending", 1, 1, "username", 1, "name"
+                        )
                     }
                     on { usersRepository } doReturn mockedUsersRepository
                     on { courseRepository } doReturn mockedCourseRepository
+                    on { compositeRepository } doReturn mockedCompositeRepository
+                    on { leaveCourseRepository } doReturn mockedLeaveCourseRepository
+                    on { leaveTeamRepository } doReturn mockedLeaveTeamRepository
                 }
                 return block(mockedTransaction)
             }
@@ -472,7 +500,7 @@ class CourseServiceTests {
         val courseId = -1
         val userId = 1
         // when: getting an error because of an invalid course id
-        val course = courseService.leaveCourse(courseId = courseId, userId = userId)
+        val course = courseService.leaveCourse(courseId = courseId, userId = userId, githubUsername = "githubUsername")
 
         if (course is Result.Problem) {
             assert(course.value is CourseServicesError.CourseNotFound)
@@ -488,7 +516,7 @@ class CourseServiceTests {
         val courseId = 1
 
         // when: getting an error because of an invalid user id
-        val course = courseService.leaveCourse(courseId = courseId, userId = userId)
+        val course = courseService.leaveCourse(courseId = courseId, userId = userId, githubUsername = "githubUsername")
 
         if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InternalError)
@@ -504,7 +532,7 @@ class CourseServiceTests {
         val userId = 1
 
         // when: getting an error because the course id that doesn't exist in database
-        val course = courseService.leaveCourse(courseId = courseId, userId = userId)
+        val course = courseService.leaveCourse(courseId = courseId, userId = userId, githubUsername = "githubUsername")
 
         if (course is Result.Problem) {
             assert(course.value is CourseServicesError.CourseNotFound)
@@ -520,7 +548,7 @@ class CourseServiceTests {
         val userId = 5
 
         // when: getting an error because the user id that doesn't exist in database
-        val course = courseService.leaveCourse(courseId = courseId, userId = userId)
+        val course = courseService.leaveCourse(courseId = courseId, userId = userId, githubUsername = "githubUsername")
 
         if (course is Result.Problem) {
             assert(course.value is CourseServicesError.InternalError)
@@ -536,10 +564,10 @@ class CourseServiceTests {
         val userId = 1
 
         // when: doing with success the leave course
-        val course = courseService.leaveCourse(courseId = courseId, userId = userId)
+        val course = courseService.leaveCourse(courseId = courseId, userId = userId, githubUsername = "githubUsername")
 
         if (course is Result.Success) {
-            assert(course.value.name == "courseName")
+            assert(course.value.id == 2)
         } else {
             fail("Should not be Either.Right")
         }

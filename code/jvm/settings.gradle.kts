@@ -1,1 +1,1 @@
-rootProject.name = "ps.ion_repohouse"
+rootProject.name = "ps.ion_classcode"

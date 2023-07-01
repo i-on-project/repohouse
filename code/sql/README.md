@@ -56,5 +56,5 @@ The script when executed creates all the necessary triggers to the database, nam
 
 - UpdateApplyRequests — Creates a teacher after an 'Apply' request is accepted
 - DeleteTeachers — Deletes all information related to a teacher when the teacher is deleted
-- SyncClassroom — Syncs the classroom information after a delivery in it is updated
+- DeleteTeam — Deletes all information related to a team when the team is deleted
 

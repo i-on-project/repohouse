@@ -1,10 +1,12 @@
 package isel.ps.classcode.presentation.login
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
@@ -44,7 +46,7 @@ class LoginActivity : ComponentActivity() {
                     error = vm.error,
                     onDismissRequest = { finish() },
                     loginHandler = {
-                        vm.startOAuth(activity = this)
+                        vm.startOAuth(startActivity = ::startActivity)
                     },
                 )
                 if (vm.finished) {
@@ -54,8 +56,24 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    fun startActivity(uri: String, challenge: String): Boolean {
+        return try {
+            val url = Uri.parse(uri).buildUpon().apply {
+                appendQueryParameter("challenge", challenge)
+                appendQueryParameter("challengeMethod", "s256")
+            }.build()
+            val customIntent = CustomTabsIntent.Builder().build().intent.apply {
+                data = url
+            }
+            startActivity(customIntent)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
         val code = intent?.data?.getQueryParameter("code")
         val state = intent?.data?.getQueryParameter("state")
         if (code != null && state != null) {

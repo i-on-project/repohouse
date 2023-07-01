@@ -106,27 +106,26 @@ that can be used to navigate through the API.
 
 The Siren format is composed by the following fields:
 
-- `class`: The class of the entity. It can be a single class or a list of classes.
+- `class` {String}: The class of the entity. It can be a single class or a list of classes.
 - `properties`: The properties of the entity.
-- `entities`:An Entity is a URI-addressable resource that has properties and actions associated with it. It may contain sub-entities and navigational links.
-  - `class`: Describes the nature of an entity's content based on the current representation.
-  - `rel`: Defines the relationship of the sub-entity to its parent.
-  - `href`: The URI of the linked sub-entity.
+- `entities`: An Entity is a URI-addressable resource that has properties and actions associated with it. It may contain sub-entities and navigational links.
+  - `properties`: A set of key-value pairs that describe the state of an entity. In JSON Siren, this is an object such as { "name": "Kevin", "age": 30 }. Optional.
+  - `rel`: Defines the relationship of the sub-entity to its parent, per [Web Linking (RFC5988)](https://tools.ietf.org/html/rfc5988) and Link Relations. MUST be a non-empty array of strings. Required.
+  - `links`: A collection of items that describe navigational links, distinct from entity relationships. Link items should contain a rel attribute to describe the relationship and an href attribute to point to the target URI. Entities should include a link rel to self. In JSON Siren, this is represented as "links": [{ "rel": ["self"], "href": "http://api/classroom/1234" }]. Optional.
 - `actions`: The actions that can be performed on the entity.
-  - `name`: Identifies the action to be performed.
-  - `method`: The HTTP method of the action.
-  - `href`: The URI of the action.
-  - `title`: Descriptive text about the action.
-  - `type`: The encoding type for the request.
+  - `name` {String}: Identifies the action to be performed.
+  - `method` {String}: The HTTP method of the action.
+  - `href` {URI}: The URI of the action.
+  - `title` {String}: Descriptive text about the action.
+  - `type` {String}: The encoding type for the request.
   - `fields`: Fields represent controls inside actions.
-    - `type`: The input type of the field.
+    - `type` {String}: The input type of the field.
     - `value`: A value assigned to the field.
-    - `title`: Textual annotation of a field.
+    - `title` {String}: Textual annotation of a field.
 - `links`: Represent navigational transitions.
-  - `rel`: The relation of the link to its entity.
-  - `href`: The URI of the linked resource.
-  - `type`: Defines media type of the linked resource, per [Web Linking (RFC5988)](https://tools.ietf.org/html/rfc5988).
-  - `title`: Text describing the nature of a link.
+  - `rel` : List of relations of the link to its entity.
+  - `href` {String}: The URI of the linked resource.
+  - `needAuthentication` {Boolean}: Defines if access to the link requires API authentication.
 
 
 The media type of the responses is `application/vnd.siren+json`.
@@ -242,13 +241,14 @@ that tries to register in the application.
 
 The JVM application uses the following environment variables:
 
-| Name | Description                               |
-| ---- |-------------------------------------------|
-| `CLASSCODE_ENCRYPTION_KEY` | The key used to encrypt the cookies data  |
-| `JDBC_DATABASE_URL` | The URL of the database                   | 
-|`GITHUB_CLIENT_ID` | The client ID of the GitHub OAuth App     |
-|`GITHUB_CLIENT_SECRET` | The client secret of the GitHub OAuth App | 
-| `SENDGRID_CLASSCODE_API_KEY` | The key to access the SendGrid API        |
+| Name                         | Description                                                                           |
+|------------------------------|---------------------------------------------------------------------------------------|
+| `CLASSCODE_ENCRYPTION_KEY`   | The key used to encrypt the cookies data                                              |                                     
+| `JDBC_DATABASE_URL`          | The URL of the database                                                               |
+| `GITHUB_CLIENT_ID`           | The client ID of the GitHub OAuth App                                                 |                               
+| `GITHUB_CLIENT_SECRET`       | The client secret of the GitHub OAuth App                                             |                           
+| `SENDGRID_CLASSCODE_API_KEY` | The key to access the SendGrid API                                                    |
+| `NGROK_URI`                  | Used to allow the mobile application to access the backend server during development. | 
 
 
 ### How to..
@@ -273,8 +273,8 @@ To run the JVM application, run the following command:
 
 To test the JVM application, run the following command:
 
-Make sure the database is running before running the tests,
-cleaned all just with the data from the [insert.sql](../sql/insert.sql) file.
+Make sure the database is running before running the tests.
+Before running the tests, verify if the database is empty and run the script files [createTables.sql](../sql/createTables.sql) and [insert.sql](../sql/insert.sql).
 
 ```
 ./gradlew test
@@ -284,39 +284,35 @@ cleaned all just with the data from the [insert.sql](../sql/insert.sql) file.
 
 The JVM application can use Docker to run the application.
 
-<<<<<<< Updated upstream
-All the commands to run the application with Docker are in the [Compose](../jvm/docker-compose.yml) file.
-=======
-All the services defined and used to run the application with Docker are in the [Compose](../jvm/docker-compose.composeUp.yml) file.
+All the services defined and used to run the application with Docker are in the [Compose](../jvm/docker-compose.yml) file.
 
 The 'Compose' file creates:
 
 - n instances of the JVM application with spring
 - 1 instance of the PostgreSQL database
 - 1 instance of NGINX to serve the I-on Classcode Web Application and make use of the multiple instances of the JVM application for load balancing
->>>>>>> Stashed changes
 
 To run the application with Docker, run the following command:
 
 ```
-docker-compose up
+./gradlew composeUp
 ```
 
 To stop the application with Docker, run the following command:
 
 ```
-docker-compose down
+./gradlew composeDown
 ```
 
-The 'Compose' file creates:
+To run the application with Docker and define the number of JVM application instances for load balancing, run the following command:
 
-- 2 instances of the JVM application with spring 
-- 1 instance of the PostgreSQL database
-- 1 instance of NGINX to redirect the requests to the JVM application
+```
+docker-compose up --build --scale spring-service=[number]
+```
 
 ### NGINX
 
-The JVM application uses NGINX to redirect the requests to the JVM application.
+The JVM application uses NGINX to redirect the requests to the JVM application, use the multiple instances of the JVM application for load balancing and serve the web application.
 
 NGINX is a high-performance web server and reverse proxy server.
 It can serve static content, balance the load across multiple servers, and handle SSL/TLS encryption.

@@ -9,6 +9,7 @@ export interface ClassroomDtoProperties{
     name: String,
     isArchived: Boolean,
     lastSync: Date,
+    inviteCode: String,
     assignments: AssignmentDomain[],
     students: Student[],
 }
@@ -19,6 +20,7 @@ export class ClassroomDtoProperties {
         name: String,
         isArchived: Boolean,
         lastSync: Date,
+        inviteCode: String,
         assignments: AssignmentDomain[],
         students: Student[],
     ) {
@@ -26,6 +28,7 @@ export class ClassroomDtoProperties {
         this.name = name
         this.isArchived = isArchived
         this.lastSync = lastSync
+        this.inviteCode = inviteCode
         this.assignments = assignments
         this.students = students
     }

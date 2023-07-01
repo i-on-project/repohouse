@@ -11,7 +11,7 @@ class JdbiLeaveCourseInputRepositoryTests {
     @Test
     fun `createLeaveCourseRequest should create a new leaveCourse request`() = testWithHandleAndRollback { handle ->
         val leaveCourseReq = JdbiLeaveCourseRequestRepository(handle = handle)
-        val request = LeaveCourseInput(courseId = 1)
+        val request = LeaveCourseInput(courseId = 1, composite = 16, githubUsername = "test")
         leaveCourseReq.createLeaveCourseRequest(request = request, creator = 3)
     }
 
