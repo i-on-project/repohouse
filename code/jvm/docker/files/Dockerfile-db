@@ -11,8 +11,4 @@ COPY --chown=postgres:postgres ./code/jvm/docker/scripts/wait-for-postgres.sh ./
 RUN chmod +x ./bin/wait-for-postgres.sh
 
 # Expose PostgreSQL default port
-<<<<<<< Updated upstream
 EXPOSE 5432
-=======
-EXPOSE 5432
->>>>>>> Stashed changes

@@ -86,11 +86,7 @@ task<Exec>("dbDockerDown") {
 }
 
 task<Exec>("composeUp") {
-<<<<<<< Updated upstream
-    commandLine("docker-compose", "up", "--build", "--force-recreate")
-=======
     commandLine("docker", "compose","-f","docker-compose.composeUp.yml", "up", "--build", "--force-recreate")
->>>>>>> Stashed changes
     dependsOn("extractUberJar")
 }
 
