@@ -284,7 +284,17 @@ cleaned all just with the data from the [insert.sql](../sql/insert.sql) file.
 
 The JVM application can use Docker to run the application.
 
+<<<<<<< Updated upstream
 All the commands to run the application with Docker are in the [Compose](../jvm/docker-compose.yml) file.
+=======
+All the services defined and used to run the application with Docker are in the [Compose](../jvm/docker-compose.composeUp.yml) file.
+
+The 'Compose' file creates:
+
+- n instances of the JVM application with spring
+- 1 instance of the PostgreSQL database
+- 1 instance of NGINX to serve the I-on Classcode Web Application and make use of the multiple instances of the JVM application for load balancing
+>>>>>>> Stashed changes
 
 To run the application with Docker, run the following command:
 

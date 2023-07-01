@@ -14,8 +14,16 @@ jobs:
           java-version: 17
       - name: Build Docker images
         env:
+<<<<<<< Updated upstream
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: classcode
             JDBC_DATABASE_URL: jdbc:postgresql://db-docker:5432/classcode?user=postgres&password=postgres
         run: code/jvm/gradlew -p code/jvm/ check
+=======
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: classcode
+          JDBC_DATABASE_URL: jdbc:postgresql://db-docker:5432/classcode?user=postgres&password=postgres
+        run: code/jvm/gradlew -p code/jvm/ actions
+>>>>>>> Stashed changes

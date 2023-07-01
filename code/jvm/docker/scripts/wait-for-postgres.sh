@@ -16,4 +16,7 @@ done
 >&2 echo "Postgres is up - executing command '$cmd'"
 eval "$cmd"
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
