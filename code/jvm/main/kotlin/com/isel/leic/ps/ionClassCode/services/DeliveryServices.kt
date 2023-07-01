@@ -197,6 +197,7 @@ class DeliveryServices(
                 }
             }
         }
+
         couroutines.forEach { it.join() }
 
         transactionManager.run {
