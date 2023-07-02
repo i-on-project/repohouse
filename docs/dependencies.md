@@ -11,3 +11,4 @@
 | jdbi                                     | -                                                                        | Version 2.0, January 2004 | http://jdbi.org/#_license_dependencies_and_availability                                |
 | mockito                                  | Copyright (c) 2016 Niek Haarman, Copyright (c) 2007 Mockito contributors | The MIT License           | https://github.com/mockito/mockito-kotlin/blob/main/LICENSE                            |
 | postgres                                 | Copyright (c) 1997, PostgreSQL Global Development Group                  | BSD-2-Clause              | https://jdbc.postgresql.org/license/                                                   |
+| coil                                     | -                                                                        | Version 2.0, January 2004 | https://github.com/coil-kt/coil/blob/main/LICENSE.txt                                  |
