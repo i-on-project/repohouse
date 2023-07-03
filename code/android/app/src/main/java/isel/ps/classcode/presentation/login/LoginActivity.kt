@@ -10,7 +10,6 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import isel.ps.classcode.DependenciesContainer
-import isel.ps.classcode.presentation.connectivityObserver.NetworkConnectivityObserver
 import isel.ps.classcode.presentation.login.services.LoginServices
 import isel.ps.classcode.presentation.menu.MenuActivity
 import isel.ps.classcode.ui.theme.ClasscodeTheme
@@ -32,7 +31,7 @@ class LoginActivity : ComponentActivity() {
     private val vm by viewModels<LoginViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return LoginViewModel(loginServices = loginServices, connectivityObserver = NetworkConnectivityObserver(context = this@LoginActivity)) as T
+                return LoginViewModel(loginServices = loginServices) as T
             }
         }
     }
@@ -44,7 +43,7 @@ class LoginActivity : ComponentActivity() {
             ClasscodeTheme {
                 LoginScreen(
                     error = vm.error,
-                    onDismissRequest = { finish() },
+                    onDismissRequest = { vm.dismissError() },
                     loginHandler = {
                         vm.startOAuth(startActivity = ::startActivity)
                     },
