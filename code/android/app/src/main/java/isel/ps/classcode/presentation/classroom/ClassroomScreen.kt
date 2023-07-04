@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Pending
+import androidx.compose.material.icons.filled.PendingActions
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -401,7 +403,7 @@ fun AssignmentChooser(modifier: Modifier = Modifier, currentAssignment: Assignme
     Box(modifier = modifier) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(
-                imageVector = Icons.Default.Assignment,
+                imageVector = Icons.Default.List,
                 contentDescription = stringResource(id = R.string.assignment_icon),
             )
         }
@@ -427,7 +429,8 @@ private fun TypeOfTeamChooser(modifier: Modifier = Modifier, typeOfTeam: TypeOfT
             val newTypeOfTeam = if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) TypeOfTeam.TEAMS_NOT_CREATED else TypeOfTeam.TEAMS_CREATED
             onTypeOfTeamChange(newTypeOfTeam)
         }) {
-            Icon(imageVector = Icons.Default.List, contentDescription = stringResource(R.string.assignment_icon))
+            val icon = if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) Icons.Default.PendingActions else Icons.Default.Assignment
+            Icon(imageVector = icon, contentDescription = stringResource(R.string.assignment_icon))
         }
     }
 }

@@ -43,10 +43,20 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
             .post(objectMapper.writeValueAsString(requestBody).toRequestBody(MEDIA_TYPE))
             .build()
         val result = request.send(httpClient) { response ->
-            val headerName = "Set-Cookie"
-            val sessionCookie = response.headers[headerName] ?: return@send Storage(body = Either.Left(value = HandleClassCodeResponseError.FailToGetTheHeader(error = "Fail to get the value in header $headerName")))
             val body = handleSirenResponseClassCode<ClassCodeAuthDto>(response = response, type = ClassCodeAuthDtoType, jsonMapper = objectMapper)
-            return@send Storage(sessionCookie = sessionCookie, body = body)
+            return@send if (response.isSuccessful) {
+                val headerName = "Set-Cookie"
+                val sessionCookie = response.headers[headerName] ?: return@send Storage(
+                    body = Either.Left(
+                        value = HandleClassCodeResponseError.FailToGetTheHeader(
+                            error = "Fail to get the value in header $headerName",
+                        ),
+                    ),
+                )
+                Storage(sessionCookie = sessionCookie, body = body)
+            } else {
+                Storage(body = body)
+            }
         }
         return when (result.body) {
             is Either.Left -> Either.Left(value = result.body.value)
