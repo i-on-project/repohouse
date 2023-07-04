@@ -17,9 +17,9 @@ We've provided detailed instructions for each of these steps, as well as informa
 ## Manual
 
 The instruction manual for the i-on ClassCode application can be found [here](../docs/instruction_manual)
-Having the manual atually in 2 languages:
-:portugal: [Portuguese](../docs/instruction_manual/pt.pdf)
-:uk: [English](../docs/instruction_manual/en.pdf)
+Having the manual actually in 2 languages:
+- [:portugal:](../docs/instruction_manual/pt.pdf)
+- [:uk:](../docs/instruction_manual/en.pdf)
 
 
 ## Contributing
