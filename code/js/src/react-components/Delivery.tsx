@@ -207,7 +207,6 @@ export function ShowCreateDelivery({ deliveryServices,courseId,classroomId,assig
             />
             <TextField
                 hiddenLabel
-                label="Due Date"
                 value={dueDate}
                 type={"date"}
                 inputProps={{ min: new Date().toISOString().split("T")[0] }}
@@ -253,7 +252,6 @@ export function ShowEditDelivery({ deliveryServices, delivery,courseId,classroom
             />
             <TextField
                 hiddenLabel
-                label="Due Date"
                 value={dueDate}
                 type={"date"}
                 inputProps={{ min: new Date().toISOString().split("T")[0] }}

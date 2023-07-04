@@ -27,7 +27,6 @@ export const DELIVERIES_KEY = "deliveries"
 export const TEAM_KEY = "team"
 export const TEAMS_KEY = "teams"
 export const REQUESTS_KEY = "requestsHistory"
-
 export const JOIN_TEAM_KEY = "joinTeam"
 export const CREATE_TEAM_KEY = "createTeam"
 export const CREATE_DELIVERY_KEY = "createDelivery"
@@ -35,6 +34,8 @@ export const EDIT_DELIVERY_KEY = "editDelivery"
 export const DELETE_DELIVERY_KEY = "deleteDelivery"
 export const SYNC_DELIVERY_KEY = "syncDelivery"
 export const EXIT_TEAM_KEY = "leaveTeam"
+export const EXIT_COURSE_KEY = "leaveCourse"
+export const EXIT_CLASSROOM_KEY = "leaveClassroom"
 export const CLOSE_TEAM_KEY = "closeTeam"
 export const POST_FEEDBACK_KEY = "postFeedback"
 export const CHANGE_REQUEST_STATUS_KEY = "changeRequestStatus"
@@ -42,7 +43,6 @@ export const INVITE_CODE_KEY = "inviteCode"
 export const LOCAL_COPY_KEY = "localCopy"
 export const CREATE_CLASSROOM_KEY = "createClassroom"
 export const ARCHIVE_COURSE_KEY = "archiveCourse"
-
 export const ARCHIVE_CLASSROOM_KEY = "archiveClassroom"
 
 
@@ -82,6 +82,8 @@ export const systemActionKeys = [
     SYNC_DELIVERY_KEY,
     CLOSE_TEAM_KEY,
     EXIT_TEAM_KEY,
+    EXIT_COURSE_KEY,
+    EXIT_CLASSROOM_KEY,
     POST_FEEDBACK_KEY,
     INVITE_CODE_KEY,
     CREATE_CLASSROOM_KEY,

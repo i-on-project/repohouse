@@ -34,4 +34,10 @@ export class CourseServices {
         const href = parse(link.href).expand({courseId: courseId})
         return await fetchPut<CourseDtoProperties>(href)
     }
+
+    leaveCourse = async (courseId) => {
+        const link = await navigationRepository.ensureAction(Hypermedia.EXIT_COURSE_KEY, systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId})
+        return await fetchPut<CourseDtoProperties>(href)
+    }
 }

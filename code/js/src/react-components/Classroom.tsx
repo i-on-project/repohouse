@@ -41,6 +41,16 @@ export function ShowClassroomFetch({
         }
     }, [setError]);
 
+    const handleLeaveClassroom = useCallback(async () => {
+        const result = await classroomServices.leaveClassroom(courseId,classroomId);
+        if (result instanceof ErrorMessageModel) {
+            setError(result);
+        }
+        if (result instanceof SirenEntity) {
+            navigate("/courses/" + courseId, { replace: true });
+        }
+    }, [setError]);
+
     const handleLocalCopy = useCallback(async () => {
         const href = await classroomServices.localCopy(courseId, classroomId);
         window.open(href, "_blank");
@@ -105,6 +115,11 @@ export function ShowClassroomFetch({
                                 </>
                             ):null}
                             <Button variant="contained" onClick={handleLocalCopy}>Local Copy</Button>
+                        </Box>
+                    ):null}
+                    { user == AuthState.Student && !content.properties.isArchived? (
+                        <Box sx={alignHorizontalyBoxStyle}>
+                            <Button variant="contained" onClick={handleLeaveClassroom}>Leave Classroom</Button>
                         </Box>
                     ):null}
                     <Grid

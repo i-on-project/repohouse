@@ -4,6 +4,7 @@ import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
 import com.isel.leic.ps.ionClassCode.domain.User
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
+import com.isel.leic.ps.ionClassCode.http.Status
 import com.isel.leic.ps.ionClassCode.http.Uris
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomInputModel
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
@@ -11,6 +12,7 @@ import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedOrDelete
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomInviteOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomOutputModel
+import com.isel.leic.ps.ionClassCode.http.model.output.RequestOutputModel
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.infra.LinkRelation
 import com.isel.leic.ps.ionClassCode.infra.siren
@@ -206,6 +208,33 @@ class ClassroomController(
                     clazz("classroom")
                     action(title = "syncClassroom", href = Uris.syncClassroomUri(courseId, classroomId), method = HttpMethod.PUT, type = "application/json", block = {})
                 }
+            }
+        }
+    }
+
+    /**
+     * Leave a classroom
+     * Only Student
+     * It will create a request to be the teacher to approve it
+     */
+    @PutMapping(Uris.LEAVE_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
+    fun leaveClassroom(
+        user: User,
+        @PathVariable courseId: Int,
+        @PathVariable classroomId: Int
+    ): ResponseEntity<*> {
+        if (user !is Student) return Problem.unauthorized
+        return when (val request = classroomServices.leaveClassroom(classroomId, user.id, user.githubUsername)) {
+            is Result.Problem -> classroomServices.problem(request.value)
+            is Result.Success -> siren(
+                RequestOutputModel(
+                    Status.CREATED,
+                    request.value.id,
+                    "Request to leave classroom created, waiting for teacher approval",
+                ),
+            ) {
+                clazz("classroom")
+                action(title = "leaveClassroom", href = Uris.leaveClassroomUri(courseId,classroomId), method = HttpMethod.PUT, type = "application/json", block = {})
             }
         }
     }

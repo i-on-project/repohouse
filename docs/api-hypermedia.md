@@ -168,10 +168,10 @@ The specific properties representation for each endpoint response are:
         - isCreated {Boolean}: Indicates if the teacher is registered in the system.
     - isArchived {Boolean}: Indicates if the course has been archived.
     - classrooms: list of classroom
-        - id {Number}: Classroom´s system Id.
-        - name {String}: Classroom´s name.
-        - lastSync {Date}: Classroom´s last time of synchronization with Github.
-        - inviteCode {String}: Classroom´s invite code for students.
+        - id {Number}: Classroom's system Id.
+        - name {String}: Classroom's name.
+        - lastSync {Date}: Classroom's last time of synchronization with Github.
+        - inviteCode {String}: Classroom's invite code for students.
         - isArchived {Boolean}: Indicates if the classroom has been archived.
         - courseId {Number}: Classroom's associated course system´s Id.
         - teacherId {Number}: Classroom's associated course's teacher system´s Id.
@@ -212,10 +212,10 @@ The specific properties representation for each endpoint response are:
         - isCreated {Boolean}: Indicates if the teacher is registered in the system.
     - isArchived {Boolean}: Indicates if the course has been archived.
     - classrooms: list of classroom
-        - id {Number}: Classroom´s system Id.
-        - name {String}: Classroom´s name.
-        - lastSync {Date}: Classroom´s last time of synchronization with Github.
-        - inviteCode {String}: Classroom´s invite code for students.
+        - id {Number}: Classroom's system Id.
+        - name {String}: Classroom's name.
+        - lastSync {Date}: Classroom's last time of synchronization with Github.
+        - inviteCode {String}: Classroom's invite code for students.
         - isArchived {Boolean}: Indicates if the classroom has been archived.
         - courseId {Number}: Classroom's associated course system´s Id.
         - teacherId {Number}: Classroom's associated course's teacher system´s Id.  
@@ -223,11 +223,11 @@ The specific properties representation for each endpoint response are:
     - id {Number}: Course´s system Id.
     - deleted {Boolean}: Indicates if the course has been deleted.
 - GET ```/courses/:id/classrooms/:id```
-    - id {Number}: Classroom´s system Id.
-    - name {String}: Classroom´s name.
-    - lastSync {Date}: Classroom´s last time of synchronization with Github.
+    - id {Number}: Classroom's system Id.
+    - name {String}: Classroom's name.
+    - lastSync {Date}: Classroom's last time of synchronization with Github.
     - isArchived {Boolean}: Indicates if the classroom has been archived.
-    - inviteCode {String}: Classroom´s invite code for students.
+    - inviteCode {String}: Classroom's invite code for students.
     - assignments: list of assignments
         - id {Number}: Assignment´s system Id.
         - classroomId {Number}: Assignment associated classroom´s system Id.
@@ -246,11 +246,11 @@ The specific properties representation for each endpoint response are:
         - isCreated {Boolean}: Indicates if the student is registered in the system.
         - schoolId {Number}: Student´s school Id.
 - POST ```/courses/:id/classrooms/create```
-    - id {Number}: Classroom´s system Id.
-    - name {String}: Classroom´s name.
-    - lastSync {Date}: Classroom´s last time of synchronization with Github.
+    - id {Number}: Classroom's system Id.
+    - name {String}: Classroom's name.
+    - lastSync {Date}: Classroom's last time of synchronization with Github.
     - isArchived {Boolean}: Indicates if the classroom has been archived.
-    - inviteCode {String}: Classroom´s invite code for students.
+    - inviteCode {String}: Classroom's invite code for students.
     - assignments: list of assignments
         - id {Number}: Assignment´s system Id.
         - classroomId {Number}: Assignment associated classroom´s system Id.
@@ -268,41 +268,41 @@ The specific properties representation for each endpoint response are:
         - githubId {Number}: Student´s Github Id.
         - isCreated {Boolean}: Indicates if the student is registered in the system.
         - schoolId {Number}: Student´s school Id.
-- PUT ```/courses/:id/classrooms/:id/archive```
-    - id {Number}: Classroom´s system Id.
-    - archived {Boolean}: Indicates if the classroom has been archived.
-    - deleted {Boolean}: Indicates if the classroom has been deleted.
+- PUT ```/courses/:id/classrooms/:id/leave```
+    - status {Number}: Leave classroom request status.
+    - id {Number}: Leave classroom request Id.
+    - title {String}: Leave classroom request message.
 - POST ```/courses/:id/classrooms/:id/edit``` 
-    - id {Number}: Classroom´s system Id.
-    - name {String}: Classroom´s name.
-    - lastSync {Date}: Classroom´s last time of synchronization with Github.
-    - isArchived {Boolean}: Indicates if the classroom has been archived.
-    - inviteCode {String}: Classroom´s invite code for students.
-    - assignments: list of assignments
-        - id {Number}: Assignment´s system Id.
-        - classroomId {Number}: Assignment associated classroom´s system Id.
-        - minElemsPerGroup {Number}: minimum number of elements for work groups.
-        - maxElemsPerGroup {Number}: maximum number of elements for work groups.
-        - maxNumberGroups {Number}: maximum number of work groups.
-        - releaseDate {Date}: Assignment´s release date.
-        - description {String}:  Assignment´s description.
-        - title {String}:  Assignment´s title.
-    - students: list of students
-        - name {String}: Student´s name.
-        - email {String}: Student´s email.
-        - id {Number}: Student´s system Id.
-        - githubUsername {String}: Student´s Github username.
-        - githubId {Number}: Student´s Github Id.
-        - isCreated {Boolean}: Indicates if the student is registered in the system.
-        - schoolId {Number}: Student´s school Id.
+  - id {Number}: Classroom's system Id.
+  - name {String}: Classroom's name.
+  - lastSync {Date}: Classroom's last time of synchronization with Github.
+  - isArchived {Boolean}: Indicates if the classroom has been archived.
+  - inviteCode {String}: Classroom's invite code for students.
+  - assignments: list of assignments
+      - id {Number}: Assignment´s system Id.
+      - classroomId {Number}: Assignment associated classroom´s system Id.
+      - minElemsPerGroup {Number}: minimum number of elements for work groups.
+      - maxElemsPerGroup {Number}: maximum number of elements for work groups.
+      - maxNumberGroups {Number}: maximum number of work groups.
+      - releaseDate {Date}: Assignment´s release date.
+      - description {String}:  Assignment´s description.
+      - title {String}:  Assignment´s title.
+  - students: list of students
+      - name {String}: Student´s name.
+      - email {String}: Student´s email.
+      - id {Number}: Student´s system Id.
+      - githubUsername {String}: Student´s Github username.
+      - githubId {Number}: Student´s Github Id.
+      - isCreated {Boolean}: Indicates if the student is registered in the system.
+      - schoolId {Number}: Student´s school Id.
 - POST ```/courses/:id/enter-classroom/:inviteLink```
     - courseId {Number}: Classroom associated course's system Id.
     - classroom:
-        - id {Number}: Classroom´s system Id.
-        - name {String}: Classroom´s name.
-        - lastSync {Date}: Classroom´s last time of synchronization with Github.
+        - id {Number}: Classroom's system Id.
+        - name {String}: Classroom's name.
+        - lastSync {Date}: Classroom's last time of synchronization with Github.
         - isArchived {Boolean}: Indicates if the classroom has been archived.
-        - inviteCode {String}: Classroom´s invite code for students.
+        - inviteCode {String}: Classroom's invite code for students.
         - assignments: list of assignments
             - id {Number}: Assignment´s system Id.
             - classroomId {Number}: Assignment associated classroom´s system Id.
@@ -321,11 +321,11 @@ The specific properties representation for each endpoint response are:
             - isCreated {Boolean}: Indicates if the student is registered in the system.
             - schoolId {Number}: Student´s school Id.
 - POST ```/courses/:id/classrooms/:id/sync```
-    - id {Number}: Classroom´s system Id.
-    - name {String}: Classroom´s name.
-    - lastSync {Date}: Classroom´s last time of synchronization with Github.
+    - id {Number}: Classroom's system Id.
+    - name {String}: Classroom's name.
+    - lastSync {Date}: Classroom's last time of synchronization with Github.
     - isArchived {Boolean}: Indicates if the classroom has been archived.
-    - inviteCode {String}: Classroom´s invite code for students.
+    - inviteCode {String}: Classroom's invite code for students.
     - assignments: list of assignments
         - id {Number}: Assignment´s system Id.
         - classroomId {Number}: Assignment associated classroom´s system Id.
@@ -633,10 +633,10 @@ The specific properties representation for each endpoint response are:
             - isCreated {Boolean}: Indicates if the teacher is registered in the system.
         - isArchived {Boolean}: Indicates if the course has been archived.
         - classrooms: list of classroom
-            - id {Number}: Classroom´s system Id.
-            - name {String}: Classroom´s name.
-            - lastSync {Date}: Classroom´s last time of synchronization with Github.
-            - inviteCode {String}: Classroom´s invite code for students.
+            - id {Number}: Classroom's system Id.
+            - name {String}: Classroom's name.
+            - lastSync {Date}: Classroom's last time of synchronization with Github.
+            - inviteCode {String}: Classroom's invite code for students.
             - isArchived {Boolean}: Indicates if the classroom has been archived.
             - courseId {Number}: Classroom's associated course system´s Id.
             - teacherId {Number}: Classroom's associated course's teacher system´s Id.
@@ -661,11 +661,11 @@ The specific properties representation for each endpoint response are:
     - No properties (null).              
 - GET ```/courses/:id/classrooms/:id```
     - classroomModel:
-        - id {Number}: Classroom´s system Id.
-        - name {String}: Classroom´s name.
-        - lastSync {Date}: Classroom´s last time of synchronization with Github.
+        - id {Number}: Classroom's system Id.
+        - name {String}: Classroom's name.
+        - lastSync {Date}: Classroom's last time of synchronization with Github.
         - isArchived {Boolean}: Indicates if the classroom has been archived.
-        - inviteCode {String}: Classroom´s invite code for students.
+        - inviteCode {String}: Classroom's invite code for students.
         - assignments: list of assignments
             - id {Number}: Assignment´s system Id.
             - classroomId {Number}: Assignment associated classroom´s system Id.

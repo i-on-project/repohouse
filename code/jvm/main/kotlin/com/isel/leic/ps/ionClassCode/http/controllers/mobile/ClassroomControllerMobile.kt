@@ -2,6 +2,8 @@ package com.isel.leic.ps.ionClassCode.http.controllers.mobile
 
 import com.isel.leic.ps.ionClassCode.domain.User
 import com.isel.leic.ps.ionClassCode.domain.input.UpdateArchiveRepoInput
+import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveClassroomCompositeInput
+import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveCourseCompositeInput
 import com.isel.leic.ps.ionClassCode.http.Uris
 import com.isel.leic.ps.ionClassCode.infra.LinkRelation
 import com.isel.leic.ps.ionClassCode.infra.siren
@@ -49,6 +51,25 @@ class ClassroomControllerMobile(
             is Result.Success -> siren(value = classroom.value) {
                 clazz("classroomArchiveRequest")
                 link(rel = LinkRelation("self"), href = Uris.classroomUri(courseId = courseId, classroomId = classroomId), needAuthentication = true)
+            }
+        }
+    }
+
+    @PostMapping(Uris.MOBILE_LEAVE_CLASSROOM_PATH, produces = ["application/vnd.siren+json"])
+    fun leaveClassroom(
+        user: User,
+        @PathVariable courseId: Int,
+        @PathVariable classroomId: Int,
+        @PathVariable userId: Int,
+        @RequestBody body: UpdateLeaveClassroomCompositeInput
+    ): ResponseEntity<*> {
+        return when (val result = classroomServices.updateLeaveClassroomComposite(userId = userId, body = body)){
+            is Result.Problem -> classroomServices.problem(error = result.value)
+            is Result.Success -> {
+                siren(value = result.value) {
+                    clazz(value = "leaveClassroom")
+                    link(rel = LinkRelation(value = "self"), href = Uris.MOBILE_LEAVE_CLASSROOM_PATH, needAuthentication = true)
+                }
             }
         }
     }

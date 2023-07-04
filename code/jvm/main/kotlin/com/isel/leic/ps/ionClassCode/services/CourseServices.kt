@@ -51,6 +51,7 @@ sealed class CourseServicesError {
 @Component
 class CourseServices(
     private val transactionManager: TransactionManager,
+    private val classroomServices: ClassroomServices
 ) {
 
     /**
@@ -141,17 +142,16 @@ class CourseServices(
     /**
      * Method to request to leave a course
      */
-    fun leaveCourse(courseId: Int, userId: Int, githubUsername: String): LeaveCourseResponse {
+    fun leaveCourse(courseId: Int, userId: Int,githubUsername:String): LeaveCourseResponse {
         return transactionManager.run {
-            if (it.usersRepository.getUserById(userId) == null) return@run Result.Problem(CourseServicesError.InternalError)
+            if (it.usersRepository.getStudent(userId) == null) return@run Result.Problem(CourseServicesError.InternalError)
             if (it.courseRepository.getCourse(courseId) == null) return@run Result.Problem(CourseServicesError.CourseNotFound)
             if (!it.courseRepository.isStudentInCourse(userId, courseId)) return@run Result.Problem(CourseServicesError.UserNotInCourse)
             val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(), creator = userId)
             val course = it.leaveCourseRepository.createLeaveCourseRequest(request = LeaveCourseInput(courseId = courseId, githubUsername = githubUsername, composite = composite.id), creator = userId)
-            val classrooms = it.courseRepository.getCourseAllClassrooms(courseId = courseId).map(Classroom::id)
-            val teams = it.courseRepository.getAllTeamsFromAUserInACourse(courseId = courseId, userId = userId, classrooms = classrooms)
-            teams.forEach { team ->
-                it.leaveTeamRepository.createLeaveTeamRequest(request = LeaveTeamInput(teamId = team.id, composite = composite.id), creator = userId)
+            val classrooms = it.courseRepository.getCourseAllClassrooms(courseId = courseId)
+            classrooms.forEach { classroom ->
+                classroomServices.leaveClassroom(classroomId = classroom.id, userId = userId,githubUsername= githubUsername,compositeId = composite.id)
             }
             return@run Result.Success(value = course)
         }
@@ -162,16 +162,9 @@ class CourseServices(
             if (it.courseRepository.getCourse(courseId) == null) return@run Result.Problem(CourseServicesError.CourseNotFound)
             it.compositeRepository.getCompositeRequestsById(body.composite.requestId) ?: return@run Result.Problem(CourseServicesError.LeaveCourseCompositeNotFound)
             it.requestRepository.changeStateRequest(id = body.leaveCourse.requestId, state = "Accepted")
-            body.leaveTeam.forEach { leaveTeam ->
-                it.requestRepository.changeStateRequest(id = leaveTeam.requestId, state = leaveTeam.state)
-                if (leaveTeam.state == "Accepted") {
-                    it.teamRepository.leaveTeam(teamId = leaveTeam.teamId, studentId = userId)
-                }
-                if (leaveTeam.wasDeleted) {
-                    it.teamRepository.deleteTeam(leaveTeam.teamId)
-                }
+            body.leaveClassrooms.forEach { classroom ->
+                classroomServices.updateLeaveClassroomComposite(userId = userId, body = classroom)
             }
-            it.courseRepository.leaveCourse(courseId = courseId, studentId = userId)
             it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
             return@run Result.Success(value = true)
         }

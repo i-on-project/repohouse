@@ -134,6 +134,12 @@ CREATE TABLE LeaveCourse(
     foreign key (id) references Request(id)
 );
 
+CREATE TABLE LeaveClassroom(
+    id int primary key,
+    classroom_id int not null,
+    foreign key (id) references Request(id)
+);
+
 CREATE TABLE JoinTeam(
     id int primary key,
     team_id int not null,

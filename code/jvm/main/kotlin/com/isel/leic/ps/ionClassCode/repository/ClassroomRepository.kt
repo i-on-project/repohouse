@@ -3,6 +3,7 @@ package com.isel.leic.ps.ionClassCode.repository
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Student
+import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 
@@ -24,4 +25,6 @@ interface ClassroomRepository {
     fun getAllInviteLinks(): List<String>
     fun getAllCourseClassrooms(courseId: Int): List<Classroom>
     fun getAllReposInClassroom(classroomId: Int): List<Int>
+    fun getAllStudentTeamsInClassroom(classroomId: Int,studentId: Int): List<Team>
+    fun leaveClassroom(classroomId: Int, studentId: Int)
 }

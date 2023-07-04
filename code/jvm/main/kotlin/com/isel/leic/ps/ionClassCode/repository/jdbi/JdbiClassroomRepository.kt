@@ -3,6 +3,7 @@ package com.isel.leic.ps.ionClassCode.repository.jdbi
 import com.isel.leic.ps.ionClassCode.domain.Assignment
 import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Student
+import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.repository.ClassroomRepository
@@ -231,5 +232,31 @@ class JdbiClassroomRepository(private val handle: Handle) : ClassroomRepository 
             .bind("classroomId", classroomId)
             .mapTo<Int>()
             .list()
+    }
+
+    override fun getAllStudentTeamsInClassroom(classroomId: Int, studentId: Int): List<Team> {
+        return handle.createQuery(
+            """
+            SELECT t.id, t.name, t.is_created, t.is_closed,t.assignment
+            FROM team t JOIN student_team st on t.id = st.team
+            WHERE t.assignment IN (SELECT a.id FROM assignment a WHERE a.classroom_id = :classroomId)
+            AND st.student = :studentId
+            """,
+        )
+            .bind("classroomId", classroomId)
+            .bind("studentId", studentId)
+            .mapTo<Team>()
+            .list()
+    }
+    override fun leaveClassroom(classroomId: Int, studentId: Int) {
+        handle.createUpdate(
+            """
+            DELETE FROM student_classroom
+            WHERE student = :student_id AND classroom = :classroom_id
+            """,
+        )
+            .bind("student_id", studentId)
+            .bind("classroom_id", classroomId)
+            .execute()
     }
 }

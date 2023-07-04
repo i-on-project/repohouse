@@ -1,10 +1,18 @@
 package com.isel.leic.ps.ionClassCode.services
 
+import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.domain.input.UpdateArchiveRepoInput
+import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveClassroom
+import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveClassroomCompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.ArchiveRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveClassroomInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveCourseInput
+import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveClassroom
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveCourse
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
 import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomInviteModel
@@ -32,6 +40,9 @@ typealias ClassroomEnterResponse = Result<ClassroomServicesError, ClassroomInvit
 typealias ClassroomSyncResponse = Result<ClassroomServicesError, Boolean>
 typealias ClassroomLocalCopyResponse = Result<ClassroomServicesError, LocalCopy>
 typealias ClassroomUpdateArchiveResponse = Result<ClassroomServicesError, Boolean>
+typealias LeaveClassroomResponse = Result<ClassroomServicesError, LeaveClassroom>
+typealias LeaveClassroomRequestResponse = Result<ClassroomServicesError, Boolean>
+
 
 /**
  * Error codes for the services
@@ -45,6 +56,7 @@ sealed class ClassroomServicesError {
     object InternalError : ClassroomServicesError()
     object CourseNotFound : ClassroomServicesError()
     object NameAlreadyExists : ClassroomServicesError()
+    object StudentNotFound : ClassroomServicesError()
 }
 
 /**
@@ -140,6 +152,24 @@ class ClassroomServices(
                     students = listOf(),
                 ),
             )
+        }
+    }
+
+    /**
+     * Method to request to leave a classroom
+     */
+    fun leaveClassroom(classroomId: Int, userId: Int,githubUsername:String,compositeId:Int? = null): LeaveClassroomResponse {
+        return transactionManager.run {
+            if (it.usersRepository.getStudent(userId) == null) return@run Result.Problem(ClassroomServicesError.InternalError)
+            if (it.classroomRepository.getClassroomById(classroomId) == null) return@run Result.Problem(ClassroomServicesError.CourseNotFound)
+            if (!it.classroomRepository.getStudentsByClassroom(classroomId).map { student -> student.id }.contains(userId)) return@run Result.Problem(ClassroomServicesError.InternalError)
+            val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(compositeId), creator = userId)
+            val classroom = it.leaveClassroomRepository.createLeaveClassroomRequest(request = LeaveClassroomInput(classroomId = classroomId, githubUsername = githubUsername, composite = composite.id), creator = userId)
+            val teams = it.classroomRepository.getAllStudentTeamsInClassroom(classroomId = classroomId, studentId = userId)
+            teams.forEach { team ->
+                it.leaveTeamRepository.createLeaveTeamRequest(request = LeaveTeamInput(teamId = team.id, composite = composite.id), creator = userId)
+            }
+            return@run Result.Success(value = classroom)
         }
     }
 
@@ -258,6 +288,30 @@ class ClassroomServices(
         return Result.Success(true)
     }
 
+    fun updateLeaveClassroomComposite(userId: Int, body: UpdateLeaveClassroomCompositeInput): LeaveClassroomRequestResponse {
+        return transactionManager.run {
+            if (it.classroomRepository.getClassroomById(body.leaveClassroom.classroomId) == null) {
+                return@run Result.Problem(ClassroomServicesError.ClassroomNotFound)
+            }
+            if (it.usersRepository.getStudent(userId) == null) {
+                return@run Result.Problem(ClassroomServicesError.StudentNotFound)
+            }
+            it.requestRepository.changeStateRequest(id = body.leaveClassroom.requestId, state = "Accepted")
+            body.leaveTeams.forEach { leaveTeam ->
+                it.requestRepository.changeStateRequest(id = leaveTeam.requestId, state = leaveTeam.state)
+                if (leaveTeam.state == "Accepted") {
+                    it.teamRepository.leaveTeam(teamId = leaveTeam.teamId, studentId = userId)
+                }
+                if (leaveTeam.wasDeleted) {
+                    it.teamRepository.deleteTeam(leaveTeam.teamId)
+                }
+            }
+            it.classroomRepository.leaveClassroom(classroomId = body.leaveClassroom.classroomId, studentId = userId)
+            it.compositeRepository.updateCompositeState(compositeId = body.composite.requestId)
+            return@run Result.Success(true)
+        }
+    }
+
     /**
      * Method to get the local copy of the classroom to path in the personal computer
      */
@@ -308,6 +362,7 @@ class ClassroomServices(
             ClassroomServicesError.InternalError -> Problem.internalError
             ClassroomServicesError.CourseNotFound -> Problem.notFound
             ClassroomServicesError.NameAlreadyExists -> Problem.alreadyExists
+            ClassroomServicesError.StudentNotFound -> Problem.notFound
         }
     }
 

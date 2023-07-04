@@ -1,5 +1,7 @@
 package com.isel.leic.ps.ionClassCode.domain.input
 
+import com.isel.leic.ps.ionClassCode.domain.requests.LeaveClassroom
+
 /**
  * Update Request Input Interface
  */
@@ -70,8 +72,19 @@ data class UpdateLeaveCourse(
     val courseId: Int,
 ) : UpdateRequest
 
+data class UpdateLeaveClassroom(
+    override val requestId: Int,
+    val classroomId: Int,
+) : UpdateRequest
+
 data class UpdateLeaveCourseCompositeInput(
     val composite: UpdateCompositeState,
     val leaveCourse: UpdateLeaveCourse,
-    val leaveTeam: List<LeaveTeamWithDelete>
+    val leaveClassrooms: List<UpdateLeaveClassroomCompositeInput>
+)
+
+data class UpdateLeaveClassroomCompositeInput(
+    val composite: UpdateCompositeState,
+    val leaveClassroom: UpdateLeaveClassroom,
+    val leaveTeams: List<LeaveTeamWithDelete>
 )

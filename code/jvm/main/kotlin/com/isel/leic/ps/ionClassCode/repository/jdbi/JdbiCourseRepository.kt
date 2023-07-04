@@ -99,23 +99,6 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
     }
 
     /**
-     * Method to leave a Course
-     */
-    override fun leaveCourse(courseId: Int, studentId: Int): Course {
-        handle.createUpdate(
-            """
-            DELETE FROM student_classroom
-            WHERE student = :student_id AND classroom IN (SELECT id FROM classroom WHERE course_id = :course_id)
-            """,
-        )
-            .bind("student_id", studentId)
-            .bind("course_id", courseId)
-            .execute()
-
-        return getTheCourse(courseId = courseId)
-    }
-
-    /**
      * Method to archieve a Course
      */
     override fun archiveCourse(courseId: Int) {
@@ -404,23 +387,6 @@ class JdbiCourseRepository(private val handle: Handle) : CourseRepository {
             .bind("courseId", courseId)
             .mapTo<Int>()
             .firstOrNull() != null
-
-    override fun getAllTeamsFromAUserInACourse(courseId: Int, userId: Int, classrooms: List<Int>): List<Team> {
-        return classrooms.map { classroomId ->
-            handle.createQuery(
-                """
-                SELECT t.id, name, is_created, is_closed, assignment FROM team t
-                JOIN student_team st on t.id = st.team
-                JOIN (SELECT a.id FROM assignment a WHERE classroom_id = :classroomId) as x on t.assignment = x.id
-                WHERE st.student = :userId
-            """
-            )
-                .bind("userId", userId)
-                .bind("classroomId", classroomId)
-                .mapTo<Team>()
-                .first()
-        }
-    }
 
     /**
      * Method to get a Course by is id

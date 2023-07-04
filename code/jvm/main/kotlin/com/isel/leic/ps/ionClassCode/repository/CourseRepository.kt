@@ -15,7 +15,6 @@ interface CourseRepository {
     fun checkIfCourseNameExists(name: String): Boolean
     fun createCourse(course: CourseInput): Course
     fun deleteCourse(courseId: Int)
-    fun leaveCourse(courseId: Int, studentId: Int): Course
     fun archiveCourse(courseId: Int)
     fun addTeacherToCourse(teacherId: Int, courseId: Int): Course
     fun getCourseTeachers(courseId: Int): List<TeacherWithoutToken>
@@ -28,5 +27,4 @@ interface CourseRepository {
     fun getCourseByOrg(orgUrl: String): Course?
     fun getCourseByName(name: String): Course?
     fun isStudentInCourse(studentId: Int, courseId: Int): Boolean
-    fun getAllTeamsFromAUserInACourse(courseId: Int, userId: Int, classrooms: List<Int>): List<Team>
 }

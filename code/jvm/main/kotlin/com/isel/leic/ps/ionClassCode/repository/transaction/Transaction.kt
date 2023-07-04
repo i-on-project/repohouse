@@ -18,6 +18,7 @@ import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.request.JoinTeamRepository
+import com.isel.leic.ps.ionClassCode.repository.request.LeaveClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.request.LeaveCourseRepository
 import com.isel.leic.ps.ionClassCode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.request.RequestRepository
@@ -43,6 +44,7 @@ interface Transaction {
     val joinTeamRepository: JoinTeamRepository
     val leaveTeamRepository: LeaveTeamRepository
     val leaveCourseRepository: LeaveCourseRepository
+    val leaveClassroomRepository: LeaveClassroomRepository
     val requestRepository: RequestRepository
     val outboxRepository: OutboxRepository
     val otpRepository: OtpRepository

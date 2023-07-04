@@ -95,6 +95,7 @@ class SystemController {
         block.action(title = "createClassroom", href = Uris.CREATE_CLASSROOM_PATH, method = HttpMethod.POST, type = "application/json", block = {
             textField("name")
         })
+        block.action(title="leaveClassroom", href = Uris.LEAVE_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
         block.action(title = "archiveClassroom", href = Uris.ARCHIVE_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json", block = {})
         block.action(title = "editClassroom", href = Uris.EDIT_CLASSROOM_PATH, method = HttpMethod.PUT, type = "application/json", block = {
             textField("name")

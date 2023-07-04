@@ -29,4 +29,10 @@ export class ClassroomServices {
         const link = await navigationRepository.ensureLink(Hypermedia.LOCAL_COPY_KEY, systemServices.home)
         return parse(link.href).expand({courseId: courseId, classroomId: classroomId})
     }
+
+    leaveClassroom = async (courseId,classroomId) => {
+        const link = await navigationRepository.ensureAction(Hypermedia.EXIT_CLASSROOM_KEY, systemServices.home)
+        const href = parse(link.href).expand({courseId: courseId,classroomId:classroomId})
+        return await fetchPut<ClassroomDtoProperties>(href)
+    }
 }

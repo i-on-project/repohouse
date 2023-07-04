@@ -59,6 +59,7 @@ All web API routes are prefixed with `/api`.
 |-----------------------------------------------------|-------------------------------------------------------------|
 | GET ```/courses/:id/classrooms/:id```               | Get the classroom page for the classroom with the given id. |
 | POST ```/courses/:id/classrooms/create```           | Create a classroom. *                                       |
+ | PUT ```/courses/:id/classrooms/:id/leave```        | Leave a classroom. **                                       |
 | PUT ```/courses/:id/classrooms/:id/archive```       | Archive a classroom. *                                      |
 | POST ```/courses/:id/classrooms/:id/edit```         | Edit a classroom. *                                         |
 | POST ```/courses/:id/enter-classroom/:inviteLink``` | Invite link to a student enter in a classroom. **           |

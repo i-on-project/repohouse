@@ -31,6 +31,7 @@ import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCompositeReques
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCreateRepoRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiCreateTeamRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiJoinTeamRequestRepository
+import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiLeaveClassroomRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiLeaveCourseRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiLeaveTeamRequestRepository
 import com.isel.leic.ps.ionClassCode.repository.jdbi.request.JdbiRequestRepository
@@ -39,6 +40,7 @@ import com.isel.leic.ps.ionClassCode.repository.request.CompositeRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateRepoRepository
 import com.isel.leic.ps.ionClassCode.repository.request.CreateTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.request.JoinTeamRepository
+import com.isel.leic.ps.ionClassCode.repository.request.LeaveClassroomRepository
 import com.isel.leic.ps.ionClassCode.repository.request.LeaveCourseRepository
 import com.isel.leic.ps.ionClassCode.repository.request.LeaveTeamRepository
 import com.isel.leic.ps.ionClassCode.repository.request.RequestRepository
@@ -68,6 +70,7 @@ class JdbiTransaction(
     override val joinTeamRepository: JoinTeamRepository by lazy { JdbiJoinTeamRequestRepository(handle = handle) }
     override val leaveTeamRepository: LeaveTeamRepository by lazy { JdbiLeaveTeamRequestRepository(handle = handle) }
     override val leaveCourseRepository: LeaveCourseRepository by lazy { JdbiLeaveCourseRequestRepository(handle = handle) }
+    override val leaveClassroomRepository: LeaveClassroomRepository by lazy { JdbiLeaveClassroomRequestRepository(handle = handle) }
     override val requestRepository: RequestRepository by lazy { JdbiRequestRepository(handle = handle) }
     override val outboxRepository: OutboxRepository by lazy { JdbiOutboxRepository(handle = handle) }
     override val cooldownRepository: CooldownRepository by lazy { JdbiCooldownRepository(handle = handle) }

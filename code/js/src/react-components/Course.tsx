@@ -56,6 +56,16 @@ export function ShowCourseFetch({
         }
     }, [setError])
 
+    const handleLeaveCourse = useCallback(async () => {
+        const result = await courseServices.leaveCourse(courseId)
+        if (result instanceof ErrorMessageModel) {
+            setError(true)
+        }
+        if (result instanceof SirenEntity) {
+            navigate("/menu", { replace : true })
+        }
+    }, [setError])
+
 
     const handleGithubClick = useCallback((url) => {
         window.open(url, "_blank")
@@ -99,7 +109,7 @@ export function ShowCourseFetch({
                             <GitHubIcon onClick={() => handleGithubClick(content.properties.orgUrl)}/>
                         </IconButton>
                     </Box>
-                     <TeachersDetailBox teachers={content.properties.teacher}/>
+                    <TeachersDetailBox teachers={content.properties.teacher}/>
                     {content.properties.classrooms.length === 0 ?
                         <Typography
                             variant="h6"
@@ -127,6 +137,11 @@ export function ShowCourseFetch({
                         <Box sx={alignHorizontalyBoxStyle}>
                             <Button variant="contained" onClick={handleCreateClassroom}>Create Classroom</Button>
                             <Button variant="contained" onClick={handleArchiveButton}>Archive</Button>
+                        </Box>
+                    ) : null}
+                    { user == AuthState.Student  && !content.properties.isArchived ? (
+                        <Box sx={alignHorizontalyBoxStyle}>
+                            <Button variant="contained" onClick={handleLeaveCourse}>Leave Course</Button>
                         </Box>
                     ) : null}
                 </>
