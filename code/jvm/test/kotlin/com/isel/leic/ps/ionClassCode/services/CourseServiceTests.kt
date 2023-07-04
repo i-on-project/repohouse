@@ -142,18 +142,7 @@ class CourseServiceTests {
                         on { archiveCourse(courseId = 2) } doAnswer { }
                         on { deleteCourse(courseId = 2) } doAnswer { }
                         on { isStudentInCourse(studentId = 1, courseId = 1) } doReturn true
-                        on { leaveCourse(courseId = 1, studentId = 1) } doReturn Course(
-                            id = 1,
-                            orgUrl = "orgUrl",
-                            name = "courseName",
-                            teachers = listOf(
-                                teacherWithoutToken,
-                            ),
-                            isArchived = false,
-                            orgId = 1111,
-                        )
                         on { getCourseAllClassrooms(courseId = 1) } doReturn (listOf(Classroom(id = 1, name = "name", lastSync = Timestamp.from(Instant.now()), courseId = 1, isArchived = false, inviteCode = "inviteLink", teacherId = 1)))
-                        on { getAllTeamsFromAUserInACourse(1, 1, listOf(1)) } doReturn listOf(Team(id = 1, name = "name", isCreated = true, isClosed = true, assignment = 1))
                     }
                     val mockedCompositeRepository = mock<CompositeRepository> {
                         on { createCompositeRequest(CompositeInput(), 1) } doReturn Composite(id = 1, creator = 1, state = "Pending", composite = null)

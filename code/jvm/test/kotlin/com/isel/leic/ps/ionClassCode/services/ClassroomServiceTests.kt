@@ -5,6 +5,7 @@ import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.Teacher
+import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.requests.Composite
@@ -66,8 +67,9 @@ class ClassroomServiceTests {
                         on {
                             getClassroomByCode(inviteCode = "inviteLink")
                         } doReturn Classroom(id = 3, name = "Classroom 3", inviteCode = "inviteLink", isArchived = false, lastSync = Timestamp.from(Instant.now()), courseId = 1, teacherId = 1)
-
+                        on { getAllStudentTeamsInClassroom(1, 1) } doReturn listOf(Team(id = 1, name = "name", isCreated = true, isClosed = true, assignment = 1))
                         on { addStudentToClassroom(classroomId = 1, studentId = 4) } doAnswer {}
+                        on{ leaveClassroom(classroomId = 1, studentId = 1)} doAnswer {}
                     }
                     val mockedAssignmentRepository = mock<AssignmentRepository> {
                         on { getClassroomAssignments(classroomId = 1) } doReturn listOf(assignment)
@@ -91,6 +93,7 @@ class ClassroomServiceTests {
                         on {
                             getCourse(courseId = 1)
                         } doReturn Course(id = 1, orgUrl = "orgUrl", name = "name", orgId = 1111, teachers = listOf())
+
                     }
                     val mockedCompositeRepository = mock<CompositeRepository> {
                         on { createCompositeRequest(creator = 1, request = CompositeInput()) } doReturn Composite(id = 1, creator = 1, state = "Pending")
