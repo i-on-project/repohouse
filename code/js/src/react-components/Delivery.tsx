@@ -51,7 +51,7 @@ export function ShowDeliveryFetch({
             setContent(update)
             setDisableSync(true)
         }
-    }, [setError]);
+    }, [setError,setContent,setDisableSync]);
 
     const handleDeleteDelivery = useCallback(async () => {
         const result = await deliveryServices.deleteDelivery(courseId,classroomId,assignmentId,deliveryId);

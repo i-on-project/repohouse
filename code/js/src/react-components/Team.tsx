@@ -2,7 +2,7 @@ import {useAsync} from "../http/Fetch";
 import {TeamServices} from "../services/TeamServices";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import * as React from "react";
-import {useCallback, useState} from "react";
+import {useCallback, useState,useEffect} from "react";
 import {
     Backdrop,
     Box,
@@ -283,21 +283,33 @@ export function ShowTeamFetch({
 }
 
 export function ShowTeamRequestsFetch({
-    teamServices,courseId,classroomId,assignmentId,teamId,error
+    teamServices,courseId,classroomId,assignmentId,teamId,serror
 }: {
     teamServices: TeamServices,
     courseId: number,
     classroomId: number,
     assignmentId: number,
     teamId: number,
-    error: ErrorMessageModel
+    serror: ErrorMessageModel
 }) {
-    const content = useAsync(async () => {
-        return await teamServices.teamRequests(courseId,classroomId,assignmentId,teamId);
-    });
-    const [serror, setError] = useState<ErrorMessageModel>(error);
+    const [content, setContent] = useState(undefined)
+    const [error, setError] = useState<ErrorMessageModel>(serror);
     const navigate = useNavigate();
     const user = useLoggedIn()
+
+    useEffect(() => {
+        let cancelled = false
+        async function doFetch() {
+            const res = await teamServices.teamRequests(courseId,classroomId,assignmentId,teamId);
+            if (!cancelled) {
+                setContent(res)
+            }
+        }
+        doFetch()
+        return () => {
+            cancelled = true
+        }
+    }, [])
 
     const handleChangeStatus = useCallback(async (requestId:number) => {
         const result = await teamServices.changeRequestStatus(courseId,classroomId,assignmentId,teamId,requestId);
@@ -305,9 +317,10 @@ export function ShowTeamRequestsFetch({
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +"/teams/" + teamId + "/requests", {replace: true})
+            const update = await teamServices.teamRequests(courseId,classroomId,assignmentId,teamId);
+            setContent(update)
         }
-    }, [setError,navigate]);
+    }, [setError,setContent]);
 
     if (!content) {
         return (
@@ -379,7 +392,7 @@ export function ShowTeamRequestsFetch({
                     </Grid>
                 </>
             ) : null}
-            <ErrorAlert error={serror} onClose={() => setError(null)}/>
+            <ErrorAlert error={error} onClose={() => setError(null)}/>
         </Box>
     );
 }
