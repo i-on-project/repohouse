@@ -317,8 +317,18 @@ Restrições
 - team_id - não pode ser null. valor numérico inteiro não negativo.
 - assignment_id - não pode ser null. valor numérico inteiro não negativo.
 
-``LeaveTeam`` - especialização de ``Request``
+``LeaveClassroom`` - especialização de ``Request``
 > Entidade que representa um pedido de saída de uma turma.
+- id - identificador do pedido.
+- classroom_id - identificador do grupo.
+
+Restrições
+
+- id - valor numérico inteiro não negativo. Chave primária. Chave estrangeira para ``Request``.
+- classroom_id - não pode ser null. valor numérico inteiro não negativo.
+
+``LeaveTeam`` - especialização de ``Request``
+> Entidade que representa um pedido de saída de uma equipa.
 - id - identificador do pedido.
 - team_id - identificador do grupo.
 
