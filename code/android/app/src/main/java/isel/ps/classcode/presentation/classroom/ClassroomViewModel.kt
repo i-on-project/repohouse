@@ -93,7 +93,10 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
                                     is Either.Left -> LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = leaveTeam.state)
                                 }
                             } else {
-                                LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted")
+                                when (gitHubService.removeMemberFromTeamInGitHub(leaveTeam = leaveTeamWithRepoName.leaveTeam, courseName = classroomInfo.courseName, teamSlug = leaveTeamWithRepoName.leaveTeam.teamName,)) {
+                                    is Either.Right -> LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted")
+                                    is Either.Left -> LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = leaveTeam.state)
+                                }
                             }
                         }
                         val update = UpdateLeaveClassroomCompositeInput(composite = UpdateCompositeState(requestId = leaveClassroom.composite), leaveClassroom = UpdateLeaveClassroom(requestId = leaveClassroom.requestId, classroomId = leaveClassroom.classroomId), leaveTeams = l)
