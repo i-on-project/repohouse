@@ -162,6 +162,18 @@ class JdbiTeamRepository(private val handle: Handle) : TeamRepository {
             .list()
     }
 
+    override fun getTeamsFromClassroom(classroomId: Int): List<Team> {
+        return handle.createQuery(
+            """
+            SELECT t.id, name, is_created, is_closed, assignment FROM team t join (select a.id as assId from assignment a join classroom c on c.id = a.classroom_id where c.id = :classroomId) as x
+            on t.assignment = x.assId
+            """,
+        )
+            .bind("classroomId", classroomId)
+            .mapTo<Team>()
+            .list()
+    }
+
     /**
      * Method to get all teams from a student
      */

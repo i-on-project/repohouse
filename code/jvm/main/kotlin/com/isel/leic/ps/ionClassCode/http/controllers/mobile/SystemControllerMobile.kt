@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class SystemControllerMobile {
+class COURSE_KEYSystemControllerMobile {
     @GetMapping(Uris.MOBILE_HOME, produces = ["application/vnd.siren+json"])
     fun home(): ResponseEntity<SirenModel<HomeOutputModel>> {
         return siren(value = HomeOutputModel()) {
@@ -44,5 +44,6 @@ class SystemControllerMobile {
         block.link(rel = LinkRelation("createTeam"), href = Uris.MOBILE_TEAM_CREATE_TEAM_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("teamRequestsNotAccepted"), href = Uris.MOBILE_TEAM_REQUESTS_NOT_ACCEPTED_PATH, needAuthentication = true)
         block.link(rel = LinkRelation("classroomArchiveRequest"), href = Uris.MOBILE_CLASSROOM_ARCHIVED_PATH, needAuthentication = true)
+        block.link(rel = LinkRelation("leaveClassroom"), href = Uris.MOBILE_LEAVE_CLASSROOM_PATH, needAuthentication = true)
     }
 }

@@ -1,5 +1,7 @@
 package isel.ps.classcode.presentation.classroom
 
+import android.app.Activity
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import isel.ps.classcode.dataAccess.gitHubService.GitHubService
 import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.CreateTeamComposite
+import isel.ps.classcode.domain.LeaveTeamWithDelete
 import isel.ps.classcode.domain.Team
 import isel.ps.classcode.domain.UpdateArchiveRepoInput
 import isel.ps.classcode.domain.UpdateArchiveRepoState
@@ -16,6 +19,8 @@ import isel.ps.classcode.domain.UpdateCreateRepoState
 import isel.ps.classcode.domain.UpdateCreateTeamRequestState
 import isel.ps.classcode.domain.UpdateCreateTeamStatusInput
 import isel.ps.classcode.domain.UpdateJoinTeamState
+import isel.ps.classcode.domain.UpdateLeaveClassroom
+import isel.ps.classcode.domain.UpdateLeaveClassroomCompositeInput
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.http.utils.HandleGitHubResponseError
 import isel.ps.classcode.presentation.classroom.services.ClassroomServices
@@ -47,7 +52,7 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
     val errorGitHub: HandleGitHubResponseError?
         get() = _errorGitHub
 
-    fun getAssignments() = viewModelScope.launch {
+    fun getAssignments(activity: Activity) = viewModelScope.launch {
         when (val assignments = classroomServices.getAssignments(classroomId = classroomInfo.classroom.id, courseId = classroomInfo.classroom.courseId)) {
             is Either.Right -> {
                 val archiveRepos = assignments.value.archiveRepos
@@ -71,7 +76,43 @@ class ClassroomViewModel(private val classroomServices: ClassroomServices, priva
                         is Either.Left -> _errorClassCode = result.value
                     }
                 }
-
+                if (assignments.value.leaveClassroomsRequests.isNotEmpty()) {
+                    assignments.value.leaveClassroomsRequests.forEach { leaveClassroomRequest ->
+                        val leaveClassroom = leaveClassroomRequest.leaveClassroom
+                        val l = leaveClassroomRequest.leaveTeamRequests.map { leaveTeamWithRepoName ->
+                            val leaveTeam = leaveTeamWithRepoName.leaveTeam
+                            if (leaveTeam.membersCount == 1) {
+                                when (gitHubService.deleteTeamFromTeamInGitHub(courseName = classroomInfo.courseName, teamSlug = leaveTeam.teamName)) {
+                                    is Either.Right -> {
+                                        when (val x = gitHubService.archiveRepoInGithub(orgName = classroomInfo.courseName, repoName = leaveTeamWithRepoName.repoName)) {
+                                            is Either.Right -> Unit
+                                            is Either.Left -> _errorGitHub = x.value
+                                        }
+                                        LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted", wasDeleted = true)
+                                    }
+                                    is Either.Left -> LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = leaveTeam.state)
+                                }
+                            } else {
+                                LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted")
+                            }
+                        }
+                        val update = UpdateLeaveClassroomCompositeInput(composite = UpdateCompositeState(requestId = leaveClassroom.composite), leaveClassroom = UpdateLeaveClassroom(requestId = leaveClassroom.requestId, classroomId = leaveClassroom.classroomId), leaveTeams = l)
+                        when (val res = classroomServices.updateLeaveClassroomCompositeInClassCode(input = update, userId = leaveClassroom.creator, courseId = classroomInfo.classroom.courseId)) {
+                            is Either.Right -> {
+                                Toast
+                                    .makeText(
+                                        activity,
+                                        "The user with id ${leaveClassroom.creator} has left the classroom successfully",
+                                        Toast.LENGTH_LONG,
+                                    )
+                                    .show()
+                            }
+                            is Either.Left -> {
+                                _errorClassCode = res.value
+                            }
+                        }
+                    }
+                }
                 if (assignments.value.assignments.isNotEmpty()) {
                     _assignment = assignments.value.assignments.first()
                     getTeams(assignmentId = assignments.value.assignments.first().id)

@@ -1,24 +1,16 @@
 package com.isel.leic.ps.ionClassCode.services
 
-import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.StudentWithoutToken
 import com.isel.leic.ps.ionClassCode.domain.input.ClassroomInput
 import com.isel.leic.ps.ionClassCode.domain.input.UpdateArchiveRepoInput
-import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveClassroom
 import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveClassroomCompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.ArchiveRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.CompositeInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveClassroomInput
-import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveCourseInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveClassroom
-import com.isel.leic.ps.ionClassCode.domain.requests.LeaveCourse
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
-import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
-import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomInviteModel
-import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomModel
-import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomModelWithArchiveRequest
-import com.isel.leic.ps.ionClassCode.http.model.output.LocalCopy
+import com.isel.leic.ps.ionClassCode.http.model.output.*
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
@@ -108,8 +100,13 @@ class ClassroomServices(
                     } else {
                         null
                     }
+                    val leaveClassroomRequests = it.leaveClassroomRepository.getLeaveClassroomRequestsByClassroom(classroomId = classroomId)
+                    val requests = leaveClassroomRequests.map { leaveClassroom ->
+                        val teams = it.leaveTeamRepository.getLeaveTeamWithRepoNameRequestsFromClassroom(classroomId = leaveClassroom.classroomId, compositeId = leaveClassroom.composite)
+                        LeaveClassroomRequest(leaveClassroom = leaveClassroom, leaveTeamRequests = teams)
+                    }
                     return@run Result.Success(
-                        ClassroomModelWithArchiveRequest(classroomModel = classroomModel, archiveRequest = archiveRequest),
+                        ClassroomModelWithArchiveRequest(classroomModel = classroomModel, archiveRequest = archiveRequest, leaveClassrooms = requests),
                     )
                 }
             }
@@ -158,7 +155,7 @@ class ClassroomServices(
     /**
      * Method to request to leave a classroom
      */
-    fun leaveClassroom(classroomId: Int, userId: Int,githubUsername:String,compositeId:Int? = null): LeaveClassroomResponse {
+    fun leaveClassroom(classroomId: Int, userId: Int, githubUsername:String, compositeId: Int? = null): LeaveClassroomResponse {
         return transactionManager.run {
             if (it.usersRepository.getStudent(userId) == null) return@run Result.Problem(ClassroomServicesError.InternalError)
             if (it.classroomRepository.getClassroomById(classroomId) == null) return@run Result.Problem(ClassroomServicesError.CourseNotFound)

@@ -11,6 +11,7 @@ interface LeaveTeamRepository {
     fun createLeaveTeamRequest(request: LeaveTeamInput, creator: Int): LeaveTeam
     fun getLeaveTeamRequests(): List<LeaveTeam>
     fun getLeaveTeamWithRepoNameRequests(teamId: Int): List<LeaveTeamWithRepoName>
+    fun getLeaveTeamWithRepoNameRequestsFromClassroom(classroomId: Int, compositeId: Int): List<LeaveTeamWithRepoName>
     fun getLeaveTeamRequestById(id: Int): LeaveTeam?
     fun getLeaveTeamRequestsByCompositeId(compositeId: Int): List<LeaveTeam>
     fun updateLeaveTeamState(requestId: Int, state: String)

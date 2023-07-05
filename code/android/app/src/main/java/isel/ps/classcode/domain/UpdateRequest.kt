@@ -89,8 +89,18 @@ data class UpdateLeaveCourse(
     val courseId: Int,
 ) : UpdateRequest
 
+data class UpdateLeaveClassroom(
+    override val requestId: Int,
+    val classroomId: Int,
+) : UpdateRequest
+
+data class UpdateLeaveClassroomCompositeInput(
+    val composite: UpdateCompositeState,
+    val leaveClassroom: UpdateLeaveClassroom,
+    val leaveTeams: List<LeaveTeamWithDelete>
+)
 data class UpdateLeaveCourseCompositeInput(
     val composite: UpdateCompositeState,
     val leaveCourse: UpdateLeaveCourse,
-    val leaveTeam: List<LeaveTeamWithDelete>
+    val leaveClassrooms: List<UpdateLeaveClassroomCompositeInput>,
 )

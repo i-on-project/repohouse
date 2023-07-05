@@ -1,7 +1,7 @@
 package com.isel.leic.ps.ionClassCode.domain
 
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveCourse
-import com.isel.leic.ps.ionClassCode.domain.requests.LeaveTeam
+import com.isel.leic.ps.ionClassCode.http.model.output.LeaveClassroomRequest
 
 /**
  * Course Domain Interface
@@ -31,7 +31,7 @@ data class CourseWithClassrooms(
 
 data class LeaveCourseRequest(
     val leaveCourse: LeaveCourse,
-    val leaveTeamRequests: List<LeaveTeam>,
+    val leaveClassRoomRequests: List<LeaveClassroomRequest>,
 )
 
 data class CourseWithLeaveCourseRequests(
