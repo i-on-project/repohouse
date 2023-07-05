@@ -1,10 +1,8 @@
 package com.isel.leic.ps.ionClassCode.repository.jdbi.request
 
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveClassroomInput
-import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveCourseInput
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveClassroom
 import com.isel.leic.ps.ionClassCode.repository.request.LeaveClassroomRepository
-import com.isel.leic.ps.ionClassCode.repository.request.LeaveCourseRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
@@ -60,7 +58,7 @@ class JdbiLeaveClassroomRequestRepository(
     override fun getLeaveClassroomRequests(): List<LeaveClassroom> {
         return handle.createQuery(
             """
-            SELECT l.id, r.creator, r.state, l.cl, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leaveclassroom as l JOIN request as r ON l.id = r.id
+            SELECT l.id, r.creator, r.state, l.classroom_id, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leaveclassroom as l JOIN request as r ON l.id = r.id
             """,
         )
             .mapTo<LeaveClassroom>()
@@ -82,6 +80,18 @@ class JdbiLeaveClassroomRequestRepository(
             .firstOrNull()
     }
 
+    override fun getLeaveClassroomRequestByCompositeId(composite: Int): List<LeaveClassroom> {
+        return handle.createQuery(
+            """
+            SELECT l.id, r.creator, r.state, l.classroom_id, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leaveclassroom as l JOIN request as r ON l.id = r.id
+            WHERE r.composite = :composite
+            """,
+        )
+            .bind("composite", composite)
+            .mapTo<LeaveClassroom>()
+            .list()
+    }
+
     /**
      * Method to get all Leave Classroom Request's by a user
      */
@@ -97,7 +107,7 @@ class JdbiLeaveClassroomRequestRepository(
             .list()
     }
 
-    override fun getLeaveClassroomRequestsByCourse(classroomId: Int): List<LeaveClassroom> {
+    override fun getLeaveClassroomRequestsByClassroom(classroomId: Int): List<LeaveClassroom> {
         return handle.createQuery(
             """
             SELECT l.id, r.creator, r.state, l.classroom_id, r.composite, (SELECT u.github_username FROM users u WHERE u.id=r.creator) FROM leaveclassroom as l JOIN request as r ON l.id = r.id

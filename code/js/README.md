@@ -186,6 +186,7 @@ running in [Jest](https://jestjs.io/) framework.
 All the tests are located in the `tests/` folder.
 
 Make sure the database is running before running the tests. Before running the tests, verify if the database is empty and run the script [script.sql](tests/script.sql).
+Delete the NGROK_URI environment value and change the GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET to the correct GitHub OAuth Test App values.
 
 To run the tests, you can run:
 

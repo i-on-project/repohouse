@@ -15,6 +15,7 @@ interface TeamRepository {
     fun getStudentsFromTeam(teamId: Int): List<Student>
     fun enterTeam(teamId: Int, studentId: Int)
     fun leaveTeam(teamId: Int, studentId: Int)
+    fun getTeamsFromClassroom(classroomId: Int): List<Team>
     fun deleteTeam(teamId: Int)
     fun getTeamsFromAssignment(assignmentId: Int): List<Team>
     fun getTeamsFromStudent(studentId: Int): List<Team>

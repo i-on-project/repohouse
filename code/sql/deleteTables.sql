@@ -14,9 +14,10 @@ DELETE FROM Assignment;
 DELETE FROM Apply;
 DELETE FROM archiverepo;
 delete from leavecourse;
+delete from leaveclassroom;
 DELETE FROM createteam;
-DELETE FROM request;
 DELETE FROM composite;
+DELETE FROM request;
 DELETE FROM student_classroom;
 DELETE FROM Classroom;
 DELETE FROM teacher_course;
@@ -28,6 +29,8 @@ DELETE FROM outbox;
 DELETE From cooldown;
 DELETE FROM Users;
 DELETE FROM ChallengeInfo;
+DELETE FROM pendingstudent;
+DELETE FROM pendingteacher;
 
 
 COMMIT TRANSACTION;

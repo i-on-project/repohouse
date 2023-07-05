@@ -166,7 +166,7 @@ class TeacherServices(
                 it.login,
                 it.url.replace("api.github.com/orgs", "github.com"),
                 it.avatar_url,
-                it.id
+                it.id,
             )
         }
 
@@ -175,7 +175,7 @@ class TeacherServices(
                 githubServices.fetchRoleTeacherOrg(
                     org.login,
                     githubUsername,
-                    githubToken
+                    githubToken,
                 ).role == "admin"
             ) {
                 org

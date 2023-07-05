@@ -43,7 +43,7 @@ class ClassroomActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val extra = getClassroomExtra() ?: return finish()
         vm.classroomInfo = extra
-        vm.getAssignments()
+        vm.getAssignments(activity = this)
         setContent {
             ClasscodeTheme {
                 ClassroomScreen(
