@@ -4,10 +4,10 @@ import isel.ps.classcode.domain.deserialization.ClassCodeLeaveCourseRequestDeser
 
 data class LeaveCourseRequest(
     val leaveCourse: LeaveCourse,
-    val leaveTeamRequests: List<LeaveTeam>,
+    val leaveClassroomRequests: List<LeaveClassroomRequest>,
 ) {
     constructor(deserialization: ClassCodeLeaveCourseRequestDeserialization) : this(
         leaveCourse = LeaveCourse(deserialization = deserialization.leaveCourse),
-        leaveTeamRequests = deserialization.leaveTeamRequests.map { LeaveTeam(deserialization = it) },
+        leaveClassroomRequests = deserialization.leaveClassroomRequests.map { LeaveClassroomRequest(deserialization = it) },
     )
 }

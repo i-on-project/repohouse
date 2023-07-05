@@ -16,6 +16,7 @@ import isel.ps.classcode.presentation.COURSE_KEY
 import isel.ps.classcode.presentation.CREATE_TEAM_KEY
 import isel.ps.classcode.presentation.CREDITS_KEY
 import isel.ps.classcode.presentation.HOME_KEY
+import isel.ps.classcode.presentation.LEAVE_CLASSROOM_KEY
 import isel.ps.classcode.presentation.LEAVE_COURSE_KEY
 import isel.ps.classcode.presentation.MENU_KEY
 import isel.ps.classcode.presentation.REQUESTS_NOT_ACCEPTED_KEY
@@ -61,5 +62,6 @@ class RealBootUpServices(private val httpClient: OkHttpClient, private val objec
         CREATE_TEAM_KEY,
         REQUESTS_NOT_ACCEPTED_KEY,
         CLASSROOM_ARCHIVED_KEY,
+        LEAVE_CLASSROOM_KEY,
     )
 }

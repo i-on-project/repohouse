@@ -113,6 +113,44 @@ class JdbiLeaveTeamRequestRepository(
         }
     }
 
+    override fun getLeaveTeamWithRepoNameRequestsFromClassroom(classroomId: Int, compositeId: Int): List<LeaveTeamWithRepoName> {
+        val ids = handle.createQuery(
+            """
+            SELECT t.id FROM team t join (select a.id as assId from assignment a join classroom c on c.id = a.classroom_id where c.id = :classroomId) as x
+            on t.assignment = x.assId
+            """,
+        )
+            .bind("classroomId", classroomId)
+            .mapTo<Int>()
+            .list()
+        val requests = ids.mapNotNull {
+            handle.createQuery(
+            """
+                SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username, (SELECT COUNT(*) FROM student_team
+                WHERE team = l.team_id) as members_count, (SELECT t.name FROM team t where t.id=l.team_id) as team_name FROM
+                (SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id) as x JOIN
+                 leaveteam as l on x.id = l.id
+                 where l.team_id = :teamId and x.composite = :compositeId
+            """
+            )
+                .bind("teamId", it)
+                .bind("compositeId", compositeId)
+                .mapTo<LeaveTeam>()
+                .firstOrNull()
+        }
+        return requests.map { leaveTeam ->
+            val repoName = handle.createQuery(
+                """
+                    SELECT r.name FROM repo r JOIN team t on r.team_id = t.id
+                    WHERE t.id = :teamId
+                    """,
+            )
+                .bind("teamId", leaveTeam.teamId)
+                .mapTo<String>()
+                .first()
+            LeaveTeamWithRepoName(repoName = repoName, leaveTeam = leaveTeam)
+        }
+    }
     /**
      * Method to get a Leave Team Request by is id
      */

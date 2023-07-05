@@ -12,4 +12,6 @@ val ClassCodeClassroomWithArchiveRequestsDtoType = SirenEntity.getType<ClassCode
 data class ClassCodeClassroomWithArchiveRequestsDeserialization(
     @JsonProperty("classroomModel") val classroomModel: ClassCodeClassroomWithAssignmentsDeserialization,
     @JsonProperty("archiveRequest") val archiveRequest: List<ClassCodeArchiveRepoDeserialization>?,
+    @JsonProperty("leaveClassrooms") val leaveClassrooms: List<ClassCodeLeaveClassroomRequestDeserialization>,
+
 )

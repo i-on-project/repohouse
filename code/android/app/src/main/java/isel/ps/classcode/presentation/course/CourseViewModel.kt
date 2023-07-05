@@ -10,10 +10,12 @@ import androidx.lifecycle.viewModelScope
 import isel.ps.classcode.dataAccess.gitHubService.GitHubService
 import isel.ps.classcode.domain.Classroom
 import isel.ps.classcode.domain.Course
+import isel.ps.classcode.domain.LeaveClassroomRequest
 import isel.ps.classcode.domain.LeaveCourse
-import isel.ps.classcode.domain.LeaveTeam
 import isel.ps.classcode.domain.LeaveTeamWithDelete
 import isel.ps.classcode.domain.UpdateCompositeState
+import isel.ps.classcode.domain.UpdateLeaveClassroom
+import isel.ps.classcode.domain.UpdateLeaveClassroomCompositeInput
 import isel.ps.classcode.domain.UpdateLeaveCourse
 import isel.ps.classcode.domain.UpdateLeaveCourseCompositeInput
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
@@ -45,7 +47,7 @@ class CourseViewModel(private val courseServices: CourseServices, private val gi
                         result.value.leaveCourseRequests.forEach { leaveCourseRequest ->
                             leaveCourseInGitHub(
                                 leaveCourse = leaveCourseRequest.leaveCourse,
-                                leaveTeamRequests = leaveCourseRequest.leaveTeamRequests,
+                                leaveClassroomRequests = leaveCourseRequest.leaveClassroomRequests,
                                 activity = activity,
                             )
                         }
@@ -59,26 +61,34 @@ class CourseViewModel(private val courseServices: CourseServices, private val gi
         }
     }
 
-    private fun leaveCourseInGitHub(leaveCourse: LeaveCourse, leaveTeamRequests: List<LeaveTeam>, activity: Activity) {
+    private fun leaveCourseInGitHub(leaveCourse: LeaveCourse, leaveClassroomRequests: List<LeaveClassroomRequest>, activity: Activity) {
         viewModelScope.launch {
             when (val result = gitHubService.leaveCourseInGitHub(orgName = course.name, username = leaveCourse.githubUsername)) {
                 is Either.Right -> {
-                    val list = mutableListOf<LeaveTeamWithDelete>()
-                    leaveTeamRequests.forEach { leaveTeam ->
-                        if (leaveTeam.membersCount == 1) {
-                            when (gitHubService.deleteTeamFromTeamInGitHub(courseName = course.name, teamSlug = leaveTeam.teamName)) {
-                                is Either.Right -> {
-                                    list.add(LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted", wasDeleted = true))
+                    val leaveClassrooms = leaveClassroomRequests.map { leaveClassroom ->
+                        val list = leaveClassroom.leaveTeamRequests.map { leaveTeamWithRepoName ->
+                            val leaveTeam = leaveTeamWithRepoName.leaveTeam
+                            if (leaveTeam.membersCount == 1) {
+                                when (gitHubService.deleteTeamFromTeamInGitHub(courseName = course.name, teamSlug = leaveTeam.teamName)) {
+                                    is Either.Right -> {
+                                        when (val x = gitHubService.archiveRepoInGithub(orgName = course.name, repoName = leaveTeamWithRepoName.repoName)) {
+                                            is Either.Right -> Unit
+                                            is Either.Left -> _errorGithub = x.value
+                                        }
+                                        LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted", wasDeleted = true)
+                                    }
+                                    is Either.Left -> LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = leaveTeam.state)
                                 }
-                                is Either.Left -> {
-                                    list.add(LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = leaveTeam.state))
+                            } else {
+                                when (gitHubService.removeMemberFromTeamInGitHub(leaveTeam = leaveTeamWithRepoName.leaveTeam, courseName = course.name, teamSlug = leaveTeamWithRepoName.leaveTeam.teamName,)) {
+                                    is Either.Right -> LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted")
+                                    is Either.Left -> LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = leaveTeam.state)
                                 }
                             }
-                        } else {
-                            list.add(LeaveTeamWithDelete(requestId = leaveTeam.requestId, teamId = leaveTeam.teamId, state = "Accepted"))
                         }
+                        UpdateLeaveClassroomCompositeInput(composite = UpdateCompositeState(requestId = leaveCourse.composite), leaveClassroom = UpdateLeaveClassroom(requestId = leaveClassroom.leaveClassroom.requestId, classroomId = leaveClassroom.leaveClassroom.classroomId), leaveTeams = list)
                     }
-                    when (val res = courseServices.updateLeaveCourseCompositeInClassCode(input = UpdateLeaveCourseCompositeInput(composite = UpdateCompositeState(requestId = leaveCourse.composite), leaveCourse = UpdateLeaveCourse(requestId = leaveCourse.requestId, courseId = leaveCourse.courseId), leaveTeam = list), userId = leaveCourse.creator)) {
+                    when (val res = courseServices.updateLeaveCourseCompositeInClassCode(input = UpdateLeaveCourseCompositeInput(composite = UpdateCompositeState(requestId = leaveCourse.composite), leaveCourse = UpdateLeaveCourse(requestId = leaveCourse.requestId, courseId = leaveCourse.courseId), leaveClassrooms = leaveClassrooms), userId = leaveCourse.creator)) {
                         is Either.Right -> {
                             Toast
                                 .makeText(

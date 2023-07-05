@@ -7,5 +7,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 data class ClassCodeLeaveCourseRequestDeserialization(
     @JsonProperty("leaveCourse") val leaveCourse: ClassCodeLeaveCourseDeserialization,
-    @JsonProperty("leaveTeamRequests") val leaveTeamRequests: List<ClassCodeLeaveTeamDeserialization>,
+    @JsonProperty("leaveClassRoomRequests") val leaveClassroomRequests: List<ClassCodeLeaveClassroomRequestDeserialization>,
 )

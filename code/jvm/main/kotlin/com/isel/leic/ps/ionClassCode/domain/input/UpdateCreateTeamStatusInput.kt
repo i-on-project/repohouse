@@ -1,6 +1,5 @@
 package com.isel.leic.ps.ionClassCode.domain.input
 
-import com.isel.leic.ps.ionClassCode.domain.requests.LeaveClassroom
 
 /**
  * Update Request Input Interface

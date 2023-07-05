@@ -1,11 +1,10 @@
 package isel.ps.classcode.presentation.classroom.services
 
-import isel.ps.classcode.domain.ArchiveRepo
-import isel.ps.classcode.domain.Assignment
 import isel.ps.classcode.domain.GetAssignmentsResponse
 import isel.ps.classcode.domain.Teams
 import isel.ps.classcode.domain.UpdateArchiveRepoInput
 import isel.ps.classcode.domain.UpdateCreateTeamStatusInput
+import isel.ps.classcode.domain.UpdateLeaveClassroomCompositeInput
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.delay
@@ -18,18 +17,7 @@ class FakeClassroomServices : ClassroomServices {
         classroomId: Int,
         courseId: Int,
     ): Either<HandleClassCodeResponseError, GetAssignmentsResponse> {
-        delay(2000)
-        return Either.Right(
-            value = GetAssignmentsResponse(
-                assignments = listOf(
-                    Assignment(id = 1, classroomId = 1, description = "Description1", title = "Assignment1"),
-                    Assignment(id = 2, classroomId = 1, description = "Description2", title = "Assignment2"),
-                ),
-                archiveRepos = listOf(
-                    ArchiveRepo(requestId = 1, creator = 1, state = "Pending", composite = 1, repoId = 1, repoName = "Repo1"),
-                ),
-            ),
-        )
+        TODO("Not yet implemented")
     }
 
     override suspend fun getTeams(
@@ -55,6 +43,14 @@ class FakeClassroomServices : ClassroomServices {
         courseId: Int,
         classroomId: Int,
         updateArchiveRepo: UpdateArchiveRepoInput,
+    ): Either<HandleClassCodeResponseError, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateLeaveClassroomCompositeInClassCode(
+        input: UpdateLeaveClassroomCompositeInput,
+        courseId: Int,
+        userId: Int
     ): Either<HandleClassCodeResponseError, Unit> {
         TODO("Not yet implemented")
     }
