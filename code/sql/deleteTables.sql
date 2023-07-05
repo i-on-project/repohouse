@@ -28,6 +28,8 @@ DELETE FROM outbox;
 DELETE From cooldown;
 DELETE FROM Users;
 DELETE FROM ChallengeInfo;
+DELETE FROM pendingstudent;
+DELETE FROM pendingteacher;
 
 
 COMMIT TRANSACTION;

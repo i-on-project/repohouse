@@ -1,6 +1,5 @@
 import * as React from "react";
-import {useCallback, useState} from "react";
-import {useAsync} from "../http/Fetch";
+import {useCallback, useState, useEffect} from "react";
 import {ErrorMessageModel} from "../domain/response-models/Error";
 import {SirenEntity} from "../http/Siren";
 import {Backdrop, Box, Button, CircularProgress, Grid, List, ListItem, TextField, Typography} from "@mui/material";
@@ -8,26 +7,39 @@ import {Link, useNavigate} from "react-router-dom";
 import {ErrorAlert} from "./error/ErrorAlert";
 import {AuthState, useLoggedIn} from "./auth/Auth";
 import {DeliveryServices} from "../services/DeliveryServices";
-import {DeliveryBody, DeliveryDtoProperties} from "../domain/dto/DeliveryDtoProperties";
+import {DeliveryBody} from "../domain/dto/DeliveryDtoProperties";
 import {DeliveryDomain} from "../domain/Delivery";
 import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../utils/Style";
 
 export function ShowDeliveryFetch({
-                                  deliveryServices,courseId,classroomId,assignmentId,deliveryId
-                              }: {
+    deliveryServices,courseId,classroomId,assignmentId,deliveryId
+}: {
     deliveryServices: DeliveryServices;
     courseId: number;
     classroomId: number;
     assignmentId: number;
     deliveryId: number;
 }) {
-    const content = useAsync(async () => {
-        return await deliveryServices.delivery(courseId, classroomId, assignmentId, deliveryId);
-    });
     
+    const [content, setContent] = useState(undefined)
+    const [disableSync, setDisableSync] = useState(false)
     const [error, setError] = useState<ErrorMessageModel>(null);
     const navigate = useNavigate();
     const user = useLoggedIn()
+
+    useEffect(() => {
+        let cancelled = false
+        async function doFetch() {
+            const res = await deliveryServices.delivery(courseId, classroomId, assignmentId, deliveryId)
+            if (!cancelled) {
+                setContent(res)
+            }
+        }
+        doFetch()
+        return () => {
+            cancelled = true
+        }
+    }, [])
 
     const handleSyncDelivery = useCallback(async () => {
         const result = await deliveryServices.syncDelivery(courseId,classroomId,assignmentId,deliveryId);
@@ -35,7 +47,9 @@ export function ShowDeliveryFetch({
             setError(result);
         }
         if (result instanceof SirenEntity) {
-            // TODO
+            const update = await deliveryServices.delivery(courseId, classroomId, assignmentId, deliveryId);
+            setContent(update)
+            setDisableSync(true)
         }
     }, [setError]);
 
@@ -93,7 +107,7 @@ export function ShowDeliveryFetch({
                     </Typography>
                     {user == AuthState.Teacher ? (
                         <Box sx={alignHorizontalyBoxStyle}>
-                            <Button variant="contained" onClick={handleSyncDelivery}>Sync</Button>
+                            <Button variant="contained" onClick={handleSyncDelivery} disabled={disableSync}>Sync</Button>
                             <Button variant="contained" onClick={() => navigate("/courses/"+ courseId+ "/classrooms/" + classroomId +"/assignments/" + assignmentId +  "/deliveries/" + content.properties.delivery.id + "/edit",{state:content.properties.delivery})}> Edit </Button>
                             {content.properties.teamsDelivered.length == 0 && content.properties.teamsNotDelivered.length == 0 ? (
                                 <Button variant="contained" onClick={handleDeleteDelivery}>Delete</Button>

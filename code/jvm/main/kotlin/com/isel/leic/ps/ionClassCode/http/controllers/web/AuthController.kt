@@ -9,6 +9,7 @@ import com.isel.leic.ps.ionClassCode.domain.input.TeacherInput
 import com.isel.leic.ps.ionClassCode.http.GITHUB_BASE_URL
 import com.isel.leic.ps.ionClassCode.http.GITHUB_OAUTH_URI
 import com.isel.leic.ps.ionClassCode.http.Status
+import com.isel.leic.ps.ionClassCode.http.URI
 import com.isel.leic.ps.ionClassCode.http.Uris
 import com.isel.leic.ps.ionClassCode.http.model.input.SchoolIdInputModel
 import com.isel.leic.ps.ionClassCode.http.model.output.AuthRedirect
@@ -56,9 +57,6 @@ const val STATE_COOKIE_PATH = Uris.CALLBACK_PATH
 const val HALF_HOUR: Long = 60 * 30
 const val FULL_DAY: Long = 60 * 60 * 24
 const val AUTHORIZATION_COOKIE_NAME = "Session"
-
-const val TEST = false
-val URI = if (TEST) "http://localhost:3000" else System.getenv("NGROK_URI") ?: "http://localhost:3000"
 
 /**
  * This controller is responsible for the authentication of the users.

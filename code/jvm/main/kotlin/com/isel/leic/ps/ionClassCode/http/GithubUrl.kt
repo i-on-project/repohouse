@@ -1,13 +1,10 @@
 package com.isel.leic.ps.ionClassCode.http
 
-import com.isel.leic.ps.ionClassCode.http.controllers.web.TEST
-import com.isel.leic.ps.ionClassCode.http.controllers.web.URI
-
 const val GITHUB_BASE_URL = "https://github.com"
 const val GITHUB_API_BASE_URL = "https://api.github.com"
-
-val CLIENT_ID: String = if (TEST) System.getenv("GITHUB_CLIENT_ID_TESTS") else System.getenv("GITHUB_CLIENT_ID")
-val CLIENT_SECRET: String = if (TEST) System.getenv("GITHUB_CLIENT_SECRET_TESTS") else System.getenv("GITHUB_CLIENT_SECRET")
+val URI = System.getenv("NGROK_URI") ?: "http://localhost:3000"
+val CLIENT_ID: String = System.getenv("GITHUB_CLIENT_ID")
+val CLIENT_SECRET: String = System.getenv("GITHUB_CLIENT_SECRET")
 
 val GITHUB_OAUTH_URI: (scope: String, state: String) -> String = { scope, state ->
     "/login/oauth/authorize?" +
