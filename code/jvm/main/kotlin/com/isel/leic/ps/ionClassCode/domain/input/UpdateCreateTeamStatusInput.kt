@@ -1,6 +1,5 @@
 package com.isel.leic.ps.ionClassCode.domain.input
 
-
 /**
  * Update Request Input Interface
  */

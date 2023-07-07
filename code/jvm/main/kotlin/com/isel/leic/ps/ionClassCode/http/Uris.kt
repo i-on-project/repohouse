@@ -64,13 +64,12 @@ object Uris {
     const val TEAM_CHANGE_REQUEST_PATH = "$TEAM_REQUESTS_PATH/{requestId}"
     const val POST_FEEDBACK_PATH = "$TEAM_PATH/feedback"
 
-
     /** Functions Uris **/
     fun creditsUri(): String = URI(CREDITS).toASCIIString()
     fun courseUri(courseId: Int): String = UriTemplate(COURSE_PATH).expand(courseId).toASCIIString()
     fun leaveCourse(courseId: Int): String = UriTemplate(LEAVE_COURSE_PATH).expand(courseId).toASCIIString()
     fun classroomUri(courseId: Int, classroomId: Int): String = UriTemplate(CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()
-    fun leaveClassroomUri(courseId: Int,classroomId: Int): String = UriTemplate(LEAVE_CLASSROOM_PATH).expand(courseId,classroomId).toASCIIString()
+    fun leaveClassroomUri(courseId: Int, classroomId: Int): String = UriTemplate(LEAVE_CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()
     fun syncClassroomUri(courseId: Int, classroomId: Int): String = UriTemplate(SYNC_CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()
     fun editClassroomUri(courseId: Int, classroomId: Int): String = UriTemplate(EDIT_CLASSROOM_PATH).expand(courseId, classroomId).toASCIIString()
     fun assigmentUri(courseId: Int, classroomId: Int, assignmentId: Int): String = UriTemplate(ASSIGMENT_PATH).expand(courseId, classroomId, assignmentId).toASCIIString()

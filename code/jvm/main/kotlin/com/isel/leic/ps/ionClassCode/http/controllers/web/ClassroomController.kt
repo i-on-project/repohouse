@@ -234,7 +234,7 @@ class ClassroomController(
                 ),
             ) {
                 clazz("classroom")
-                action(title = "leaveClassroom", href = Uris.leaveClassroomUri(courseId,classroomId), method = HttpMethod.PUT, type = "application/json", block = {})
+                action(title = "leaveClassroom", href = Uris.leaveClassroomUri(courseId, classroomId), method = HttpMethod.PUT, type = "application/json", block = {})
             }
         }
     }

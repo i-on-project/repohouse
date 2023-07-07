@@ -4,7 +4,6 @@ import com.isel.leic.ps.ionClassCode.domain.Classroom
 import com.isel.leic.ps.ionClassCode.domain.Course
 import com.isel.leic.ps.ionClassCode.domain.Student
 import com.isel.leic.ps.ionClassCode.domain.TeacherWithoutToken
-import com.isel.leic.ps.ionClassCode.domain.Team
 import com.isel.leic.ps.ionClassCode.domain.dto.CourseDTO
 import com.isel.leic.ps.ionClassCode.domain.input.CourseInput
 import com.isel.leic.ps.ionClassCode.repository.CourseRepository

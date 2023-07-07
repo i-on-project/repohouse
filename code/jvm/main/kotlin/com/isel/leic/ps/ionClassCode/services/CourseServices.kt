@@ -154,7 +154,7 @@ class CourseServices(
             val course = it.leaveCourseRepository.createLeaveCourseRequest(request = LeaveCourseInput(courseId = courseId, githubUsername = githubUsername, composite = composite.id), creator = userId)
             val classrooms = it.courseRepository.getCourseAllClassrooms(courseId = courseId)
             classrooms.forEach { classroom ->
-                classroomServices.leaveClassroom(classroomId = classroom.id, userId = userId, githubUsername= githubUsername, compositeId = composite.id)
+                classroomServices.leaveClassroom(classroomId = classroom.id, userId = userId, githubUsername = githubUsername, compositeId = composite.id)
             }
             return@run Result.Success(value = course)
         }

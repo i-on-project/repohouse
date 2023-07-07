@@ -25,6 +25,6 @@ interface ClassroomRepository {
     fun getAllInviteLinks(): List<String>
     fun getAllCourseClassrooms(courseId: Int): List<Classroom>
     fun getAllReposInClassroom(classroomId: Int): List<Int>
-    fun getAllStudentTeamsInClassroom(classroomId: Int,studentId: Int): List<Team>
+    fun getAllStudentTeamsInClassroom(classroomId: Int, studentId: Int): List<Team>
     fun leaveClassroom(classroomId: Int, studentId: Int)
 }

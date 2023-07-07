@@ -125,13 +125,13 @@ class JdbiLeaveTeamRequestRepository(
             .list()
         val requests = ids.mapNotNull {
             handle.createQuery(
-            """
-                SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username, (SELECT COUNT(*) FROM student_team
-                WHERE team = l.team_id) as members_count, (SELECT t.name FROM team t where t.id=l.team_id) as team_name FROM
-                (SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id) as x JOIN
-                 leaveteam as l on x.id = l.id
-                 where l.team_id = :teamId and x.composite = :compositeId
-            """
+                """
+                    SELECT l.id, x.creator, x.state, x.composite, l.team_id, x.github_username, (SELECT COUNT(*) FROM student_team
+                    WHERE team = l.team_id) as members_count, (SELECT t.name FROM team t where t.id=l.team_id) as team_name FROM
+                    (SELECT u.github_username, r.id, r.creator, r.composite, r.state FROM request r JOIN users u on r.creator = u.id) as x JOIN
+                     leaveteam as l on x.id = l.id
+                     where l.team_id = :teamId and x.composite = :compositeId
+                    """
             )
                 .bind("teamId", it)
                 .bind("compositeId", compositeId)

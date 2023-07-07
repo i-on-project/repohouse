@@ -3,7 +3,6 @@ package com.isel.leic.ps.ionClassCode.http.controllers.mobile
 import com.isel.leic.ps.ionClassCode.domain.User
 import com.isel.leic.ps.ionClassCode.domain.input.UpdateArchiveRepoInput
 import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveClassroomCompositeInput
-import com.isel.leic.ps.ionClassCode.domain.input.UpdateLeaveCourseCompositeInput
 import com.isel.leic.ps.ionClassCode.http.Uris
 import com.isel.leic.ps.ionClassCode.infra.LinkRelation
 import com.isel.leic.ps.ionClassCode.infra.siren
@@ -63,7 +62,7 @@ class ClassroomControllerMobile(
         @PathVariable userId: Int,
         @RequestBody body: UpdateLeaveClassroomCompositeInput
     ): ResponseEntity<*> {
-        return when (val result = classroomServices.updateLeaveClassroomComposite(userId = userId, body = body)){
+        return when (val result = classroomServices.updateLeaveClassroomComposite(userId = userId, body = body)) {
             is Result.Problem -> classroomServices.problem(error = result.value)
             is Result.Success -> {
                 siren(value = result.value) {

@@ -10,7 +10,12 @@ import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveClassroomInput
 import com.isel.leic.ps.ionClassCode.domain.input.request.LeaveTeamInput
 import com.isel.leic.ps.ionClassCode.domain.requests.LeaveClassroom
 import com.isel.leic.ps.ionClassCode.http.model.input.ClassroomUpdateInputModel
-import com.isel.leic.ps.ionClassCode.http.model.output.*
+import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomArchivedResult
+import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomInviteModel
+import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomModel
+import com.isel.leic.ps.ionClassCode.http.model.output.ClassroomModelWithArchiveRequest
+import com.isel.leic.ps.ionClassCode.http.model.output.LeaveClassroomRequest
+import com.isel.leic.ps.ionClassCode.http.model.output.LocalCopy
 import com.isel.leic.ps.ionClassCode.http.model.problem.Problem
 import com.isel.leic.ps.ionClassCode.repository.transaction.TransactionManager
 import com.isel.leic.ps.ionClassCode.utils.Result
@@ -34,7 +39,6 @@ typealias ClassroomLocalCopyResponse = Result<ClassroomServicesError, LocalCopy>
 typealias ClassroomUpdateArchiveResponse = Result<ClassroomServicesError, Boolean>
 typealias LeaveClassroomResponse = Result<ClassroomServicesError, LeaveClassroom>
 typealias LeaveClassroomRequestResponse = Result<ClassroomServicesError, Boolean>
-
 
 /**
  * Error codes for the services
@@ -155,7 +159,7 @@ class ClassroomServices(
     /**
      * Method to request to leave a classroom
      */
-    fun leaveClassroom(classroomId: Int, userId: Int, githubUsername:String, compositeId: Int? = null): LeaveClassroomResponse {
+    fun leaveClassroom(classroomId: Int, userId: Int, githubUsername: String, compositeId: Int? = null): LeaveClassroomResponse {
         return transactionManager.run {
             if (it.usersRepository.getStudent(userId) == null) return@run Result.Problem(ClassroomServicesError.InternalError)
             if (it.classroomRepository.getClassroomById(classroomId) == null) return@run Result.Problem(ClassroomServicesError.CourseNotFound)
