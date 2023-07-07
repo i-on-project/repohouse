@@ -34,11 +34,10 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/html:/usr/share/nginx/html
-      - /etc/letsencrypt/live/classcode.i-on.live:/etc/letsencrypt/live/classcode.i-on.live
-      - /etc/letsencrypt/archive/classcode.i-on.live:/etc/letsencrypt/archive/classcode.i-on.live
       - /etc/letsencrypt/dhparams:/etc/nginx/dhparams
       - /etc/letsencrypt/live/classcode.i-on.live:/etc/letsencrypt/live/classcode.i-on.live
       - /etc/letsencrypt/archive/classcode.i-on.live:/etc/letsencrypt/archive/classcode.i-on.live
+
     depends_on:
       - certbot
       - spring-service
