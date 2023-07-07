@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class COURSE_KEYSystemControllerMobile {
+class SystemControllerMobile {
     @GetMapping(Uris.MOBILE_HOME, produces = ["application/vnd.siren+json"])
     fun home(): ResponseEntity<SirenModel<HomeOutputModel>> {
         return siren(value = HomeOutputModel()) {
