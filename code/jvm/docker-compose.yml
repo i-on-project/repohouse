@@ -8,7 +8,7 @@ services:
       context: ../..
       dockerfile: code/jvm/docker/files/Dockerfile-Spring
     environment:
-      PORT: 8081
+      PORT: 8080
       NGROK_URI: ${NGROK_URI}
       JDBC_DATABASE_URL: ${JDBC_DATABASE_URL}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
@@ -19,7 +19,7 @@ services:
       SENDGRID_CLASSCODE_API_KEY: ${SENDGRID_CLASSCODE_API_KEY}
 
     ports:
-      - "8080"
+      - "8080:8080"
 
   # The service running the load-balancer
   nginx:
