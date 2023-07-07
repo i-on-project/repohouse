@@ -82,6 +82,10 @@ task<Exec>("composeUp") {
     dependsOn("extractUberJar")
 }
 
+task<Exec>("dryRun") {
+    commandLine("docker", "compose", "run", "--rm",  "certbot" ,"certonly", "--webroot", "--webroot-path" ,"/var/www/certbot/" ,"--dry-run" ,"-d" ,"classcode.i-on.live")
+    dependsOn("extractUberJar")
+}
 
 task<Exec>("composeDown") {
     commandLine("docker-compose", "down")
