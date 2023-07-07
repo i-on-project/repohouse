@@ -460,7 +460,7 @@ function TeamRequests() {
     const {courseId, classroomId, assignmentId,teamId} = useParams<{ courseId: string, classroomId: string, assignmentId:string,teamId: string }>();
     return (
         <div>
-            <ShowTeamRequestsFetch teamServices={teamServices} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)} teamId={Number(teamId)} error={null}/>
+            <ShowTeamRequestsFetch teamServices={teamServices} courseId={Number(courseId)} classroomId={Number(classroomId)} assignmentId={Number(assignmentId)} teamId={Number(teamId)} serror={null}/>
         </div>
     )
 }
