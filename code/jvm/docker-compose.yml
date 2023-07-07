@@ -29,7 +29,8 @@ services:
       context: ../..
       dockerfile: code/jvm/docker/files/Dockerfile-nginx
     ports:
-      - "443:3000"
+      - "80:80"
+      - "443:443"
 
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
@@ -39,13 +40,4 @@ services:
       - /etc/letsencrypt/archive/classcode.i-on.live:/etc/letsencrypt/archive/classcode.i-on.live
 
     depends_on:
-      - certbot
       - spring-service
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    command: certonly --manual --preferred-challenges dns --email ricardo.freitas.henriques@gmail.com --agree-tos --no-eff-email -d classcode.i-on-live
-
