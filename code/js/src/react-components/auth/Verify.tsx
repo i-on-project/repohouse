@@ -1,14 +1,13 @@
 import * as React from "react"
 import { useCallback, useState } from "react"
 import { ErrorMessageModel } from "../../domain/response-models/Error"
-import {Box, TextField, Typography } from "@mui/material"
-import { Button } from "react-bootstrap"
+import {Box, TextField, Typography,Button } from "@mui/material"
 import { Navigate } from "react-router-dom"
 import { AuthServices } from "../../services/AuthServices"
 import { ErrorAlertForm } from "../error/ErrorAlert"
 import { OTPBody } from "../../domain/dto/PendingUserDtoProperties"
 import { SirenEntity } from "../../http/Siren"
-import {homeBoxStyle, typographyStyle} from "../../utils/Style";
+import {alignHorizontalyBoxStyle, homeBoxStyle, typographyStyle} from "../../utils/Style";
 
 export function ShowVerifyFetch({
     authServices,
@@ -62,8 +61,10 @@ export function ShowVerifyFetch({
                 Verify
             </Typography>
             <TextField label={"OTP"} required type={"number"} onChange={(event) => setOtp(Number(event.target.value))}/>
-            <Button onClick={handleResend}>Resend</Button>
-            <Button onClick={handleSubmit}>Verify</Button>
+            <Box sx={alignHorizontalyBoxStyle}>
+                <Button variant="contained" onClick={handleSubmit}>Verify</Button>
+                <Button variant="contained" onClick={handleResend}>Resend</Button>
+            </Box>
             { serror ? <ErrorAlertForm title={serror.title} detail={serror.detail} onClose={() => { setError(null) }}/> : null }
         </Box>
     )

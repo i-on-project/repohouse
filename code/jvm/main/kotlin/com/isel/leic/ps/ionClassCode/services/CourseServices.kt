@@ -150,13 +150,13 @@ class CourseServices(
             if (it.usersRepository.getStudent(userId) == null) return@run Result.Problem(CourseServicesError.InternalError)
             if (it.courseRepository.getCourse(courseId) == null) return@run Result.Problem(CourseServicesError.CourseNotFound)
             if (!it.courseRepository.isStudentInCourse(userId, courseId)) return@run Result.Problem(CourseServicesError.UserNotInCourse)
-            val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(), creator = userId)
-            val course = it.leaveCourseRepository.createLeaveCourseRequest(request = LeaveCourseInput(courseId = courseId, githubUsername = githubUsername, composite = composite.id), creator = userId)
+            val composite = it.compositeRepository.createCompositeRequest(CompositeInput(), userId)
+            val courseRequest = it.leaveCourseRepository.createLeaveCourseRequest(request = LeaveCourseInput(courseId = courseId, githubUsername = githubUsername, composite = composite.id), creator = userId)
             val classrooms = it.courseRepository.getCourseAllClassrooms(courseId = courseId)
             classrooms.forEach { classroom ->
                 classroomServices.leaveClassroom(classroomId = classroom.id, userId = userId, githubUsername = githubUsername, compositeId = composite.id)
             }
-            return@run Result.Success(value = course)
+            return@run Result.Success(value = courseRequest)
         }
     }
 

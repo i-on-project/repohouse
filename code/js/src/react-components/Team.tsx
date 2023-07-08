@@ -181,9 +181,9 @@ export function ShowTeamFetch({
                             <>
                                 { team.students.find(student => student.id === userId) ? (
                                     <>
-                                        <Button onClick={handleLeaveTeam}>Leave Team</Button>
+                                        <Button variant="contained" onClick={handleLeaveTeam}>Leave Team</Button>
                                         { team.team.isClosed == false  && team.students.length >= team.assignment.minElemsPerGroup ? (
-                                            <Button onClick={handleCloseTeam}>Close Team</Button>
+                                            <Button variant="contained" onClick={handleCloseTeam}>Close Team</Button>
                                         ) : null}
                                     </>
                                 ) : null}
@@ -272,7 +272,7 @@ export function ShowTeamFetch({
                                     onChange={(event) => setDescription(event.target.value)}
                                 />
                             </Box>
-                            <Button onClick={handleSendFeedback}>Send Feedback</Button>
+                            <Button variant="contained" onClick={handleSendFeedback}>Send Feedback</Button>
                         </Box>
                     ): null}
                 </>
@@ -365,7 +365,7 @@ export function ShowTeamRequestsFetch({
                                     <ListItem>
                                         {request.creator + " - " + request.state}
                                         {user === AuthState.Teacher && request.state == "Rejected" ? (
-                                            <Button onClick={() => handleChangeStatus(request.id)}>To pending</Button>
+                                            <Button variant="contained" onClick={() => handleChangeStatus(request.id)}>To pending</Button>
                                         ):null}
                                     </ListItem>
                                 )}
@@ -383,7 +383,7 @@ export function ShowTeamRequestsFetch({
                                     <ListItem>
                                         {"User " + request.creator + " - " + request.state}
                                         {user === AuthState.Teacher && request.state == "Rejected" ? (
-                                            <Button onClick={() => handleChangeStatus(request.id)}>To pending</Button>
+                                            <Button variant="contained" onClick={() => handleChangeStatus(request.id)}>To pending</Button>
                                         ):null}
                                     </ListItem>
                                 )}

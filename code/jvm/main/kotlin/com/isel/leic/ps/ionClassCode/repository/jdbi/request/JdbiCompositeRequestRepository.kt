@@ -19,10 +19,10 @@ class JdbiCompositeRequestRepository(
     override fun createCompositeRequest(request: CompositeInput, creator: Int): Composite {
         val requestId = handle.createUpdate(
             """
-        INSERT INTO request (creator, composite, state)
-        VALUES (:creator, :compositeId, 'Pending')
-        RETURNING id
-        """,
+                INSERT INTO request (creator, composite, state)
+                VALUES (:creator, :compositeId, 'Pending')
+                RETURNING id
+                """,
         )
             .bind("creator", creator)
             .bind("compositeId", request.composite)
@@ -42,6 +42,22 @@ class JdbiCompositeRequestRepository(
             .mapTo<Int>()
             .first()
         return Composite(compositeId, creator)
+    }
+
+    /**
+     * Method to create a Composite Request
+     */
+    override fun createCompositeRequest(requestId: Int, creator: Int): Composite {
+        handle.createUpdate(
+            """
+                INSERT INTO composite (id)
+                VALUES (:id)
+                RETURNING id
+            """,
+        )
+            .bind("id", requestId)
+            .execute()
+        return Composite(requestId, creator)
     }
 
     /**

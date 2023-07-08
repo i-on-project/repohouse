@@ -165,10 +165,10 @@ class ClassroomServices(
             if (it.classroomRepository.getClassroomById(classroomId) == null) return@run Result.Problem(ClassroomServicesError.CourseNotFound)
             if (!it.classroomRepository.getStudentsByClassroom(classroomId).map { student -> student.id }.contains(userId)) return@run Result.Problem(ClassroomServicesError.InternalError)
             val composite = it.compositeRepository.createCompositeRequest(request = CompositeInput(compositeId), creator = userId)
-            val classroom = it.leaveClassroomRepository.createLeaveClassroomRequest(request = LeaveClassroomInput(classroomId = classroomId, githubUsername = githubUsername, composite = composite.id), creator = userId)
+            val classroom = it.leaveClassroomRepository.createLeaveClassroomRequest(request = LeaveClassroomInput(classroomId = classroomId, githubUsername = githubUsername, composite = compositeId ?: composite.id), creator = userId)
             val teams = it.classroomRepository.getAllStudentTeamsInClassroom(classroomId = classroomId, studentId = userId)
             teams.forEach { team ->
-                it.leaveTeamRepository.createLeaveTeamRequest(request = LeaveTeamInput(teamId = team.id, composite = composite.id), creator = userId)
+                it.leaveTeamRepository.createLeaveTeamRequest(request = LeaveTeamInput(teamId = team.id, composite = compositeId ?: composite.id), creator = userId)
             }
             return@run Result.Success(value = classroom)
         }

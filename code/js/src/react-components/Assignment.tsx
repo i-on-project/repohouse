@@ -344,39 +344,40 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
     const [maxNumbElemPerGroup, setMaxNumbElemPerGroup] = useState(minElemsPerGroup)
     const [create, setCreate] = useState(false)
     const [serror, setError] = useState<ErrorMessageModel>(error)
-    
-    const handleMinNumbElemsDecrease = useCallback(() => {
-        decreaseValue(minElemsPerGroup,minNumbElemPerGroup,setMinNumbElemPerGroup)
-    }, [minNumbElemPerGroup,setMinNumbElemPerGroup])
-
-    const handleMaxNumbElemsIncrese = useCallback(() => {
-        increaseValue(maxNumbElemPerGroup,setMaxNumbElemPerGroup)
-    }, [maxNumbElemPerGroup,setMaxNumbElemPerGroup])
-
-    const handleMinNumbElemsIncrese = useCallback(() => {
-        if (minNumbElemPerGroup + 1 > maxNumbElemPerGroup) {
-            handleMaxNumbElemsIncrese()
-        }
-        increaseValue(minNumbElemPerGroup,setMinNumbElemPerGroup)
-    }, [minNumbElemPerGroup,maxNumbElemPerGroup,setMinNumbElemPerGroup,setMaxNumbElemPerGroup])
-
-    const handleMaxNumbElemsDecrease = useCallback(() => {
-        if (maxNumbElemPerGroup - 1 < minNumbElemPerGroup) {
-            handleMinNumbElemsDecrease()
-        }
-        decreaseValue(minNumbElemPerGroup,maxNumbElemPerGroup,setMaxNumbElemPerGroup)
-    }, [minNumbElemPerGroup,maxNumbElemPerGroup,setMinNumbElemPerGroup,setMaxNumbElemPerGroup])
-
 
     const increaseValue = useCallback((actualValue, fun) => {
-        fun(actualValue + 1)
-    }, [])
+        fun(actualValue + 1);
+    }, []);
 
-    const decreaseValue = useCallback((minValue,actualValue, fun) => {
-        if (actualValue - 1 >= minValue) {
-            fun(actualValue - 1)
+    const decreaseValue = useCallback((minValue, actualValue, fun,anotherFun) => {
+        if (actualValue > minValue) {
+            fun(actualValue - 1);
+        }else{
+            if (anotherFun != null){
+                anotherFun(minValue - 1)
+            }
+            fun(minValue - 1)
         }
-    }, [])
+    }, []);
+
+    const handleMinNumbElemsDecrease = useCallback(() => {
+        decreaseValue(minElemsPerGroup, minNumbElemPerGroup, setMinNumbElemPerGroup,setMaxNumbElemPerGroup);
+    }, [minNumbElemPerGroup, setMinNumbElemPerGroup, setMaxNumbElemPerGroup]);
+
+    const handleMaxNumbElemsIncrease = useCallback(() => {
+        increaseValue(maxNumbElemPerGroup, setMaxNumbElemPerGroup);
+    }, [maxNumbElemPerGroup, setMaxNumbElemPerGroup]);
+
+    const handleMinNumbElemsIncrease = useCallback(() => {
+        if (minNumbElemPerGroup + 1 > maxNumbElemPerGroup) {
+            handleMaxNumbElemsIncrease();
+        }
+        increaseValue(minNumbElemPerGroup, setMinNumbElemPerGroup);
+    }, [minNumbElemPerGroup, maxNumbElemPerGroup, setMinNumbElemPerGroup, handleMaxNumbElemsIncrease]);
+
+    const handleMaxNumbElemsDecrease = useCallback(() => {
+        decreaseValue(minNumbElemPerGroup, maxNumbElemPerGroup,setMaxNumbElemPerGroup,setMinNumbElemPerGroup);
+    }, [minNumbElemPerGroup, maxNumbElemPerGroup, setMaxNumbElemPerGroup, setMinNumbElemPerGroup]);
 
     const handleTitleChange = useCallback((value) => {
         setTitle(value.target.value)
@@ -409,9 +410,9 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
             <TextField onChange={handleDescriptionChange} value={description} id="description" label="Description" variant="outlined" required/>
             <Box sx={alignHorizontalyBoxStyle}>
                 <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                    <Button onClick={() => decreaseValue(minNumbGroups,numbGroups, setNumbGroups)}>-</Button>
+                    <Button onClick={() => decreaseValue(minNumbGroups,numbGroups, setNumbGroups,null)}>-</Button>
                     <Button>{numbGroups}</Button>
-                    <Button onClick={() => increaseValue( numbGroups, setNumbGroups)}>+</Button>
+                    <Button onClick={() => increaseValue(numbGroups, setNumbGroups)}>+</Button>
                 </ButtonGroup>
                 <Typography variant="h6" component="h1" gutterBottom  sx={typographyStyle}>
                     Number of Groups
@@ -419,9 +420,9 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
             </Box>
             <Box sx={alignHorizontalyBoxStyle}>
                 <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                    <Button onClick={() => decreaseValue(minElemsPerGroup,minNumbElemPerGroup, setMinNumbElemPerGroup)}>-</Button>
+                    <Button onClick={() => handleMinNumbElemsDecrease()}>-</Button>
                     <Button>{minNumbElemPerGroup}</Button>
-                    <Button onClick={() => increaseValue(minNumbElemPerGroup, setMinNumbElemPerGroup)}>+</Button>
+                    <Button onClick={() => handleMinNumbElemsIncrease()}>+</Button>
                 </ButtonGroup>
                 <Typography variant="h6" component="h1" gutterBottom sx={typographyStyle}>
                     Minimum Number of Elements per Group
@@ -429,9 +430,9 @@ export function ShowCreateAssignment({ assignmentServices,courseId,classroomId, 
             </Box>
             <Box sx={alignHorizontalyBoxStyle}>
                 <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                    <Button onClick={() => decreaseValue(maxNumbElemPerGroup,maxNumbElemPerGroup, setMaxNumbElemPerGroup)}>-</Button>
+                    <Button onClick={() => handleMaxNumbElemsDecrease()}>-</Button>
                     <Button>{maxNumbElemPerGroup}</Button>
-                    <Button onClick={() => increaseValue(maxNumbElemPerGroup, setMaxNumbElemPerGroup)}>+</Button>
+                    <Button onClick={() => handleMaxNumbElemsIncrease()}>+</Button>
                 </ButtonGroup>
                 <Typography variant="h6" component="h1" gutterBottom sx={typographyStyle}>
                     Maximum Number of Elements per Group

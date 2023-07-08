@@ -110,16 +110,22 @@ export function ShowCourseFetch({
                         </IconButton>
                     </Box>
                     <TeachersDetailBox teachers={content.properties.teacher}/>
-                    { user == AuthState.Teacher  && !content.properties.isArchived ? (
-                        <Box sx={alignHorizontalyBoxStyle}>
-                            <Button variant="contained" onClick={handleCreateClassroom}>Create Classroom</Button>
-                            <Button variant="contained" onClick={handleArchiveButton}>Archive</Button>
-                        </Box>
-                    ) : null}
-                    { user == AuthState.Student  && !content.properties.isArchived ? (
-                        <Box sx={alignHorizontalyBoxStyle}>
-                            <Button variant="contained" onClick={handleLeaveCourse}>Leave Course</Button>
-                        </Box>
+                    {!content.properties.isArchived ? (
+                        <>
+                        { user == AuthState.Teacher ? (
+                            <Box sx={alignHorizontalyBoxStyle}>
+                                <>
+                                    <Button variant="contained" onClick={handleCreateClassroom}>Create Classroom</Button>
+                                    <Button variant="contained" onClick={handleArchiveButton}>Archive</Button>
+                                </>
+                            </Box>
+                        ) : null}
+                        { user == AuthState.Student ? (
+                            <Box sx={alignHorizontalyBoxStyle}>
+                                <Button variant="contained" onClick={handleLeaveCourse}>Leave Course</Button>
+                            </Box>
+                        ) : null}
+                        </>
                     ) : null}
                     {content.properties.classrooms.length === 0 ?
                         <Typography
