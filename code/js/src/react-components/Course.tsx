@@ -110,6 +110,17 @@ export function ShowCourseFetch({
                         </IconButton>
                     </Box>
                     <TeachersDetailBox teachers={content.properties.teacher}/>
+                    { user == AuthState.Teacher  && !content.properties.isArchived ? (
+                        <Box sx={alignHorizontalyBoxStyle}>
+                            <Button variant="contained" onClick={handleCreateClassroom}>Create Classroom</Button>
+                            <Button variant="contained" onClick={handleArchiveButton}>Archive</Button>
+                        </Box>
+                    ) : null}
+                    { user == AuthState.Student  && !content.properties.isArchived ? (
+                        <Box sx={alignHorizontalyBoxStyle}>
+                            <Button variant="contained" onClick={handleLeaveCourse}>Leave Course</Button>
+                        </Box>
+                    ) : null}
                     {content.properties.classrooms.length === 0 ?
                         <Typography
                             variant="h6"
@@ -133,17 +144,6 @@ export function ShowCourseFetch({
                             ))}
                         </Grid>
                     }
-                    { user == AuthState.Teacher  && !content.properties.isArchived ? (
-                        <Box sx={alignHorizontalyBoxStyle}>
-                            <Button variant="contained" onClick={handleCreateClassroom}>Create Classroom</Button>
-                            <Button variant="contained" onClick={handleArchiveButton}>Archive</Button>
-                        </Box>
-                    ) : null}
-                    { user == AuthState.Student  && !content.properties.isArchived ? (
-                        <Box sx={alignHorizontalyBoxStyle}>
-                            <Button variant="contained" onClick={handleLeaveCourse}>Leave Course</Button>
-                        </Box>
-                    ) : null}
                 </>
             ) : null}
         </Box>

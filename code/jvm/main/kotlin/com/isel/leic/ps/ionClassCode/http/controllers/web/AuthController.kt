@@ -204,59 +204,82 @@ class AuthController(
                 }
             }
             is Result.Problem -> {
-                val userEmail = githubServices.fetchUserEmails(accessToken.access_token).first { it.primary }
-                if (position == TEACHER_COOKIE_NAME) {
-                    when (
-                        teacherServices.createPendingTeacher(
-                            TeacherInput(
-                                email = userEmail.email,
-                                githubUsername = userGithubInfo.login,
-                                githubId = userGithubInfo.id,
-                                token = generateRandomToken(),
-                                name = userGithubInfo.name ?: userGithubInfo.login,
-                                githubToken = accessToken.access_token,
-                            ),
-                        )
-                    ) {
-                        is Result.Success -> {
+                when(userServices.getPendingUserByGithubId(userGithubInfo.id,position)) {
+                    is Result.Success -> {
+                        if (position == TEACHER_COOKIE_NAME) {
                             val cookie = generateGithubIdCookie(userGithubInfo.id)
                             ResponseEntity
                                 .status(Status.REDIRECT)
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "$URI/auth/create/callback/teacher")
+                                .header(HttpHeaders.LOCATION, "$URI/auth/status")
                                 .body(EMPTY_REQUEST)
-                        }
-                        is Result.Problem ->
+                        } else {
+                            val cookie = generateGithubIdCookie(userGithubInfo.id)
                             ResponseEntity
                                 .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .header(HttpHeaders.LOCATION, "$URI/auth/verify")
                                 .body(EMPTY_REQUEST)
+                        }
                     }
-                } else {
-                    when (
-                        studentServices.createPendingStudent(
-                            StudentInput(
-                                email = userEmail.email,
-                                githubUsername = userGithubInfo.login,
-                                githubId = userGithubInfo.id,
-                                token = generateRandomToken(),
-                                name = userGithubInfo.name ?: userGithubInfo.login,
-                            ),
-                        )
-                    ) {
-                        is Result.Success -> {
-                            val cookie = generateGithubIdCookie(userGithubInfo.id)
-                            ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .header(HttpHeaders.LOCATION, "$URI/auth/create/callback/student")
-                                .body(EMPTY_REQUEST)
+                    is Result.Problem -> {
+                        val userEmail = githubServices.fetchUserEmails(accessToken.access_token).first { it.primary }
+                        if (position == TEACHER_COOKIE_NAME) {
+                            when (
+                                teacherServices.createPendingTeacher(
+                                    TeacherInput(
+                                        email = userEmail.email,
+                                        githubUsername = userGithubInfo.login,
+                                        githubId = userGithubInfo.id,
+                                        token = generateRandomToken(),
+                                        name = userGithubInfo.name ?: userGithubInfo.login,
+                                        githubToken = accessToken.access_token,
+                                    ),
+                                )
+                            ) {
+                                is Result.Success -> {
+                                    val cookie = generateGithubIdCookie(userGithubInfo.id)
+                                    ResponseEntity
+                                        .status(Status.REDIRECT)
+                                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                        .header(HttpHeaders.LOCATION, "$URI/auth/create/callback/teacher")
+                                        .body(EMPTY_REQUEST)
+                                }
+
+                                is Result.Problem ->
+                                    ResponseEntity
+                                        .status(Status.REDIRECT)
+                                        .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
+                                        .body(EMPTY_REQUEST)
+                            }
+                        } else {
+                            when (
+                                studentServices.createPendingStudent(
+                                    StudentInput(
+                                        email = userEmail.email,
+                                        githubUsername = userGithubInfo.login,
+                                        githubId = userGithubInfo.id,
+                                        token = generateRandomToken(),
+                                        name = userGithubInfo.name ?: userGithubInfo.login,
+                                    ),
+                                )
+                            ) {
+                                is Result.Success -> {
+                                    val cookie = generateGithubIdCookie(userGithubInfo.id)
+                                    ResponseEntity
+                                        .status(Status.REDIRECT)
+                                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                        .header(HttpHeaders.LOCATION, "$URI/auth/create/callback/student")
+                                        .body(EMPTY_REQUEST)
+                                }
+
+                                is Result.Problem ->
+                                    ResponseEntity
+                                        .status(Status.REDIRECT)
+                                        .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
+                                        .body(EMPTY_REQUEST)
+                            }
                         }
-                        is Result.Problem ->
-                            ResponseEntity
-                                .status(Status.REDIRECT)
-                                .header(HttpHeaders.LOCATION, "$URI/auth/error/callback")
-                                .body(EMPTY_REQUEST)
                     }
                 }
             }

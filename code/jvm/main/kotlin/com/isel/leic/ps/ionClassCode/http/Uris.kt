@@ -38,7 +38,7 @@ object Uris {
     const val LEAVE_COURSE_PATH = "$COURSE_PATH/leave"
     const val CLASSROOMS_PATH = "$COURSE_PATH/classrooms"
     const val CLASSROOM_PATH = "$CLASSROOMS_PATH/{classroomId}"
-    const val LEAVE_CLASSROOM_PATH = "$CLASSROOMS_PATH/leave"
+    const val LEAVE_CLASSROOM_PATH = "$CLASSROOM_PATH/leave"
     const val CREATE_CLASSROOM_PATH = "$CLASSROOMS_PATH/create"
     const val ARCHIVE_CLASSROOM_PATH = "$CLASSROOM_PATH/archive"
     const val SYNC_CLASSROOM_PATH = "$CLASSROOM_PATH/sync"

@@ -76,12 +76,12 @@ class JdbiApplyRepository(
     }
 
     /**
-     * Method to get a Pending Teacher by a Apply Request
+     * Method to get a Pending Teacher by an Apply Request
      */
     override fun getPendingTeacherByApply(applyId: Int): PendingTeacher? {
         return handle.createQuery(
             """
-            SELECT pendingteacher.id, email, is_created, github_username, github_id, token, name, github_token, created_at FROM pendingteacher 
+            SELECT pendingteacher.id, email, is_created, github_username,  github_id, token, name, github_token, created_at FROM pendingteacher 
             JOIN apply a on pendingteacher.id = a.pending_teacher_id
             WHERE a.id = :applyId
             """,
