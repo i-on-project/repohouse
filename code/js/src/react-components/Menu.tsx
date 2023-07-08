@@ -12,7 +12,8 @@ import {
     TextField,
     Typography,
     Button,
-    Avatar
+    Avatar,
+    IconButton
 } from "@mui/material"
 import { MenuServices } from "../services/MenuServices"
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
@@ -20,6 +21,7 @@ import { AuthState, toState, useLoggedIn } from "./auth/Auth"
 import { Error } from "./error/Error"
 import {cardBoxStyle, homeBoxStyle, modalBoxStyle, alignHorizontalyBoxStyle, typographyStyle} from "../utils/Style";
 import {CourseDtoProperties} from "../domain/dto/CourseDtoProperties";
+import InstallMobileIcon from '@mui/icons-material/InstallMobile';
 
 export function ShowMenuFetch({
     menuServices,
@@ -51,6 +53,14 @@ export function ShowMenuFetch({
             navigate('/courses/' + response.properties.courseId + "/classrooms/" + response.properties.classroom.id)
         }
     }, [inviteCode, setIsOpened, setError])
+
+    const handlePendingApproval = useCallback(async () => {
+        navigate('/pending-teachers')
+    }, [])
+
+    const handleCourses = useCallback(async () => {
+        navigate('/teacher/orgs')
+    }, [])
 
     if (!content) {
         return (
@@ -127,10 +137,23 @@ export function ShowMenuFetch({
                         </Grid>
                     }
                     { loggedIn === AuthState.Teacher ? (
-                        <Box sx={alignHorizontalyBoxStyle}>
-                            <Link to={"/teacher/orgs"}> Create Course </Link>
-                            <Link to={"/pending-teachers"}> Pending Teachers </Link>
-                        </Box>
+                        <>
+                            <Box sx={alignHorizontalyBoxStyle}>
+                            <Button variant="contained" onClick={handleCourses}> Create Course </Button>
+                            <Button variant="contained" onClick={handlePendingApproval}> Pending Teachers </Button>
+                            </Box>
+                            <Box sx={alignHorizontalyBoxStyle}>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={typographyStyle}
+                                >
+                                    {content.properties.name}
+                                </Typography>
+                                <IconButton>
+                                    <InstallMobileIcon onClick={() => window.open("https://storage.googleapis.com/cn_europe/classcode.apk")}/>
+                                </IconButton>
+                            </Box>
+                        </>
                     ) : null}
                 </>
             ) : null}

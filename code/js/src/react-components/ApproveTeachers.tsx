@@ -105,7 +105,7 @@ export function ShowTeacherApprovalFetch({
                             {"There are no pending requests"}
                         </Typography>
                     }
-                    { teachersApproved.length || teachersRejected.length ? <Button onClick={handleSubmit}> Submit </Button> : null}
+                    { teachersApproved.length || teachersRejected.length ? <Button variant="contained" onClick={handleSubmit}> Submit </Button> : null}
                 </>
             ) : null}
         </Box>
