@@ -149,12 +149,24 @@ class CourseServiceTests {
                     }
                     val mockedLeaveCourseRepository = mock<LeaveCourseRepository> {
                         on { createLeaveCourseRequest(LeaveCourseInput(1, 1, "githubUsername"), 1) } doReturn LeaveCourse(
-                            2, 1, "Pending", 1, 1, "username"
+                            2,
+                            1,
+                            "Pending",
+                            1,
+                            1,
+                            "username",
                         )
                     }
                     val mockedLeaveTeamRepository = mock<LeaveTeamRepository> {
                         on { createLeaveTeamRequest(LeaveTeamInput(1, 1), 1) } doReturn LeaveTeam(
-                            2, 1, "Pending", 1, 1, "username", 1, "name"
+                            2,
+                            1,
+                            "Pending",
+                            1,
+                            1,
+                            "username",
+                            1,
+                            "name",
                         )
                     }
                     on { usersRepository } doReturn mockedUsersRepository
@@ -162,7 +174,6 @@ class CourseServiceTests {
                     on { compositeRepository } doReturn mockedCompositeRepository
                     on { leaveCourseRepository } doReturn mockedLeaveCourseRepository
                     on { leaveTeamRepository } doReturn mockedLeaveTeamRepository
-                    on { }
                 }
                 return block(mockedTransaction)
             }
