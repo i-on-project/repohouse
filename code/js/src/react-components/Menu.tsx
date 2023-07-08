@@ -147,7 +147,7 @@ export function ShowMenuFetch({
                                     variant="subtitle1"
                                     sx={typographyStyle}
                                 >
-                                    {content.properties.name}
+                                    Download Mobile App
                                 </Typography>
                                 <IconButton>
                                     <InstallMobileIcon onClick={() => window.open("https://storage.googleapis.com/cn_europe/classcode.apk")}/>
