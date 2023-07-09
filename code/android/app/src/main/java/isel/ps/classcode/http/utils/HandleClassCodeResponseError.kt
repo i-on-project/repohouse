@@ -7,6 +7,7 @@ import isel.ps.classcode.domain.ProblemJson
  */
 sealed class HandleClassCodeResponseError {
     class FailDeserialize(val error: String) : HandleClassCodeResponseError()
+    class Unauthorized(val error: String) : HandleClassCodeResponseError()
     class FailRequest(val error: ProblemJson) : HandleClassCodeResponseError()
     class FailToGetTheHeader(val error: String) : HandleClassCodeResponseError()
     class LinkNotFound(val error: String = "Fail to get the link fo the navigation") : HandleClassCodeResponseError()

@@ -43,6 +43,15 @@ class RealLoginServices(private val httpClient: OkHttpClient, private val object
             .post(objectMapper.writeValueAsString(requestBody).toRequestBody(MEDIA_TYPE))
             .build()
         val result = request.send(httpClient) { response ->
+            if (response.code == 401) {
+                return@send Storage(
+                    body = Either.Left(
+                        value = HandleClassCodeResponseError.Unauthorized(
+                            error = "You are not authorized to use this app.",
+                        ),
+                    ),
+                )
+            }
             val body = handleSirenResponseClassCode<ClassCodeAuthDto>(response = response, type = ClassCodeAuthDtoType, jsonMapper = objectMapper)
             return@send if (response.isSuccessful) {
                 val headerName = "Set-Cookie"

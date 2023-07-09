@@ -5,6 +5,9 @@ import isel.ps.classcode.domain.TeamRequests
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
 import isel.ps.classcode.presentation.utils.Either
 
+/**
+ * Represents the services that can be used on the team
+ */
 class FakeTeamServices : TeamServices {
     override suspend fun getTeamRequests(
         courseId: Int,

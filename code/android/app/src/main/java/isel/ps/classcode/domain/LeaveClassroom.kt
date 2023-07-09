@@ -2,7 +2,10 @@ package isel.ps.classcode.domain
 
 import isel.ps.classcode.domain.deserialization.ClassCodeLeaveClassroomDeserialization
 
-data class LeaveClassroom (
+/**
+ * Represents a ClassCode Leave Classroom
+ */
+data class LeaveClassroom(
     val requestId: Int,
     val creator: Int,
     val state: String = "Pending",

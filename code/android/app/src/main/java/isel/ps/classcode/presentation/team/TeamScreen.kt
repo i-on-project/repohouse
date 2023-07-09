@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PendingActions
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -69,9 +70,12 @@ fun TeamScreen(
     errorClassCode: HandleClassCodeResponseError? = null,
     errorGitHub: HandleGitHubResponseError? = null,
     onDismissRequest: () -> Unit = {},
+    onReloadRequest: () -> Unit = { },
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var seeRequestHistory by remember { mutableStateOf(false) }
+    var enabled by remember { mutableStateOf(true) }
+
     Scaffold(
         topBar = {
             TopBar(
@@ -113,10 +117,21 @@ fun TeamScreen(
                         Icon(imageVector = Icons.Default.History, contentDescription = stringResource(R.string.history_icon))
                     }
                 }
-                if (seeRequestHistory) {
-                    ShowRequestsHistory(requests = requests.requestsHistory)
-                } else {
-                    ShowNeedApprovalRequests(requests = requests.needApproval, onJoinTeamAccepted = onJoinTeamAccepted, onJoinTeamRejected = onJoinTeamRejected, onLeaveTeamAccepted = onLeaveTeamAccepted, onLeaveTeamRejected = onLeaveTeamRejected)
+                Column(modifier = Modifier.fillMaxSize()) {
+                    if (seeRequestHistory) {
+                        ShowRequestsHistory(modifier = Modifier.weight(0.85f), requests = requests.requestsHistory)
+                    } else {
+                        ShowNeedApprovalRequests(modifier = Modifier.weight(0.85f), requests = requests.needApproval, onJoinTeamAccepted = onJoinTeamAccepted, onJoinTeamRejected = onJoinTeamRejected, onLeaveTeamAccepted = onLeaveTeamAccepted, onLeaveTeamRejected = onLeaveTeamRejected)
+                    }
+                    Box(modifier = Modifier.fillMaxSize().weight(0.15f)) {
+                        IconButton(onClick = {
+                            enabled = false
+                            onReloadRequest()
+                            enabled = true
+                        }, enabled = enabled, modifier = Modifier.align(Alignment.Center)) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+                        }
+                    }
                 }
             } else {
                 LoadingAnimationCircle()
@@ -126,8 +141,9 @@ fun TeamScreen(
 }
 
 @Composable
-fun ShowRequestsHistory(requests: RequestsHistory) {
+fun ShowRequestsHistory(modifier: Modifier = Modifier, requests: RequestsHistory) {
     LazyColumn(
+        modifier = modifier,
         contentPadding = PaddingValues(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -156,8 +172,9 @@ fun ShowRequestsHistory(requests: RequestsHistory) {
 }
 
 @Composable
-fun ShowNeedApprovalRequests(requests: RequestsThatNeedApproval, onJoinTeamAccepted: (JoinTeam) -> Unit, onJoinTeamRejected: (JoinTeam) -> Unit, onLeaveTeamAccepted: (LeaveTeamWithRepoName) -> Unit, onLeaveTeamRejected: (LeaveTeam) -> Unit) {
+fun ShowNeedApprovalRequests(modifier: Modifier = Modifier, requests: RequestsThatNeedApproval, onJoinTeamAccepted: (JoinTeam) -> Unit, onJoinTeamRejected: (JoinTeam) -> Unit, onLeaveTeamAccepted: (LeaveTeamWithRepoName) -> Unit, onLeaveTeamRejected: (LeaveTeam) -> Unit) {
     LazyColumn(
+        modifier = modifier,
         contentPadding = PaddingValues(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),

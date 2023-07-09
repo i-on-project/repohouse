@@ -57,6 +57,7 @@ class TeamActivity : ComponentActivity() {
                     errorGitHub = vm.errorGitHub,
                     onDismissRequest = { finish() },
                     onBackRequest = { finish() },
+                    onReloadRequest = { vm.getTeamRequests() },
                 )
             }
         }

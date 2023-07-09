@@ -57,7 +57,8 @@ class MenuActivity : ComponentActivity() {
                     },
                     errorGitHub = vm.errorGitHub,
                     errorClassCode = vm.errorClassCode,
-                    onDismissRequest = { finish() }
+                    onDismissRequest = { finish() },
+                    onReloadRequest = { vm.getCourses() },
                 )
             }
         }

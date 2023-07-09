@@ -2,6 +2,10 @@ package isel.ps.classcode.domain
 
 import isel.ps.classcode.domain.deserialization.ClassCodeLeaveClassroomRequestDeserialization
 
+/**
+ * Represents a ClassCode Leave Classroom Request
+ */
+
 data class LeaveClassroomRequest(
     val leaveClassroom: LeaveClassroom,
     val leaveTeamRequests: List<LeaveTeamWithRepoName>,

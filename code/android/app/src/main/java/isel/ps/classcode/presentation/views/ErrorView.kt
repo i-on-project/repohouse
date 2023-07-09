@@ -101,6 +101,21 @@ fun ClassCodeErrorView(
                     text = { Text(text = error) },
                 )
             }
+
+            is HandleClassCodeResponseError.Unauthorized -> {
+                val error = handleClassCodeResponseError.error
+                AlertDialog(
+                    onDismissRequest = onDismissRequest,
+                    confirmButton = {
+                        IconButton(onClick = onDismissRequest) {
+                            Icon(imageVector = Icons.Default.Done, contentDescription = stringResource(id = R.string.checked_icon))
+                        }
+                    },
+                    icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = stringResource(id = R.string.warning_icon)) },
+                    title = { Text(text = "Unauthorized") },
+                    text = { Text(text = error) },
+                )
+            }
         }
     }
 }

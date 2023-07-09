@@ -63,7 +63,7 @@ class CourseViewModel(private val courseServices: CourseServices, private val gi
 
     private fun leaveCourseInGitHub(leaveCourse: LeaveCourse, leaveClassroomRequests: List<LeaveClassroomRequest>, activity: Activity) {
         viewModelScope.launch {
-            when (val result = gitHubService.leaveCourseInGitHub(orgName = course.name, username = leaveCourse.githubUsername)) {
+            when (gitHubService.leaveCourseInGitHub(orgName = course.name, username = leaveCourse.githubUsername)) {
                 is Either.Right -> {
                     val leaveClassrooms = leaveClassroomRequests.map { leaveClassroom ->
                         val list = leaveClassroom.leaveTeamRequests.map { leaveTeamWithRepoName ->
@@ -104,7 +104,23 @@ class CourseViewModel(private val courseServices: CourseServices, private val gi
                     }
                 }
                 is Either.Left -> {
-                    _errorGithub = result.value
+                    val leaveClassrooms = leaveClassroomRequests.map { leaveClassroom ->
+                        UpdateLeaveClassroomCompositeInput(composite = UpdateCompositeState(requestId = leaveCourse.composite), leaveClassroom = UpdateLeaveClassroom(requestId = leaveClassroom.leaveClassroom.requestId, classroomId = leaveClassroom.leaveClassroom.classroomId), leaveTeams = emptyList())
+                    }
+                    when (val res = courseServices.updateLeaveCourseCompositeInClassCode(input = UpdateLeaveCourseCompositeInput(composite = UpdateCompositeState(requestId = leaveCourse.composite), leaveCourse = UpdateLeaveCourse(requestId = leaveCourse.requestId, courseId = leaveCourse.courseId), leaveClassrooms = leaveClassrooms), userId = leaveCourse.creator)) {
+                        is Either.Right -> {
+                            Toast
+                                .makeText(
+                                    activity,
+                                    "The user with id ${leaveCourse.creator} has left the course successfully",
+                                    Toast.LENGTH_LONG,
+                                )
+                                .show()
+                        }
+                        is Either.Left -> {
+                            _errorClassCode = res.value
+                        }
+                    }
                 }
             }
         }

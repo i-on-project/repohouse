@@ -17,8 +17,8 @@ enum class TypeOfData(val alias: String) {
 /**
  * The class that will be used to encrypt and decrypt the token. Uses a androidKeyStore.
  * The key is generated if it doesn't exist, and if it exists it is used to encrypt and decrypt the token.
- * The algorithm used was AED, the block mode was CBC and the padding was PKCS7.
- * Importanto to notice, the key to be use need a user authentication.
+ * The algorithm used was AES, the block mode was CBC and the padding was PKCS7.
+ * Important to notice, the key to be use need a user authentication.
  */
 
 class CryptoManager {

@@ -23,6 +23,7 @@
     <string name="logout_icon">Logout icon</string>
     <string name="logout">Logout</string>
     <string name="create_team_composite_empty_text">No teams need approval</string>
+    <string name="no_classrooms_created_empty_text">No classrooms were created</string>
     <string name="teams_empty_text">No teams were created so far</string>
     <string name="no_teams_text">No teams were created</string>
     <string name="dropdown_menu_item_normal">Normal</string>

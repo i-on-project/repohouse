@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,15 +15,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,9 +65,11 @@ fun MenuScreen(
     errorClassCode: HandleClassCodeResponseError? = null,
     errorGitHub: HandleGitHubResponseError? = null,
     onDismissRequest: () -> Unit = { },
+    onReloadRequest: () -> Unit = { },
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
+    var enabled by remember { mutableStateOf(true) }
     Scaffold(
         topBar = {
             TopBar(
@@ -73,7 +84,7 @@ fun MenuScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) {
         Column(
-            verticalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
@@ -98,7 +109,18 @@ fun MenuScreen(
             }
             Spacer(modifier = Modifier.size(16.dp))
             if (courses != null) {
-                ShowListOfCourses(list = courses, onCourseSelected = onCourseSelected)
+                Column(modifier = Modifier.fillMaxSize()) {
+                    ShowListOfCourses(modifier = Modifier.weight(0.85f), list = courses, onCourseSelected = onCourseSelected)
+                    Box(modifier = Modifier.fillMaxSize().weight(0.15f)) {
+                        IconButton(onClick = {
+                            enabled = false
+                            onReloadRequest()
+                            enabled = true
+                        }, enabled = enabled, modifier = Modifier.align(Alignment.Center)) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+                        }
+                    }
+                }
             } else {
                 LoadingAnimationCircle()
             }
@@ -129,7 +151,7 @@ fun ShowListOfCourses(modifier: Modifier = Modifier, list: List<Course>, onCours
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         items(list.size) { index ->
             CourseCard(index = index, course = list[index], onCourseSelected = onCourseSelected)

@@ -2,7 +2,10 @@ package isel.ps.classcode.domain
 
 import isel.ps.classcode.domain.deserialization.ClassCodeJoinTeamDeserialization
 
-data class JoinTeam (
+/**
+ * Represents a ClassCode Join Team
+ */
+data class JoinTeam(
     val requestId: Int,
     val creator: Int,
     val state: String,

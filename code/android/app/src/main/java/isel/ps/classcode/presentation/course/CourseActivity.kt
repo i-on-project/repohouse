@@ -58,6 +58,7 @@ class CourseActivity : ComponentActivity() {
                     errorClassCode = vm.errorClassCode,
                     errorGitHub = vm.errorGithub,
                     onDismissRequest = { finish() },
+                    onReloadRequest = { vm.getClassrooms(activity = this) },
                 )
             }
         }

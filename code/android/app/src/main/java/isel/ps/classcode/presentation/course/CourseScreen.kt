@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -68,8 +69,10 @@ fun CourseScreen(
     errorClassCode: HandleClassCodeResponseError? = null,
     errorGitHub: HandleGitHubResponseError? = null,
     onDismissRequest: () -> Unit = {},
+    onReloadRequest: () -> Unit = { },
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    var enabled by remember { mutableStateOf(true) }
     Scaffold(
         topBar = {
             TopBar(
@@ -99,7 +102,22 @@ fun CourseScreen(
             ShowCourseInfo(course = course)
             Spacer(modifier = Modifier.size(8.dp))
             if (classrooms != null) {
-                ShowListOfClassrooms(classrooms = classrooms, onClassroomSelected = onClassroomSelected)
+                Column(modifier = Modifier.fillMaxSize()) {
+                    ShowListOfClassrooms(
+                        modifier = Modifier.weight(0.85f),
+                        classrooms = classrooms,
+                        onClassroomSelected = onClassroomSelected
+                    )
+                    Box(modifier = Modifier.fillMaxSize().weight(0.15f)) {
+                        IconButton(onClick = {
+                            enabled = false
+                            onReloadRequest()
+                            enabled = true
+                        }, enabled = enabled, modifier = Modifier.align(Alignment.Center)) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+                        }
+                    }
+                }
             } else {
                 LoadingAnimationCircle()
             }
@@ -137,13 +155,25 @@ fun ShowListOfClassrooms(modifier: Modifier = Modifier, classrooms: List<Classro
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            val list = when (type) {
-                ListFilter.ARCHIVED -> classrooms.filter { it.isArchived }
-                ListFilter.UNARCHIVED -> classrooms.filter { !it.isArchived }
-                else -> classrooms
-            }
-            items(list.size) { index ->
-                ClassroomCard(classroom = list[index], onClassroomSelected = onClassroomSelected)
+            if (classrooms.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(id = R.string.no_classrooms_created_empty_text),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            } else {
+                val list = when (type) {
+                    ListFilter.ARCHIVED -> classrooms.filter { it.isArchived }
+                    ListFilter.UNARCHIVED -> classrooms.filter { !it.isArchived }
+                    else -> classrooms
+                }
+                items(list.size) { index ->
+                    ClassroomCard(
+                        classroom = list[index],
+                        onClassroomSelected = onClassroomSelected,
+                    )
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        archivesBaseName = "classcode"
 
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -27,6 +28,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix "-release"
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

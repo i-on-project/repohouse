@@ -3,6 +3,9 @@ package isel.ps.classcode.domain.deserialization
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/**
+ * Class used to deserialize the GitHubCreateTeam response from the GitHub API
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class GitHubCreateTeamDeserialization(
     @JsonProperty("id") val id: Int,

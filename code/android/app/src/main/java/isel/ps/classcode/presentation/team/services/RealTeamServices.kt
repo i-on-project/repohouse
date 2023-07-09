@@ -4,8 +4,6 @@ import com.damnhandy.uri.template.UriTemplate
 import com.fasterxml.jackson.databind.ObjectMapper
 import isel.ps.classcode.CLASSCODE_LINK_BUILDER
 import isel.ps.classcode.MEDIA_TYPE
-import isel.ps.classcode.presentation.REQUESTS_NOT_ACCEPTED_KEY
-import isel.ps.classcode.presentation.TEAM_KEY
 import isel.ps.classcode.dataAccess.sessionStore.SessionStore
 import isel.ps.classcode.domain.LeaveRequestStateInput
 import isel.ps.classcode.domain.TeamRequests
@@ -16,6 +14,8 @@ import isel.ps.classcode.http.NavigationRepository
 import isel.ps.classcode.http.handleSirenResponseClassCode
 import isel.ps.classcode.http.send
 import isel.ps.classcode.http.utils.HandleClassCodeResponseError
+import isel.ps.classcode.presentation.REQUESTS_NOT_ACCEPTED_KEY
+import isel.ps.classcode.presentation.TEAM_KEY
 import isel.ps.classcode.presentation.bootUp.services.BootUpServices
 import isel.ps.classcode.presentation.utils.Either
 import kotlinx.coroutines.flow.first
@@ -23,6 +23,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
+/**
+ * Implementation of the [TeamServices] interface that will be used for the real app
+ */
 class RealTeamServices(private val httpClient: OkHttpClient, private val objectMapper: ObjectMapper, private val sessionStore: SessionStore, private val navigationRepo: NavigationRepository, private val bootUpServices: BootUpServices) : TeamServices {
 
     override suspend fun getTeamRequests(courseId: Int, classroomId: Int, assignmentId: Int, teamId: Int): Either<HandleClassCodeResponseError, TeamRequests> {

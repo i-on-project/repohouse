@@ -65,6 +65,7 @@ class ClassroomActivity : ComponentActivity() {
                             vm.createTeamCompositeRejected(team = createTeamComposite, assignmentId = assignment.id)
                         }
                     },
+                    onReloadRequest = { vm.getAssignments(activity = this) },
                 )
             }
         }

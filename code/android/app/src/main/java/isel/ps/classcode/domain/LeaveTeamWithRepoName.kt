@@ -8,7 +8,7 @@ import isel.ps.classcode.domain.deserialization.ClassCodeLeaveTeamWithRepoNameDe
 
 data class LeaveTeamWithRepoName(
     val leaveTeam: LeaveTeam,
-    val repoName: String
+    val repoName: String,
 ) {
     constructor(deserialization: ClassCodeLeaveTeamWithRepoNameDeserialization) : this (
         leaveTeam = LeaveTeam(deserialization = deserialization.leaveTeam),

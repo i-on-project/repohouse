@@ -3,6 +3,9 @@ package isel.ps.classcode.http
 import isel.ps.classcode.http.hypermedia.SirenAction
 import isel.ps.classcode.http.hypermedia.SirenLink
 
+/**
+ * Class that represents the navigation repository.
+ */
 class NavigationRepository {
     private val linkStorage = mutableMapOf<String, SirenLink?>()
     private val actionsStorage = mutableMapOf<String, SirenAction?>()

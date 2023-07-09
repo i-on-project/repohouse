@@ -85,9 +85,12 @@ fun ClassroomScreen(
     errorClassCode: HandleClassCodeResponseError? = null,
     errorGitHub: HandleGitHubResponseError? = null,
     onDismissRequest: () -> Unit = {},
+    onReloadRequest: () -> Unit = { },
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var typeOfTeam by remember { mutableStateOf(TypeOfTeam.TEAMS_CREATED) }
+    var enabled by remember { mutableStateOf(true) }
+
     Scaffold(
         topBar = {
             TopBar(
@@ -130,20 +133,33 @@ fun ClassroomScreen(
                         assignments = assignments,
                         onAssignmentChange = onAssignmentChange,
                     )
-                    if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
-                        if (teamsCreated != null) {
-                            ShowTeams(
-                                teamsCreated = teamsCreated,
-                                onTeamSelected = onTeamSelected,
-                            )
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (typeOfTeam == TypeOfTeam.TEAMS_CREATED) {
+                            if (teamsCreated != null) {
+                                ShowTeams(
+                                    modifier = Modifier.weight(0.85f),
+                                    teamsCreated = teamsCreated,
+                                    onTeamSelected = onTeamSelected,
+                                )
+                            }
+                        } else {
+                            if (createTeamComposite != null) {
+                                ShowCreateTeamComposite(
+                                    modifier = Modifier.weight(0.85f),
+                                    createTeamComposite = createTeamComposite,
+                                    assignment = assignment,
+                                    onCreateTeamComposite = onCreateTeamComposite,
+                                )
+                            }
                         }
-                    } else {
-                        if (createTeamComposite != null) {
-                            ShowCreateTeamComposite(
-                                createTeamComposite = createTeamComposite,
-                                assignment = assignment,
-                                onCreateTeamComposite = onCreateTeamComposite,
-                            )
+                        Box(modifier = Modifier.fillMaxSize().weight(0.15f)) {
+                            IconButton(onClick = {
+                                enabled = false
+                                onReloadRequest()
+                                enabled = true
+                            }, enabled = enabled, modifier = Modifier.align(Alignment.Center)) {
+                                Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
+                            }
                         }
                     }
                 }
@@ -156,11 +172,13 @@ fun ClassroomScreen(
 
 @Composable
 private fun ShowCreateTeamComposite(
+    modifier: Modifier = Modifier,
     createTeamComposite: List<CreateTeamComposite>,
     assignment: Assignment,
     onCreateTeamComposite: (CreateTeamComposite, Boolean, Assignment) -> Unit,
 ) {
     LazyColumn(
+        modifier = modifier,
         contentPadding = PaddingValues(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -328,8 +346,9 @@ fun Aaaa() {
 }
 
 @Composable
-fun ShowTeams(teamsCreated: List<Team>, onTeamSelected: (Team) -> Unit) {
+fun ShowTeams(modifier: Modifier = Modifier, teamsCreated: List<Team>, onTeamSelected: (Team) -> Unit) {
     LazyColumn(
+        modifier = modifier,
         contentPadding = PaddingValues(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),

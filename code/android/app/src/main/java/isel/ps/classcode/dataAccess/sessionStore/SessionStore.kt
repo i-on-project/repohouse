@@ -11,9 +11,7 @@ interface SessionStore {
     suspend fun storeSecret(secret: String)
     fun getGithubToken(): Flow<String>
     fun getSessionCookie(): Flow<String>
-
     fun getSecret(): Flow<String>
-
     suspend fun cleanSecret()
     suspend fun cleanTokens()
     suspend fun checkIfTokensExists(): Boolean

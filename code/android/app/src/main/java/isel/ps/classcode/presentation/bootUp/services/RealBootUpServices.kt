@@ -26,6 +26,9 @@ import isel.ps.classcode.presentation.utils.Either
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
+/**
+ * Implementation of the [BootUpServices] interface that will be used for the real app
+ */
 class RealBootUpServices(private val httpClient: OkHttpClient, private val objectMapper: ObjectMapper, private val navigationRepo: NavigationRepository) : BootUpServices {
     override suspend fun getHome(): Either<HandleClassCodeResponseError, Unit> {
         val request = Request.Builder()
