@@ -98,4 +98,4 @@ To run the Android application, run the following command:
 
 ### Test
 
-[ ] TODO: Add tests implementation
+We didn't have time to implement the tests due to a lack of time. However, the groundwork for them has been implemented using TODO().
